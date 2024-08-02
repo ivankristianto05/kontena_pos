@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pos_kontena/Screen/components/appbar_section.dart';
+import 'package:pos_kontena/Screen/components/buttonfilter_section.dart';
+import 'package:pos_kontena/Screen/components/cardmenu_section.dart';
+import 'package:pos_kontena/Screen/components/searchbar_section.dart';
 import 'package:pos_kontena/constants.dart';
 
 class OrderPage extends StatefulWidget {
@@ -11,146 +15,71 @@ class OrderPage extends StatefulWidget {
 class _OrderPageState extends State<OrderPage> {
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    bool isWideScreen = screenWidth > 800;
+
+    // Define widths based on the screen width
+    double buttonWidth = screenWidth * 0.15; // 15% of the screen width
+    double smallButtonWidth = screenWidth * 0.05; // 5% of the screen width
+    double bottomBarWidth = screenWidth * 0.65; // 65% of the screen width
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: buttoncolor, // Set the background color
-        titleSpacing: 0, // Ensure the title starts at the edge
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      appBar: BuildAppbar(
+        smallButtonWidth: smallButtonWidth,
+        buttonWidth: buttonWidth,
+        isWideScreen: isWideScreen,
+      ),
+      body: Container(
+        color: itembackgroundcolor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: MaterialButton(
-                    minWidth: 60,
-                    height: 65,
-                    child: Icon(Icons.refresh, color: Colors.white),
-                    onPressed: () {
-                      // Define the action for the refresh button
-                    },
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: MaterialButton(
-                    minWidth: 230,
-                    height: 65,
-                    onPressed: () {
-                      // Define the action for the Order button
-                    },
-                    child: Text(
-                      'Order',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: MaterialButton(
-                    minWidth: 230,
-                    height: 65,
-                    onPressed: () {
-                      // Define the action for the Invoice button
-                    },
-                    child: Text(
-                      'Invoice',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: MaterialButton(
-                    minWidth: 230,
-                    height: 65,
-                    onPressed: () {
-                      // Define the action for the History button
-                    },
-                    child: Text(
-                      'History',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
+            // Integrate Searchbar component
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Searchbar(screenWidth: screenWidth),
             ),
-            Row(
-              children: [
-                Container(
-                  height: 65,
-                  alignment: Alignment.center, // Align text in the center vertically
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Shokudo Restaurant',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                DropdownButton<String>(
-                  dropdownColor: Colors.purple,
-                  value: 'Agi Mahardika',
-                  icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-                  underline: SizedBox(), // Removes the underline
-                  items: <String>['Agi Mahardika', 'Profile', 'Logout']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    // Define the action when selecting an item
-                  },
-                ),
-              ],
-            ),
+            // Buttons
+            ButtonFilter(),
+            // Menu cards
+            cardmenu(), // Adjust this if necessary
           ],
         ),
       ),
-      body: Center(
-        child: Text('Order Page Content'),
+      bottomNavigationBar: Container(
+  width: MediaQuery.of(context).size.width * 0.65,
+  color: Colors.blue,
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: <Widget>[
+      IconButton(
+        icon: Icon(Icons.home, color: Colors.white),
+        onPressed: () {
+          // Handle home button press
+        },
       ),
+      IconButton(
+        icon: Icon(Icons.search, color: Colors.white),
+        onPressed: () {
+          // Handle search button press
+        },
+      ),
+      IconButton(
+        icon: Icon(Icons.notifications, color: Colors.white),
+        onPressed: () {
+          // Handle notifications button press
+        },
+      ),
+      IconButton(
+        icon: Icon(Icons.account_circle, color: Colors.white),
+        onPressed: () {
+          // Handle profile button press
+        },
+      ),
+    ],
+  ),
+),
+
     );
   }
 }
