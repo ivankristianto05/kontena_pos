@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:pos_kontena/Screen/components/appbar_section.dart';
 import 'package:pos_kontena/Screen/components/buttonfilter_section.dart';
 import 'package:pos_kontena/Screen/components/cardmenu_section.dart';
+import 'package:pos_kontena/Screen/components/footer_section.dart';
 import 'package:pos_kontena/Screen/components/searchbar_section.dart';
 import 'package:pos_kontena/constants.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:pos_kontena/data/menu.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
@@ -13,6 +16,8 @@ class OrderPage extends StatefulWidget {
 }
 
 class _OrderPageState extends State<OrderPage> {
+  String? selectedValue;
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -21,7 +26,6 @@ class _OrderPageState extends State<OrderPage> {
     // Define widths based on the screen width
     double buttonWidth = screenWidth * 0.15; // 15% of the screen width
     double smallButtonWidth = screenWidth * 0.05; // 5% of the screen width
-    double bottomBarWidth = screenWidth * 0.65; // 65% of the screen width
 
     return Scaffold(
       appBar: BuildAppbar(
@@ -35,51 +39,98 @@ class _OrderPageState extends State<OrderPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Integrate Searchbar component
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Searchbar(screenWidth: screenWidth),
+            Row(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        color: Colors.white,
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                  width: screenWidth * 0.65,
+                  child: Searchbar(screenWidth: screenWidth),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'Input Guest Name',
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            color: Colors.white,
+                            width: smallButtonWidth,
+                            child: MaterialButton(
+                              height: 55,
+                              minWidth: 0,
+                              onPressed: () {
+                                // Handle the action for the search button
+                              },
+                              child: Icon(Icons.search_outlined, color: Colors.black),
+                            ),
+                          ),
+                          Container(
+                            color: Colors.white,
+                            width: smallButtonWidth,
+                            child: MaterialButton(
+                              height: 55,
+                              minWidth: 0,
+                              onPressed: () {
+                                // Handle the action for the person button
+                              },
+                              child: Icon(Icons.person, color: Colors.black),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                            width: screenWidth * 0.30,
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              hint: Text("Select an Option"),
+                              value: selectedValue,
+                              items: <String>['Option 1', 'Option 2', 'Option 3', 'Option 4']
+                                  .map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedValue = newValue;
+                                });
+                              },
+                            ),
+                          ),
+                      
+                    ],
+                  ),
+                ),
+              ],
             ),
             // Buttons
             ButtonFilter(),
-            // Menu cards
-            cardmenu(), // Adjust this if necessary
+            // Expanded widget for CardMenu to fill remaining space
+            CardMenu(),
+            // Footer
+            Footer(screenWidth: screenWidth),
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-  width: MediaQuery.of(context).size.width * 0.65,
-  color: Colors.blue,
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceAround,
-    children: <Widget>[
-      IconButton(
-        icon: Icon(Icons.home, color: Colors.white),
-        onPressed: () {
-          // Handle home button press
-        },
-      ),
-      IconButton(
-        icon: Icon(Icons.search, color: Colors.white),
-        onPressed: () {
-          // Handle search button press
-        },
-      ),
-      IconButton(
-        icon: Icon(Icons.notifications, color: Colors.white),
-        onPressed: () {
-          // Handle notifications button press
-        },
-      ),
-      IconButton(
-        icon: Icon(Icons.account_circle, color: Colors.white),
-        onPressed: () {
-          // Handle profile button press
-        },
-      ),
-    ],
-  ),
-),
-
     );
   }
 }

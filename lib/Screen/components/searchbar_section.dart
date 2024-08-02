@@ -12,7 +12,15 @@ class Searchbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: screenWidth * 0.65,
-      color: Colors.white,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          right: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+        ),
+      ),
       child: TextField(
         decoration: InputDecoration(
           hintText: 'Search Menu',

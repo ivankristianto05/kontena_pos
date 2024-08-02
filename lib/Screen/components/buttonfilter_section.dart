@@ -14,32 +14,32 @@ class ButtonFilter extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            height: 40,
+            height: 50,
             width: 130,
             child: MaterialButton(
               onPressed: () {},
               color: buttoncolor,
               textColor: Colors.white,
-              height: 40,
+              height: 50,
               child: Text('All',style: TextStyle(fontSize: 16,fontWeight:FontWeight.w700),),
             ),
           ),
           SizedBox(width: 8),
           Container(
-            height: 40,
+            height: 50,
             width: 130,
             child: MaterialButton(
               onPressed: () {},
               color: buttoncolor,
               textColor: Colors.white,
-              height: 40,
+              height: 50,
               child: Text('Food',style: TextStyle(fontSize: 16,fontWeight:FontWeight.w700),),
             ),
           ),
           SizedBox(width: 8),
           Container(
             width: 130,
-            height: 40,
+            height: 50,
             child: MaterialButton(
               onPressed: () {},
               color: buttoncolor,
@@ -50,7 +50,7 @@ class ButtonFilter extends StatelessWidget {
           ),
           SizedBox(width: 8),
           Container(
-            height: 40,
+            height: 50,
             width: 130,
             child: MaterialButton(
               onPressed: () {},
