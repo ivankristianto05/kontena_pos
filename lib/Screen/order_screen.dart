@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pos_kontena/Screen/components/appbar_section.dart';
 import 'package:pos_kontena/Screen/components/buttonfilter_section.dart';
 import 'package:pos_kontena/Screen/components/cardmenu_section.dart';
+import 'package:pos_kontena/Screen/components/dropdown_delete_section.dart';
 import 'package:pos_kontena/Screen/components/footer_section.dart';
 import 'package:pos_kontena/Screen/components/itemcart_section.dart';
 import 'package:pos_kontena/Screen/components/searchbar_section.dart';
@@ -49,10 +50,26 @@ class _OrderPageState extends State<OrderPage> {
                 ),
                 // Input Guest Name and buttons
                 Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
                   width: screenWidth - searchbarWidth,
                   child: Row(
                     children: [
                       Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey,
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
                         width: inputGuestNameWidth,
                         child: TextField(
                           decoration: InputDecoration(
@@ -64,10 +81,10 @@ class _OrderPageState extends State<OrderPage> {
                         ),
                       ),
                       Container(
-                        color: Colors.white,
                         width: smallButtonWidth,
+                        color: Colors.white,
                         child: MaterialButton(
-                          height: 55,
+                          height: 65,
                           minWidth: 0,
                           onPressed: () {
                             // Handle the action for the search button
@@ -106,58 +123,7 @@ class _OrderPageState extends State<OrderPage> {
                   ),
                 ),
                 // Dropdown and Delete Button
-                Container(
-                  width: screenWidth - searchbarWidth,
-                  height: 50,
-                  alignment: Alignment.topRight,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          color: Colors.white,
-                          height: 50,
-                          child: DropdownButtonHideUnderline(
-                            // Use this to hide the underline
-                            child: DropdownButton<String>(
-                              isExpanded: true,
-                              hint: Text("Select an Option"),
-                              value: selectedValue,
-                              items: <String>[
-                                'Option 1',
-                                'Option 2',
-                                'Option 3',
-                                'Option 4'
-                              ].map((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedValue = newValue;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        color: Colors.white,
-                        width: smallButtonWidth,
-                        height: 50, // Set the height to match the dropdown
-                        child: MaterialButton(
-                          minWidth: 0,
-                          height: 50, // Set the height to match the container
-                          onPressed: () {
-                            // Handle the action for the delete button
-                          },
-                          child: Icon(Icons.delete, color: Colors.red),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                DropdownDeleteSection()
               ],
             ),
             // Row for Menu Cards and Item Cart
