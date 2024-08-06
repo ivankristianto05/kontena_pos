@@ -1,6 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:pos_kontena/data/menu.dart';
+import 'package:kontena_pos/data/menu.dart';
 
 class CardMenu extends StatelessWidget {
   const CardMenu({Key? key}) : super(key: key);
@@ -34,7 +34,8 @@ class CardMenu extends StatelessWidget {
                   child: Container(
                     color: Colors.grey[300],
                     child: Center(
-                      child: Icon(Icons.image, size: 50.0, color: Colors.grey[600]),
+                      child: Icon(Icons.image,
+                          size: 50.0, color: Colors.grey[600]),
                     ),
                   ),
                 ),
@@ -43,10 +44,14 @@ class CardMenu extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(menu['type'].toString(), style: TextStyle(fontSize: 12, color: Colors.black)),
+                      Text(menu['type'].toString(),
+                          style: TextStyle(fontSize: 12, color: Colors.black)),
                       AutoSizeText(
                         menu['nama_menu'].toString(),
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         minFontSize: 10,
@@ -54,7 +59,9 @@ class CardMenu extends StatelessWidget {
                       SizedBox(height: 4.0),
                       Align(
                         alignment: Alignment.bottomRight,
-                        child: Text('Rp ${menu['harga'].toString()}', style: TextStyle(fontSize: 14, color: Colors.black)),
+                        child: Text('Rp ${menu['harga'].toString()}',
+                            style:
+                                TextStyle(fontSize: 14, color: Colors.black)),
                       ),
                     ],
                   ),

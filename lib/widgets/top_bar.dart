@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/constants.dart';
 
-class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
-  const BuildAppbar({
+class TopBar extends StatelessWidget implements PreferredSizeWidget {
+  final double smallButtonWidth;
+  final double buttonWidth;
+  final bool isWideScreen;
+
+  const TopBar({
     super.key,
     required this.smallButtonWidth,
     required this.buttonWidth,
     required this.isWideScreen,
   });
-
-  final double smallButtonWidth;
-  final double buttonWidth;
-  final bool isWideScreen;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               Container(
                 width: smallButtonWidth,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     right: BorderSide(
                       color: Colors.white,
@@ -34,8 +34,8 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 child: MaterialButton(
-                  height: 65,
-                  child: Icon(Icons.refresh, color: Colors.white),
+                  height: 45,
+                  child: const Icon(Icons.refresh, color: Colors.white),
                   onPressed: () {
                     // Define the action for the refresh button
                   },
@@ -43,7 +43,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
               ),
               Container(
                 width: buttonWidth,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     right: BorderSide(
                       color: Colors.white,
@@ -52,7 +52,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 child: MaterialButton(
-                  height: 65,
+                  height: 45,
                   onPressed: () {
                     // Define the action for the Order button
                   },
@@ -60,7 +60,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                     'Order',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 20,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -69,7 +69,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
               if (isWideScreen) ...[
                 Container(
                   width: buttonWidth,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       right: BorderSide(
                         color: Colors.white,
@@ -78,7 +78,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   child: MaterialButton(
-                    height: 65,
+                    height: 45,
                     onPressed: () {
                       // Define the action for the Invoice button
                     },
@@ -86,7 +86,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                       'Invoice',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -94,7 +94,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 Container(
                   width: buttonWidth,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       right: BorderSide(
                         color: Colors.white,
@@ -103,7 +103,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   child: MaterialButton(
-                    height: 65,
+                    height: 45,
                     onPressed: () {
                       // Define the action for the History button
                     },
@@ -111,7 +111,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                       'History',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -125,9 +125,9 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
               if (isWideScreen)
                 Container(
                   width: buttonWidth,
-                  height: 65,
+                  height: 45,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       right: BorderSide(
                         color: Colors.white,
@@ -143,7 +143,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                         'Shokudo Restaurant',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -152,8 +152,8 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               Container(
                 width: smallButtonWidth,
-                height: 65,
-                decoration: BoxDecoration(
+                height: 45,
+                decoration: const BoxDecoration(
                   border: Border(
                     right: BorderSide(
                       color: Colors.white,
@@ -169,14 +169,18 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               Container(
-                height: 65,
+                height: 45,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Text(
-                      'Agil Mahardika',
-                      style: TextStyle(color: Colors.white),
+                      'Administrator',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     SizedBox(width: 8), // Space between text and icon
                     Icon(Icons.person, color: Colors.white),
@@ -191,5 +195,5 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

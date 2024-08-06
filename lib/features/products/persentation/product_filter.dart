@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/constants.dart';
 
-class ButtonFilter extends StatelessWidget {
-  const ButtonFilter({
+class ProductFilter extends StatelessWidget {
+  const ProductFilter({
     super.key,
   });
 
@@ -14,13 +14,13 @@ class ButtonFilter extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            height: 50,
+            height: 45,
             width: 130,
             child: MaterialButton(
               onPressed: () {},
               color: buttoncolor,
               textColor: Colors.white,
-              height: 50,
+              height: 45,
               child: Text(
                 'All',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
@@ -29,13 +29,13 @@ class ButtonFilter extends StatelessWidget {
           ),
           SizedBox(width: 8),
           Container(
-            height: 50,
+            height: 45,
             width: 130,
             child: MaterialButton(
               onPressed: () {},
               color: buttoncolor,
               textColor: Colors.white,
-              height: 50,
+              height: 45,
               child: Text(
                 'Food',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
@@ -45,7 +45,7 @@ class ButtonFilter extends StatelessWidget {
           SizedBox(width: 8),
           Container(
             width: 130,
-            height: 50,
+            height: 45,
             child: MaterialButton(
               onPressed: () {},
               color: buttoncolor,
@@ -59,7 +59,7 @@ class ButtonFilter extends StatelessWidget {
           ),
           SizedBox(width: 8),
           Container(
-            height: 50,
+            height: 45,
             width: 130,
             child: MaterialButton(
               onPressed: () {},

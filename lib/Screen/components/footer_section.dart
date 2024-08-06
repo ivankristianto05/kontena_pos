@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pos_kontena/constants.dart';
+import 'package:kontena_pos/constants.dart';
 
 class Footer extends StatelessWidget {
   const Footer({
@@ -41,7 +41,8 @@ class Footer extends StatelessWidget {
     );
   }
 
-  Widget _buildFooterButton({required String text, required VoidCallback onPressed}) {
+  Widget _buildFooterButton(
+      {required String text, required VoidCallback onPressed}) {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -60,7 +61,8 @@ class Footer extends StatelessWidget {
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20, // Ensure font size matches AppBar
-                fontWeight: FontWeight.bold, // Ensure font weight matches AppBar
+                fontWeight:
+                    FontWeight.bold, // Ensure font weight matches AppBar
               ),
             ),
           ),

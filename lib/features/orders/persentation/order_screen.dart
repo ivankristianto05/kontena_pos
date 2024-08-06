@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/Screen/components/appbar_section.dart';
-import 'package:kontena_pos/Screen/components/buttonfilter_section.dart';
-import 'package:kontena_pos/Screen/components/cardmenu_section.dart';
-import 'package:kontena_pos/Screen/components/dropdown_delete_section.dart';
-import 'package:kontena_pos/Screen/components/footer_section.dart';
-import 'package:kontena_pos/Screen/components/itemcart_section.dart';
-import 'package:kontena_pos/Screen/components/searchbar_section.dart';
-import 'package:kontena_pos/constants.dart';
+import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/features/products/persentation/product_filter.dart';
+import 'package:kontena_pos/widgets/dropdown_delete.dart';
+import 'package:kontena_pos/widgets/no_cart.dart';
+import 'package:kontena_pos/widgets/searchbar.dart';
+import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/data/menu.dart';
+import 'package:kontena_pos/features/products/persentation/product_grid.dart';
+import 'package:kontena_pos/widgets/card_item.dart';
+import 'package:kontena_pos/widgets/top_bar.dart';
 
-class OrderPage extends StatefulWidget {
-  const OrderPage({Key? key}) : super(key: key);
-
-  @override
-  _OrderPageState createState() => _OrderPageState();
-}
-
-class _OrderPageState extends State<OrderPage> {
-  String? selectedValue;
+class OrderScreen extends StatelessWidget {
+  const OrderScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,40 +24,41 @@ class _OrderPageState extends State<OrderPage> {
     double smallButtonWidth = screenWidth * 0.05;
     double buttonWidth = screenWidth * 0.15;
 
+    int crossAxisCount = isWideScreen ? 6 : 2;
     return Scaffold(
-      appBar: BuildAppbar(
+      appBar: TopBar(
         smallButtonWidth: smallButtonWidth,
         buttonWidth: buttonWidth,
         isWideScreen: isWideScreen,
       ),
       body: Container(
-        color: itembackgroundcolor,
+        color: appTheme.gray200,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row for Searchbar and Input Guest Name with Buttons
             Row(
               children: [
                 // Searchbar
-                Container(
+                SizedBox(
                   width: searchbarWidth,
-                  child: Searchbar(screenWidth: screenWidth),
-                ),
-                // Input Guest Name and buttons
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                    ),
+                  child: Searchbar(
+                    screenWidth: screenWidth,
                   ),
+                ),
+                Container(
+                  // decoration: const BoxDecoration(
+                  //   border: Border(
+                  //     bottom: BorderSide(
+                  //       color: Colors.grey,
+                  //       width: 1.0,
+                  //     ),
+                  //   ),
+                  // ),
                   width: screenWidth - searchbarWidth,
                   child: Row(
                     children: [
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             right: BorderSide(
                               color: Colors.grey,
@@ -71,12 +67,13 @@ class _OrderPageState extends State<OrderPage> {
                           ),
                         ),
                         width: inputGuestNameWidth,
-                        child: TextField(
+                        child: const TextField(
                           decoration: InputDecoration(
                             hintText: 'Input Guest Name',
                             filled: true,
                             fillColor: Colors.white,
                             border: InputBorder.none,
+                            isDense: true,
                           ),
                         ),
                       ),
@@ -84,25 +81,30 @@ class _OrderPageState extends State<OrderPage> {
                         width: smallButtonWidth,
                         color: Colors.white,
                         child: MaterialButton(
-                          height: 65,
+                          height: 45,
                           minWidth: 0,
                           onPressed: () {
                             // Handle the action for the search button
                           },
-                          child:
-                              Icon(Icons.search_outlined, color: Colors.black),
+                          child: const Icon(
+                            Icons.search_outlined,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                       Container(
                         color: Colors.white,
                         width: smallButtonWidth,
                         child: MaterialButton(
-                          height: 55,
+                          height: 45,
                           minWidth: 0,
                           onPressed: () {
                             // Handle the action for the person button
                           },
-                          child: Icon(Icons.person, color: Colors.black),
+                          child: const Icon(
+                            Icons.person,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ],
@@ -110,58 +112,39 @@ class _OrderPageState extends State<OrderPage> {
                 ),
               ],
             ),
-            // Row for Button Filter and Dropdown with Delete Button
             Row(
               children: [
                 // Button Filter
-                Container(
+                SizedBox(
                   width: searchbarWidth,
-                  child: Row(
+                  child: const Row(
                     children: [
-                      ButtonFilter(),
+                      ProductFilter(),
                     ],
                   ),
                 ),
                 // Dropdown and Delete Button
-                DropdownDeleteSection()
+                const DropdownDelete()
               ],
             ),
-            // Row for Menu Cards and Item Cart
             Expanded(
               child: Row(
                 children: [
                   // Menu Cards
                   Expanded(
                     flex: 2,
-                    child: CardMenu(),
-                  ),
-                  // Item Cart
-                  ItemCart(screenWidth: screenWidth),
-                ],
-              ),
-            ),
-            // Footer with Order Button
-            Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: screenWidth * 0.65,
-                    child: Footer(screenWidth: screenWidth),
-                  ),
-                  Container(
-                    height: 50,
-                    width: screenWidth * 0.35,
-                    child: MaterialButton(
-                      color: buttoncolor,
-                      textColor: Colors.white,
-                      onPressed: () {
-                        // Handle the action for the order button
-                      },
-                      child: Text("Order"),
+                    child: ProductGrid(
+                      items: ListMenu,
                     ),
                   ),
+                  // Item Cart
+                  // ItemCart(screenWidth: screenWidth),
+                  if (AppState.cartItems.isNotEmpty)
+                    Container()
+                  else
+                    EmptyCart(
+                      screenWidth: screenWidth,
+                    )
                 ],
               ),
             ),
