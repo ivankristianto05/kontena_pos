@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pos_kontena/Screen/components/searchbar_section.dart';
+import 'package:pos_kontena/Screen/popup/itemdialog_section.dart';
+import 'package:pos_kontena/models/cart_item.dart';
 import 'package:pos_kontena/Screen/components/actionbutton_section.dart';
 import 'package:pos_kontena/Screen/components/appbar_section.dart';
 import 'package:pos_kontena/Screen/components/buttonfilter_section.dart';
@@ -6,12 +9,18 @@ import 'package:pos_kontena/Screen/components/cardmenu_section.dart';
 import 'package:pos_kontena/Screen/components/dropdown_delete_section.dart';
 import 'package:pos_kontena/Screen/components/footer_section.dart';
 import 'package:pos_kontena/Screen/components/guestinputwithbutton_section.dart';
-import 'package:pos_kontena/Screen/components/itemcart_section.dart';
-import 'package:pos_kontena/Screen/components/searchbar_section.dart';
+import 'package:pos_kontena/Screen/components/cart_section.dart';
 import 'package:pos_kontena/constants.dart';
 
 class OrderPage extends StatefulWidget {
-  const OrderPage({Key? key}) : super(key: key);
+  final List<CartItem> cartItems;
+  final void Function(CartItem item) addItemToCart;
+
+  const OrderPage({
+    Key? key,
+    required this.cartItems,
+    required this.addItemToCart,
+  }) : super(key: key);
 
   @override
   _OrderPageState createState() => _OrderPageState();
@@ -19,7 +28,6 @@ class OrderPage extends StatefulWidget {
 
 class _OrderPageState extends State<OrderPage> {
   final TextEditingController _guestNameController = TextEditingController();
-  String? selectedValue;
 
   @override
   void initState() {
@@ -36,6 +44,19 @@ class _OrderPageState extends State<OrderPage> {
 
   void _updateState() {
     setState(() {});
+  }
+
+  void _showItemDetailsDialog(String name, String price, String idMenu, String type) {
+    showDialog(
+      context: context,
+      builder: (context) => ItemDetailsDialog(
+        name: name,
+        price: price,
+        idMenu: idMenu,
+        type: type,
+        onAddToCart: widget.addItemToCart,
+      ),
+    );
   }
 
   @override
@@ -60,22 +81,22 @@ class _OrderPageState extends State<OrderPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row for Searchbar and Input Guest Name with Buttons
             Row(
               children: [
-                // Searchbar
                 Container(
                   width: searchbarWidth,
                   child: Searchbar(screenWidth: screenWidth),
                 ),
-                // Input Guest Name and buttons
-                GuestInputWithButton(screenWidth: screenWidth, searchbarWidth: searchbarWidth, guestNameController: _guestNameController, smallButtonWidth: smallButtonWidth),
+                GuestInputWithButton(
+                  screenWidth: screenWidth,
+                  searchbarWidth: searchbarWidth,
+                  guestNameController: _guestNameController,
+                  smallButtonWidth: smallButtonWidth,
+                ),
               ],
             ),
-            // Row for Button Filter and Dropdown with Delete Button
             Row(
               children: [
-                // Button Filter
                 Container(
                   width: searchbarWidth,
                   child: Row(
@@ -84,25 +105,27 @@ class _OrderPageState extends State<OrderPage> {
                     ],
                   ),
                 ),
-                // Dropdown and Delete Button
                 DropdownDeleteSection()
               ],
             ),
-            // Row for Menu Cards and Item Cart
             Expanded(
               child: Row(
                 children: [
-                  // Menu Cards
                   Expanded(
                     flex: 2,
-                    child: CardMenu(),
+                    child: CardMenu(
+                      onMenuTap: (name, price, idMenu, type) {
+                        _showItemDetailsDialog(name, price, idMenu, type);
+                      },
+                    ),
                   ),
-                  // Item Cart
-                  ItemCart(screenWidth: screenWidth),
+                  Cart(
+                      screenWidth: screenWidth,
+                      cartItems: widget.cartItems,
+                    ),
                 ],
               ),
             ),
-            // Footer with Order Button
             Container(
               height: 50,
               child: Row(
@@ -118,8 +141,7 @@ class _OrderPageState extends State<OrderPage> {
             ),
           ],
         ),
-      ),
+      )
     );
   }
 }
-

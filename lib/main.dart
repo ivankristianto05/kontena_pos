@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:pos_kontena/Screen/order_screen.dart';
+import 'package:pos_kontena/models/cart_item.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
 
-  // This widget is the root of your application.
+class _MyAppState extends State<MyApp> {
+  List<CartItem> cartItems = [];
+
+  void addItemToCart(CartItem item) {
+    setState(() {
+      cartItems.add(item);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,8 +28,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: OrderPage(),
+      home: OrderPage(
+        cartItems: cartItems,
+        addItemToCart: addItemToCart,
+      ),
     );
   }
 }
-

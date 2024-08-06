@@ -1,19 +1,11 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:pos_kontena/Screen/components/itemdialog_section.dart';
+import 'package:pos_kontena/Screen/popup/itemdialog_section.dart';
 import 'package:pos_kontena/data/menu.dart';
 
 class CardMenu extends StatelessWidget {
-  const CardMenu({Key? key}) : super(key: key);
+  final void Function(String name, String price, String idMenu, String type) onMenuTap;
 
-  void _showItemDetails(BuildContext context, String name, String price, String idMenu) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ItemDetailsDialog(name: name, price: price, idMenu: idMenu);
-      },
-    );
-  }
+  const CardMenu({Key? key, required this.onMenuTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +28,12 @@ class CardMenu extends StatelessWidget {
           final menu = ListMenu[index];
           return GestureDetector(
             onTap: () {
-              _showItemDetails(context, menu['nama_menu'].toString(), menu['harga'].toString(), menu['id_menu'].toString());
+              onMenuTap(
+                menu['nama_menu'].toString(),
+                menu['harga'].toString(),
+                menu['id_menu'].toString(),
+                menu['type'].toString(),
+              );
             },
             child: Card(
               elevation: 2,
@@ -44,7 +41,7 @@ class CardMenu extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AspectRatio(
-                    aspectRatio: 2.03, // Adjust aspect ratio as needed
+                    aspectRatio: 2.03,
                     child: Container(
                       color: Colors.grey[300],
                       child: Center(
@@ -58,12 +55,10 @@ class CardMenu extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(menu['type'].toString(), style: TextStyle(fontSize: 12, color: Colors.black)),
-                        AutoSizeText(
+                        Text(
                           menu['nama_menu'].toString(),
                           style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
-                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          minFontSize: 10,
                         ),
                         SizedBox(height: 2.0),
                         Align(
