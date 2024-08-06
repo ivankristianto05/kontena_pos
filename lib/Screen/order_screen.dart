@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/Screen/components/appbar_section.dart';
-import 'package:kontena_pos/Screen/components/buttonfilter_section.dart';
-import 'package:kontena_pos/Screen/components/cardmenu_section.dart';
-import 'package:kontena_pos/Screen/components/dropdown_delete_section.dart';
-import 'package:kontena_pos/Screen/components/footer_section.dart';
-import 'package:kontena_pos/Screen/components/itemcart_section.dart';
-import 'package:kontena_pos/Screen/components/searchbar_section.dart';
-import 'package:kontena_pos/constants.dart';
+// <<<<<<< HEAD
+// import 'package:kontena_pos/Screen/components/appbar_section.dart';
+// import 'package:kontena_pos/Screen/components/buttonfilter_section.dart';
+// import 'package:kontena_pos/Screen/components/cardmenu_section.dart';
+// import 'package:kontena_pos/Screen/components/dropdown_delete_section.dart';
+// import 'package:kontena_pos/Screen/components/footer_section.dart';
+// import 'package:kontena_pos/Screen/components/itemcart_section.dart';
+// import 'package:kontena_pos/Screen/components/searchbar_section.dart';
+// import 'package:kontena_pos/constants.dart';
+
+import 'package:pos_kontena/Screen/components/actionbutton_section.dart';
+import 'package:pos_kontena/Screen/components/appbar_section.dart';
+import 'package:pos_kontena/Screen/components/buttonfilter_section.dart';
+import 'package:pos_kontena/Screen/components/cardmenu_section.dart';
+import 'package:pos_kontena/Screen/components/dropdown_delete_section.dart';
+import 'package:pos_kontena/Screen/components/footer_section.dart';
+import 'package:pos_kontena/Screen/components/guestinputwithbutton_section.dart';
+import 'package:pos_kontena/Screen/components/itemcart_section.dart';
+import 'package:pos_kontena/Screen/components/searchbar_section.dart';
+import 'package:pos_kontena/constants.dart';
 
 class OrderPage extends StatefulWidget {
   const OrderPage({Key? key}) : super(key: key);
@@ -16,7 +28,25 @@ class OrderPage extends StatefulWidget {
 }
 
 class _OrderPageState extends State<OrderPage> {
+  final TextEditingController _guestNameController = TextEditingController();
   String? selectedValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _guestNameController.addListener(_updateState);
+  }
+
+  @override
+  void dispose() {
+    _guestNameController.removeListener(_updateState);
+    _guestNameController.dispose();
+    super.dispose();
+  }
+
+  void _updateState() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,65 +79,11 @@ class _OrderPageState extends State<OrderPage> {
                   child: Searchbar(screenWidth: screenWidth),
                 ),
                 // Input Guest Name and buttons
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  width: screenWidth - searchbarWidth,
-                  child: Row(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                        ),
-                        width: inputGuestNameWidth,
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Input Guest Name',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: smallButtonWidth,
-                        color: Colors.white,
-                        child: MaterialButton(
-                          height: 65,
-                          minWidth: 0,
-                          onPressed: () {
-                            // Handle the action for the search button
-                          },
-                          child:
-                              Icon(Icons.search_outlined, color: Colors.black),
-                        ),
-                      ),
-                      Container(
-                        color: Colors.white,
-                        width: smallButtonWidth,
-                        child: MaterialButton(
-                          height: 55,
-                          minWidth: 0,
-                          onPressed: () {
-                            // Handle the action for the person button
-                          },
-                          child: Icon(Icons.person, color: Colors.black),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                GuestInputWithButton(
+                    screenWidth: screenWidth,
+                    searchbarWidth: searchbarWidth,
+                    guestNameController: _guestNameController,
+                    smallButtonWidth: smallButtonWidth),
               ],
             ),
             // Row for Button Filter and Dropdown with Delete Button
@@ -150,18 +126,7 @@ class _OrderPageState extends State<OrderPage> {
                     width: screenWidth * 0.65,
                     child: Footer(screenWidth: screenWidth),
                   ),
-                  Container(
-                    height: 50,
-                    width: screenWidth * 0.35,
-                    child: MaterialButton(
-                      color: buttoncolor,
-                      textColor: Colors.white,
-                      onPressed: () {
-                        // Handle the action for the order button
-                      },
-                      child: Text("Order"),
-                    ),
-                  ),
+                  ActionButton(screenWidth: screenWidth),
                 ],
               ),
             ),

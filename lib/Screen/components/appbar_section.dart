@@ -18,6 +18,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: buttoncolor, // Set the background color
       titleSpacing: 0, // Ensure the title starts at the edge
+      toolbarHeight: 50, // Set the height of the AppBar
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -25,6 +26,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               Container(
                 width: smallButtonWidth,
+                height: 50, // Set height of Container
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
@@ -34,7 +36,8 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 child: MaterialButton(
-                  height: 65,
+                  height: 50, // Set height of MaterialButton
+                  minWidth: 0,
                   child: Icon(Icons.refresh, color: Colors.white),
                   onPressed: () {
                     // Define the action for the refresh button
@@ -43,6 +46,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
               ),
               Container(
                 width: buttonWidth,
+                height: 50, // Set height of Container
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
@@ -52,7 +56,8 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 child: MaterialButton(
-                  height: 65,
+                  height: 50, // Set height of MaterialButton
+                  minWidth: 0,
                   onPressed: () {
                     // Define the action for the Order button
                   },
@@ -69,6 +74,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
               if (isWideScreen) ...[
                 Container(
                   width: buttonWidth,
+                  height: 50, // Set height of Container
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
@@ -78,7 +84,8 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   child: MaterialButton(
-                    height: 65,
+                    height: 50, // Set height of MaterialButton
+                    minWidth: 0,
                     onPressed: () {
                       // Define the action for the Invoice button
                     },
@@ -94,6 +101,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 Container(
                   width: buttonWidth,
+                  height: 50, // Set height of Container
                   decoration: BoxDecoration(
                     border: Border(
                       right: BorderSide(
@@ -103,7 +111,8 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   child: MaterialButton(
-                    height: 65,
+                    height: 50, // Set height of MaterialButton
+                    minWidth: 0,
                     onPressed: () {
                       // Define the action for the History button
                     },
@@ -125,7 +134,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
               if (isWideScreen)
                 Container(
                   width: buttonWidth,
-                  height: 65,
+                  height: 50, // Set height of Container
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     border: Border(
@@ -152,7 +161,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               Container(
                 width: smallButtonWidth,
-                height: 65,
+                height: 50, // Set height of Container
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
@@ -162,6 +171,8 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 child: MaterialButton(
+                  height: 50, // Set height of MaterialButton
+                  minWidth: 0,
                   onPressed: () {
                     // Define the action for the MaterialButton
                   },
@@ -169,7 +180,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               Container(
-                height: 65,
+                height: 50, // Set height of Container
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
@@ -191,5 +202,5 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => Size.fromHeight(40); // Set preferred size of AppBar
 }

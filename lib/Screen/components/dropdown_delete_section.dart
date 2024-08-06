@@ -24,7 +24,19 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
         children: [
           Expanded(
             child: Container(
-              color: Colors.white,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  right: BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                ),
+              ),
+              ),
               height: 50,
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
@@ -52,9 +64,17 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
             ),
           ),
           Container(
-            color: Colors.white,
             width: smallButtonWidth,
             height: 50,
+            decoration: BoxDecoration(
+               color: Colors.white,
+               border: Border(
+                 bottom: BorderSide(
+                   color: Colors.grey,
+                   width: 1.0,
+                 ),
+               ), 
+            ),
             child: MaterialButton(
               minWidth: 0,
               height: 50,
