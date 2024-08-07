@@ -9,6 +9,7 @@ class CartItem {
   final Map<String, bool> addons;
   final String notes;
   final String preference;
+  //final String type;
 
   CartItem({
     required this.idMenu,
@@ -19,5 +20,6 @@ class CartItem {
     required this.addons,
     required this.notes,
     required this.preference,
+    //required this.type,
   });
 }

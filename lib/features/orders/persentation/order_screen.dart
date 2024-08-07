@@ -1,150 +1,153 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/app_state.dart';
-import 'package:kontena_pos/features/products/persentation/product_filter.dart';
-import 'package:kontena_pos/widgets/dropdown_delete.dart';
-import 'package:kontena_pos/widgets/no_cart.dart';
-import 'package:kontena_pos/widgets/searchbar.dart';
-import 'package:kontena_pos/core/theme/theme_helper.dart';
-import 'package:kontena_pos/data/menu.dart';
-import 'package:kontena_pos/features/products/persentation/product_grid.dart';
-import 'package:kontena_pos/widgets/card_item.dart';
-import 'package:kontena_pos/widgets/top_bar.dart';
+import 'package:kontena_pos/Screen/components/actionbutton_section.dart';
+import 'package:kontena_pos/Screen/components/appbar_section.dart';
+import 'package:kontena_pos/Screen/components/buttonfilter_section.dart';
+import 'package:kontena_pos/Screen/components/cardmenu_section.dart';
+import 'package:kontena_pos/Screen/components/dropdown_delete_section.dart';
+import 'package:kontena_pos/Screen/components/footer_section.dart';
+import 'package:kontena_pos/Screen/components/guestinputwithbutton_section.dart';
+import 'package:kontena_pos/Screen/components/itemcart_section.dart';
+import 'package:kontena_pos/Screen/components/searchbar_section.dart';
+import 'package:kontena_pos/Screen/popup/itemdialog_section.dart';
+import 'package:kontena_pos/models/cart_item.dart';
+import 'package:kontena_pos/constants.dart';
 
-class OrderScreen extends StatelessWidget {
-  const OrderScreen({Key? key}) : super(key: key);
+class OrderScreen extends StatefulWidget {
+  final List<CartItem> cartItems;
+  final void Function(CartItem item) addItemToCart;
+
+  const OrderScreen({
+    Key? key,
+    required this.cartItems,
+    required this.addItemToCart,
+  }) : super(key: key);
+
+  @override
+  _OrderScreenState createState() => _OrderScreenState();
+}
+
+class _OrderScreenState extends State<OrderScreen> {
+  final TextEditingController _guestNameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _guestNameController.addListener(_updateState);
+  }
+
+  @override
+  void dispose() {
+    _guestNameController.removeListener(_updateState);
+    _guestNameController.dispose();
+    super.dispose();
+  }
+
+  void _updateState() {
+    setState(() {});
+  }
+
+  void _showItemDetailsDialog(
+      String name, String price, String idMenu, String type) {
+    showDialog(
+      context: context,
+      builder: (context) => ItemDetailsDialog(
+        name: name,
+        price: price,
+        idMenu: idMenu,
+        type: type,
+        onAddToCart: widget.addItemToCart,
+      ),
+    );
+  }
+
+  void _editItemInCart(CartItem editedItem) {
+    final index = widget.cartItems.indexWhere((item) => item.idMenu == editedItem.idMenu);
+    if (index != -1) {
+      setState(() {
+        widget.cartItems[index] = editedItem;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    bool isWideScreen = screenWidth > 800;
-
     double searchbarWidth = screenWidth * 0.65;
-    double inputGuestNameWidth = screenWidth * 0.25;
     double smallButtonWidth = screenWidth * 0.05;
     double buttonWidth = screenWidth * 0.15;
 
-    int crossAxisCount = isWideScreen ? 6 : 2;
     return Scaffold(
-      appBar: TopBar(
+      appBar: BuildAppbar(
         smallButtonWidth: smallButtonWidth,
         buttonWidth: buttonWidth,
-        isWideScreen: isWideScreen,
+        isWideScreen: screenWidth > 800,
       ),
       body: Container(
-        color: appTheme.gray200,
+        color: itembackgroundcolor,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                // Searchbar
-                SizedBox(
-                  width: searchbarWidth,
-                  child: Searchbar(
-                    screenWidth: screenWidth,
-                  ),
-                ),
-                Container(
-                  // decoration: const BoxDecoration(
-                  //   border: Border(
-                  //     bottom: BorderSide(
-                  //       color: Colors.grey,
-                  //       width: 1.0,
-                  //     ),
-                  //   ),
-                  // ),
-                  width: screenWidth - searchbarWidth,
-                  child: Row(
-                    children: [
-                      Container(
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                        ),
-                        width: inputGuestNameWidth,
-                        child: const TextField(
-                          decoration: InputDecoration(
-                            hintText: 'Input Guest Name',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: InputBorder.none,
-                            isDense: true,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: smallButtonWidth,
-                        color: Colors.white,
-                        child: MaterialButton(
-                          height: 45,
-                          minWidth: 0,
-                          onPressed: () {
-                            // Handle the action for the search button
-                          },
-                          child: const Icon(
-                            Icons.search_outlined,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        color: Colors.white,
-                        width: smallButtonWidth,
-                        child: MaterialButton(
-                          height: 45,
-                          minWidth: 0,
-                          onPressed: () {
-                            // Handle the action for the person button
-                          },
-                          child: const Icon(
-                            Icons.person,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                Searchbar(screenWidth: screenWidth),
+                GuestInputWithButton(
+                  searchbarWidth: searchbarWidth,
+                  guestNameController: _guestNameController,
+                  smallButtonWidth: smallButtonWidth,
                 ),
               ],
             ),
             Row(
               children: [
-                // Button Filter
-                SizedBox(
+                Container(
                   width: searchbarWidth,
-                  child: const Row(
+                  child: Row(
                     children: [
-                      ProductFilter(),
+                      ButtonFilter(),
                     ],
                   ),
                 ),
-                // Dropdown and Delete Button
-                const DropdownDelete()
+                DropdownDeleteSection()
               ],
             ),
             Expanded(
               child: Row(
                 children: [
-                  // Menu Cards
                   Expanded(
                     flex: 2,
-                    child: ProductGrid(
-                      items: ListMenu,
+                    child: CardMenu(
+                      onMenuTap: (name, price, idMenu, type) {
+                        _showItemDetailsDialog(name, price, idMenu, type);
+                      },
                     ),
                   ),
-                  // Item Cart
-                  // ItemCart(screenWidth: screenWidth),
-                  if (AppState.cartItems.isNotEmpty)
-                    Container()
-                  else
-                    EmptyCart(
+                  Container(
+                    width: screenWidth * 0.35,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    child: ItemCart(
                       screenWidth: screenWidth,
-                    )
+                      cartItems: widget.cartItems,
+                      onEditItem: _editItemInCart,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: screenWidth * 0.65,
+                    child: Footer(screenWidth: screenWidth),
+                  ),
+                  ActionButton(
+                    screenWidth: screenWidth,
+                    cartItems: widget.cartItems,
+                  ),
                 ],
               ),
             ),

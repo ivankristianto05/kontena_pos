@@ -1,23 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:pos_kontena/constants.dart';
+import 'package:kontena_pos/constants.dart';
 
-class NotesAndPreferenceSection extends StatelessWidget {
+class NotesAndPreferenceSection extends StatefulWidget {
   final String type;
   final int selectedPreferenceIndex;
   final Function(int, String) onPreferenceSelected;
   final Function(String) onNotesChanged;
+  final String initialNotes;
 
   NotesAndPreferenceSection({
     required this.type,
     required this.selectedPreferenceIndex,
     required this.onPreferenceSelected,
     required this.onNotesChanged,
+    this.initialNotes = '', // Set default value if not provided
   });
+
+  @override
+  _NotesAndPreferenceSectionState createState() => _NotesAndPreferenceSectionState();
+}
+
+class _NotesAndPreferenceSectionState extends State<NotesAndPreferenceSection> {
+  late TextEditingController _notesController;
+
+  @override
+  void initState() {
+    super.initState();
+    _notesController = TextEditingController(text: widget.initialNotes);
+    _notesController.addListener(() {
+      widget.onNotesChanged(_notesController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     List<String> preferences = [];
-    if (type == 'food') {
+    if (widget.type == 'food') {
       preferences = [
         'original',
         'hot',
@@ -26,9 +50,9 @@ class NotesAndPreferenceSection extends StatelessWidget {
         'no MSG',
         'no salt'
       ];
-    } else if (type == 'beverage') {
+    } else if (widget.type == 'beverage') {
       preferences = ['less sugar', 'less ice'];
-    } else if (type == 'breakfast') {
+    } else if (widget.type == 'breakfast') {
       preferences = ['small', 'medium', 'jumbo'];
     }
 
@@ -40,9 +64,7 @@ class NotesAndPreferenceSection extends StatelessWidget {
           Text('Notes:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           TextField(
-            onChanged: (value) {
-              onNotesChanged(value);
-            },
+            controller: _notesController,
             decoration: InputDecoration(
               hintText: 'Input Here',
             ),
@@ -55,12 +77,12 @@ class NotesAndPreferenceSection extends StatelessWidget {
               child: Column(
                 children: List.generate(preferences.length, (index) {
                   final preference = preferences[index];
-                  final isSelected = selectedPreferenceIndex == index;
+                  final isSelected = widget.selectedPreferenceIndex == index;
                   return Column(
                     children: [
                       GestureDetector(
                         onTap: () {
-                          onPreferenceSelected(index, preference);
+                          widget.onPreferenceSelected(index, preference);
                         },
                         child: Container(
                           decoration: BoxDecoration(

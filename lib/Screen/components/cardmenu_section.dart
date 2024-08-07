@@ -1,24 +1,8 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/data/menu.dart';
-import 'package:kontena_pos/Screen/components/itemdialog_section.dart';
-import 'package:kontena_pos/data/menu.dart';
-import 'package:kontena_pos/Screen/popup/itemdialog_section.dart';
 import 'package:kontena_pos/data/menu.dart';
 
 class CardMenu extends StatelessWidget {
-  final void Function(String name, String price, String idMenu, String type)
-      onMenuTap;
-
-  void _showItemDetails(
-      BuildContext context, String name, String price, String idMenu) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ItemDetailsDialog(name: name, price: price, idMenu: idMenu);
-      },
-    );
-  }
+  final void Function(String name, String price, String idMenu, String type) onMenuTap;
 
   const CardMenu({Key? key, required this.onMenuTap}) : super(key: key);
 
@@ -43,8 +27,6 @@ class CardMenu extends StatelessWidget {
           final menu = ListMenu[index];
           return GestureDetector(
             onTap: () {
-              _showItemDetails(context, menu['nama_menu'].toString(),
-                  menu['harga'].toString(), menu['id_menu'].toString());
               onMenuTap(
                 menu['nama_menu'].toString(),
                 menu['harga'].toString(),
@@ -53,18 +35,16 @@ class CardMenu extends StatelessWidget {
               );
             },
             child: Card(
-              elevation: 2.0,
+              elevation: 2,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AspectRatio(
-                    aspectRatio: 1.85, // Adjust aspect ratio as needed
-                    // aspectRatio: 2.03,
+                    aspectRatio: 2.03,
                     child: Container(
                       color: Colors.grey[300],
                       child: Center(
-                        child: Icon(Icons.image,
-                            size: 50.0, color: Colors.grey[600]),
+                        child: Icon(Icons.image, size: 50.0, color: Colors.grey[600]),
                       ),
                     ),
                   ),
@@ -73,38 +53,20 @@ class CardMenu extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(menu['type'].toString(),
-                            style:
-                                TextStyle(fontSize: 12, color: Colors.black)),
-                        AutoSizeText(
-                          menu['nama_menu'].toString(),
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                          maxLines: 1,
-                        ),
-                        Text(menu['type'].toString(),
-                            style:
-                                TextStyle(fontSize: 12, color: Colors.black)),
+                        Text(menu['type'].toString(), style: TextStyle(fontSize: 12, color: Colors.black)),
                         Text(
                           menu['nama_menu'].toString(),
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
                           overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 4.0),
+                        SizedBox(height: 2.0),
                         Align(
                           alignment: Alignment.bottomRight,
-                          child: Text('Rp ${menu['harga'].toString()}',
-                              style:
-                                  TextStyle(fontSize: 14, color: Colors.black)),
+                          child: Text('Rp ${menu['harga'].toString()}', style: TextStyle(fontSize: 14, color: Colors.black)),
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

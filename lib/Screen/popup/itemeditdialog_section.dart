@@ -5,27 +5,20 @@ import 'package:kontena_pos/Screen/popup/sumary_section.dart';
 import 'package:kontena_pos/Screen/popup/variant_section.dart';
 import 'package:kontena_pos/models/cart_item.dart';
 
+class ItemEditDialog extends StatefulWidget {
+  final CartItem item;
+  final void Function(CartItem editedItem) onEdit;
 
-class ItemDetailsDialog extends StatefulWidget {
-  final String name;
-  final String price;
-  final String idMenu;
-  final String type;
-  final void Function(CartItem item) onAddToCart;
-
-  ItemDetailsDialog({
-    required this.name,
-    required this.price,
-    required this.idMenu,
-    required this.type,
-    required this.onAddToCart,
+  ItemEditDialog({
+    required this.item,
+    required this.onEdit,
   });
 
   @override
-  _ItemDetailsDialogState createState() => _ItemDetailsDialogState();
+  _ItemEditDialogState createState() => _ItemEditDialogState();
 }
 
-class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
+class _ItemEditDialogState extends State<ItemEditDialog> {
   int _selectedVariantIndex = -1;
   int _selectedPreferenceIndex = -1;
   String _selectedPreference = '';
@@ -34,18 +27,80 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
   String? _selectedVariant;
   int _quantity = 1;
 
-  void _addItemToCart() {
-    final cartItem = CartItem(
-      idMenu: widget.idMenu,
-      name: widget.name,
+  @override
+  void initState() {
+    super.initState();
+    _initializeFields();
+    // Print type when dialog is initialized
+    print('Dialog Initialized with type: ${widget.item.idMenu}');
+  }
+
+  void _initializeFields() {
+    setState(() {
+      _selectedVariant = widget.item.variant;
+      _quantity = widget.item.quantity;
+      _notes = widget.item.notes;
+      _selectedPreference = widget.item.preference;
+      _selectedAddons = widget.item.addons;
+
+      // Debugging
+      print('Initializing fields with type: ${widget.item.idMenu}');
+
+      // Set selected indices based on the existing data
+      _selectedVariantIndex = _getVariantIndex(_selectedVariant);
+      _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
+    });
+  }
+
+  int _getVariantIndex(String? variant) {
+    // Implement logic to get index of the selected variant
+    List<String> variants = _getVariantsBasedOnType();
+    return variants.indexOf(variant ?? '');
+  }
+
+  int _getPreferenceIndex(String preference) {
+    // Implement logic to get index of the selected preference
+    List<String> preferences = _getPreferencesBasedOnType();
+    return preferences.indexOf(preference);
+  }
+
+  List<String> _getVariantsBasedOnType() {
+    if (widget.item.idMenu == 'food') {
+      return ['Variant 1', 'Variant 2', 'Variant 3']; // Replace with actual variants
+    } else if (widget.item.idMenu == 'beverage') {
+      return ['Variant A', 'Variant B', 'Variant C']; // Replace with actual variants
+    } else if (widget.item.idMenu == 'breakfast') {
+      return ['Small', 'Medium', 'Large']; // Replace with actual variants
+    }
+    return [];
+  }
+
+  List<String> _getPreferencesBasedOnType() {
+    if (widget.item.idMenu == 'food') {
+      return ['original', 'hot', 'very hot', 'no sauce', 'no MSG', 'no salt'];
+    } else if (widget.item.idMenu == 'beverage') {
+      return ['less sugar', 'less ice'];
+    } else if (widget.item.idMenu == 'breakfast') {
+      return ['small', 'medium', 'jumbo'];
+    }
+    return [];
+  }
+
+  void _editItem() {
+    final editedItem = CartItem(
+      idMenu: widget.item.idMenu,
+      name: widget.item.name,
       variant: _selectedVariant ?? '',
       quantity: _quantity,
-      price: double.tryParse(widget.price) ?? 0.0,
+      price: widget.item.price,
       addons: _selectedAddons,
       notes: _notes,
       preference: _selectedPreference,
     );
-    widget.onAddToCart(cartItem);
+    // Print type when editing
+    print('Editing Item with type: ${widget.item.idMenu}');
+    print('Edited Item: $editedItem'); // Debugging
+    widget.onEdit(editedItem);
     Navigator.of(context).pop();
   }
 
@@ -70,7 +125,7 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.name,
+                    'Edit ${widget.item.name}',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
@@ -89,9 +144,10 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                   Flexible(
                     flex: 2,
                     child: VariantSection(
-                      idMenu: widget.idMenu,
+                      idMenu: widget.item.idMenu,
                       selectedIndex: _selectedVariantIndex,
                       onVariantSelected: (index, variant) {
+                        print('Variant Selected: $variant'); // Debugging
                         setState(() {
                           _selectedVariantIndex = index;
                           _selectedVariant = variant;
@@ -102,27 +158,31 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                   Flexible(
                     flex: 2,
                     child: NotesAndPreferenceSection(
-                      type: widget.type,
+                      type: widget.item.idMenu,
                       selectedPreferenceIndex: _selectedPreferenceIndex,
                       onPreferenceSelected: (index, preference) {
+                        print('Preference Selected: $preference'); // Debugging
                         setState(() {
                           _selectedPreferenceIndex = index;
                           _selectedPreference = preference;
                         });
                       },
                       onNotesChanged: (notes) {
+                        print('Notes Changed: $notes'); // Debugging
                         setState(() {
                           _notes = notes;
                         });
                       },
+                      initialNotes: widget.item.notes,
                     ),
                   ),
                   Flexible(
                     flex: 2,
                     child: AddonSection(
-                      type: widget.type,
+                      type: widget.item.idMenu,
                       selectedAddons: _selectedAddons,
                       onAddonChanged: (addons) {
+                        print('Addons Changed: $addons'); // Debugging
                         setState(() {
                           _selectedAddons = addons;
                         });
@@ -132,15 +192,16 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                   Flexible(
                     flex: 2,
                     child: SummarySection(
-                      name: widget.name,
-                      price: widget.price,
-                      type: widget.type,
+                      name: widget.item.name,
+                      price: widget.item.price.toString(),
+                      type: widget.item.idMenu,
                       selectedVariant: _selectedVariant,
                       selectedPreferenceIndex: _selectedPreferenceIndex,
                       selectedAddons: _selectedAddons,
                       notes: _notes,
                       quantity: _quantity,
                       onQuantityChanged: (quantity) {
+                        print('Quantity Changed: $quantity'); // Debugging
                         setState(() {
                           _quantity = quantity;
                         });
@@ -159,9 +220,9 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF00ADB5)),
                   ),
-                  onPressed: _addItemToCart,
+                  onPressed: _editItem,
                   child: Text(
-                    'Add to Cart',
+                    'Save Changes',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),

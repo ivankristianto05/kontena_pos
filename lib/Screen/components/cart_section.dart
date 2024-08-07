@@ -1,13 +1,18 @@
-// cart.dart
 import 'package:flutter/material.dart';
-import 'package:pos_kontena/Screen/components/itemcart_section.dart';
-import 'package:pos_kontena/models/cart_item.dart';
+import 'package:kontena_pos/models/cart_item.dart';
+import 'itemcart_section.dart';
 
 class Cart extends StatelessWidget {
   final double screenWidth;
   final List<CartItem> cartItems;
+  final void Function(CartItem editedItem) onEditItem;
 
-  const Cart({Key? key, required this.screenWidth, required this.cartItems}) : super(key: key);
+  const Cart({
+    Key? key,
+    required this.screenWidth,
+    required this.cartItems,
+    required this.onEditItem,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,14 @@ class Cart extends StatelessWidget {
               itemCount: cartItems.length,
               itemBuilder: (context, index) {
                 final item = cartItems[index];
-                return ItemCart(item: item);
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ItemCart(
+                    cartItems: [item],
+                    screenWidth: screenWidth,
+                    onEditItem: onEditItem,
+                  ),
+                );
               },
             ),
     );

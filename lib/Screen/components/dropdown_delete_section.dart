@@ -31,6 +31,10 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                     color: Colors.grey,
                     width: 1.0,
                   ),
+                  top: BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
                   bottom: BorderSide(
                     color: Colors.grey,
                     width: 1.0,
@@ -73,6 +77,10 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                    color: Colors.grey,
                    width: 1.0,
                  ),
+                 top: BorderSide(
+                   color: Colors.grey,
+                   width: 1.0,
+                 )
                ), 
             ),
             child: MaterialButton(
