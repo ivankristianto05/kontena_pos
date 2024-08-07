@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pos_kontena/constants.dart';
-import 'package:pos_kontena/data/menuvarian.dart';
+import 'package:kontena_pos/constants.dart';
+import 'package:kontena_pos/data/menuvarian.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-
 
 class ItemDetailsDialog extends StatefulWidget {
   final String name;
@@ -24,8 +23,10 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
   @override
   void initState() {
     super.initState();
-    print("Food Type: ${widget.name}"); // Print the food type when the dialog opens
+    print(
+        "Food Type: ${widget.name}"); // Print the food type when the dialog opens
   }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -67,10 +68,12 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                   Expanded(
                     flex: 2,
                     child: Container(
-                      decoration: BoxDecoration(
-                        border: Border(right: BorderSide(color: Colors.grey,width: 0.3)),
-                      ),
-                      child: _buildVariantSection(widget.idMenu)),
+                        decoration: BoxDecoration(
+                          border: Border(
+                              right:
+                                  BorderSide(color: Colors.grey, width: 0.3)),
+                        ),
+                        child: _buildVariantSection(widget.idMenu)),
                   ),
                   Expanded(
                     flex: 2,
@@ -105,106 +108,118 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
     );
   }
 
- Widget _buildVariantSection(String idMenu) {
-  final variants = MenuVarian.where((variant) => variant['id_menu'] == idMenu).toList();
-  return Padding(
-    padding: const EdgeInsets.all(2.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Variant:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        TextField(
-          decoration: InputDecoration(
-            hintText: 'Search',
+  Widget _buildVariantSection(String idMenu) {
+    final variants =
+        MenuVarian.where((variant) => variant['id_menu'] == idMenu).toList();
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Variant:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Search',
+            ),
           ),
-        ),
-        SizedBox(height: 8.0),
-        Expanded(
-          child: ListView.builder(
-            itemCount: variants.length,
-            itemBuilder: (context, index) {
-              final variant = variants[index];
-              final isSelected = _selectedIndex == index;
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedIndex = index;
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isSelected ? buttonselectedcolor : Colors.white,
-                      border: Border.all(color: isSelected ? buttonselectedcolor : Colors.black),
-                    ),
-                    child: ListTile(
-                      title: AutoSizeText(
-                        variant['nama_varian'],
-                        style: TextStyle(fontSize: 16, color: isSelected ? Colors.white : Colors.black),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+          SizedBox(height: 8.0),
+          Expanded(
+            child: ListView.builder(
+              itemCount: variants.length,
+              itemBuilder: (context, index) {
+                final variant = variants[index];
+                final isSelected = _selectedIndex == index;
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isSelected ? buttonselectedcolor : Colors.white,
+                        border: Border.all(
+                            color: isSelected
+                                ? buttonselectedcolor
+                                : Colors.black),
                       ),
-                      subtitle: AutoSizeText(
-                        "Rp ${variant['harga']}",
-                        style: TextStyle(fontSize: 13, color: isSelected ? Colors.white : Colors.black),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      child: ListTile(
+                        title: AutoSizeText(
+                          variant['nama_varian'],
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: isSelected ? Colors.white : Colors.black),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: AutoSizeText(
+                          "Rp ${variant['harga']}",
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: isSelected ? Colors.white : Colors.black),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotesAndPreferenceSection() {
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Notes:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Input Here',
+            ),
+          ),
+          SizedBox(height: 8.0),
+          Text('Preference:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          // Add your preference options here
+          Container(
+            child: Column(
+              children: [
+                CustomListTile(
+                  title: "Extra Ice",
+                  onTap: () {
+                    // Handle preference selection
+                  },
                 ),
-              );
-            },
+                CustomListTile(
+                  title: "Half Ice",
+                  onTap: () {
+                    // Handle preference selection
+                  },
+                ),
+                CustomListTile(
+                  title: "Normal Ice",
+                  onTap: () {
+                    // Handle preference selection
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-Widget _buildNotesAndPreferenceSection() {
-  return Padding(
-    padding: const EdgeInsets.all(2.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Notes:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        TextField(
-          decoration: InputDecoration(
-            hintText: 'Input Here',
-          ),
-        ),
-        SizedBox(height: 8.0),
-        Text('Preference:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        // Add your preference options here
-        Container(
-          child: Column(
-            children: [
-              CustomListTile(
-                title: "Extra Ice",
-                onTap: () {
-                  // Handle preference selection
-                },
-              ),
-              CustomListTile(
-                title: "Half Ice",
-                onTap: () {
-                  // Handle preference selection
-                },
-              ),
-              CustomListTile(
-                title: "Normal Ice",
-                onTap: () {
-                  // Handle preference selection
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   Widget _buildAddonSection() {
     return Padding(
@@ -212,7 +227,8 @@ Widget _buildNotesAndPreferenceSection() {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Addon:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('Addon:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           // Add your addon options here
           Container(
             child: Column(
@@ -251,13 +267,15 @@ Widget _buildNotesAndPreferenceSection() {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Summary:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('Summary:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           SizedBox(height: 8.0),
           Text('Name: $name'),
           Text('Price: Rp $price'),
           // Add more summary details here
           Spacer(),
-          Text('Qty', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('Qty',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           Row(
             children: [
               IconButton(
@@ -285,7 +303,8 @@ class CustomListTile extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
 
-  const CustomListTile({required this.title, required this.onTap, Key? key}) : super(key: key);
+  const CustomListTile({required this.title, required this.onTap, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +317,9 @@ class CustomListTile extends StatelessWidget {
         child: ListTile(
           title: Text(
             title,
-            style: TextStyle(fontSize: 16, color: Colors.black), // Customize this style as needed
+            style: TextStyle(
+                fontSize: 16,
+                color: Colors.black), // Customize this style as needed
           ),
           onTap: onTap,
         ),

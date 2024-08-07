@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pos_kontena/constants.dart';
+import 'package:kontena_pos/constants.dart';
 
 class ActionButton extends StatelessWidget {
   const ActionButton({

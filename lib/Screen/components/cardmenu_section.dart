@@ -1,8 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/data/menu.dart';
-import 'package:pos_kontena/Screen/components/itemdialog_section.dart';
-import 'package:pos_kontena/data/menu.dart';
+import 'package:kontena_pos/Screen/components/itemdialog_section.dart';
+import 'package:kontena_pos/data/menu.dart';
 
 class CardMenu extends StatelessWidget {
   const CardMenu({Key? key}) : super(key: key);
