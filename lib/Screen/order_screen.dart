@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 // <<<<<<< HEAD
 // import 'package:kontena_pos/Screen/components/appbar_section.dart';
 // import 'package:kontena_pos/Screen/components/buttonfilter_section.dart';
@@ -20,8 +21,28 @@ import 'package:kontena_pos/Screen/components/itemcart_section.dart';
 import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/constants.dart';
 
+import 'package:kontena_pos/Screen/components/searchbar_section.dart';
+import 'package:kontena_pos/Screen/popup/itemdialog_section.dart';
+import 'package:kontena_pos/models/cart_item.dart';
+import 'package:kontena_pos/Screen/components/actionbutton_section.dart';
+import 'package:kontena_pos/Screen/components/appbar_section.dart';
+import 'package:kontena_pos/Screen/components/buttonfilter_section.dart';
+import 'package:kontena_pos/Screen/components/cardmenu_section.dart';
+import 'package:kontena_pos/Screen/components/dropdown_delete_section.dart';
+import 'package:kontena_pos/Screen/components/footer_section.dart';
+import 'package:kontena_pos/Screen/components/guestinputwithbutton_section.dart';
+import 'package:kontena_pos/Screen/components/cart_section.dart';
+import 'package:kontena_pos/constants.dart';
+
 class OrderPage extends StatefulWidget {
-  const OrderPage({Key? key}) : super(key: key);
+  final List<CartItem> cartItems;
+  final void Function(CartItem item) addItemToCart;
+
+  const OrderPage({
+    Key? key,
+    required this.cartItems,
+    required this.addItemToCart,
+  }) : super(key: key);
 
   @override
   _OrderPageState createState() => _OrderPageState();
@@ -29,7 +50,6 @@ class OrderPage extends StatefulWidget {
 
 class _OrderPageState extends State<OrderPage> {
   final TextEditingController _guestNameController = TextEditingController();
-  String? selectedValue;
 
   @override
   void initState() {
@@ -48,6 +68,20 @@ class _OrderPageState extends State<OrderPage> {
     setState(() {});
   }
 
+  void _showItemDetailsDialog(
+      String name, String price, String idMenu, String type) {
+    showDialog(
+      context: context,
+      builder: (context) => ItemDetailsDialog(
+        name: name,
+        price: price,
+        idMenu: idMenu,
+        type: type,
+        onAddToCart: widget.addItemToCart,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -60,79 +94,82 @@ class _OrderPageState extends State<OrderPage> {
     double buttonWidth = screenWidth * 0.15;
 
     return Scaffold(
-      appBar: BuildAppbar(
-        smallButtonWidth: smallButtonWidth,
-        buttonWidth: buttonWidth,
-        isWideScreen: isWideScreen,
-      ),
-      body: Container(
-        color: itembackgroundcolor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Row for Searchbar and Input Guest Name with Buttons
-            Row(
-              children: [
-                // Searchbar
-                Container(
-                  width: searchbarWidth,
-                  child: Searchbar(screenWidth: screenWidth),
-                ),
-                // Input Guest Name and buttons
-                GuestInputWithButton(
+        appBar: BuildAppbar(
+          smallButtonWidth: smallButtonWidth,
+          buttonWidth: buttonWidth,
+          isWideScreen: isWideScreen,
+        ),
+        body: Container(
+          color: itembackgroundcolor,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: searchbarWidth,
+                    child: Searchbar(screenWidth: screenWidth),
+                  ),
+                  // Input Guest Name and buttons
+                  GuestInputWithButton(
+                      screenWidth: screenWidth,
+                      searchbarWidth: searchbarWidth,
+                      guestNameController: _guestNameController,
+                      smallButtonWidth: smallButtonWidth),
+                  GuestInputWithButton(
                     screenWidth: screenWidth,
                     searchbarWidth: searchbarWidth,
                     guestNameController: _guestNameController,
-                    smallButtonWidth: smallButtonWidth),
-              ],
-            ),
-            // Row for Button Filter and Dropdown with Delete Button
-            Row(
-              children: [
-                // Button Filter
-                Container(
-                  width: searchbarWidth,
-                  child: Row(
-                    children: [
-                      ButtonFilter(),
-                    ],
+                    smallButtonWidth: smallButtonWidth,
                   ),
-                ),
-                // Dropdown and Delete Button
-                DropdownDeleteSection()
-              ],
-            ),
-            // Row for Menu Cards and Item Cart
-            Expanded(
-              child: Row(
-                children: [
-                  // Menu Cards
-                  Expanded(
-                    flex: 2,
-                    child: CardMenu(),
-                  ),
-                  // Item Cart
-                  ItemCart(screenWidth: screenWidth),
                 ],
               ),
-            ),
-            // Footer with Order Button
-            Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Row(
                 children: [
                   Container(
-                    width: screenWidth * 0.65,
-                    child: Footer(screenWidth: screenWidth),
+                    width: searchbarWidth,
+                    child: Row(
+                      children: [
+                        ButtonFilter(),
+                      ],
+                    ),
                   ),
-                  ActionButton(screenWidth: screenWidth),
+                  DropdownDeleteSection()
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: CardMenu(
+                        onMenuTap: (name, price, idMenu, type) {
+                          _showItemDetailsDialog(name, price, idMenu, type);
+                        },
+                      ),
+                    ),
+                    Cart(
+                      screenWidth: screenWidth,
+                      cartItems: widget.cartItems,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: 50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: screenWidth * 0.65,
+                      child: Footer(screenWidth: screenWidth),
+                    ),
+                    ActionButton(screenWidth: screenWidth),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 }

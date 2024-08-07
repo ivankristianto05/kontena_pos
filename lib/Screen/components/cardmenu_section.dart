@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/Screen/components/itemdialog_section.dart';
 import 'package:kontena_pos/data/menu.dart';
+import 'package:kontena_pos/Screen/popup/itemdialog_section.dart';
+import 'package:kontena_pos/data/menu.dart';
 
 class CardMenu extends StatelessWidget {
-  const CardMenu({Key? key}) : super(key: key);
+  final void Function(String name, String price, String idMenu, String type)
+      onMenuTap;
 
   void _showItemDetails(
       BuildContext context, String name, String price, String idMenu) {
@@ -16,6 +19,8 @@ class CardMenu extends StatelessWidget {
       },
     );
   }
+
+  const CardMenu({Key? key, required this.onMenuTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +45,12 @@ class CardMenu extends StatelessWidget {
             onTap: () {
               _showItemDetails(context, menu['nama_menu'].toString(),
                   menu['harga'].toString(), menu['id_menu'].toString());
+              onMenuTap(
+                menu['nama_menu'].toString(),
+                menu['harga'].toString(),
+                menu['id_menu'].toString(),
+                menu['type'].toString(),
+              );
             },
             child: Card(
               elevation: 2.0,
@@ -48,6 +59,7 @@ class CardMenu extends StatelessWidget {
                 children: [
                   AspectRatio(
                     aspectRatio: 1.85, // Adjust aspect ratio as needed
+                    // aspectRatio: 2.03,
                     child: Container(
                       color: Colors.grey[300],
                       child: Center(
@@ -71,8 +83,17 @@ class CardMenu extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: Colors.black),
                           maxLines: 1,
+                        ),
+                        Text(menu['type'].toString(),
+                            style:
+                                TextStyle(fontSize: 12, color: Colors.black)),
+                        Text(
+                          menu['nama_menu'].toString(),
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
                           overflow: TextOverflow.ellipsis,
-                          minFontSize: 10,
                         ),
                         SizedBox(height: 4.0),
                         Align(

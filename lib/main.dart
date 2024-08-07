@@ -3,6 +3,8 @@ import 'package:kontena_pos/Screen/order_screen.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/routes/app_routes.dart';
+import 'package:kontena_pos/Screen/order_screen.dart';
+import 'package:kontena_pos/models/cart_item.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -36,7 +38,14 @@ class _MyAppState extends State<MyApp> {
     return AppRoutes.orderScreen;
   }
 
-  // This widget is the root of your application.
+  List<CartItem> cartItems = [];
+
+  void addItemToCart(CartItem item) {
+    setState(() {
+      cartItems.add(item);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // return MaterialApp(
@@ -68,6 +77,16 @@ class _MyAppState extends State<MyApp> {
           );
         }
       },
+      // return MaterialApp(
+      //   title: 'Flutter Demo',
+      //   theme: ThemeData(
+      //     colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      //     useMaterial3: true,
+      //   ),
+      //   home: OrderPage(
+      //     cartItems: cartItems,
+      //     addItemToCart: addItemToCart,
+      //   ),
     );
   }
 }
