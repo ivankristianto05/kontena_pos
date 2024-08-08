@@ -15,7 +15,7 @@ class Footer extends StatelessWidget {
       children: <Widget>[
         Expanded(
           child: _buildFooterButton(
-            text: 'Order',
+            text: 'Menu',
             onPressed: () {
               // Handle Order button press
             },

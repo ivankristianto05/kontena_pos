@@ -32,6 +32,8 @@ dependencies:
     sdk: flutter
   auto_size_text: ^3.0.0
   provider: ^6.1.2
+  dotted_line: ^3.2.2
+  intl: ^0.19.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -40,7 +42,6 @@ dependencies:
   shared_preferences: ^2.2.3
   font_awesome_flutter: ^10.7.0
   easy_debounce: ^2.0.3
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

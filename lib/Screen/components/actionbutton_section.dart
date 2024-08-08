@@ -15,7 +15,11 @@ class ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var buttoncolor2 = buttoncolor;
-    int totalOrders = cartItems.fold(0, (sum, item) => sum + item.quantity);
+
+    // Collect the IDs of the selected menu items
+    List<String> selectedItemIds = cartItems.map((item) => item.idMenu.toString()).toList();
+    // Calculate the number of selected item IDs
+    int numberOfSelectedItemIds = selectedItemIds.length;
 
     return Container(
       height: 50,
@@ -44,7 +48,7 @@ class ActionButton extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                "$totalOrders - Item",
+                "$numberOfSelectedItemIds - Item",
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.normal,

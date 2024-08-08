@@ -43,26 +43,30 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
               ),
               height: 50,
               child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  hint: Text("Select an Option"),
-                  value: selectedValue,
-                  items: <String>[
-                    'Option 1',
-                    'Option 2',
-                    'Option 3',
-                    'Option 4'
-                  ].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedValue = newValue;
-                    });
-                  },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    hint: Text("Select an Option"),
+                    value: selectedValue,
+                    items: <String>[
+                      'Dine in',
+                      'Take away',
+                      'Gojek',
+                    ].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value,style: TextStyle(
+                          fontWeight: FontWeight.normal
+                        ),),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedValue = newValue;
+                      });
+                    },
+                  ),
                 ),
               ),
             ),

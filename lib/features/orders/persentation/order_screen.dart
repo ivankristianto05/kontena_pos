@@ -28,6 +28,8 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   final TextEditingController _guestNameController = TextEditingController();
+  String _selectedFilterType = 'All';
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -69,6 +71,18 @@ class _OrderScreenState extends State<OrderScreen> {
     }
   }
 
+  void _handleFilterSelected(String type) {
+    setState(() {
+      _selectedFilterType = type;
+    });
+  }
+
+  void _handleSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -89,7 +103,10 @@ class _OrderScreenState extends State<OrderScreen> {
           children: [
             Row(
               children: [
-                Searchbar(screenWidth: screenWidth),
+                Searchbar(
+                  screenWidth: screenWidth,
+                  onSearchChanged: _handleSearchChanged,
+                ),
                 GuestInputWithButton(
                   searchbarWidth: searchbarWidth,
                   guestNameController: _guestNameController,
@@ -103,7 +120,7 @@ class _OrderScreenState extends State<OrderScreen> {
                   width: searchbarWidth,
                   child: Row(
                     children: [
-                      ButtonFilter(),
+                      ButtonFilter(onFilterSelected: _handleFilterSelected),
                     ],
                   ),
                 ),
@@ -119,6 +136,8 @@ class _OrderScreenState extends State<OrderScreen> {
                       onMenuTap: (name, price, idMenu, type) {
                         _showItemDetailsDialog(name, price, idMenu, type);
                       },
+                      filterType: _selectedFilterType,
+                      searchQuery: _searchQuery,
                     ),
                   ),
                   Container(
@@ -135,6 +154,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 ],
               ),
             ),
+            
             Container(
               height: 50,
               child: Row(

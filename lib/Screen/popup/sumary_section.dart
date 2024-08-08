@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class SummarySection extends StatelessWidget {
   final String name;
@@ -10,6 +11,7 @@ class SummarySection extends StatelessWidget {
   final String notes;
   final int quantity;
   final Function(int) onQuantityChanged;
+  final int variantPrice;
 
   SummarySection({
     required this.name,
@@ -21,14 +23,15 @@ class SummarySection extends StatelessWidget {
     required this.notes,
     required this.quantity,
     required this.onQuantityChanged,
+    required this.variantPrice,
   });
 
   @override
   Widget build(BuildContext context) {
     final selectedAddonList = selectedAddons.entries
-            .where((entry) => entry.value)
-            .map((entry) => entry.key)
-            .join(', ') ??
+        .where((entry) => entry.value)
+        .map((entry) => entry.key)
+        .join(', ') ??
         '-';
 
     final selectedPreference = selectedPreferenceIndex >= 0
@@ -45,6 +48,14 @@ class SummarySection extends StatelessWidget {
                 ? ['less sugar', 'less ice'][selectedPreferenceIndex]
                 : ['small', 'medium', 'jumbo'][selectedPreferenceIndex]
         : '-';
+
+    // Create a NumberFormat instance for Indonesian locale
+    final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
+
+    // Determine the effective price
+    final int effectivePrice = (selectedVariant != null && selectedVariant!.isNotEmpty)
+        ? variantPrice
+        : int.tryParse(price) ?? 0;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -78,9 +89,9 @@ class SummarySection extends StatelessWidget {
                             Text('Variant:',
                                 style: TextStyle(
                                     fontSize: 14, fontWeight: FontWeight.bold)),
-                            Text(selectedVariant ?? 'Not selected',
+                            Text(selectedVariant ?? 'Original',
                                 style: TextStyle(fontSize: 14)),
-                            Text(price, style: TextStyle(fontSize: 14)),
+                            Text("Rp ${currencyFormat.format(effectivePrice)}", style: TextStyle(fontSize: 14)),
                           ],
                         ),
                       ),

@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';  // Import intl package
 import 'package:kontena_pos/data/menu.dart';
 
 class CardMenu extends StatelessWidget {
   final void Function(String name, String price, String idMenu, String type) onMenuTap;
+  final String filterType;
+  final String searchQuery;
 
-  const CardMenu({Key? key, required this.onMenuTap}) : super(key: key);
+  const CardMenu({
+    Key? key,
+    required this.onMenuTap,
+    required this.filterType,
+    required this.searchQuery,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,6 +20,15 @@ class CardMenu extends StatelessWidget {
     bool isWideScreen = screenWidth > 800;
 
     int crossAxisCount = isWideScreen ? 4 : 2;
+
+    final filteredMenu = ListMenu.where((menu) {
+      final matchesType = filterType == 'All' || menu['type'].toString().toLowerCase() == filterType.toLowerCase();
+      final matchesSearch = searchQuery.isEmpty || menu['nama_menu'].toString().toLowerCase().contains(searchQuery.toLowerCase());
+      return matchesType && matchesSearch;
+    }).toList();
+
+    // Create a NumberFormat instance for Indonesian locale
+    final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
 
     return Container(
       width: screenWidth * 0.65,
@@ -22,9 +39,11 @@ class CardMenu extends StatelessWidget {
           crossAxisSpacing: 8.0,
           mainAxisSpacing: 8.0,
         ),
-        itemCount: ListMenu.length,
+        itemCount: filteredMenu.length,
         itemBuilder: (context, index) {
-          final menu = ListMenu[index];
+          final menu = filteredMenu[index];
+          final harga = int.tryParse(menu['harga'].toString()) ?? 0; // Convert price to integer
+
           return GestureDetector(
             onTap: () {
               onMenuTap(
@@ -59,10 +78,13 @@ class CardMenu extends StatelessWidget {
                           style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
                           overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 2.0),
+                        SizedBox(height: screenWidth * 0.001),
                         Align(
                           alignment: Alignment.bottomRight,
-                          child: Text('Rp ${menu['harga'].toString()}', style: TextStyle(fontSize: 14, color: Colors.black)),
+                          child: Text(
+                            'Rp ${currencyFormat.format(harga)}', // Format price with thousands separator
+                            style: TextStyle(fontSize: 14, color: Colors.black),
+                          ),
                         ),
                       ],
                     ),
