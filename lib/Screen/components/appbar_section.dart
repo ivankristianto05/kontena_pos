@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:kontena_pos/constants.dart';
 
 class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
@@ -6,27 +7,33 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.smallButtonWidth,
     required this.buttonWidth,
-    required this.isWideScreen,
   });
 
   final double smallButtonWidth;
   final double buttonWidth;
-  final bool isWideScreen;
 
   @override
   Widget build(BuildContext context) {
+    // Get screen width and orientation
+    double screenWidth = MediaQuery.of(context).size.width;
+    Orientation orientation = MediaQuery.of(context).orientation;
+
+    // Adjust button widths
+    double adjustedSmallButtonWidth = screenWidth * 0.08;
+    double adjustedButtonWidth = (screenWidth * 0.65 - 100) / 4;
+
     return AppBar(
-      backgroundColor: buttoncolor, // Set the background color
-      titleSpacing: 0, // Ensure the title starts at the edge
-      toolbarHeight: 50, // Set the height of the AppBar
+      backgroundColor: buttoncolor,
+      titleSpacing: 0,
+      toolbarHeight: 50,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
               Container(
-                width: smallButtonWidth,
-                height: 50, // Set height of Container
+                width: adjustedSmallButtonWidth,
+                height: 50,
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
@@ -36,17 +43,17 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 child: MaterialButton(
-                  height: 50, // Set height of MaterialButton
+                  height: 50,
                   minWidth: 0,
                   child: Icon(Icons.refresh, color: Colors.white),
                   onPressed: () {
-                    // Define the action for the refresh button
+                    // Action for refresh button
                   },
                 ),
               ),
               Container(
-                width: buttonWidth,
-                height: 50, // Set height of Container
+                width: adjustedButtonWidth,
+                height: 50,
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
@@ -56,10 +63,10 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 child: MaterialButton(
-                  height: 50, // Set height of MaterialButton
+                  height: 50,
                   minWidth: 0,
                   onPressed: () {
-                    // Define the action for the Order button
+                    // Action for Order button
                   },
                   child: const Text(
                     'Order',
@@ -71,97 +78,9 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-              if (isWideScreen) ...[
-                Container(
-                  width: buttonWidth,
-                  height: 50, // Set height of Container
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: MaterialButton(
-                    height: 50, // Set height of MaterialButton
-                    minWidth: 0,
-                    onPressed: () {
-                      // Define the action for the Invoice button
-                    },
-                    child: const Text(
-                      'Invoice',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  width: buttonWidth,
-                  height: 50, // Set height of Container
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: MaterialButton(
-                    height: 50, // Set height of MaterialButton
-                    minWidth: 0,
-                    onPressed: () {
-                      // Define the action for the History button
-                    },
-                    child: const Text(
-                      'History',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-          Row(
-            children: [
-              if (isWideScreen)
-                Container(
-                  width: buttonWidth,
-                  height: 50, // Set height of Container
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Shokudo Restaurant',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               Container(
-                width: smallButtonWidth,
-                height: 50, // Set height of Container
+                width: adjustedButtonWidth,
+                height: 50,
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
@@ -171,16 +90,101 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 child: MaterialButton(
-                  height: 50, // Set height of MaterialButton
+                  height: 50,
                   minWidth: 0,
                   onPressed: () {
-                    // Define the action for the MaterialButton
+                    // Action for Invoice button
+                  },
+                  child: const Text(
+                    'Invoice',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                width: adjustedButtonWidth,
+                height: 50,
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Colors.white,
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                child: MaterialButton(
+                  height: 50,
+                  minWidth: 0,
+                  onPressed: () {
+                    // Action for History button
+                  },
+                  child: const Text(
+                    'History',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Container(
+                width: adjustedButtonWidth,
+                height: 50,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Colors.white,
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: AutoSizeText(
+                    'Shokudo Restaurant',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: orientation == Orientation.portrait ? 2 : 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              Container(
+                width: adjustedSmallButtonWidth,
+                height: 50,
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Colors.white,
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                child: MaterialButton(
+                  height: 50,
+                  minWidth: 0,
+                  onPressed: () {
+                    // Action for settings button
                   },
                   child: const Icon(Icons.settings, color: Colors.white),
                 ),
               ),
               Container(
-                height: 50, // Set height of Container
+                height: 50,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
@@ -189,7 +193,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                       'Agil Mahardika',
                       style: TextStyle(color: Colors.white),
                     ),
-                    SizedBox(width: 8), // Space between text and icon
+                    SizedBox(width: 8),
                     Icon(Icons.person, color: Colors.white),
                   ],
                 ),
@@ -202,5 +206,5 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(40); // Set preferred size of AppBar
+  Size get preferredSize => Size.fromHeight(50); // Adjust preferred size of AppBar if needed
 }

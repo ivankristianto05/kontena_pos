@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';  // Import intl package
+import 'package:intl/intl.dart'; // Import intl package
 import 'package:kontena_pos/Screen/popup/addons_section.dart';
 import 'package:kontena_pos/Screen/popup/noteandpreference_section.dart';
 import 'package:kontena_pos/Screen/popup/sumary_section.dart';
@@ -8,7 +8,7 @@ import 'package:kontena_pos/models/cart_item.dart';
 
 class ItemDetailsDialog extends StatefulWidget {
   final String name;
-  final String price;
+  final int price;
   final String idMenu;
   final String type;
   final void Function(CartItem item) onAddToCart;
@@ -44,12 +44,12 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
       name: widget.name,
       variant: _selectedVariant ?? '',
       quantity: _quantity,
-      price: int.tryParse(widget.price) ?? 0, // Convert price to int
+      price: widget.price,
       addons: _selectedAddons,
       notes: _notes,
       preference: _selectedPreference,
-      type: widget.type, // Ensure this is correctly assigned
-      variantPrice: _variantPrice, // Add this line
+      type: widget.type,
+      variantPrice: _variantPrice,
     );
 
     widget.onAddToCart(cartItem);
@@ -141,7 +141,9 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                     flex: 2,
                     child: SummarySection(
                       name: widget.name,
-                      price: currencyFormat.format(_variantPrice != 0 ? _variantPrice : int.tryParse(widget.price) ?? 0), // Format price with thousands separator
+                      price: _variantPrice != 0
+                          ? _variantPrice
+                          : widget.price, // Send price as int
                       type: widget.type,
                       selectedVariant: _selectedVariant,
                       selectedPreferenceIndex: _selectedPreferenceIndex,
@@ -166,7 +168,8 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF00ADB5)),
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color(0xFF00ADB5)),
                   ),
                   onPressed: _addItemToCart,
                   child: Text(

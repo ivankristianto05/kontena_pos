@@ -67,25 +67,27 @@ class GuestInputWithButton extends StatelessWidget {
                 ),
               ),
             ),
-            child: MaterialButton(
-              height: 55,
-              minWidth: 0,
-              onPressed: () {
-                // Handle the action for the search button
-              },
-              child: Icon(Icons.search_outlined, color: Colors.black),
+              child: MaterialButton(
+                height: 55,
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  // Handle the action for the search button
+                },
+                child: Center(child: FaIcon(FontAwesomeIcons.magnifyingGlass, size: 16,)),
+              ),
             ),
-          ),
+
           Container(
             color: Colors.white,
             width: smallButtonWidth,
             child: MaterialButton(
               height: 55,
-              minWidth: 0,
+              padding: EdgeInsets.zero,
               onPressed: () {
                 // Handle the action for the person button
               },
-              child: FaIcon(FontAwesomeIcons.userPlus, size: 18),
+              child: 
+              Center(child: FaIcon(FontAwesomeIcons.userPlus, size: 16)),
             ),
           ),
         ],

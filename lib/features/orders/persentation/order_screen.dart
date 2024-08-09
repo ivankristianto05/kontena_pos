@@ -50,12 +50,12 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   void _showItemDetailsDialog(
-      String name, String price, String idMenu, String type) {
+      String name, int price, String idMenu, String type) { // Change price to int
     showDialog(
       context: context,
       builder: (context) => ItemDetailsDialog(
         name: name,
-        price: price,
+        price: price, // Pass price as int
         idMenu: idMenu,
         type: type,
         onAddToCart: widget.addItemToCart,
@@ -96,7 +96,7 @@ class _OrderScreenState extends State<OrderScreen> {
       appBar: TopBar(
         smallButtonWidth: smallButtonWidth,
         buttonWidth: buttonWidth,
-        isWideScreen: screenWidth > 800,
+        //isWideScreen: screenWidth > 800,
       ),
       body: Container(
         color: itembackgroundcolor,
@@ -136,7 +136,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     flex: 2,
                     child: CardMenu(
                       onMenuTap: (name, price, idMenu, type) {
-                        _showItemDetailsDialog(name, price, idMenu, type);
+                        _showItemDetailsDialog(name, price, idMenu, type); // Pass price as int
                       },
                       filterType: _selectedFilterType,
                       searchQuery: _searchQuery,

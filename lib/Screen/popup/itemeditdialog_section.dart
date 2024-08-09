@@ -3,6 +3,7 @@ import 'package:kontena_pos/Screen/popup/addons_section.dart';
 import 'package:kontena_pos/Screen/popup/noteandpreference_section.dart';
 import 'package:kontena_pos/Screen/popup/sumary_section.dart';
 import 'package:kontena_pos/Screen/popup/variant_section.dart';
+import 'package:kontena_pos/data/menuvarian.dart';
 import 'package:kontena_pos/models/cart_item.dart';
 
 class ItemEditDialog extends StatefulWidget {
@@ -34,43 +35,46 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
     _initializeFields();
   }
 
-  void _initializeFields() {
-    setState(() {
-      _selectedVariant = widget.item.variant;
-      _quantity = widget.item.quantity;
-      _notes = widget.item.notes;
-      _selectedPreference = widget.item.preference;
-      _selectedAddons = widget.item.addons;
-      _variantPrice = widget.item.variantPrice;
+ void _initializeFields() {
+  setState(() {
+    _selectedVariant = widget.item.variant;
+    _quantity = widget.item.quantity;
+    _notes = widget.item.notes;
+    _selectedPreference = widget.item.preference;
+    _selectedAddons = widget.item.addons;
+    _variantPrice = widget.item.variantPrice;
 
-      // Debugging
-      print('Item type: ${widget.item.type}'); // Debugging
+    List<String> variants = MenuVarian
+        .where((variant) => variant['id_menu'] == widget.item.idMenu)
+        .map((variant) => variant['nama_varian'] as String)
+        .toList();
 
-      // Set selected indices based on the existing data
-      _selectedVariantIndex = _getVariantIndex(_selectedVariant);
-      _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
-    });
-  }
+    _selectedVariantIndex = variants.indexOf(_selectedVariant ?? '');
+    _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
+  });
+}
 
-  int _getVariantIndex(String? variant) {
-    // Implement logic to get index of the selected variant
-    List<String> variants = _getVariantsBasedOnType();
-    return variants.indexOf(variant ?? '');
-  }
+
+
+
+
+ int _getVariantIndex(String? variant) {
+  List<String> variants = _getVariantsBasedOnType();
+ return variants.indexOf(variant ?? '');
+}
 
   int _getPreferenceIndex(String preference) {
-    // Implement logic to get index of the selected preference
     List<String> preferences = _getPreferencesBasedOnType();
     return preferences.indexOf(preference);
   }
 
   List<String> _getVariantsBasedOnType() {
     if (widget.item.type == 'food') {
-      return ['Variant 1', 'Variant 2', 'Variant 3']; // Replace with actual variants
+      return ['Variant 1', 'Variant 2', 'Variant 3'];
     } else if (widget.item.type == 'beverage') {
-      return ['Variant A', 'Variant B', 'Variant C']; // Replace with actual variants
+      return ['Variant A', 'Variant B', 'Variant C'];
     } else if (widget.item.type == 'breakfast') {
-      return ['Small', 'Medium', 'Large']; // Replace with actual variants
+      return ['Small', 'Medium', 'Large'];
     }
     return [];
   }
@@ -96,10 +100,9 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
       addons: _selectedAddons,
       notes: _notes,
       preference: _selectedPreference,
-      type: widget.item.type, // Ensure type is correctly set
-      variantPrice: _variantPrice, // Add this line
+      type: widget.item.type,
+      variantPrice: _variantPrice,
     );
-    print('Editing Item: $editedItem'); // Debugging
     widget.onEdit(editedItem);
     Navigator.of(context).pop();
   }
@@ -147,7 +150,6 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                       idMenu: widget.item.idMenu,
                       selectedIndex: _selectedVariantIndex,
                       onVariantSelected: (index, variant, price) {
-                        print('Variant Selected: $variant'); // Debugging
                         setState(() {
                           _selectedVariantIndex = index;
                           _selectedVariant = variant;
@@ -159,17 +161,15 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                   Flexible(
                     flex: 2,
                     child: NotesAndPreferenceSection(
-                      type: widget.item.type, // Use type instead of idMenu
+                      type: widget.item.type,
                       selectedPreferenceIndex: _selectedPreferenceIndex,
                       onPreferenceSelected: (index, preference) {
-                        print('Preference Selected: $preference'); // Debugging
                         setState(() {
                           _selectedPreferenceIndex = index;
                           _selectedPreference = preference;
                         });
                       },
                       onNotesChanged: (notes) {
-                        print('Notes Changed: $notes'); // Debugging
                         setState(() {
                           _notes = notes;
                         });
@@ -180,10 +180,9 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                   Flexible(
                     flex: 2,
                     child: AddonSection(
-                      type: widget.item.type, // Use type instead of idMenu
+                      type: widget.item.type,
                       selectedAddons: _selectedAddons,
                       onAddonChanged: (addons) {
-                        print('Addons Changed: $addons'); // Debugging
                         setState(() {
                           _selectedAddons = addons;
                         });
@@ -194,15 +193,14 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                     flex: 2,
                     child: SummarySection(
                       name: widget.item.name,
-                      price: (_variantPrice != 0) ? _variantPrice.toString() : widget.item.price.toString(),
-                      type: widget.item.type, // Use type instead of idMenu
+                      price: (_variantPrice != 0) ? _variantPrice : widget.item.price,
+                      type: widget.item.type,
                       selectedVariant: _selectedVariant,
                       selectedPreferenceIndex: _selectedPreferenceIndex,
                       selectedAddons: _selectedAddons,
                       notes: _notes,
                       quantity: _quantity,
                       onQuantityChanged: (quantity) {
-                        print('Quantity Changed: $quantity'); // Debugging
                         setState(() {
                           _quantity = quantity;
                         });
