@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 class SummarySection extends StatelessWidget {
   final String name;
-  final String price;
+  final int price;
   final String type;
   final String? selectedVariant;
   final int selectedPreferenceIndex;
@@ -28,11 +28,12 @@ class SummarySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
+
     final selectedAddonList = selectedAddons.entries
         .where((entry) => entry.value)
         .map((entry) => entry.key)
-        .join(', ') ??
-        '-';
+        .join(', ') ?? '-';
 
     final selectedPreference = selectedPreferenceIndex >= 0
         ? type == 'food'
@@ -49,19 +50,18 @@ class SummarySection extends StatelessWidget {
                 : ['small', 'medium', 'jumbo'][selectedPreferenceIndex]
         : '-';
 
-    // Create a NumberFormat instance for Indonesian locale
-    final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
-
-    // Determine the effective price
     final int effectivePrice = (selectedVariant != null && selectedVariant!.isNotEmpty)
         ? variantPrice
-        : int.tryParse(price) ?? 0;
+        : price;
+
+    final String displayedVariant = (selectedVariant != null && selectedVariant!.isNotEmpty)
+        ? selectedVariant!
+        : 'Original';
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final double popupHeight = MediaQuery.of(context).size.height * 0.7;
-        final double verticalSpacing =
-            popupHeight * 0.01; // Adjust this value as needed
+        final double verticalSpacing = popupHeight * 0.01;
 
         return Padding(
           padding: const EdgeInsets.all(8.0),
@@ -89,9 +89,10 @@ class SummarySection extends StatelessWidget {
                             Text('Variant:',
                                 style: TextStyle(
                                     fontSize: 14, fontWeight: FontWeight.bold)),
-                            Text(selectedVariant ?? 'Original',
+                            Text(displayedVariant,
                                 style: TextStyle(fontSize: 14)),
-                            Text("Rp ${currencyFormat.format(effectivePrice)}", style: TextStyle(fontSize: 14)),
+                            Text("Rp ${currencyFormat.format(effectivePrice)}",
+                                style: TextStyle(fontSize: 14)),
                           ],
                         ),
                       ),
@@ -162,7 +163,7 @@ class SummarySection extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Text('$quantity',
                               style: TextStyle(
-                                  fontSize: 16)), // Display the dynamic quantity
+                                  fontSize: 16)),
                         ),
                         IconButton(
                           icon: Icon(Icons.add),

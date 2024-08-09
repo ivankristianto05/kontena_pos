@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';  // Import intl package
 import 'package:kontena_pos/data/menu.dart';
 
 class CardMenu extends StatelessWidget {
-  final void Function(String name, String price, String idMenu, String type) onMenuTap;
+  final void Function(String name, int price, String idMenu, String type) onMenuTap;
   final String filterType;
   final String searchQuery;
 
@@ -48,7 +48,7 @@ class CardMenu extends StatelessWidget {
             onTap: () {
               onMenuTap(
                 menu['nama_menu'].toString(),
-                menu['harga'].toString(),
+                menu['harga'],
                 menu['id_menu'].toString(),
                 menu['type'].toString(),
               );

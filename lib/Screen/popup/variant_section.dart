@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/data/menuvarian.dart';
+import 'package:intl/intl.dart';
 
 class VariantSection extends StatefulWidget {
   final String idMenu;
@@ -43,6 +44,9 @@ class _VariantSectionState extends State<VariantSection> {
     final variants =
         MenuVarian.where((variant) => variant['id_menu'] == widget.idMenu)
             .toList();
+
+    final numberFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ');
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -62,30 +66,26 @@ class _VariantSectionState extends State<VariantSection> {
                 children: List.generate(variants.length, (index) {
                   final variant = variants[index];
                   final isSelected = _selectedIndex == index;
+                  final formattedPrice = numberFormat.format(variant['harga_varian']);
+
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
                           if (_selectedIndex == index) {
-                            // If the same variant is tapped again, deselect it
                             _selectedIndex = -1;
-                            widget.onVariantSelected(-1, '',
-                                0); // Pass empty values to indicate deselection
+                            widget.onVariantSelected(-1, '', 0);
                           } else {
-                            // Otherwise, select the new variant
                             _selectedIndex = index;
                             widget.onVariantSelected(
-                                index,
-                                variant['nama_varian'],
-                                variant['harga_varian']);
+                                index, variant['nama_varian'], variant['harga_varian']);
                           }
                         });
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color:
-                              isSelected ? buttonselectedcolor : Colors.white,
+                          color: isSelected ? buttonselectedcolor : Colors.white,
                           border: Border.all(
                               color: isSelected
                                   ? buttonselectedcolor
@@ -102,7 +102,7 @@ class _VariantSectionState extends State<VariantSection> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           subtitle: AutoSizeText(
-                            "Rp ${variant['harga_varian']}",
+                            formattedPrice,
                             style: TextStyle(
                               fontSize: 12,
                               color: isSelected ? Colors.white : Colors.black,
