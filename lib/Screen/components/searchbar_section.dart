@@ -23,7 +23,8 @@ class _SearchbarState extends State<Searchbar> {
     super.initState();
     _searchController = TextEditingController();
     _searchController.addListener(() {
-      widget.onSearchChanged(_searchController.text); // Notify parent on search change
+      widget.onSearchChanged(
+          _searchController.text); // Notify parent on search change
       setState(() {}); // Update the UI when the text changes
     });
   }
@@ -37,7 +38,7 @@ class _SearchbarState extends State<Searchbar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: widget.screenWidth * 0.65,
+      // width: widget.screenWidth * 0.65,
       height: 55,
       decoration: BoxDecoration(
         color: Colors.white,

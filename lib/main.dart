@@ -62,18 +62,12 @@ class _MyAppState extends State<MyApp> {
         } else {
           // Membangun aplikasi dengan initialRoute berdasarkan hasil
           return MaterialApp(
-            theme: theme,
+            theme: ThemeData(useMaterial3: false),
             title: 'KONTENA',
             debugShowCheckedModeBanner: false,
             initialRoute: snapshot.data!,
             navigatorKey: navigatorKey,
-            routes: {
-              AppRoutes.loginScreen: (context) => const LoginScreen(),
-              AppRoutes.orderScreen: (context) => OrderScreen(
-                    cartItems: cartItems,
-                    addItemToCart: addItemToCart,
-                  ),
-            },
+            routes: AppRoutes.routes,
           );
         }
       },

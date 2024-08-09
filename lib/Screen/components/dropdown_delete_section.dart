@@ -13,8 +13,8 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double smallButtonWidth = screenWidth * 0.05;
-    double searchbarWidth = screenWidth * 0.65;
+    double smallButtonWidth = 60.0;
+    double searchbarWidth = screenWidth * 0.7;
 
     return Container(
       width: screenWidth - searchbarWidth,
@@ -38,8 +38,8 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                   bottom: BorderSide(
                     color: Colors.grey,
                     width: 1.0,
+                  ),
                 ),
-              ),
               ),
               height: 50,
               child: DropdownButtonHideUnderline(
@@ -56,9 +56,10 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                     ].map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(value,style: TextStyle(
-                          fontWeight: FontWeight.normal
-                        ),),
+                        child: Text(
+                          value,
+                          style: TextStyle(fontWeight: FontWeight.normal),
+                        ),
                       );
                     }).toList(),
                     onChanged: (String? newValue) {
@@ -72,20 +73,19 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
             ),
           ),
           Container(
-            width: smallButtonWidth,
+            width: 60,
             height: 50,
             decoration: BoxDecoration(
-               color: Colors.white,
-               border: Border(
-                 bottom: BorderSide(
-                   color: Colors.grey,
-                   width: 1.0,
-                 ),
-                 top: BorderSide(
-                   color: Colors.grey,
-                   width: 1.0,
-                 )
-               ), 
+              color: Colors.white,
+              border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                  top: BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  )),
             ),
             child: MaterialButton(
               minWidth: 0,

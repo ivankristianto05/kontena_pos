@@ -4,12 +4,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class GuestInputWithButton extends StatelessWidget {
   const GuestInputWithButton({
     super.key,
-    required this.width,
+    required this.searchbarWidth,
     required TextEditingController guestNameController,
     required this.smallButtonWidth,
   }) : _guestNameController = guestNameController;
 
-  final double width;
+  final double searchbarWidth;
   final TextEditingController _guestNameController;
   final double smallButtonWidth;
 
@@ -19,9 +19,8 @@ class GuestInputWithButton extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: SizedBox(
-              height: 55,
-              // width: width * 0.3, // Ensuring the height is consistent
+            child: Container(
+              height: 55, // Ensuring the height is consistent
               child: Stack(
                 children: [
                   TextField(
@@ -42,7 +41,7 @@ class GuestInputWithButton extends StatelessWidget {
                     child: Visibility(
                       visible: _guestNameController.text.isNotEmpty,
                       child: IconButton(
-                        icon: const FaIcon(FontAwesomeIcons.circleXmark),
+                        icon: FaIcon(FontAwesomeIcons.circleXmark),
                         onPressed: () {
                           _guestNameController.clear();
                         },
@@ -55,7 +54,7 @@ class GuestInputWithButton extends StatelessWidget {
           ),
           Container(
             width: smallButtonWidth,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: Colors.white,
               border: Border(
                 right: BorderSide(
@@ -74,7 +73,7 @@ class GuestInputWithButton extends StatelessWidget {
               onPressed: () {
                 // Handle the action for the search button
               },
-              child: const Icon(Icons.search_outlined, color: Colors.black),
+              child: Icon(Icons.search_outlined, color: Colors.black),
             ),
           ),
           Container(
@@ -86,7 +85,7 @@ class GuestInputWithButton extends StatelessWidget {
               onPressed: () {
                 // Handle the action for the person button
               },
-              child: const FaIcon(FontAwesomeIcons.userPlus, size: 18),
+              child: FaIcon(FontAwesomeIcons.userPlus, size: 18),
             ),
           ),
         ],

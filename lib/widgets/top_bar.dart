@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/constants.dart';
+import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/routes/app_routes.dart';
 
 class TopBar extends StatelessWidget implements PreferredSizeWidget {
   final double smallButtonWidth;
@@ -16,7 +18,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: buttoncolor, // Set the background color
+      backgroundColor: theme.colorScheme.onPrimary, // Set the background color
       titleSpacing: 0, // Ensure the title starts at the edge
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -55,6 +57,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   height: 45,
                   onPressed: () {
                     // Define the action for the Order button
+                    onTapOrder(context);
                   },
                   child: const Text(
                     'Order',
@@ -81,6 +84,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                     height: 45,
                     onPressed: () {
                       // Define the action for the Invoice button
+                      onTapInvoice(context);
                     },
                     child: const Text(
                       'Invoice',
@@ -106,6 +110,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                     height: 45,
                     onPressed: () {
                       // Define the action for the History button
+                      onTapHistoryInvoice(context);
                     },
                     child: const Text(
                       'History',
@@ -196,4 +201,25 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  onTapInvoice(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.invoiceScreen,
+      (route) => false,
+    );
+  }
+
+  onTapHistoryInvoice(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.historyInvoiceScreen,
+      (route) => false,
+    );
+  }
+
+  onTapOrder(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.orderScreen,
+      (route) => false,
+    );
+  }
 }

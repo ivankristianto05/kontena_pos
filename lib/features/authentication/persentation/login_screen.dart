@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
-import 'package:kontena_pos/core/utils/alert.dart' as alert;
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
+import 'package:kontena_pos/core/app_export.dart';
+import 'package:kontena_pos/core/animation/fade.dart';
+import 'package:kontena_pos/core/utils/alert.dart' as alert;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -177,6 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController enterPhoneController = TextEditingController();
   FocusNode inputPhone = FocusNode();
   Widget _buildPhoneNumberSection(BuildContext context) {
+    enterPhoneController.text = 'test';
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       // const Padding(
       //   padding: EdgeInsets.only(left: 1),
@@ -214,6 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
   FocusNode inputPassword = FocusNode();
   late bool _obscurePassword = false;
   Widget _buildPasswordSection(BuildContext context) {
+    enterPasswordController.text = 'test';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -272,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void onTapMasuk(BuildContext context) async {
     if (enterPhoneController.text != '' && enterPasswordController.text != '') {
       Navigator.of(context).pushNamedAndRemoveUntil(
-        await AppRoutes.orderScreen,
+        AppRoutes.invoiceScreen,
         (route) => false,
       );
     } else {
