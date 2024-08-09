@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
     // if (await myMe.checkStoredUser()) {
     //   return AppRoutes.orderScreen;
     // }
-    return AppRoutes.orderScreen;
+    return AppRoutes.loginScreen;
   }
 
   void addItemToCart(CartItem item) {
@@ -55,7 +55,7 @@ class _MyAppState extends State<MyApp> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Menampilkan loading indicator jika sedang menunggu hasil
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           // Menampilkan pesan error jika terjadi error
           return Center(child: Text('Error: ${snapshot.error}'));
@@ -68,11 +68,11 @@ class _MyAppState extends State<MyApp> {
             initialRoute: snapshot.data!,
             navigatorKey: navigatorKey,
             routes: {
-              AppRoutes.loginScreen: (context) => LoginScreen(),
+              AppRoutes.loginScreen: (context) => const LoginScreen(),
               AppRoutes.orderScreen: (context) => OrderScreen(
-                cartItems: cartItems,
-                addItemToCart: addItemToCart,
-              ),
+                    cartItems: cartItems,
+                    addItemToCart: addItemToCart,
+                  ),
             },
           );
         }

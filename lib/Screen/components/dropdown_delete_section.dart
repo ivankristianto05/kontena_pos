@@ -24,7 +24,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
         children: [
           Expanded(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(
                   right: BorderSide(
@@ -38,14 +38,14 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                   bottom: BorderSide(
                     color: Colors.grey,
                     width: 1.0,
+                  ),
                 ),
-              ),
               ),
               height: 50,
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   isExpanded: true,
-                  hint: Text("Select an Option"),
+                  hint: const Text("Select an Option"),
                   value: selectedValue,
                   items: <String>[
                     'Option 1',
@@ -70,18 +70,17 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
           Container(
             width: smallButtonWidth,
             height: 50,
-            decoration: BoxDecoration(
-               color: Colors.white,
-               border: Border(
-                 bottom: BorderSide(
-                   color: Colors.grey,
-                   width: 1.0,
-                 ),
-                 top: BorderSide(
-                   color: Colors.grey,
-                   width: 1.0,
-                 )
-               ), 
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                  top: BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  )),
             ),
             child: MaterialButton(
               minWidth: 0,
@@ -89,7 +88,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
               onPressed: () {
                 // Handle the action for the delete button
               },
-              child: Icon(Icons.delete, color: Colors.red),
+              child: const Icon(Icons.delete, color: Colors.red),
             ),
           ),
         ],

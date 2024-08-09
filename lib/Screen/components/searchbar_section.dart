@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 class Searchbar extends StatelessWidget {
   const Searchbar({
     super.key,
-    required this.screenWidth,
+    required this.width,
   });
 
-  final double screenWidth;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: screenWidth * 0.65,height: 55,
-      decoration: BoxDecoration(
+      width: width * 0.65,
+      height: 55,
+      decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(
           right: BorderSide(
@@ -21,7 +22,7 @@ class Searchbar extends StatelessWidget {
           ),
         ),
       ),
-      child: TextField(
+      child: const TextField(
         decoration: InputDecoration(
           hintText: 'Search Menu',
           filled: true,

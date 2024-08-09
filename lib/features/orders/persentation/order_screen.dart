@@ -9,8 +9,11 @@ import 'package:kontena_pos/Screen/components/guestinputwithbutton_section.dart'
 import 'package:kontena_pos/Screen/components/itemcart_section.dart';
 import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/Screen/popup/itemdialog_section.dart';
+import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/models/cart_item.dart';
 import 'package:kontena_pos/constants.dart';
+import 'package:kontena_pos/widgets/custom_text_form_field.dart';
+import 'package:kontena_pos/widgets/top_bar.dart';
 
 class OrderScreen extends StatefulWidget {
   final List<CartItem> cartItems;
@@ -28,6 +31,7 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   final TextEditingController _guestNameController = TextEditingController();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -61,7 +65,8 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   void _editItemInCart(CartItem editedItem) {
-    final index = widget.cartItems.indexWhere((item) => item.idMenu == editedItem.idMenu);
+    final index =
+        widget.cartItems.indexWhere((item) => item.idMenu == editedItem.idMenu);
     if (index != -1) {
       setState(() {
         widget.cartItems[index] = editedItem;
@@ -76,84 +81,139 @@ class _OrderScreenState extends State<OrderScreen> {
     double smallButtonWidth = screenWidth * 0.05;
     double buttonWidth = screenWidth * 0.15;
 
-    return Scaffold(
-      appBar: BuildAppbar(
-        smallButtonWidth: smallButtonWidth,
-        buttonWidth: buttonWidth,
-        isWideScreen: screenWidth > 800,
-      ),
-      body: Container(
-        color: itembackgroundcolor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Searchbar(screenWidth: screenWidth),
-                GuestInputWithButton(
-                  searchbarWidth: searchbarWidth,
-                  guestNameController: _guestNameController,
-                  smallButtonWidth: smallButtonWidth,
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Container(
-                  width: searchbarWidth,
-                  child: Row(
-                    children: [
-                      ButtonFilter(),
-                    ],
-                  ),
-                ),
-                DropdownDeleteSection()
-              ],
-            ),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: CardMenu(
-                      onMenuTap: (name, price, idMenu, type) {
-                        _showItemDetailsDialog(name, price, idMenu, type);
-                      },
-                    ),
-                  ),
-                  Container(
-                    width: screenWidth * 0.35,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                    ),
-                    child: ItemCart(
-                      screenWidth: screenWidth,
-                      cartItems: widget.cartItems,
-                      onEditItem: _editItemInCart,
-                    ),
-                  ),
-                ],
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: theme.colorScheme.background,
+        body: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              TopBar(
+                smallButtonWidth: smallButtonWidth,
+                buttonWidth: buttonWidth,
+                isWideScreen: true,
               ),
-            ),
-            Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: screenWidth * 0.65,
-                    child: Footer(screenWidth: screenWidth),
-                  ),
-                  ActionButton(
-                    screenWidth: screenWidth,
-                    cartItems: widget.cartItems,
-                  ),
-                ],
+              Expanded(
+                child: Stack(
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: [
+                              CustomTextFormField(
+                                controller: enterPasswordController,
+                                focusNode: inputPassword,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 3.h,
+                                  vertical: 9.v,
+                                ),
+                                hintText: "Masukin password test",
+                                textInputAction: TextInputAction.done,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Password tidak boleh kosong';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              Align(
+                                alignment: AlignmentDirectional(0.00, 0.00),
+                                child: CardMenu(
+                                  onMenuTap: (name, price, idMenu, type) {
+                                    _showItemDetailsDialog(
+                                        name, price, idMenu, type);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          // ),
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // DropdownDeleteSection(),
+                            CustomTextFormField(
+                              controller: enterPasswordController,
+                              focusNode: inputPassword,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 3.h,
+                                vertical: 9.v,
+                              ),
+                              hintText: "Masukin password test",
+                              textInputAction: TextInputAction.done,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Password tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                            ),
+                            // Container(
+                            //   child:
+                            // ),
+                            // Text('test'),
+                            // GuestInputWithButton(
+                            //   width: 40.0,
+                            //   guestNameController: _guestNameController,
+                            //   smallButtonWidth: smallButtonWidth,
+                            // ),
+                            // _buildPasswordSection(context),
+                          ],
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  TextEditingController enterPasswordController = TextEditingController();
+  FocusNode inputPassword = FocusNode();
+  Widget _buildPasswordSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // const Padding(
+        //   padding: EdgeInsets.only(left: 1),
+        //   child: Text(
+        //     "Password",
+        //     style: TextStyle(
+        //       fontSize: 16,
+        //     ),
+        //   ),
+        // ),
+        // const SizedBox(height: 6),
+        CustomTextFormField(
+          controller: enterPasswordController,
+          focusNode: inputPassword,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 3.h,
+            vertical: 9.v,
+          ),
+          hintText: "Masukin password mu",
+          textInputAction: TextInputAction.done,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Password tidak boleh kosong';
+            }
+            return null;
+          },
+        ),
+      ],
     );
   }
 }

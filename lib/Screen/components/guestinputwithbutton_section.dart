@@ -4,12 +4,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class GuestInputWithButton extends StatelessWidget {
   const GuestInputWithButton({
     super.key,
-    required this.searchbarWidth,
+    required this.width,
     required TextEditingController guestNameController,
     required this.smallButtonWidth,
   }) : _guestNameController = guestNameController;
 
-  final double searchbarWidth;
+  final double width;
   final TextEditingController _guestNameController;
   final double smallButtonWidth;
 
@@ -19,18 +19,20 @@ class GuestInputWithButton extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              height: 55, // Ensuring the height is consistent
+            child: SizedBox(
+              height: 55,
+              // width: width * 0.3, // Ensuring the height is consistent
               child: Stack(
                 children: [
                   TextField(
                     controller: _guestNameController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Input Guest Name',
                       filled: true,
                       fillColor: Colors.white,
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 18,horizontal: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 18, horizontal: 8),
                     ),
                   ),
                   Positioned(
@@ -40,7 +42,7 @@ class GuestInputWithButton extends StatelessWidget {
                     child: Visibility(
                       visible: _guestNameController.text.isNotEmpty,
                       child: IconButton(
-                        icon: FaIcon(FontAwesomeIcons.circleXmark),
+                        icon: const FaIcon(FontAwesomeIcons.circleXmark),
                         onPressed: () {
                           _guestNameController.clear();
                         },
@@ -53,7 +55,7 @@ class GuestInputWithButton extends StatelessWidget {
           ),
           Container(
             width: smallButtonWidth,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(
                 right: BorderSide(
@@ -72,7 +74,7 @@ class GuestInputWithButton extends StatelessWidget {
               onPressed: () {
                 // Handle the action for the search button
               },
-              child: Icon(Icons.search_outlined, color: Colors.black),
+              child: const Icon(Icons.search_outlined, color: Colors.black),
             ),
           ),
           Container(
@@ -84,7 +86,7 @@ class GuestInputWithButton extends StatelessWidget {
               onPressed: () {
                 // Handle the action for the person button
               },
-              child: FaIcon(FontAwesomeIcons.userPlus, size: 18),
+              child: const FaIcon(FontAwesomeIcons.userPlus, size: 18),
             ),
           ),
         ],
