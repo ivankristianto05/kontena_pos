@@ -94,7 +94,7 @@ class _OrderScreenState extends State<OrderScreen> {
       appBar: BuildAppbar(
         smallButtonWidth: smallButtonWidth,
         buttonWidth: buttonWidth,
-        isWideScreen: screenWidth > 800,
+        //isWideScreen: screenWidth > 800,
       ),
       body: Container(
         color: itembackgroundcolor,
@@ -154,7 +154,6 @@ class _OrderScreenState extends State<OrderScreen> {
                 ],
               ),
             ),
-            
             Container(
               height: 50,
               child: Row(

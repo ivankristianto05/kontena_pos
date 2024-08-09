@@ -3,6 +3,7 @@ import 'package:kontena_pos/Screen/popup/addons_section.dart';
 import 'package:kontena_pos/Screen/popup/noteandpreference_section.dart';
 import 'package:kontena_pos/Screen/popup/sumary_section.dart';
 import 'package:kontena_pos/Screen/popup/variant_section.dart';
+import 'package:kontena_pos/data/menuvarian.dart';
 import 'package:kontena_pos/models/cart_item.dart';
 
 class ItemEditDialog extends StatefulWidget {
@@ -34,24 +35,33 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
     _initializeFields();
   }
 
-  void _initializeFields() {
-    setState(() {
-      _selectedVariant = widget.item.variant;
-      _quantity = widget.item.quantity;
-      _notes = widget.item.notes;
-      _selectedPreference = widget.item.preference;
-      _selectedAddons = widget.item.addons;
-      _variantPrice = widget.item.variantPrice;
+ void _initializeFields() {
+  setState(() {
+    _selectedVariant = widget.item.variant;
+    _quantity = widget.item.quantity;
+    _notes = widget.item.notes;
+    _selectedPreference = widget.item.preference;
+    _selectedAddons = widget.item.addons;
+    _variantPrice = widget.item.variantPrice;
 
-      _selectedVariantIndex = _getVariantIndex(_selectedVariant);
-      _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
-    });
-  }
+    List<String> variants = MenuVarian
+        .where((variant) => variant['id_menu'] == widget.item.idMenu)
+        .map((variant) => variant['nama_varian'] as String)
+        .toList();
 
-  int _getVariantIndex(String? variant) {
-    List<String> variants = _getVariantsBasedOnType();
-    return variants.indexOf(variant ?? '');
-  }
+    _selectedVariantIndex = variants.indexOf(_selectedVariant ?? '');
+    _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
+  });
+}
+
+
+
+
+
+ int _getVariantIndex(String? variant) {
+  List<String> variants = _getVariantsBasedOnType();
+ return variants.indexOf(variant ?? '');
+}
 
   int _getPreferenceIndex(String preference) {
     List<String> preferences = _getPreferencesBasedOnType();

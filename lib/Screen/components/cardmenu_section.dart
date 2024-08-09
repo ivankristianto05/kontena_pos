@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';  // Import AutoSizeText package
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';  // Import intl package
 import 'package:kontena_pos/data/menu.dart';
@@ -72,18 +73,27 @@ class CardMenu extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(menu['type'].toString(), style: TextStyle(fontSize: 12, color: Colors.black)),
-                        Text(
+                        AutoSizeText(
+                          menu['type'].toString(),
+                          style: TextStyle(fontSize: 12, color: Colors.black),
+                          maxLines: 1,
+                          minFontSize: 10, // Minimum font size
+                        ),
+                        AutoSizeText(
                           menu['nama_menu'].toString(),
                           style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
+                          maxLines: 1,
+                          minFontSize: 12, // Minimum font size
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: screenWidth * 0.001),
                         Align(
                           alignment: Alignment.bottomRight,
-                          child: Text(
+                          child: AutoSizeText(
                             'Rp ${currencyFormat.format(harga)}', // Format price with thousands separator
                             style: TextStyle(fontSize: 14, color: Colors.black),
+                            maxLines: 1,
+                            minFontSize: 12, // Minimum font size
                           ),
                         ),
                       ],

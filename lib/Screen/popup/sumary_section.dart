@@ -147,7 +147,7 @@ class SummarySection extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Qty',
+                    Text('Total',
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     Row(

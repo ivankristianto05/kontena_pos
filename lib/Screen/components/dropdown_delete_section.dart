@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/constants.dart';
 
 class DropdownDeleteSection extends StatefulWidget {
   const DropdownDeleteSection({super.key});
@@ -88,12 +89,13 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                ), 
             ),
             child: MaterialButton(
-              minWidth: 0,
               height: 50,
+              padding: EdgeInsets.zero,
               onPressed: () {
                 // Handle the action for the delete button
               },
-              child: Icon(Icons.delete, color: Colors.red),
+              
+              child: Icon(Icons.delete, color: redcolor),
             ),
           ),
         ],
