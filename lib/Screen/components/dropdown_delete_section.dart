@@ -24,7 +24,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
         children: [
           Expanded(
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
                   right: BorderSide(
@@ -38,31 +38,35 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                   bottom: BorderSide(
                     color: Colors.grey,
                     width: 1.0,
-                  ),
                 ),
+              ),
               ),
               height: 50,
               child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  hint: const Text("Select an Option"),
-                  value: selectedValue,
-                  items: <String>[
-                    'Option 1',
-                    'Option 2',
-                    'Option 3',
-                    'Option 4'
-                  ].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedValue = newValue;
-                    });
-                  },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    hint: Text("Select an Option"),
+                    value: selectedValue,
+                    items: <String>[
+                      'Dine in',
+                      'Take away',
+                      'Gojek',
+                    ].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value,style: TextStyle(
+                          fontWeight: FontWeight.normal
+                        ),),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedValue = newValue;
+                      });
+                    },
+                  ),
                 ),
               ),
             ),
@@ -70,17 +74,18 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
           Container(
             width: smallButtonWidth,
             height: 50,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                  bottom: BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  ),
-                  top: BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  )),
+            decoration: BoxDecoration(
+               color: Colors.white,
+               border: Border(
+                 bottom: BorderSide(
+                   color: Colors.grey,
+                   width: 1.0,
+                 ),
+                 top: BorderSide(
+                   color: Colors.grey,
+                   width: 1.0,
+                 )
+               ), 
             ),
             child: MaterialButton(
               minWidth: 0,
@@ -88,7 +93,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
               onPressed: () {
                 // Handle the action for the delete button
               },
-              child: const Icon(Icons.delete, color: Colors.red),
+              child: Icon(Icons.delete, color: Colors.red),
             ),
           ),
         ],

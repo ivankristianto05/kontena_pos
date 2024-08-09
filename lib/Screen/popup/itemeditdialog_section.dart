@@ -26,13 +26,12 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
   String _notes = '';
   String? _selectedVariant;
   int _quantity = 1;
+  int _variantPrice = 0;
 
   @override
   void initState() {
     super.initState();
     _initializeFields();
-    // Print type when dialog is initialized
-    print('Dialog Initialized with type: ${widget.item.idMenu}');
   }
 
   void _initializeFields() {
@@ -42,9 +41,10 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
       _notes = widget.item.notes;
       _selectedPreference = widget.item.preference;
       _selectedAddons = widget.item.addons;
+      _variantPrice = widget.item.variantPrice;
 
       // Debugging
-      print('Initializing fields with type: ${widget.item.idMenu}');
+      print('Item type: ${widget.item.type}'); // Debugging
 
       // Set selected indices based on the existing data
       _selectedVariantIndex = _getVariantIndex(_selectedVariant);
@@ -65,22 +65,22 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
   }
 
   List<String> _getVariantsBasedOnType() {
-    if (widget.item.idMenu == 'food') {
+    if (widget.item.type == 'food') {
       return ['Variant 1', 'Variant 2', 'Variant 3']; // Replace with actual variants
-    } else if (widget.item.idMenu == 'beverage') {
+    } else if (widget.item.type == 'beverage') {
       return ['Variant A', 'Variant B', 'Variant C']; // Replace with actual variants
-    } else if (widget.item.idMenu == 'breakfast') {
+    } else if (widget.item.type == 'breakfast') {
       return ['Small', 'Medium', 'Large']; // Replace with actual variants
     }
     return [];
   }
 
   List<String> _getPreferencesBasedOnType() {
-    if (widget.item.idMenu == 'food') {
+    if (widget.item.type == 'food') {
       return ['original', 'hot', 'very hot', 'no sauce', 'no MSG', 'no salt'];
-    } else if (widget.item.idMenu == 'beverage') {
+    } else if (widget.item.type == 'beverage') {
       return ['less sugar', 'less ice'];
-    } else if (widget.item.idMenu == 'breakfast') {
+    } else if (widget.item.type == 'breakfast') {
       return ['small', 'medium', 'jumbo'];
     }
     return [];
@@ -96,10 +96,10 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
       addons: _selectedAddons,
       notes: _notes,
       preference: _selectedPreference,
+      type: widget.item.type, // Ensure type is correctly set
+      variantPrice: _variantPrice, // Add this line
     );
-    // Print type when editing
-    print('Editing Item with type: ${widget.item.idMenu}');
-    print('Edited Item: $editedItem'); // Debugging
+    print('Editing Item: $editedItem'); // Debugging
     widget.onEdit(editedItem);
     Navigator.of(context).pop();
   }
@@ -146,11 +146,12 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                     child: VariantSection(
                       idMenu: widget.item.idMenu,
                       selectedIndex: _selectedVariantIndex,
-                      onVariantSelected: (index, variant) {
+                      onVariantSelected: (index, variant, price) {
                         print('Variant Selected: $variant'); // Debugging
                         setState(() {
                           _selectedVariantIndex = index;
                           _selectedVariant = variant;
+                          _variantPrice = price;
                         });
                       },
                     ),
@@ -158,7 +159,7 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                   Flexible(
                     flex: 2,
                     child: NotesAndPreferenceSection(
-                      type: widget.item.idMenu,
+                      type: widget.item.type, // Use type instead of idMenu
                       selectedPreferenceIndex: _selectedPreferenceIndex,
                       onPreferenceSelected: (index, preference) {
                         print('Preference Selected: $preference'); // Debugging
@@ -179,7 +180,7 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                   Flexible(
                     flex: 2,
                     child: AddonSection(
-                      type: widget.item.idMenu,
+                      type: widget.item.type, // Use type instead of idMenu
                       selectedAddons: _selectedAddons,
                       onAddonChanged: (addons) {
                         print('Addons Changed: $addons'); // Debugging
@@ -193,8 +194,8 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                     flex: 2,
                     child: SummarySection(
                       name: widget.item.name,
-                      price: widget.item.price.toString(),
-                      type: widget.item.idMenu,
+                      price: (_variantPrice != 0) ? _variantPrice.toString() : widget.item.price.toString(),
+                      type: widget.item.type, // Use type instead of idMenu
                       selectedVariant: _selectedVariant,
                       selectedPreferenceIndex: _selectedPreferenceIndex,
                       selectedAddons: _selectedAddons,
@@ -206,6 +207,7 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                           _quantity = quantity;
                         });
                       },
+                      variantPrice: _variantPrice,
                     ),
                   ),
                 ],

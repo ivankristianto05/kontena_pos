@@ -2,26 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/Screen/popup/itemeditdialog_section.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/models/cart_item.dart';
+import 'package:dotted_line/dotted_line.dart';
+import 'package:intl/intl.dart'; // Import intl package
 
 class ItemCart extends StatelessWidget {
   final List<CartItem> cartItems;
   final double screenWidth;
   final void Function(CartItem editedItem) onEditItem;
 
-  const ItemCart({
+  ItemCart({
     required this.cartItems,
     required this.screenWidth,
     required this.onEditItem,
   });
 
+  // Create a NumberFormat instance for Indonesian locale
+  final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: screenWidth * 0.3,
-      child: ListView.builder(
+      child: ListView.separated(
         itemCount: cartItems.length,
+        separatorBuilder: (context, index) => Padding(
+            padding: const EdgeInsets.symmetric(
+                vertical: 8.0), // Adjust the vertical padding
+            child: Divider(
+              thickness: 3,
+            )),
         itemBuilder: (context, index) {
           final item = cartItems[index];
+          final price = (item.variantPrice != 0) ? item.variantPrice : item.price;
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -32,15 +44,23 @@ class ItemCart extends StatelessWidget {
                   child: Text(
                     '${item.name} - (${item.quantity})',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                Divider(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: DottedLine(
+                    dashColor: Colors.grey,
+                    lineThickness: 1.0,
+                    dashLength: 4.0,
+                    dashGapLength: 4.0,
+                  ),
+                ),
                 // nama menu - jumlah
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 4),
+                  // padding: EdgeInsets.symmetric(vertical: 4),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -50,29 +70,33 @@ class ItemCart extends StatelessWidget {
                           Expanded(
                             child: Text(
                               '${item.name} - ${item.variant} (${item.quantity})',
-                              style: TextStyle(fontSize: 14),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w500),
                               maxLines: 2, // Set maximum number of lines
-                              overflow: TextOverflow.ellipsis, // Handle overflow with ellipsis
+                              overflow: TextOverflow
+                                  .ellipsis, // Handle overflow with ellipsis
                             ),
                           ),
                           Text(
-                            'Rp ${item.price * item.quantity}',
-                            style: TextStyle(fontSize: 14),
+                            'Rp ${currencyFormat.format(price * item.quantity)}', // Format price with thousands separator
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 4),
                 // perhitungan harga
                 Container(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '${item.quantity}x Rp ${item.price}',
-                        style: TextStyle(fontSize: 12),
+                        '${item.quantity}x Rp ${currencyFormat.format(price)}', // Format price with thousands separator
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w300),
                       ),
                     ],
                   ),
@@ -85,7 +109,8 @@ class ItemCart extends StatelessWidget {
                     children: [
                       Text(
                         'Addon:',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       ...item.addons.entries.map((addon) => addon.value
                           ? Text(
@@ -96,7 +121,7 @@ class ItemCart extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 8),
+                //SizedBox(height: 8),
                 // preference
                 Container(
                   child: Column(
@@ -104,12 +129,15 @@ class ItemCart extends StatelessWidget {
                     children: [
                       Text(
                         'Preference:',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
                       ),
-                      Text(
-                        item.preference,
-                        style: TextStyle(fontSize: 14),
-                      ),
+                      item.preference.isNotEmpty
+                          ? Text(
+                              item.preference,
+                              style: TextStyle(fontSize: 14),
+                            )
+                          : Container(), // If preference is empty, display an empty container
                     ],
                   ),
                 ),
@@ -120,15 +148,19 @@ class ItemCart extends StatelessWidget {
                     children: [
                       Text(
                         'Notes:',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
                       ),
-                      Text(
-                        item.notes,
-                        style: TextStyle(fontSize: 14),
-                      ),
+                      item.notes.isNotEmpty
+                          ? Text(
+                              item.notes,
+                              style: TextStyle(fontSize: 14),
+                            )
+                          : Container(), // If notes are empty, display an empty container
                     ],
                   ),
                 ),
+                SizedBox(height: 8),
                 // edit button
                 Container(
                   child: ElevatedButton(

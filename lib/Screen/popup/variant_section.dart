@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/data/menuvarian.dart';
 
-
-class VariantSection extends StatelessWidget {
+class VariantSection extends StatefulWidget {
   final String idMenu;
   final int selectedIndex;
-  final Function(int, String) onVariantSelected;
+  final Function(int, String, int) onVariantSelected;
 
   VariantSection({
     required this.idMenu,
@@ -16,8 +15,34 @@ class VariantSection extends StatelessWidget {
   });
 
   @override
+  _VariantSectionState createState() => _VariantSectionState();
+}
+
+class _VariantSectionState extends State<VariantSection> {
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedIndex; // Initialize with the prop
+  }
+
+  @override
+  void didUpdateWidget(VariantSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update _selectedIndex if selectedIndex prop changes
+    if (widget.selectedIndex != oldWidget.selectedIndex) {
+      setState(() {
+        _selectedIndex = widget.selectedIndex;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final variants = MenuVarian.where((variant) => variant['id_menu'] == idMenu).toList();
+    final variants =
+        MenuVarian.where((variant) => variant['id_menu'] == widget.idMenu)
+            .toList();
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -36,33 +61,52 @@ class VariantSection extends StatelessWidget {
               child: Column(
                 children: List.generate(variants.length, (index) {
                   final variant = variants[index];
-                  final isSelected = selectedIndex == index;
+                  final isSelected = _selectedIndex == index;
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () {
-                        onVariantSelected(index, variant['nama_varian']);
+                        setState(() {
+                          if (_selectedIndex == index) {
+                            // If the same variant is tapped again, deselect it
+                            _selectedIndex = -1;
+                            widget.onVariantSelected(-1, '',
+                                0); // Pass empty values to indicate deselection
+                          } else {
+                            // Otherwise, select the new variant
+                            _selectedIndex = index;
+                            widget.onVariantSelected(
+                                index,
+                                variant['nama_varian'],
+                                variant['harga_varian']);
+                          }
+                        });
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: isSelected ? buttonselectedcolor : Colors.white,
+                          color:
+                              isSelected ? buttonselectedcolor : Colors.white,
                           border: Border.all(
-                              color: isSelected ? buttonselectedcolor : Colors.grey),
+                              color: isSelected
+                                  ? buttonselectedcolor
+                                  : Colors.grey),
                         ),
                         child: ListTile(
                           title: AutoSizeText(
                             variant['nama_varian'],
                             style: TextStyle(
-                                fontSize: 14,
-                                color: isSelected ? Colors.white : Colors.black),
+                              fontSize: 14,
+                              color: isSelected ? Colors.white : Colors.black,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           subtitle: AutoSizeText(
-                            "Rp ${variant['harga']}",
+                            "Rp ${variant['harga_varian']}",
                             style: TextStyle(
-                                fontSize: 12,
-                                color: isSelected ? Colors.white : Colors.black),
+                              fontSize: 12,
+                              color: isSelected ? Colors.white : Colors.black,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),

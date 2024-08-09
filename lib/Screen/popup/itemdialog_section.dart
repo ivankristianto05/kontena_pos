@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';  // Import intl package
 import 'package:kontena_pos/Screen/popup/addons_section.dart';
 import 'package:kontena_pos/Screen/popup/noteandpreference_section.dart';
 import 'package:kontena_pos/Screen/popup/sumary_section.dart';
 import 'package:kontena_pos/Screen/popup/variant_section.dart';
 import 'package:kontena_pos/models/cart_item.dart';
-
 
 class ItemDetailsDialog extends StatefulWidget {
   final String name;
@@ -33,6 +33,10 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
   String _notes = '';
   String? _selectedVariant;
   int _quantity = 1;
+  int _variantPrice = 0;
+
+  // Create a NumberFormat instance for Indonesian locale
+  final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
 
   void _addItemToCart() {
     final cartItem = CartItem(
@@ -40,11 +44,14 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
       name: widget.name,
       variant: _selectedVariant ?? '',
       quantity: _quantity,
-      price: double.tryParse(widget.price) ?? 0.0,
+      price: int.tryParse(widget.price) ?? 0, // Convert price to int
       addons: _selectedAddons,
       notes: _notes,
       preference: _selectedPreference,
+      type: widget.type, // Ensure this is correctly assigned
+      variantPrice: _variantPrice, // Add this line
     );
+
     widget.onAddToCart(cartItem);
     Navigator.of(context).pop();
   }
@@ -91,10 +98,11 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                     child: VariantSection(
                       idMenu: widget.idMenu,
                       selectedIndex: _selectedVariantIndex,
-                      onVariantSelected: (index, variant) {
+                      onVariantSelected: (index, variant, price) {
                         setState(() {
                           _selectedVariantIndex = index;
                           _selectedVariant = variant;
+                          _variantPrice = price;
                         });
                       },
                     ),
@@ -133,7 +141,7 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                     flex: 2,
                     child: SummarySection(
                       name: widget.name,
-                      price: widget.price,
+                      price: currencyFormat.format(_variantPrice != 0 ? _variantPrice : int.tryParse(widget.price) ?? 0), // Format price with thousands separator
                       type: widget.type,
                       selectedVariant: _selectedVariant,
                       selectedPreferenceIndex: _selectedPreferenceIndex,
@@ -145,6 +153,7 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                           _quantity = quantity;
                         });
                       },
+                      variantPrice: _variantPrice,
                     ),
                   ),
                 ],

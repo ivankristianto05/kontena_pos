@@ -32,6 +32,8 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   final TextEditingController _guestNameController = TextEditingController();
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  String _selectedFilterType = 'All';
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -72,6 +74,18 @@ class _OrderScreenState extends State<OrderScreen> {
         widget.cartItems[index] = editedItem;
       });
     }
+  }
+
+  void _handleFilterSelected(String type) {
+    setState(() {
+      _selectedFilterType = type;
+    });
+  }
+
+  void _handleSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
   }
 
   @override
@@ -130,6 +144,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                     _showItemDetailsDialog(
                                         name, price, idMenu, type);
                                   },
+                                  filterType: _selectedFilterType,
+                                  searchQuery: _searchQuery,
                                 ),
                               ),
                             ],
@@ -173,6 +189,85 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                   ],
                 ),
+                // return Scaffold(
+                //   appBar: BuildAppbar(
+                //     smallButtonWidth: smallButtonWidth,
+                //     buttonWidth: buttonWidth,
+                //     isWideScreen: screenWidth > 800,
+                //   ),
+                //   body: Container(
+                //     color: itembackgroundcolor,
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         Row(
+                //           children: [
+                //             Searchbar(
+                //               screenWidth: screenWidth,
+                //               onSearchChanged: _handleSearchChanged,
+                //             ),
+                //             GuestInputWithButton(
+                //               searchbarWidth: searchbarWidth,
+                //               guestNameController: _guestNameController,
+                //               smallButtonWidth: smallButtonWidth,
+                //             ),
+                //           ],
+                //         ),
+                //         Row(
+                //           children: [
+                //             Container(
+                //               width: searchbarWidth,
+                //               child: Row(
+                //                 children: [
+                //                   ButtonFilter(onFilterSelected: _handleFilterSelected),
+                //                 ],
+                //               ),
+                //             ),
+                //             DropdownDeleteSection()
+                //           ],
+                //         ),
+                //         Expanded(
+                //           child: Row(
+                //             children: [
+                //               Expanded(
+                //                 flex: 2,
+                //                 child: CardMenu(
+                //                   onMenuTap: (name, price, idMenu, type) {
+                //                     _showItemDetailsDialog(name, price, idMenu, type);
+                //                   },
+                //                   filterType: _selectedFilterType,
+                //                   searchQuery: _searchQuery,
+                //                 ),
+                //               ),
+                //               Container(
+                //                 width: screenWidth * 0.35,
+                //                 decoration: BoxDecoration(
+                //                   color: Colors.white,
+                //                 ),
+                //                 child: ItemCart(
+                //                   screenWidth: screenWidth,
+                //                   cartItems: widget.cartItems,
+                //                   onEditItem: _editItemInCart,
+                //                 ),
+                //               ),
+                //             ],
+                //           ),
+                //         ),
+
+                //         Container(
+                //           height: 50,
+                //           child: Row(
+                //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //             children: [
+                //               Container(
+                //                 width: screenWidth * 0.65,
+                //                 child: Footer(screenWidth: screenWidth),
+                //               ),
+                //               ActionButton(
+                //                 screenWidth: screenWidth,
+                //                 cartItems: widget.cartItems,
+                //               ),
+                //             ],
               ),
             ],
           ),
