@@ -174,27 +174,6 @@ class ItemCart extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Delete button at bottom right
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: redcolor, // Change color to red for delete
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                          onPressed: () {
-                            //onDeleteItem(item); // Call delete callback
-                          },
-                          child: Text(
-                            'Delete',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),

@@ -109,6 +109,8 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
 
   @override
   Widget build(BuildContext context) {
+    double popupWidth = MediaQuery.of(context).size.width * 0.9;
+    double popupHeight = MediaQuery.of(context).size.height * 0.7;
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
