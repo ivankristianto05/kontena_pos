@@ -1,8 +1,10 @@
-import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/widgets/custom_text_form_field.dart';
+import 'package:kontena_pos/core/app_export.dart';
+import 'package:kontena_pos/core/animation/fade.dart';
+import 'package:kontena_pos/core/utils/alert.dart' as alert;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -16,11 +18,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final unfocusNode = FocusNode();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
-
-  TextEditingController? userFieldController;
-  TextEditingController? pwFieldController;
-
-  late bool pwFieldVisibility = false;
 
   String? Function(BuildContext, String?)? userFieldControllerValidator;
 
@@ -42,8 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
     // _model.settingDevice = getJsonField(FFAppState().settingValue, r'''$.device''',);
     // _model.settingPrinter = getJsonField(FFAppState().settingValue, r'''$.printer''',);
 
-    userFieldController ??= TextEditingController();
-    pwFieldController ??= TextEditingController();
+    // userFieldController ??= TextEditingController();
+    // pwFieldController ??= TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
   }
 
@@ -81,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: MediaQuery.sizeOf(context).width * 0.4,
+                        width: MediaQuery.sizeOf(context).width * 0.26,
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primaryContainer,
                           border: Border.all(
@@ -92,39 +89,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              30.0, 30.0, 30.0, 30.0),
+                              30.0, 30.0, 30.0, 80.0),
                           child: SingleChildScrollView(
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 0.0, 0.0, 60.0),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsetsDirectional
-                                            .fromSTEB(16.0, 16.0, 16.0, 16.0),
-                                        child: InkWell(
-                                          splashColor: Colors.transparent,
-                                          focusColor: Colors.transparent,
-                                          hoverColor: Colors.transparent,
-                                          highlightColor: Colors.transparent,
-                                          child: Image.asset(
-                                            'images/logo.png',
-                                            height: MediaQuery.sizeOf(context)
-                                                    .height *
-                                                0.18,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                CustomImageView(
+                                  imagePath: ImageConstant.imgAppLauncherIcon,
+                                  // imagePath: 'images/img_app_launcher_icon.png',
+                                  height: 156,
+                                  width: 168,
+                                  alignment: Alignment.centerRight,
                                 ),
                                 Column(
                                   mainAxisSize: MainAxisSize.max,
@@ -142,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Padding(
                                       padding:
                                           const EdgeInsetsDirectional.fromSTEB(
-                                              0.0, 8.0, 0.0, 16.0),
+                                              0.0, 16.0, 0.0, 16.0),
                                       child: Form(
                                         key: formKey,
                                         autovalidateMode:
@@ -157,123 +134,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   const EdgeInsetsDirectional
                                                       .fromSTEB(
                                                       0.0, 0.0, 0.0, 16.0),
-                                              child: Container(
-                                                width: double.infinity,
-                                                decoration: BoxDecoration(
-                                                  color: theme
-                                                      .colorScheme.background,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.0),
-                                                  border: Border.all(
-                                                    color: theme
-                                                        .colorScheme.surface,
-                                                    width: 1.0,
-                                                  ),
-                                                ),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsetsDirectional
-                                                          .fromSTEB(
-                                                          16.0, 0.0, 16.0, 0.0),
-                                                  child: TextFormField(
-                                                    controller:
-                                                        userFieldController,
-                                                    onChanged: (_) =>
-                                                        EasyDebounce.debounce(
-                                                      '_model.userFieldController',
-                                                      const Duration(
-                                                          milliseconds: 100),
-                                                      () => setState(() {}),
-                                                    ),
-                                                    autofocus: false,
-                                                    obscureText: false,
-                                                    decoration: InputDecoration(
-                                                      hintText:
-                                                          'Email/Username',
-                                                      hintStyle: theme
-                                                          .textTheme.labelSmall,
-                                                      enabledBorder:
-                                                          InputBorder.none,
-                                                      focusedBorder:
-                                                          InputBorder.none,
-                                                      errorBorder:
-                                                          InputBorder.none,
-                                                      focusedErrorBorder:
-                                                          InputBorder.none,
-                                                    ),
-                                                    style: theme
-                                                        .textTheme.labelSmall,
-                                                  ),
-                                                ),
+                                              child: _buildPhoneNumberSection(
+                                                context,
                                               ),
                                             ),
-                                            Container(
-                                              width: double.infinity,
-                                              decoration: BoxDecoration(
-                                                color: theme
-                                                    .colorScheme.background,
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                                border: Border.all(
-                                                  color:
-                                                      theme.colorScheme.surface,
-                                                  width: 1.0,
-                                                ),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsetsDirectional
-                                                        .fromSTEB(
-                                                        16.0, 0.0, 16.0, 0.0),
-                                                child: TextFormField(
-                                                  controller: pwFieldController,
-                                                  onChanged: (_) =>
-                                                      EasyDebounce.debounce(
-                                                    '_model.pwFieldController',
-                                                    const Duration(
-                                                        milliseconds: 100),
-                                                    () => setState(() {}),
-                                                  ),
-                                                  autofocus: false,
-                                                  obscureText:
-                                                      !pwFieldVisibility,
-                                                  decoration: InputDecoration(
-                                                    hintText: 'Password',
-                                                    hintStyle: theme
-                                                        .textTheme.labelSmall,
-                                                    enabledBorder:
-                                                        InputBorder.none,
-                                                    focusedBorder:
-                                                        InputBorder.none,
-                                                    errorBorder:
-                                                        InputBorder.none,
-                                                    focusedErrorBorder:
-                                                        InputBorder.none,
-                                                    suffixIcon: InkWell(
-                                                      onTap: () => setState(
-                                                        () => pwFieldVisibility =
-                                                            !pwFieldVisibility,
-                                                      ),
-                                                      focusNode: FocusNode(
-                                                          skipTraversal: true),
-                                                      child: Icon(
-                                                        pwFieldVisibility
-                                                            ? Icons
-                                                                .visibility_outlined
-                                                            : Icons
-                                                                .visibility_off_outlined,
-                                                        color: appTheme.gray500,
-                                                        size: 22.0,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  style: theme
-                                                      .textTheme.labelSmall,
-                                                  keyboardType: TextInputType
-                                                      .visiblePassword,
-                                                ),
-                                              ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                      0.0, 0.0, 0.0, 16.0),
+                                              child: _buildPasswordSection(
+                                                  context),
                                             ),
                                           ],
                                         ),
@@ -281,6 +152,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     CustomElevatedButton(
                                       text: "Masuk",
+                                      onPressed: () {
+                                        onTapMasuk(context);
+                                      },
                                     ),
                                   ],
                                 ),
@@ -298,5 +172,114 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  // widget input phone
+  TextEditingController enterPhoneController = TextEditingController();
+  FocusNode inputPhone = FocusNode();
+  Widget _buildPhoneNumberSection(BuildContext context) {
+    enterPhoneController.text = 'test';
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // const Padding(
+      //   padding: EdgeInsets.only(left: 1),
+      //   child: Text(
+      //     "No Hp / Email",
+      //     style: TextStyle(
+      //       fontSize: 16,
+      //     ),
+      //   ),
+      // ),
+      // const SizedBox(height: 6),
+      CustomTextFormField(
+        controller: enterPhoneController,
+        focusNode: inputPhone,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 3.h,
+          vertical: 9.v,
+        ),
+        hintText: "Masukin no hp / email mu",
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Nomor HP / Email tidak boleh kosong';
+          }
+          return null;
+        },
+        onTapOutside: (value) {
+          inputPhone.unfocus();
+        },
+      ),
+    ]);
+  }
+
+  // widget password
+  TextEditingController enterPasswordController = TextEditingController();
+  FocusNode inputPassword = FocusNode();
+  late bool _obscurePassword = false;
+  Widget _buildPasswordSection(BuildContext context) {
+    enterPasswordController.text = 'test';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // const Padding(
+        //   padding: EdgeInsets.only(left: 1),
+        //   child: Text(
+        //     "Password",
+        //     style: TextStyle(
+        //       fontSize: 16,
+        //     ),
+        //   ),
+        // ),
+        // const SizedBox(height: 6),
+        CustomTextFormField(
+          controller: enterPasswordController,
+          focusNode: inputPassword,
+          obscureText: _obscurePassword,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 3.h,
+            vertical: 9.v,
+          ),
+          hintText: "Masukin password mu",
+          suffix: IconButton(
+            icon: Icon(
+              _obscurePassword ? Icons.visibility : Icons.visibility_off,
+            ),
+            color: appTheme.gray500,
+            onPressed: _togglePasswordView,
+          ),
+          textInputAction: TextInputAction.done,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Password tidak boleh kosong';
+            }
+            return null;
+          },
+          onTapOutside: (value) {
+            inputPassword.unfocus();
+          },
+          onEditingComplete: () {
+            // print('debug');
+            inputPassword.unfocus();
+            onTapMasuk(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  void _togglePasswordView() {
+    setState(() {
+      _obscurePassword = !_obscurePassword;
+    });
+  }
+
+  void onTapMasuk(BuildContext context) async {
+    if (enterPhoneController.text != '' && enterPasswordController.text != '') {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.invoiceScreen,
+        (route) => false,
+      );
+    } else {
+      alert.alertError(context, 'Data Belum Lengkap!');
+    }
   }
 }

@@ -31,7 +31,10 @@ class _ButtonFilterState extends State<ButtonFilter> {
     double buttonWidth = (screenWidth * 0.65 - 145) / 4; // 65% of screen width divided among 4 buttons, minus padding
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8.0,
+        vertical: 8.0,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [

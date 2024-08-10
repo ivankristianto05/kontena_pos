@@ -17,7 +17,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
     double screenWidth = MediaQuery.of(context).size.width;
     double smallButtonWidth = screenWidth * 0.05;
     double searchbarWidth = screenWidth * 0.65;
-    double dropdownwidth = (screenWidth - searchbarWidth) / 2;
+
     return Container(
       width: screenWidth - searchbarWidth,
       height: 50,
@@ -141,7 +141,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
             ),
           ),
           Container(
-            width: smallButtonWidth,
+            width: 60,
             height: 50,
             decoration: BoxDecoration(
               color: Colors.white,

@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
     // if (await myMe.checkStoredUser()) {
     //   return AppRoutes.orderScreen;
     // }
-    return AppRoutes.orderScreen;
+    return AppRoutes.loginScreen;
   }
 
   void addItemToCart(CartItem item) {
@@ -55,25 +55,19 @@ class _MyAppState extends State<MyApp> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Menampilkan loading indicator jika sedang menunggu hasil
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           // Menampilkan pesan error jika terjadi error
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
           // Membangun aplikasi dengan initialRoute berdasarkan hasil
           return MaterialApp(
-            theme: theme,
+            theme: ThemeData(useMaterial3: false),
             title: 'KONTENA',
             debugShowCheckedModeBanner: false,
             initialRoute: snapshot.data!,
             navigatorKey: navigatorKey,
-            routes: {
-              AppRoutes.loginScreen: (context) => LoginScreen(),
-              AppRoutes.orderScreen: (context) => OrderScreen(
-                cartItems: cartItems,
-                addItemToCart: addItemToCart,
-              ),
-            },
+            routes: AppRoutes.routes,
           );
         }
       },

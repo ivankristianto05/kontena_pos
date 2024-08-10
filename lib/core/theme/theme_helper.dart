@@ -128,8 +128,8 @@ class TextThemes {
           fontWeight: FontWeight.w600,
         ),
         labelMedium: TextStyle(
-          color: appTheme.blueGray300,
-          fontSize: 11.0,
+          color: appTheme.gray500,
+          fontSize: 14.0,
           fontFamily: 'Urbanist',
           fontWeight: FontWeight.w700,
         ),

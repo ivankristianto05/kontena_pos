@@ -25,12 +25,13 @@ class GuestInputWithButton extends StatelessWidget {
                 children: [
                   TextField(
                     controller: _guestNameController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Input Guest Name',
                       filled: true,
                       fillColor: Colors.white,
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 18,horizontal: 8),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 18, horizontal: 8),
                     ),
                   ),
                   Positioned(
