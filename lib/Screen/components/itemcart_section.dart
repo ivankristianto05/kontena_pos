@@ -48,6 +48,7 @@ class ItemCart extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -167,6 +168,27 @@ class ItemCart extends StatelessWidget {
                           },
                           child: Text(
                             'Edit',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Delete button at bottom right
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: redcolor, // Change color to red for delete
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                          onPressed: () {
+                            //onDeleteItem(item); // Call delete callback
+                          },
+                          child: Text(
+                            'Delete',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,

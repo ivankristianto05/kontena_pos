@@ -49,12 +49,12 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   void _showItemDetailsDialog(
-      String name, int price, String idMenu, String type) {
+      String name, int price, String idMenu, String type) { // Change price to int
     showDialog(
       context: context,
       builder: (context) => ItemDetailsDialog(
         name: name,
-        price: price,
+        price: price, // Pass price as int
         idMenu: idMenu,
         type: type,
         onAddToCart: widget.addItemToCart,
@@ -84,43 +84,48 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double searchbarWidth = screenWidth * 0.65;
-    double smallButtonWidth = screenWidth * 0.05;
-    double buttonWidth = screenWidth * 0.15;
+Widget build(BuildContext context) {
+  double screenWidth = MediaQuery.of(context).size.width;
+  double searchbarWidth = screenWidth * 0.65;
+  double smallButtonWidth = screenWidth * 0.05;
+  double buttonWidth = screenWidth * 0.15;
 
-    return Scaffold(
-      appBar: BuildAppbar(
-        smallButtonWidth: smallButtonWidth,
-        buttonWidth: buttonWidth,
-      ),
-      body: Container(
-        color: itembackgroundcolor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Searchbar(
-                    screenWidth: screenWidth,
-                    onSearchChanged: _handleSearchChanged,
-                  ),
+  return Scaffold(
+    appBar: BuildAppbar(
+      smallButtonWidth: smallButtonWidth,
+      buttonWidth: buttonWidth,
+    ),
+    body: Container(
+      color: itembackgroundcolor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                height: 55,
+                child: Searchbar(
+                  screenWidth: searchbarWidth, // Pass the calculated width
+                  onSearchChanged: _handleSearchChanged,
                 ),
-                Expanded(
-                  child: GuestInputWithButton(
-                    searchbarWidth: searchbarWidth,
-                    guestNameController: _guestNameController,
-                    smallButtonWidth: smallButtonWidth,
+              ),
+              GuestInputWithButton(
+                  screenWidth: screenWidth,
+                  guestNameController: _guestNameController,
+                  smallButtonWidth: smallButtonWidth,
                   ),
-                ),
+            
               ],
             ),
             Row(
               children: [
-                Expanded(
-                  child: ButtonFilter(onFilterSelected: _handleFilterSelected),
+                Container(
+                  width: searchbarWidth,
+                  child: Row(
+                    children: [
+                      ButtonFilter(onFilterSelected: _handleFilterSelected),
+                    ],
+                  ),
                 ),
                 DropdownDeleteSection()
               ],
@@ -132,23 +137,21 @@ class _OrderScreenState extends State<OrderScreen> {
                     flex: 2,
                     child: CardMenu(
                       onMenuTap: (name, price, idMenu, type) {
-                        _showItemDetailsDialog(name, price, idMenu, type);
+                        _showItemDetailsDialog(name, price, idMenu, type); // Pass price as int
                       },
                       filterType: _selectedFilterType,
                       searchQuery: _searchQuery,
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: ItemCart(
-                        screenWidth: screenWidth,
-                        cartItems: widget.cartItems,
-                        onEditItem: _editItemInCart,
-                      ),
+                  Container(
+                    width: screenWidth * 0.35,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    child: ItemCart(
+                      screenWidth: screenWidth,
+                      cartItems: widget.cartItems,
+                      onEditItem: _editItemInCart,
                     ),
                   ),
                 ],
@@ -159,16 +162,13 @@ class _OrderScreenState extends State<OrderScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    flex: 2,
+                  Container(
+                    width: screenWidth * 0.65,
                     child: Footer(screenWidth: screenWidth),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: ActionButton(
-                      screenWidth: screenWidth,
-                      cartItems: widget.cartItems,
-                    ),
+                  ActionButton(
+                    screenWidth: screenWidth,
+                    cartItems: widget.cartItems,
                   ),
                 ],
               ),

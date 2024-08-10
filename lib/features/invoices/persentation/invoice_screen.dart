@@ -153,7 +153,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               // width: screenWidth * 0.3,
                               guestNameController: enterGuestNameController,
                               smallButtonWidth: smallButtonWidth,
-                              searchbarWidth: 10,
+                              screenWidth: 10,
                             ),
                           ),
                           // Container(
