@@ -18,72 +18,71 @@ class ProductGrid extends StatelessWidget {
     this.name = 'Item Name',
     this.description = 'Item Deskripsi',
     this.category = 'None',
-    this.price = 'Rp 10.000',
+    this.price = '10000',
   });
 
   // Map<String, dynamic> item;
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    bool isWideScreen = screenWidth > 800;
-
-    int crossAxisCount = isWideScreen ? 4 : 2;
-
-    return Card(
-      elevation: 2.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AspectRatio(
-            aspectRatio: 1.85, // Adjust aspect ratio as needed
-            child: Container(
-              color: Colors.grey[300],
-              child: Center(
-                child: Icon(Icons.image, size: 50.0, color: Colors.grey[600]),
+    return InkWell(
+      onTap: onTap,
+      child: Card(
+        elevation: 2.0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+              aspectRatio: 1.85, // Adjust aspect ratio as needed
+              child: Container(
+                color: Colors.grey[300],
+                child: Center(
+                  child: image ?? SizedBox(height: 72.v, width: 48.h),
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(
-              16.0,
-              16.0,
-              16.0,
-              16.0,
+            Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(
+                16.0,
+                8.0,
+                16.0,
+                10.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                      0.0,
+                      0.0,
+                      0.0,
+                      4.0,
+                    ),
+                    child: Text(
+                      category.toString(),
+                      style: theme.textTheme.labelMedium,
+                    ),
+                  ),
+                  AutoSizeText(
+                    name.toString(),
+                    style: theme.textTheme.titleMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    minFontSize: 10,
+                  ),
+                  const SizedBox(height: 12.0),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Text(
+                      numberFormat('idr', int.parse(price)),
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  category.toString(),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black,
-                  ),
-                ),
-                AutoSizeText(
-                  name.toString(),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  minFontSize: 10,
-                ),
-                const SizedBox(height: 12.0),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Text(
-                    numberFormat('idr', int.parse(price)),
-                    style: theme.textTheme.displaySmall,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

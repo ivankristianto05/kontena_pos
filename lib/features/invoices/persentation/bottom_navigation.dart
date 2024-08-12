@@ -79,7 +79,7 @@ class BottomNavigationInvoice extends StatelessWidget {
                           children: [
                             Text(
                               'Bayar',
-                              style: theme.textTheme.labelMedium,
+                              style: theme.textTheme.labelLarge,
                             ),
                             Text(
                               '0 item',
@@ -89,7 +89,7 @@ class BottomNavigationInvoice extends StatelessWidget {
                         ),
                         Text(
                           'IDR 0',
-                          style: theme.textTheme.labelMedium,
+                          style: theme.textTheme.labelLarge,
                         ),
                       ],
                     ),
