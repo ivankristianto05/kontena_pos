@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'core/functions/cart.dart';
+import 'core/functions/cart.dart'; // Pastikan ini mengimpor CartItem dari file yang benar
 
 class AppState extends ChangeNotifier {
   static AppState _instance = AppState._internal();
@@ -33,12 +32,27 @@ class AppState extends ChangeNotifier {
     _item = _value;
   }
 
-  static List<CartItem> cartItems = []; // New static list to store cart items
-  static void updateCart(List<CartItem> items) {
-    cartItems = items;
+  // List untuk menyimpan item di cart
+  List<CartItem> _cartItems = [];
+
+  List<CartItem> get cartItems => _cartItems;
+
+  // Menambahkan item ke dalam cart
+  void addItemToCart(CartItem item) {
+    final existingItemIndex = _cartItems.indexWhere((i) => i.id == item.id);
+    if (existingItemIndex >= 0) {
+      // Update existing item jika ada
+      _cartItems[existingItemIndex].qty += item.qty;
+    } else {
+      // Tambah item baru jika belum ada
+      _cartItems.add(item);
+    }
+    notifyListeners(); // Pemberitahuan bahwa ada perubahan
   }
 
-  static void resetCart() {
-    cartItems = [];
+  // Mengatur ulang cart
+  void resetCart() {
+    _cartItems = [];
+    notifyListeners(); // Pemberitahuan bahwa cart direset
   }
 }

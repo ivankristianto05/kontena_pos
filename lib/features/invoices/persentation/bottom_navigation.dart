@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 
 class BottomNavigationInvoice extends StatelessWidget {
+  final double dataContentWidth;
+
+  const BottomNavigationInvoice({
+    Key? key,
+    required this.dataContentWidth,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -45,7 +52,7 @@ class BottomNavigationInvoice extends StatelessWidget {
           ),
         ),
         Container(
-          width: MediaQuery.sizeOf(context).width * 0.3,
+          width: dataContentWidth,
           height: MediaQuery.sizeOf(context).height * 0.07,
           decoration: BoxDecoration(
             color: Colors.transparent,

@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:kontena_pos/app_state.dart';
 
 enum CartMode {
@@ -13,12 +12,12 @@ class CartItem {
   String? variant;
   int qty;
   final int price;
+  int variantPrice; // Tambahkan ini untuk menyimpan harga varian
   late int totalPrice;
   Map<String, Map<String, dynamic>>? addons;
   final String notes;
   final Map<String, String> preference;
   String? type;
-  // final int variantPrice; // Add this field
 
   CartItem({
     required this.id,
@@ -26,75 +25,53 @@ class CartItem {
     this.variant,
     required this.qty,
     required this.price,
+    this.variantPrice = 0, // Inisialisasi harga varian
     this.addons,
     required this.notes,
     required this.preference,
     this.type,
-    // required this.variantPrice, // Add this parameter
   }) {
-    totalPrice = qty * price;
+    totalPrice = qty * (variantPrice != 0 ? variantPrice : price);
+    // Jika addons memiliki harga, tambahkan logika untuk menghitung totalPrice dengan addons.
   }
 }
 
+
 class Cart {
   List<CartItem> _items = [];
+  final AppState appState; // Dependency injection for AppState
   VoidCallback? _onCartChanged;
 
-  Cart({VoidCallback? onCartChanged}) : _onCartChanged = onCartChanged {
+  Cart(this.appState, {VoidCallback? onCartChanged}) : _onCartChanged = onCartChanged {
     // Set the initial cart items from AppState
-    _items = List.from(AppState.cartItems);
+    _items = List.from(appState.cartItems);
   }
 
   List<CartItem> get items => List.from(_items);
 
   void _recalculateTotalPrice() {
     for (var item in _items) {
-      item.totalPrice = item.qty * item.price;
+      item.totalPrice = item.qty * (item.variantPrice != 0 ? item.variantPrice : item.price);
     }
   }
 
   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
-    // Check if the item with the same ID already exists
-    var existingItem = _items.firstWhere(
-      (item) => item.id == newItem.id,
-      orElse: () => CartItem(
-        id: '',
-        name: '',
-        qty: 0,
-        price: 0,
-        // itemName: '',
-        preference: {},
-        addons: {},
-        notes: '',
-      ),
-    );
+    var existingItemIndex = _items.indexWhere((item) => item.id == newItem.id);
 
-    if (existingItem.id.isNotEmpty) {
+    if (existingItemIndex != -1) {
       // Item already exists, update the quantity
+      var existingItem = _items[existingItemIndex];
       if (mode == CartMode.add) {
         existingItem.qty += newItem.qty;
       } else {
-        // Default behavior: Add a new item
         existingItem.qty = newItem.qty;
       }
+      _items[existingItemIndex] = existingItem;
     } else {
       // Item doesn't exist, add a new item
       _items.add(newItem);
     }
 
-    // / Recalculate total price
-    _recalculateTotalPrice();
-
-    // Notify changes
-    _onCartChanged?.call();
-
-    // Update app state
-    AppState.updateCart(_items);
-  }
-
-  void removeItem(String itemId) {
-    _items.removeWhere((item) => item.id == itemId);
-
     // Recalculate total price
     _recalculateTotalPrice();
 
@@ -102,24 +79,11 @@ class Cart {
     _onCartChanged?.call();
 
     // Update app state
-    AppState.updateCart(_items);
-  }
-
-  void clearCart() {
-    _items.clear();
-
-    // Recalculate total price
-    _recalculateTotalPrice();
-
-    // Notify changes
-    _onCartChanged?.call();
-
-    // Update app state
-    AppState.updateCart(_items);
+    appState.addItemToCart(newItem);
   }
 
   bool isItemInCart(String itemId) {
-    return AppState.cartItems.any((item) => item.id == itemId);
+    return _items.any((item) => item.id == itemId);
   }
 
   Map<String, dynamic> getItemCart(String itemName) {
@@ -127,7 +91,7 @@ class Cart {
     Map<String, int> indexes = {};
 
     int index = 0;
-    for (var item in AppState.cartItems) {
+    for (var item in _items) {
       if (item.name == itemName) {
         indexes[item.id] = index;
         data.add(item);
@@ -136,23 +100,14 @@ class Cart {
     }
 
     return {"data": data, "index": indexes};
-
-    // return {
-    //   "index": indexes,
-    //   "data": result
-    // }
-
-    // return AppState.cartItems
-    //     .where((item) => item.name == itemName)
-    //     .toList();
   }
 
   CartItem getItemByIndex(int index) {
-    return AppState.cartItems[index];
+    return _items[index];
   }
 
   List<CartItem> getAllItemCart() {
-    return AppState.cartItems.toList();
+    return List.from(_items);
   }
 
   Map<String, dynamic> recapCart() {
@@ -163,7 +118,7 @@ class Cart {
       'items': {},
     };
 
-    for (var item in AppState.cartItems) {
+    for (var item in _items) {
       recap['totalPrice'] += item.totalPrice;
 
       if (!recap['items'].containsKey(item.name)) {

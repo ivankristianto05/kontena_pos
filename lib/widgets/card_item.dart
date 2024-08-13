@@ -1,5 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/core/utils/number_ui.dart';
 
 class CardItem extends StatelessWidget {
   final Widget? image;
@@ -9,15 +11,15 @@ class CardItem extends StatelessWidget {
   final String description;
   final String price;
 
-  CardItem({
-    Key? key,
+  const CardItem({
+    super.key,
     this.image,
     this.onTap,
     this.name = 'Item Name',
     this.description = 'Item Deskripsi',
     this.category = 'None',
     this.price = 'Rp 10.000',
-  }) : super(key: key);
+  });
 
   // Map<String, dynamic> item;
 
@@ -43,20 +45,25 @@ class CardItem extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsetsDirectional.fromSTEB(
+              16.0,
+              16.0,
+              16.0,
+              16.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   category.toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: Colors.black,
                   ),
                 ),
                 AutoSizeText(
                   name.toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
@@ -65,15 +72,12 @@ class CardItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   minFontSize: 10,
                 ),
-                SizedBox(height: 4.0),
+                const SizedBox(height: 12.0),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: Text(
-                    price,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                    ),
+                    numberFormat('idr', int.parse(price)),
+                    style: theme.textTheme.displaySmall,
                   ),
                 ),
               ],

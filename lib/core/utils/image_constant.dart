@@ -87,7 +87,7 @@ class ImageConstant {
 
   static String imgThumbsUp = '$imagePath/img_thumbs_up.svg';
 
-  static String imgAdl1 = '$imagePath/img_adl_1.png';
+  static String imgAdl1 = '$imagePath/stock-card-image.jpg';
 
   static String imgF263 = '$imagePath/img_f26_3.png';
 

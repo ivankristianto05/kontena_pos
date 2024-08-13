@@ -1,46 +1,89 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/widgets/card_item.dart';
+import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/core/utils/number_ui.dart';
 
 class ProductGrid extends StatelessWidget {
-  final List<Map<String, dynamic>> items;
+  final Widget? image;
   final VoidCallback? onTap;
+  final String name;
+  final String category;
+  final String description;
+  final String price;
+
   const ProductGrid({
-    Key? key,
-    required this.items,
+    super.key,
+    this.image,
     this.onTap,
-  }) : super(key: key);
+    this.name = 'Item Name',
+    this.description = 'Item Deskripsi',
+    this.category = 'None',
+    this.price = 'Rp 10.000',
+  });
+
+  // Map<String, dynamic> item;
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     bool isWideScreen = screenWidth > 800;
 
-    int crossAxisCount = isWideScreen ? 5 : 2;
-    return SizedBox(
-      width: screenWidth * 0.7,
-      child: GridView.builder(
-        padding: const EdgeInsets.all(8.0),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          crossAxisSpacing: 8.0,
-          mainAxisSpacing: 8.0,
-        ),
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final menu = items[index];
-          return InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: onTap,
-            child: CardItem(
-              name: menu['nama_menu'].toString(),
-              price: menu['harga'].toString(),
-              category: menu['type'].toString(),
+    int crossAxisCount = isWideScreen ? 4 : 2;
+
+    return Card(
+      elevation: 2.0,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AspectRatio(
+            aspectRatio: 1.85, // Adjust aspect ratio as needed
+            child: Container(
+              color: Colors.grey[300],
+              child: Center(
+                child: Icon(Icons.image, size: 50.0, color: Colors.grey[600]),
+              ),
             ),
-          );
-        },
+          ),
+          Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(
+              16.0,
+              16.0,
+              16.0,
+              16.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  category.toString(),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black,
+                  ),
+                ),
+                AutoSizeText(
+                  name.toString(),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  minFontSize: 10,
+                ),
+                const SizedBox(height: 12.0),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    numberFormat('idr', int.parse(price)),
+                    style: theme.textTheme.displaySmall,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

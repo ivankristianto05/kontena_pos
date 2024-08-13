@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/Screen/popup/itemeditdialog_section.dart';
 import 'package:kontena_pos/constants.dart';
-import 'package:kontena_pos/models/cart_item.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:intl/intl.dart';
 
@@ -9,13 +9,11 @@ class ItemCart extends StatelessWidget {
   final List<CartItem> cartItems;
   final double screenWidth;
   final void Function(CartItem editedItem) onEditItem;
-  //final void Function(CartItem item) onDeleteItem; // Add callback for delete
 
   ItemCart({
     required this.cartItems,
     required this.screenWidth,
     required this.onEditItem,
-    //required this.onDeleteItem, // Initialize delete callback
   });
 
   final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
@@ -28,13 +26,11 @@ class ItemCart extends StatelessWidget {
         itemCount: cartItems.length,
         separatorBuilder: (context, index) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Divider(
-            thickness: 3,
-          ),
+          child: Divider(thickness: 3),
         ),
         itemBuilder: (context, index) {
           final item = cartItems[index];
-          final price = (item.variantPrice != 0) ? item.variantPrice : item.price;
+          final price = item.variantPrice != 0 ? item.variantPrice : item.price;
 
           return Padding(
             padding: const EdgeInsets.all(8.0),
@@ -42,15 +38,9 @@ class ItemCart extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Menu title
-                Container(
-                  child: Text(
-                    '${item.name} - (${item.quantity})',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
+                Text(
+                  '${item.name} - (${item.qty})',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -62,84 +52,74 @@ class ItemCart extends StatelessWidget {
                   ),
                 ),
                 // Menu name - quantity
-                Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '${item.name} - ${item.variant} (${item.quantity})',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${item.name} - ${item.variant ?? ''} (${item.qty})',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      Text(
-                        'Rp ${currencyFormat.format(price * item.quantity)}',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
+                    ),
+                    Text(
+                      'Rp ${currencyFormat.format(price * item.qty)}',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 4),
                 // Price calculation
-                Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${item.quantity}x Rp ${currencyFormat.format(price)}',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
-                      ),
-                    ],
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${item.qty}x Rp ${currencyFormat.format(price)}',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 8),
                 // Addons
-                Container(
-                  child: Column(
+                if (item.addons != null && item.addons!.isNotEmpty)
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Addon:',
+                        'Addons:',
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                       ),
-                      ...item.addons.entries.map((addon) => addon.value
-                          ? Text('${addon.key} x1', style: TextStyle(fontSize: 14))
+                      ...item.addons!.entries.map((addon) => addon.value['selected'] == true
+                          ? Text('${addon.key}', style: TextStyle(fontSize: 14))
                           : Container()),
                     ],
                   ),
-                ),
                 // Preference
-                Container(
-                  child: Column(
+                if (item.preference.isNotEmpty)
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Preference:',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      item.preference.isNotEmpty
-                          ? Text(item.preference, style: TextStyle(fontSize: 14))
-                          : Container(),
+                      if (item.preference['preference']?.isNotEmpty ?? false)
+                        Text(
+                          'Preference:',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                      Text(item.preference['preference'] ?? '', style: TextStyle(fontSize: 14)),
                     ],
                   ),
-                ),
                 // Notes
-                Container(
-                  child: Column(
+                if (item.notes.isNotEmpty)
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Notes:',
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                       ),
-                      item.notes.isNotEmpty
-                          ? Text(item.notes, style: TextStyle(fontSize: 14))
-                          : Container(),
+                      Text(item.notes, style: TextStyle(fontSize: 14)),
                     ],
                   ),
-                ),
                 SizedBox(height: 8),
                 // Stack for buttons
                 Container(
@@ -156,15 +136,16 @@ class ItemCart extends StatelessWidget {
                             padding: EdgeInsets.symmetric(horizontal: 16),
                           ),
                           onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => ItemEditDialog(
-                                item: item,
-                                onEdit: (editedItem) {
-                                  onEditItem(editedItem);
-                                },
-                              ),
-                            );
+                            // showDialog(
+                            //   context: context,
+                            //   builder: (context) => ItemEditDialog(
+                            //     item: item,
+                            //     onEdit: (editedItem) {
+                            //       onEditItem(editedItem);
+                            //     },
+                            //     cart: 
+                            //   ),
+                            // );
                           },
                           child: Text(
                             'Edit',

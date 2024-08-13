@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/Screen/popup/addons_section.dart';
-import 'package:kontena_pos/Screen/popup/noteandpreference_section.dart';
 import 'package:kontena_pos/Screen/popup/sumary_section.dart';
-import 'package:kontena_pos/Screen/popup/variant_section.dart';
+import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/data/menuvarian.dart';
 import 'package:kontena_pos/models/cart_item.dart';
+import 'package:kontena_pos/Screen/popup/addons_section.dart';
+import 'package:kontena_pos/Screen/popup/noteandpreference_section.dart';
+import 'package:kontena_pos/Screen/popup/variant_section.dart';
 
 class ItemEditDialog extends StatefulWidget {
   final CartItem item;
-  final void Function(CartItem editedItem) onEdit;
+  final Cart cart; // Add the cart instance
+  final AppState appState; // Add the app state instance
+    final Function(CartItem) onEdit; // Add this line to define onEdit
+
 
   ItemEditDialog({
     required this.item,
-    required this.onEdit,
+    required this.cart,
+    required this.appState,
+        required this.onEdit, // Add this line to require onEdit in the constructor
+
   });
 
   @override
@@ -35,33 +43,29 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
     _initializeFields();
   }
 
- void _initializeFields() {
-  setState(() {
-    _selectedVariant = widget.item.variant;
-    _quantity = widget.item.quantity;
-    _notes = widget.item.notes;
-    _selectedPreference = widget.item.preference;
-    _selectedAddons = widget.item.addons;
-    _variantPrice = widget.item.variantPrice;
+  void _initializeFields() {
+    setState(() {
+      _selectedVariant = widget.item.variant;
+      _quantity = widget.item.qty; // Use qty instead of quantity
+      _notes = widget.item.notes;
+      _selectedPreference = widget.item.preference.isNotEmpty ? getPreferenceText(widget.item.preference) : '';
+      _selectedAddons = widget.item.addons?.map((key, value) => MapEntry(key, value['selected'] as bool)) ?? {};
+      _variantPrice = widget.item.variantPrice;
 
-    List<String> variants = MenuVarian
-        .where((variant) => variant['id_menu'] == widget.item.idMenu)
-        .map((variant) => variant['nama_varian'] as String)
-        .toList();
+      List<String> variants = MenuVarian
+          .where((variant) => variant['id_menu'] == widget.item.id)
+          .map((variant) => variant['nama_varian'] as String)
+          .toList();
 
-    _selectedVariantIndex = variants.indexOf(_selectedVariant ?? '');
-    _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
-  });
-}
+      _selectedVariantIndex = variants.indexOf(_selectedVariant ?? '');
+      _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
+    });
+  }
 
-
-
-
-
- int _getVariantIndex(String? variant) {
-  List<String> variants = _getVariantsBasedOnType();
- return variants.indexOf(variant ?? '');
-}
+  int _getVariantIndex(String? variant) {
+    List<String> variants = _getVariantsBasedOnType();
+    return variants.indexOf(variant ?? '');
+  }
 
   int _getPreferenceIndex(String preference) {
     List<String> preferences = _getPreferencesBasedOnType();
@@ -91,33 +95,36 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
   }
 
   void _editItem() {
-    final editedItem = CartItem(
-      idMenu: widget.item.idMenu,
-      name: widget.item.name,
-      variant: _selectedVariant ?? '',
-      quantity: _quantity,
-      price: widget.item.price,
-      addons: _selectedAddons,
-      notes: _notes,
-      preference: _selectedPreference,
-      type: widget.item.type,
-      variantPrice: _variantPrice,
-    );
-    widget.onEdit(editedItem);
-    Navigator.of(context).pop();
-  }
+  final editedItem = CartItem(
+    id: widget.item.id,
+    name: widget.item.name,
+    variant: _selectedVariant ?? '',
+    qty: _quantity,
+    price: widget.item.price,
+    addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})), // Adjust this line
+    notes: _notes,
+    preference: widget.item.preference,
+    type: widget.item.type ?? 'unknown', // Provide a default value
+    variantPrice: _variantPrice,
+  );
+  widget.onEdit(editedItem); // Use the callback
+  Navigator.of(context).pop();
+}
+
+
 
   @override
   Widget build(BuildContext context) {
     double popupWidth = MediaQuery.of(context).size.width * 0.9;
     double popupHeight = MediaQuery.of(context).size.height * 0.7;
+
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        height: MediaQuery.of(context).size.height * 0.7,
+        width: popupWidth,
+        height: popupHeight,
         child: Column(
           children: [
             Container(
@@ -149,7 +156,7 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                   Flexible(
                     flex: 2,
                     child: VariantSection(
-                      idMenu: widget.item.idMenu,
+                      idMenu: widget.item.id,
                       selectedIndex: _selectedVariantIndex,
                       onVariantSelected: (index, variant, price) {
                         setState(() {
@@ -163,7 +170,7 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                   Flexible(
                     flex: 2,
                     child: NotesAndPreferenceSection(
-                      type: widget.item.type,
+type: widget.item.type ?? 'defaultType', // Replace 'defaultType' with an appropriate default value
                       selectedPreferenceIndex: _selectedPreferenceIndex,
                       onPreferenceSelected: (index, preference) {
                         setState(() {
@@ -182,7 +189,7 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                   Flexible(
                     flex: 2,
                     child: AddonSection(
-                      type: widget.item.type,
+type: widget.item.type ?? 'defaultType', // Replace 'defaultType' with an appropriate default value
                       selectedAddons: _selectedAddons,
                       onAddonChanged: (addons) {
                         setState(() {
@@ -196,7 +203,7 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                     child: SummarySection(
                       name: widget.item.name,
                       price: (_variantPrice != 0) ? _variantPrice : widget.item.price,
-                      type: widget.item.type,
+type: widget.item.type ?? 'defaultType', // Replace 'defaultType' with an appropriate default value
                       selectedVariant: _selectedVariant,
                       selectedPreferenceIndex: _selectedPreferenceIndex,
                       selectedAddons: _selectedAddons,

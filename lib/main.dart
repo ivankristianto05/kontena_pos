@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/Screen/order_screen.dart';
-import 'package:kontena_pos/core/theme/theme_helper.dart';
-import 'package:kontena_pos/app_state.dart';
-import 'package:kontena_pos/features/authentication/persentation/login_screen.dart';
-import 'package:kontena_pos/features/orders/persentation/order_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:kontena_pos/routes/app_routes.dart';
-import 'package:kontena_pos/Screen/order_screen.dart';
-import 'package:kontena_pos/models/cart_item.dart';
+import 'package:kontena_pos/app_state.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -22,7 +17,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late Future<String> _initialRouteFuture;
-  List<CartItem> cartItems = [];
 
   @override
   void initState() {
@@ -31,21 +25,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<String> _checkStoredUser() async {
-    // debug mode
-    // return AppRoutes.loginScreen;
-    // return AppRoutes.deleteAccount;
-
-    // me myMe = me();
-    // if (await myMe.checkStoredUser()) {
-    //   return AppRoutes.orderScreen;
-    // }
+    // Uncomment and adjust based on actual implementation
+    // return AppRoutes.orderScreen;
     return AppRoutes.loginScreen;
-  }
-
-  void addItemToCart(CartItem item) {
-    setState(() {
-      cartItems.add(item);
-    });
   }
 
   @override
@@ -54,20 +36,23 @@ class _MyAppState extends State<MyApp> {
       future: _initialRouteFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Menampilkan loading indicator jika sedang menunggu hasil
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          // Menampilkan pesan error jika terjadi error
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          // Membangun aplikasi dengan initialRoute berdasarkan hasil
-          return MaterialApp(
-            theme: ThemeData(useMaterial3: false),
-            title: 'KONTENA',
-            debugShowCheckedModeBanner: false,
-            initialRoute: snapshot.data!,
-            navigatorKey: navigatorKey,
-            routes: AppRoutes.routes,
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => AppState()),
+              // Tambahkan provider lain jika diperlukan
+            ],
+            child: MaterialApp(
+              theme: ThemeData(useMaterial3: false),
+              title: 'KONTENA',
+              debugShowCheckedModeBanner: false,
+              initialRoute: snapshot.data ?? AppRoutes.loginScreen,
+              navigatorKey: navigatorKey,
+              routes: AppRoutes.routes,
+            ),
           );
         }
       },

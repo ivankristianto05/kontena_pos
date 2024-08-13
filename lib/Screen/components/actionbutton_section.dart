@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/constants.dart';
-import 'package:kontena_pos/models/cart_item.dart';
+import 'package:kontena_pos/core/functions/cart.dart'; // Import Cart
 import 'package:intl/intl.dart';
 
 class ActionButton extends StatelessWidget {
   const ActionButton({
     super.key,
     required this.screenWidth,
-    required this.cartItems,
+    required this.cart,
   });
 
   final double screenWidth;
-  final List<CartItem> cartItems;
+  final Cart cart;
 
   @override
   Widget build(BuildContext context) {
     var buttoncolor2 = buttoncolor;
 
     // Calculate the number of selected item IDs
-    int numberOfSelectedItemIds = cartItems.length;
+    int numberOfSelectedItemIds = cart.items.length;
 
     // Calculate the total price of all items in the cart
-    double totalPrice = cartItems.fold(0.0, (sum, item) {
-double price = (item.variantPrice != 0) ? item.variantPrice.toDouble() : item.price.toDouble();
-      return sum + price * item.quantity;
+    double totalPrice = cart.items.fold(0.0, (sum, item) {
+      double price = (item.variantPrice != 0) ? item.variantPrice.toDouble() : item.price.toDouble();
+      return sum + price * item.qty;
     });
 
     // Format the total price to the appropriate currency format
