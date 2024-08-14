@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:provider/provider.dart';
 import 'package:kontena_pos/constants.dart';
 
 class DropdownDeleteSection extends StatefulWidget {
@@ -15,8 +18,11 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double smallButtonWidth = screenWidth * 0.05;
     double searchbarWidth = screenWidth * 0.65;
+
+    // Access AppState and Cart
+    final appState = Provider.of<AppState>(context, listen: false);
+    final cart = Cart(appState, onCartChanged: () => setState(() {}));
 
     return Container(
       width: screenWidth - searchbarWidth,
@@ -146,20 +152,24 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border(
-                  bottom: BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  ),
-                  top: BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  )),
+                bottom: BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+                top: BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
             ),
             child: MaterialButton(
               height: 50,
               padding: EdgeInsets.zero,
               onPressed: () {
-                // Handle the action for the delete button
+                // Clear all items from the cart
+                setState(() {
+                  cart.clearAllItems();
+                });
               },
               child: Icon(Icons.delete, color: redcolor),
             ),

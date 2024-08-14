@@ -183,7 +183,10 @@ class ItemCart extends StatelessWidget {
                             padding: EdgeInsets.symmetric(horizontal: 16),
                           ),
                           onPressed: () {
-                            //onDeleteItem(item); // Call delete callback
+                            cart.removeItem(item); // Call delete function
+                            appState.update(() {
+                              appState.cartItems.remove(item); // Remove from appState
+                            });
                           },
                           child: Text(
                             'Delete',

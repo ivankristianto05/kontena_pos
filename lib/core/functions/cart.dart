@@ -33,43 +33,15 @@ class CartItem {
   }) {
     totalPrice = qty * (variantPrice != 0 ? variantPrice : price);
   }
-
-  // Define the copyWith method
-  CartItem copyWith({
-    String? id,
-    String? name,
-    String? variant,
-    int? qty,
-    int? price,
-    int? variantPrice,
-    Map<String, Map<String, dynamic>>? addons,
-    String? notes,
-    Map<String, String>? preference,
-    String? type,
-  }) {
-    return CartItem(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      variant: variant ?? this.variant,
-      qty: qty ?? this.qty,
-      price: price ?? this.price,
-      variantPrice: variantPrice ?? this.variantPrice,
-      addons: addons ?? this.addons,
-      notes: notes ?? this.notes,
-      preference: preference ?? this.preference,
-      type: type ?? this.type,
-    );
-  }
 }
-
-
 
 class Cart {
   List<CartItem> _items = [];
   final AppState appState; // Dependency injection for AppState
   VoidCallback? _onCartChanged;
 
-  Cart(this.appState, {VoidCallback? onCartChanged}) : _onCartChanged = onCartChanged {
+  Cart(this.appState, {VoidCallback? onCartChanged})
+      : _onCartChanged = onCartChanged {
     // Set the initial cart items from AppState
     _items = List.from(appState.cartItems);
   }
@@ -78,24 +50,34 @@ class Cart {
 
   void _recalculateTotalPrice() {
     for (var item in _items) {
-      item.totalPrice = item.qty * (item.variantPrice != 0 ? item.variantPrice : item.price);
+      item.totalPrice = item.qty *
+          (item.variantPrice != 0 ? item.variantPrice : item.price);
     }
   }
 
   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
-    var existingItemIndex = _items.indexWhere((item) => item.id == newItem.id);
+    final existingItemIndex = _items.indexWhere((item) =>
+        item.id == newItem.id &&
+        item.variant == newItem.variant &&
+        item.notes == newItem.notes &&
+        item.preference.toString() == newItem.preference.toString() &&
+        item.addons.toString() == newItem.addons.toString());
 
-    if (existingItemIndex != -1) {
-      // Item already exists, update the quantity
+    if (existingItemIndex >= 0) {
+      // Update existing item jika atributnya sama
       var existingItem = _items[existingItemIndex];
       if (mode == CartMode.add) {
         existingItem.qty += newItem.qty;
       } else {
         existingItem.qty = newItem.qty;
       }
+      existingItem.totalPrice = existingItem.qty *
+          (existingItem.variantPrice != 0
+              ? existingItem.variantPrice
+              : existingItem.price);
       _items[existingItemIndex] = existingItem;
     } else {
-      // Item doesn't exist, add a new item
+      // Tambah item baru jika atributnya berbeda
       _items.add(newItem);
     }
 
@@ -107,6 +89,34 @@ class Cart {
 
     // Update app state
     appState.addItemToCart(newItem);
+  }
+
+  void removeItem(CartItem itemToRemove) {
+    _items.removeWhere((item) =>
+        item.id == itemToRemove.id &&
+        item.variant == itemToRemove.variant &&
+        item.notes == itemToRemove.notes &&
+        item.preference.toString() == itemToRemove.preference.toString() &&
+        item.addons.toString() == itemToRemove.addons.toString());
+
+    // Update app state
+    appState.cartItems.removeWhere((item) =>
+        item.id == itemToRemove.id &&
+        item.variant == itemToRemove.variant &&
+        item.notes == itemToRemove.notes &&
+        item.preference.toString() == itemToRemove.preference.toString() &&
+        item.addons.toString() == itemToRemove.addons.toString());
+
+    // Notify changes
+    _onCartChanged?.call();
+    appState.notifyListeners();
+  }
+
+  void clearAllItems() {
+    _items.clear();
+    appState.resetCart(); // Clear items from the AppState as well
+    _onCartChanged?.call(); // Notify listeners
+    appState.notifyListeners(); // Notify listeners of AppState
   }
 
   bool isItemInCart(String itemId) {

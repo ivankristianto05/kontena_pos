@@ -37,16 +37,28 @@ class AppState extends ChangeNotifier {
 
   List<CartItem> get cartItems => _cartItems;
 
-  // Menambahkan item ke dalam cart
-  void addItemToCart(CartItem item) {
-    final existingItemIndex = _cartItems.indexWhere((i) => i.id == item.id);
+  // Menambahkan atau memperbarui item di cart
+  void addItemToCart(CartItem newItem) {
+    final existingItemIndex = _cartItems.indexWhere((item) =>
+      item.id == newItem.id &&
+      item.variant == newItem.variant &&
+      item.notes == newItem.notes &&
+      item.preference.toString() == newItem.preference.toString() &&
+      item.addons.toString() == newItem.addons.toString()
+    );
+
     if (existingItemIndex >= 0) {
-      // Update existing item jika ada
-      _cartItems[existingItemIndex].qty += item.qty;
+      // Update existing item jika atributnya sama
+      _cartItems[existingItemIndex].qty += newItem.qty;
+      _cartItems[existingItemIndex].totalPrice = _cartItems[existingItemIndex].qty * 
+        (_cartItems[existingItemIndex].variantPrice != 0 ? 
+        _cartItems[existingItemIndex].variantPrice : 
+        _cartItems[existingItemIndex].price);
     } else {
-      // Tambah item baru jika belum ada
-      _cartItems.add(item);
+      // Tambah item baru jika atributnya berbeda
+      _cartItems.add(newItem);
     }
+
     notifyListeners(); // Pemberitahuan bahwa ada perubahan
   }
 
