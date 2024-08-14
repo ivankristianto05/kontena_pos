@@ -10,17 +10,15 @@ import 'package:kontena_pos/Screen/popup/variant_section.dart';
 
 class ItemEditDialog extends StatefulWidget {
   final CartItem item;
-  final Cart cart; // Add the cart instance
-  final AppState appState; // Add the app state instance
-    final Function(CartItem) onEdit; // Add this line to define onEdit
-
+  final Cart cart;
+  final AppState appState;
+  final Function(CartItem) onEdit;
 
   ItemEditDialog({
     required this.item,
     required this.cart,
     required this.appState,
-        required this.onEdit, // Add this line to require onEdit in the constructor
-
+    required this.onEdit,
   });
 
   @override
@@ -46,14 +44,13 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
   void _initializeFields() {
     setState(() {
       _selectedVariant = widget.item.variant;
-      _quantity = widget.item.qty; // Use qty instead of quantity
+      _quantity = widget.item.qty;
       _notes = widget.item.notes;
-      _selectedPreference = widget.item.preference.isNotEmpty ? getPreferenceText(widget.item.preference) : '';
+      _selectedPreference = widget.item.preference['preference'] ?? ''; // Make sure to access the preference correctly
       _selectedAddons = widget.item.addons?.map((key, value) => MapEntry(key, value['selected'] as bool)) ?? {};
       _variantPrice = widget.item.variantPrice;
 
-      List<String> variants = MenuVarian
-          .where((variant) => variant['id_menu'] == widget.item.id)
+      List<String> variants = MenuVarian.where((variant) => variant['id_menu'] == widget.item.id)
           .map((variant) => variant['nama_varian'] as String)
           .toList();
 
@@ -61,6 +58,7 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
       _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
     });
   }
+
 
   int _getVariantIndex(String? variant) {
     List<String> variants = _getVariantsBasedOnType();
@@ -93,25 +91,38 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
     }
     return [];
   }
-
-  void _editItem() {
-  final editedItem = CartItem(
-    id: widget.item.id,
-    name: widget.item.name,
-    variant: _selectedVariant ?? '',
-    qty: _quantity,
-    price: widget.item.price,
-    addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})), // Adjust this line
-    notes: _notes,
-    preference: widget.item.preference,
-    type: widget.item.type ?? 'unknown', // Provide a default value
-    variantPrice: _variantPrice,
-  );
-  widget.onEdit(editedItem); // Use the callback
-  Navigator.of(context).pop();
+String printPreference(Map<String, String> preference) {
+  // Menggabungkan semua nilai preference menjadi satu string yang mudah dibaca
+  return preference.entries.map((entry) => "${entry.key}: ${entry.value}").join(', ');
 }
 
+  void _editItem() {
+    final editedItem = CartItem(
+      id: widget.item.id,
+      name: widget.item.name,
+      variant: _selectedVariant ?? '',
+      qty: _quantity,
+      price: widget.item.price,
+      addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
+      notes: _notes,
+      preference: {'preference': _selectedPreference}, // Update with the selected preference
+      type: widget.item.type ?? 'unknown',
+      variantPrice: _variantPrice,
+    );
+      // Mencetak preference dari item yang diedit
+  String preferences = printPreference(editedItem.preference);
+  print("Preferences: $preferences");
+    // Update the cart with the edited item
+    widget.cart.addItem(editedItem, mode: CartMode.update);
 
+    // Notify the app state and the parent widget
+    widget.appState.update(() {
+      // Optionally perform any additional state updates here
+    });
+
+    widget.onEdit(editedItem); // Callback to notify that the item has been edited
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +181,7 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
                   Flexible(
                     flex: 2,
                     child: NotesAndPreferenceSection(
-type: widget.item.type ?? 'defaultType', // Replace 'defaultType' with an appropriate default value
+                      type: widget.item.type ?? 'defaultType',
                       selectedPreferenceIndex: _selectedPreferenceIndex,
                       onPreferenceSelected: (index, preference) {
                         setState(() {
@@ -189,7 +200,7 @@ type: widget.item.type ?? 'defaultType', // Replace 'defaultType' with an approp
                   Flexible(
                     flex: 2,
                     child: AddonSection(
-type: widget.item.type ?? 'defaultType', // Replace 'defaultType' with an appropriate default value
+                      type: widget.item.type ?? 'defaultType',
                       selectedAddons: _selectedAddons,
                       onAddonChanged: (addons) {
                         setState(() {
@@ -202,8 +213,10 @@ type: widget.item.type ?? 'defaultType', // Replace 'defaultType' with an approp
                     flex: 2,
                     child: SummarySection(
                       name: widget.item.name,
-                      price: (_variantPrice != 0) ? _variantPrice : widget.item.price,
-type: widget.item.type ?? 'defaultType', // Replace 'defaultType' with an appropriate default value
+                      price: (_variantPrice != 0)
+                          ? _variantPrice
+                          : widget.item.price,
+                      type: widget.item.type ?? 'defaultType',
                       selectedVariant: _selectedVariant,
                       selectedPreferenceIndex: _selectedPreferenceIndex,
                       selectedAddons: _selectedAddons,
@@ -227,7 +240,8 @@ type: widget.item.type ?? 'defaultType', // Replace 'defaultType' with an approp
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF00ADB5)),
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color(0xFF00ADB5)),
                   ),
                   onPressed: _editItem,
                   child: Text(

@@ -12,7 +12,7 @@ class CartItem {
   String? variant;
   int qty;
   final int price;
-  int variantPrice; // Tambahkan ini untuk menyimpan harga varian
+  int variantPrice;
   late int totalPrice;
   Map<String, Map<String, dynamic>>? addons;
   final String notes;
@@ -25,16 +25,43 @@ class CartItem {
     this.variant,
     required this.qty,
     required this.price,
-    this.variantPrice = 0, // Inisialisasi harga varian
+    this.variantPrice = 0,
     this.addons,
     required this.notes,
     required this.preference,
     this.type,
   }) {
     totalPrice = qty * (variantPrice != 0 ? variantPrice : price);
-    // Jika addons memiliki harga, tambahkan logika untuk menghitung totalPrice dengan addons.
+  }
+
+  // Define the copyWith method
+  CartItem copyWith({
+    String? id,
+    String? name,
+    String? variant,
+    int? qty,
+    int? price,
+    int? variantPrice,
+    Map<String, Map<String, dynamic>>? addons,
+    String? notes,
+    Map<String, String>? preference,
+    String? type,
+  }) {
+    return CartItem(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      variant: variant ?? this.variant,
+      qty: qty ?? this.qty,
+      price: price ?? this.price,
+      variantPrice: variantPrice ?? this.variantPrice,
+      addons: addons ?? this.addons,
+      notes: notes ?? this.notes,
+      preference: preference ?? this.preference,
+      type: type ?? this.type,
+    );
   }
 }
+
 
 
 class Cart {

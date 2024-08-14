@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Import Provider package
+import 'package:provider/provider.dart';
 import 'package:kontena_pos/Screen/components/actionbutton_section.dart';
 import 'package:kontena_pos/Screen/components/appbar_section.dart';
 import 'package:kontena_pos/Screen/components/buttonfilter_section.dart';
@@ -12,7 +12,7 @@ import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/Screen/popup/itemdialog_section.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/constants.dart';
-import 'package:kontena_pos/core/functions/cart.dart'; // Import Cart
+import 'package:kontena_pos/core/functions/cart.dart';
 
 class OrderScreen extends StatefulWidget {
   @override
@@ -42,18 +42,18 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   void _showItemDetailsDialog(String name, int price, String idMenu, String type) {
-   showDialog(
-     context: context,
-     builder: (context) {
-       return ItemDetailsDialog(
-         name: name,
-         price: price,
-         idMenu: idMenu,
-         type: type,
-       );
-     },
-   );
- }
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ItemDetailsDialog(
+          name: name,
+          price: price,
+          idMenu: idMenu,
+          type: type,
+        );
+      },
+    );
+  }
 
   void _handleFilterSelected(String type) {
     setState(() {
@@ -69,7 +69,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context); // Access AppState
+    final appState = Provider.of<AppState>(context);
     double screenWidth = MediaQuery.of(context).size.width;
     double searchbarWidth = screenWidth * 0.65;
     double smallButtonWidth = screenWidth * 0.05;
@@ -136,8 +136,8 @@ class _OrderScreenState extends State<OrderScreen> {
                       color: Colors.white,
                     ),
                     child: ItemCart(
+                      cartItems: appState.cartItems, // Pass the cart items from appState
                       screenWidth: screenWidth,
-                      cartItems: appState.cartItems,
                       onEditItem: (editedItem) {
                         final index = appState.cartItems.indexWhere(
                             (item) => item.id == editedItem.id);
@@ -147,6 +147,8 @@ class _OrderScreenState extends State<OrderScreen> {
                           });
                         }
                       },
+                      appState: appState, // Pass the appState
+                      cart: cart, // Pass the cart instance
                     ),
                   ),
                 ],
@@ -163,7 +165,7 @@ class _OrderScreenState extends State<OrderScreen> {
                   ),
                   ActionButton(
                     screenWidth: screenWidth,
-                    cart: cart, // Pass the Cart instance
+                    cart: cart,
                   ),
                 ],
               ),

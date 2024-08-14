@@ -4,16 +4,21 @@ import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:intl/intl.dart';
+import 'package:kontena_pos/app_state.dart'; // Import the AppState
 
 class ItemCart extends StatelessWidget {
   final List<CartItem> cartItems;
   final double screenWidth;
   final void Function(CartItem editedItem) onEditItem;
+  final AppState appState; // Add this line to include appState
+  final Cart cart; // Add this line to include the cart
 
   ItemCart({
     required this.cartItems,
     required this.screenWidth,
     required this.onEditItem,
+    required this.appState, // Add this line to require appState
+    required this.cart, // Add this line to require cart
   });
 
   final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
@@ -58,14 +63,16 @@ class ItemCart extends StatelessWidget {
                     Expanded(
                       child: Text(
                         '${item.name} - ${item.variant ?? ''} (${item.qty})',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Text(
                       'Rp ${currencyFormat.format(price * item.qty)}',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -76,7 +83,8 @@ class ItemCart extends StatelessWidget {
                   children: [
                     Text(
                       '${item.qty}x Rp ${currencyFormat.format(price)}',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
+                      style:
+                          TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
                     ),
                   ],
                 ),
@@ -88,26 +96,32 @@ class ItemCart extends StatelessWidget {
                     children: [
                       Text(
                         'Addons:',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
                       ),
-                      ...item.addons!.entries.map((addon) => addon.value['selected'] == true
+                      ...item.addons!.entries.map((addon) => addon
+                                  .value['selected'] ==
+                              true
                           ? Text('${addon.key}', style: TextStyle(fontSize: 14))
                           : Container()),
                     ],
                   ),
                 // Preference
-                if (item.preference.isNotEmpty)
+                if (item.preference['preference'] != null &&
+                    item.preference['preference']!.isNotEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (item.preference['preference']?.isNotEmpty ?? false)
-                        Text(
-                          'Preference:',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                      Text(item.preference['preference'] ?? '', style: TextStyle(fontSize: 14)),
+                      Text(
+                        'Preference:',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      Text(item.preference['preference']!,
+                          style: TextStyle(fontSize: 14)),
                     ],
                   ),
+
                 // Notes
                 if (item.notes.isNotEmpty)
                   Column(
@@ -115,7 +129,8 @@ class ItemCart extends StatelessWidget {
                     children: [
                       Text(
                         'Notes:',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                       Text(item.notes, style: TextStyle(fontSize: 14)),
                     ],
@@ -136,16 +151,17 @@ class ItemCart extends StatelessWidget {
                             padding: EdgeInsets.symmetric(horizontal: 16),
                           ),
                           onPressed: () {
-                            // showDialog(
-                            //   context: context,
-                            //   builder: (context) => ItemEditDialog(
-                            //     item: item,
-                            //     onEdit: (editedItem) {
-                            //       onEditItem(editedItem);
-                            //     },
-                            //     cart: 
-                            //   ),
-                            // );
+                            showDialog(
+                              context: context,
+                              builder: (context) => ItemEditDialog(
+                                item: item,
+                                onEdit: (editedItem) {
+                                  onEditItem(editedItem);
+                                },
+                                appState: appState, // Pass the AppState here
+                                cart: cart, // Pass the cart here
+                              ),
+                            );
                           },
                           child: Text(
                             'Edit',
@@ -162,7 +178,8 @@ class ItemCart extends StatelessWidget {
                         right: 0,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: redcolor, // Change color to red for delete
+                            backgroundColor:
+                                redcolor, // Change color to red for delete
                             padding: EdgeInsets.symmetric(horizontal: 16),
                           ),
                           onPressed: () {
@@ -170,10 +187,7 @@ class ItemCart extends StatelessWidget {
                           },
                           child: Text(
                             'Delete',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
+                            style: TextStyle(color: Colors.white, fontSize: 14),
                           ),
                         ),
                       ),
