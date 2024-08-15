@@ -46,7 +46,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
               child: TopBar(
                 smallButtonWidth: smallButtonWidth,
                 buttonWidth: buttonWidth,
-                isWideScreen: true,
+                // isWideScreen: true,
               ),
             ),
           ],

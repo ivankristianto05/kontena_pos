@@ -6,13 +6,13 @@ import 'package:kontena_pos/routes/app_routes.dart';
 class TopBar extends StatelessWidget implements PreferredSizeWidget {
   final double smallButtonWidth;
   final double buttonWidth;
-  final bool isWideScreen;
+  // final bool isWideScreen;
 
   const TopBar({
     super.key,
     required this.smallButtonWidth,
     required this.buttonWidth,
-    required this.isWideScreen,
+    // required this.isWideScreen,
   });
 
   @override
@@ -69,92 +69,92 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-              if (isWideScreen) ...[
-                Container(
-                  width: buttonWidth,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: MaterialButton(
-                    height: 45,
-                    onPressed: () {
-                      // Define the action for the Invoice button
-                      onTapInvoice(context);
-                    },
-                    child: const Text(
-                      'Invoice',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+              // if (isWideScreen) ...[
+              Container(
+                width: buttonWidth,
+                decoration: const BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Colors.white,
+                      width: 1.0,
                     ),
                   ),
                 ),
-                Container(
-                  width: buttonWidth,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                  child: MaterialButton(
-                    height: 45,
-                    onPressed: () {
-                      // Define the action for the History button
-                      onTapHistoryInvoice(context);
-                    },
-                    child: const Text(
-                      'History',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                child: MaterialButton(
+                  height: 45,
+                  onPressed: () {
+                    // Define the action for the Invoice button
+                    onTapInvoice(context);
+                  },
+                  child: const Text(
+                    'Invoice',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ],
+              ),
+              Container(
+                width: buttonWidth,
+                decoration: const BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Colors.white,
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                child: MaterialButton(
+                  height: 45,
+                  onPressed: () {
+                    // Define the action for the History button
+                    onTapHistoryInvoice(context);
+                  },
+                  child: const Text(
+                    'History',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              // ],
             ],
           ),
           Row(
             children: [
-              if (isWideScreen)
-                Container(
-                  width: buttonWidth,
-                  height: 45,
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.white,
-                        width: 1.0,
-                      ),
+              // if (isWideScreen)
+              Container(
+                width: buttonWidth,
+                height: 45,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Colors.white,
+                      width: 1.0,
                     ),
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'Shokudo Restaurant',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'Shokudo Restaurant',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
+              ),
               Container(
                 width: smallButtonWidth,
                 height: 45,

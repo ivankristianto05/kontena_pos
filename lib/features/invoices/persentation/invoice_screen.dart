@@ -19,50 +19,52 @@
 // import 'package:kontena_pos/core/functions/cart.dart';
 // import 'package:skeletonizer/skeletonizer.dart';
 // // import 'package:kontena_pos/core/functions/cart.dart';
+// // import 'package:skeletonizer/skeletonizer.dart';
+// // // import 'package:kontena_pos/core/functions/cart.dart';
 
-// class InvoiceScreen extends StatefulWidget {
-//   const InvoiceScreen({Key? key}) : super(key: key);
+// // class InvoiceScreen extends StatefulWidget {
+// //   const InvoiceScreen({Key? key}) : super(key: key);
 
-//   @override
-//   _InvoiceScreenState createState() => _InvoiceScreenState();
-// }
+// //   @override
+// //   _InvoiceScreenState createState() => _InvoiceScreenState();
+// // }
 
-// class _InvoiceScreenState extends State<InvoiceScreen> {
-//   final scaffoldKey = GlobalKey<ScaffoldState>();
-//   late List<ItemCart> cartItem;
-//   Cart cart = Cart();
-//   late Map cartRecapData;
-//   late List<CartItem> cartData;
-//   late List<Map<String, dynamic>> cartDataItem = [
-//     {
-//       'id': 'test',
-//       'name': 'Item 1',
-//       'qty': 3,
-//     }
-//   ];
-//   String filterSearch = '';
-//   bool isSearchActive = false;
-//   bool isLoading = true;
-//   String selectedGroup = '';
-//   List<dynamic> item = [];
-//   List<dynamic> itemDisplay = [];
-//   String searchItemQuery = '';
+// // class _InvoiceScreenState extends State<InvoiceScreen> {
+// //   final scaffoldKey = GlobalKey<ScaffoldState>();
+// //   late List<ItemCart> cartItem;
+// //   Cart cart = Cart();
+// //   late Map cartRecapData;
+// //   late List<CartItem> cartData;
+// //   late List<Map<String, dynamic>> cartDataItem = [
+// //     {
+// //       'id': 'test',
+// //       'name': 'Item 1',
+// //       'qty': 3,
+// //     }
+// //   ];
+// //   String filterSearch = '';
+// //   bool isSearchActive = false;
+// //   bool isLoading = true;
+// //   String selectedGroup = '';
+// //   List<dynamic> item = [];
+// //   List<dynamic> itemDisplay = [];
+// //   String searchItemQuery = '';
 
-//   //  final String id;
-//   // final String name;
-//   // String? variant;
-//   // int qty;
-//   // final int price;
-//   // late int totalPrice;
-//   // Map<String, Map<String, dynamic>>? addons;
-//   // final String notes;
-//   // final Map<String, String> preference;
-//   // String? type;
+// //   //  final String id;
+// //   // final String name;
+// //   // String? variant;
+// //   // int qty;
+// //   // final int price;
+// //   // late int totalPrice;
+// //   // Map<String, Map<String, dynamic>>? addons;
+// //   // final String notes;
+// //   // final Map<String, String> preference;
+// //   // String? type;
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     cartData = cart.getAllItemCart();
+// //   @override
+// //   void initState() {
+// //     super.initState();
+// //     cartData = cart.getAllItemCart();
 
 //     Future.delayed(Duration(milliseconds: 300), () {
 //       setState(() {
@@ -76,26 +78,26 @@
 //     itemDisplay = getItem();
 //   }
 
-//   @override
-//   void dispose() {
-//     super.dispose();
-//   }
+// //   @override
+// //   void dispose() {
+// //     super.dispose();
+// //   }
 
-//   List<dynamic> getItem() {
-//     // List<dynamic> filteredItems = filterSearch == ""
-//     //     ? item.where((_item) => _item["type"] == selectedGroup).toList()
-//     //     : item
-//     //         .where((_item) =>
-//     //             _item["type"] == selectedGroup &&
-//     //             _item["name"]
-//     //                 .toLowerCase()
-//     //                 .contains(filterSearch.toLowerCase()))
-//     //         .toList();
-//     List<dynamic> filteredItems = item.toList();
-//     // updateQty(filteredItems);
-//     // print('filtered, ${filteredItems}');
-//     return filteredItems;
-//   }
+// //   List<dynamic> getItem() {
+// //     // List<dynamic> filteredItems = filterSearch == ""
+// //     //     ? item.where((_item) => _item["type"] == selectedGroup).toList()
+// //     //     : item
+// //     //         .where((_item) =>
+// //     //             _item["type"] == selectedGroup &&
+// //     //             _item["name"]
+// //     //                 .toLowerCase()
+// //     //                 .contains(filterSearch.toLowerCase()))
+// //     //         .toList();
+// //     List<dynamic> filteredItems = item.toList();
+// //     // updateQty(filteredItems);
+// //     // print('filtered, ${filteredItems}');
+// //     return filteredItems;
+// //   }
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -243,7 +245,7 @@
 //                               // width: screenWidth * 0.3,
 //                               guestNameController: enterGuestNameController,
 //                               smallButtonWidth: smallButtonWidth,
-//                               screenWidth: 10,
+//                               searchbarWidth: 10,
 //                             ),
 //                           ),
 //                           Container(
