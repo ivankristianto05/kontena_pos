@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:collection/collection.dart'; // Import for deep equality check
 import 'package:kontena_pos/app_state.dart';
 
 enum CartMode {
@@ -15,8 +16,8 @@ class CartItem {
   int variantPrice;
   late int totalPrice;
   Map<String, Map<String, dynamic>>? addons;
-  final String notes;
-  final Map<String, String> preference;
+  String notes;
+  Map<String, String> preference;
   String? type;
 
   CartItem({
@@ -56,66 +57,75 @@ class Cart {
   }
 
   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
-    final existingItemIndex = _items.indexWhere((item) =>
-        item.id == newItem.id &&
-        item.variant == newItem.variant &&
-        item.notes == newItem.notes &&
-        item.preference.toString() == newItem.preference.toString() &&
-        item.addons.toString() == newItem.addons.toString());
+  final existingItemIndex = _items.indexWhere((item) =>
+      item.id == newItem.id);
 
-    if (existingItemIndex >= 0) {
-      // Update existing item jika atributnya sama
-      var existingItem = _items[existingItemIndex];
-      if (mode == CartMode.add) {
-        existingItem.qty += newItem.qty;
-      } else {
-        existingItem.qty = newItem.qty;
-      }
-      existingItem.totalPrice = existingItem.qty *
-          (existingItem.variantPrice != 0
-              ? existingItem.variantPrice
-              : existingItem.price);
-      _items[existingItemIndex] = existingItem;
+  if (existingItemIndex >= 0) {
+    // Update existing item jika id-nya sama
+    var existingItem = _items[existingItemIndex];
+    if (mode == CartMode.add) {
+      existingItem.qty += newItem.qty;
     } else {
-      // Tambah item baru jika atributnya berbeda
-      _items.add(newItem);
+      existingItem.qty = newItem.qty;
     }
-
-    // Recalculate total price
-    _recalculateTotalPrice();
-
-    // Notify changes
-    _onCartChanged?.call();
-
-    // Update app state
-    appState.addItemToCart(newItem);
+    existingItem.variant = newItem.variant;
+    existingItem.notes = newItem.notes;
+    existingItem.preference = newItem.preference;
+    existingItem.addons = newItem.addons;
+    existingItem.variantPrice = newItem.variantPrice;
+    existingItem.totalPrice = existingItem.qty *
+        (existingItem.variantPrice != 0
+            ? existingItem.variantPrice
+            : existingItem.price);
+    _items[existingItemIndex] = existingItem;
+  } else {
+    // Tambah item baru jika tidak ditemukan item dengan id yang sama
+    _items.add(newItem);
   }
 
+  // Recalculate total price
+  _recalculateTotalPrice();
+
+  // Notify changes
+  _onCartChanged?.call();
+
+  // Update app state
+  appState.addItemToCart(newItem);
+}
+
+
+  
   void removeItem(CartItem itemToRemove) {
+    final eq = const DeepCollectionEquality().equals;
+
     _items.removeWhere((item) =>
         item.id == itemToRemove.id &&
         item.variant == itemToRemove.variant &&
         item.notes == itemToRemove.notes &&
-        item.preference.toString() == itemToRemove.preference.toString() &&
-        item.addons.toString() == itemToRemove.addons.toString());
+        eq(item.preference, itemToRemove.preference) && // Deep compare for preference
+        eq(item.addons, itemToRemove.addons)); // Deep compare for addons
 
-    // Update app state
+    // Update AppState
     appState.cartItems.removeWhere((item) =>
         item.id == itemToRemove.id &&
         item.variant == itemToRemove.variant &&
         item.notes == itemToRemove.notes &&
-        item.preference.toString() == itemToRemove.preference.toString() &&
-        item.addons.toString() == itemToRemove.addons.toString());
+        eq(item.preference, itemToRemove.preference) && // Deep compare for preference
+        eq(item.addons, itemToRemove.addons)); // Deep compare for addons
 
     // Notify changes
-    _onCartChanged?.call();
+    if (_onCartChanged != null) {
+      _onCartChanged!();
+    }
     appState.notifyListeners();
   }
 
   void clearAllItems() {
     _items.clear();
     appState.resetCart(); // Clear items from the AppState as well
-    _onCartChanged?.call(); // Notify listeners
+    if (_onCartChanged != null) {
+      _onCartChanged!();
+    }
     appState.notifyListeners(); // Notify listeners of AppState
   }
 
@@ -123,67 +133,22 @@ class Cart {
     return _items.any((item) => item.id == itemId);
   }
 
-  Map<String, dynamic> getItemCart(String itemName) {
-    List<CartItem> data = [];
-    Map<String, int> indexes = {};
-
-    int index = 0;
-    for (var item in _items) {
-      if (item.name == itemName) {
-        indexes[item.id] = index;
-        data.add(item);
-      }
-      index++;
-    }
-
-    return {"data": data, "index": indexes};
-  }
-
-  CartItem getItemByIndex(int index) {
-    return _items[index];
-  }
-
-  List<CartItem> getAllItemCart() {
-    return List.from(_items);
-  }
-
-  Map<String, dynamic> recapCart() {
-    // Summarize quantities and total price based on item names
-    Map<String, dynamic> recap = {
-      'totalPrice': 0,
-      'totalItem': 0,
-      'items': {},
-    };
+  // Method untuk mencetak array idmenu, idvarian, indexpreference, dan indexaddons
+  List<Map<String, dynamic>> printItemDetails() {
+    List<Map<String, dynamic>> itemDetails = [];
 
     for (var item in _items) {
-      recap['totalPrice'] += item.totalPrice;
-
-      if (!recap['items'].containsKey(item.name)) {
-        recap['items'][item.name] = {
-          'name': item.name,
-          'preference': item.preference,
-          'totalQty': item.qty,
-          'totalPrice': item.totalPrice,
-          'notes': item.notes,
-          'addon': item.addons,
-        };
-        recap['totalItem'] += 1;
-      } else {
-        recap['items'][item.name]['totalQty'] += item.qty;
-        recap['items'][item.name]['totalPrice'] += item.totalPrice;
-      }
+      itemDetails.add({
+        'idmenu': item.id,
+        'idvarian': item.variant,
+        'indexpreference': item.preference,
+        'indexaddons': item.addons,
+      });
     }
 
-    return recap;
+    // Print the array
+    print(itemDetails);
+
+    return itemDetails;
   }
-}
-
-String getPreferenceText(Map<String, String> data) {
-  // Get the values from the map
-  List<String> values = data.values.cast<String>().toList();
-
-  // Join the values into a comma-separated string
-  String result = values.join(', ');
-
-  return result;
 }

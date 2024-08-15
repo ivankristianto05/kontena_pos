@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/functions/cart.dart'; // Pastikan ini mengimpor CartItem dari file yang benar
@@ -38,23 +37,29 @@ class AppState extends ChangeNotifier {
 
   List<CartItem> get cartItems => _cartItems;
 
-  // Menambahkan atau memperbarui item di cart
-  void addItemToCart(CartItem newItem) {
-    final existingItemIndex = _cartItems.indexWhere((item) =>
+  // Method untuk mengecek apakah item dengan kombinasi idmenu, idvarian, indexpreference, dan indexaddons sudah ada
+  int findItemIndex(CartItem newItem) {
+    return _cartItems.indexWhere((item) =>
       item.id == newItem.id &&
       item.variant == newItem.variant &&
-      item.notes == newItem.notes &&
       item.preference.toString() == newItem.preference.toString() &&
       item.addons.toString() == newItem.addons.toString()
     );
+  }
+
+  // Menambahkan atau memperbarui item di cart
+  void addItemToCart(CartItem newItem) {
+    final existingItemIndex = findItemIndex(newItem);
 
     if (existingItemIndex >= 0) {
       // Update existing item jika atributnya sama
-      _cartItems[existingItemIndex].qty += newItem.qty;
-      _cartItems[existingItemIndex].totalPrice = _cartItems[existingItemIndex].qty * 
-        (_cartItems[existingItemIndex].variantPrice != 0 ? 
-        _cartItems[existingItemIndex].variantPrice : 
-        _cartItems[existingItemIndex].price);
+      var existingItem = _cartItems[existingItemIndex];
+      existingItem.qty += newItem.qty;
+      existingItem.totalPrice = existingItem.qty *
+        (existingItem.variantPrice != 0 ? 
+        existingItem.variantPrice : 
+        existingItem.price);
+      _cartItems[existingItemIndex] = existingItem;
     } else {
       // Tambah item baru jika atributnya berbeda
       _cartItems.add(newItem);
@@ -67,5 +72,24 @@ class AppState extends ChangeNotifier {
   void resetCart() {
     _cartItems = [];
     notifyListeners(); // Pemberitahuan bahwa cart direset
+  }
+
+  // Method untuk mencetak array idmenu, idvarian, indexpreference, dan indexaddons
+  List<Map<String, dynamic>> printItemDetails() {
+    List<Map<String, dynamic>> itemDetails = [];
+
+    for (var item in _cartItems) {
+      itemDetails.add({
+        'idmenu': item.id,
+        'idvarian': item.variant,
+        'indexpreference': item.preference,
+        'indexaddons': item.addons,
+      });
+    }
+
+    // Print the array
+    print(itemDetails);
+
+    return itemDetails;
   }
 }

@@ -96,33 +96,31 @@ String printPreference(Map<String, String> preference) {
   return preference.entries.map((entry) => "${entry.key}: ${entry.value}").join(', ');
 }
 
-  void _editItem() {
-    final editedItem = CartItem(
-      id: widget.item.id,
-      name: widget.item.name,
-      variant: _selectedVariant ?? '',
-      qty: _quantity,
-      price: widget.item.price,
-      addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
-      notes: _notes,
-      preference: {'preference': _selectedPreference}, // Update with the selected preference
-      type: widget.item.type ?? 'unknown',
-      variantPrice: _variantPrice,
-    );
-      // Mencetak preference dari item yang diedit
-  String preferences = printPreference(editedItem.preference);
-  print("Preferences: $preferences");
-    // Update the cart with the edited item
-    widget.cart.addItem(editedItem, mode: CartMode.update);
+ void _editItem() {
+  final editedItem = CartItem(
+    id: widget.item.id,
+    name: widget.item.name,
+    variant: _selectedVariant ?? '',
+    qty: _quantity,
+    price: widget.item.price,
+    addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
+    notes: _notes,
+    preference: {'preference': _selectedPreference},
+    type: widget.item.type ?? 'unknown',
+    variantPrice: _variantPrice,
+  );
+  
+  // Update the cart with the edited item, only match by ID
+  widget.cart.addItem(editedItem, mode: CartMode.update);
 
-    // Notify the app state and the parent widget
-    widget.appState.update(() {
-      // Optionally perform any additional state updates here
-    });
+  // Notify the app state and the parent widget
+  widget.appState.update(() {});
 
-    widget.onEdit(editedItem); // Callback to notify that the item has been edited
-    Navigator.of(context).pop();
-  }
+  widget.onEdit(editedItem); // Callback to notify that the item has been edited
+  Navigator.of(context).pop();
+}
+
+
 
   @override
   Widget build(BuildContext context) {
