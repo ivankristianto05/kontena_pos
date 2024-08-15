@@ -343,6 +343,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   FocusNode inputPhone = FocusNode();
 
   void onTapOpenItem(BuildContext context, dynamic item) async {
+    print('check item, $item');
     await showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: false,
@@ -359,7 +360,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           //   type: item['type'],
           //   onAddToCart: (item) {},
           // ),
-          child: AddToCart(),
+          child: AddToCart(dataMenu: item),
         );
       },
     ).then((value) => {});

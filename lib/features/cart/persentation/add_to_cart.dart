@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/data/menuvarian.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
 
 class AddToCart extends StatefulWidget {
@@ -15,6 +16,9 @@ class AddToCart extends StatefulWidget {
 }
 
 class _AddToCartState extends State<AddToCart> {
+  bool isLoading = true;
+  List<dynamic> varianDisplay = [];
+
   @override
   void setState(VoidCallback callback) {
     super.setState(callback);
@@ -23,6 +27,16 @@ class _AddToCartState extends State<AddToCart> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      setState(() {
+        // item = AppState().item;
+        // item = ListMenu;
+        isLoading = false;
+
+        // print(itemDisplay);
+        varianDisplay = getVarian();
+      });
+    });
   }
 
   @override
@@ -30,8 +44,15 @@ class _AddToCartState extends State<AddToCart> {
     super.dispose();
   }
 
+  List<dynamic> getVarian() {
+    List<dynamic> filteredVarians = MenuVarian.where(
+        (_varian) => _varian['id_menu'] == widget.dataMenu['id_menu']).toList();
+    return filteredVarians;
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('varian display, $varianDisplay');
     return Column(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -63,7 +84,7 @@ class _AddToCartState extends State<AddToCart> {
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               16.0, 16.0, 16.0, 16.0),
                           child: Text(
-                            'Item Varian 1',
+                            widget.dataMenu['nama_menu'],
                             style: theme.textTheme.labelMedium,
                           ),
                         ),
@@ -107,7 +128,7 @@ class _AddToCartState extends State<AddToCart> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: Container(
+                          child: SizedBox(
                             width: 100.0,
                             height: double.infinity,
                             // decoration: BoxDecoration(
@@ -122,7 +143,7 @@ class _AddToCartState extends State<AddToCart> {
                                   Padding(
                                     padding:
                                         const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 24.0, 8.0, 0.0),
+                                            16.0, 24.0, 16.0, 0.0),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment:
@@ -135,6 +156,82 @@ class _AddToCartState extends State<AddToCart> {
                                           decoration: const BoxDecoration(),
                                           child: _buildSearchVarianSection(
                                               context),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(0.0, 8.0, 0.0, 16.0),
+                                          child: Builder(
+                                            builder: (context) {
+                                              final variant =
+                                                  varianDisplay.toList();
+                                              return Column(
+                                                mainAxisSize: MainAxisSize.max,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  ListView.builder(
+                                                    physics:
+                                                        const BouncingScrollPhysics(),
+                                                    shrinkWrap: true,
+                                                    itemCount:
+                                                        varianDisplay.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      if (isLoading) {
+                                                      } else {
+                                                        final currentVarian =
+                                                            varianDisplay[
+                                                                index];
+
+                                                        return Container(
+                                                          width:
+                                                              double.infinity,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: theme
+                                                                .colorScheme
+                                                                .primaryContainer,
+                                                            border: Border.all(
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .surface,
+                                                            ),
+                                                          ),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                              16.0,
+                                                              16.0,
+                                                              16.0,
+                                                              16.0,
+                                                            ),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  currentVarian[
+                                                                      'nama_varian'],
+                                                                  style: theme
+                                                                      .textTheme
+                                                                      .labelMedium,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -167,7 +264,7 @@ class _AddToCartState extends State<AddToCart> {
                                   Padding(
                                     padding:
                                         const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 24.0, 8.0, 0.0),
+                                            16.0, 24.0, 16.0, 0.0),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment:
@@ -188,7 +285,7 @@ class _AddToCartState extends State<AddToCart> {
                                   Padding(
                                     padding:
                                         const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 8.0, 0.0, 16.0),
+                                            16.0, 8.0, 16.0, 16.0),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment:
@@ -196,10 +293,86 @@ class _AddToCartState extends State<AddToCart> {
                                       children: [
                                         Padding(
                                           padding: const EdgeInsetsDirectional
-                                              .fromSTEB(0.0, 0.0, 8.0, 8.0),
+                                              .fromSTEB(0.0, 0.0, 0.0, 8.0),
                                           child: Text(
                                             'Preference:',
                                             style: theme.textTheme.labelMedium,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(0.0, 8.0, 0.0, 16.0),
+                                          child: Builder(
+                                            builder: (context) {
+                                              final variant =
+                                                  varianDisplay.toList();
+                                              return Column(
+                                                mainAxisSize: MainAxisSize.max,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  ListView.builder(
+                                                    physics:
+                                                        const BouncingScrollPhysics(),
+                                                    shrinkWrap: true,
+                                                    itemCount:
+                                                        varianDisplay.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      if (isLoading) {
+                                                      } else {
+                                                        final currentVarian =
+                                                            varianDisplay[
+                                                                index];
+
+                                                        return Container(
+                                                          width:
+                                                              double.infinity,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: theme
+                                                                .colorScheme
+                                                                .primaryContainer,
+                                                            border: Border.all(
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .surface,
+                                                            ),
+                                                          ),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                              16.0,
+                                                              16.0,
+                                                              16.0,
+                                                              16.0,
+                                                            ),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  currentVarian[
+                                                                      'nama_varian'],
+                                                                  style: theme
+                                                                      .textTheme
+                                                                      .labelMedium,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    },
+                                                  ),
+                                                ],
+                                              );
+                                            },
                                           ),
                                         ),
                                       ],

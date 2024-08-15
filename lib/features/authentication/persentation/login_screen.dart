@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: MediaQuery.sizeOf(context).width * 0.26,
+                        width: MediaQuery.sizeOf(context).width * 0.2,
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primaryContainer,
                           border: Border.all(
@@ -89,7 +89,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              30.0, 30.0, 30.0, 80.0),
+                            30.0,
+                            30.0,
+                            30.0,
+                            80.0,
+                          ),
                           child: SingleChildScrollView(
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
@@ -119,7 +123,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Padding(
                                       padding:
                                           const EdgeInsetsDirectional.fromSTEB(
-                                              0.0, 16.0, 0.0, 16.0),
+                                        0.0,
+                                        16.0,
+                                        0.0,
+                                        16.0,
+                                      ),
                                       child: Form(
                                         key: formKey,
                                         autovalidateMode:
@@ -133,7 +141,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                               padding:
                                                   const EdgeInsetsDirectional
                                                       .fromSTEB(
-                                                      0.0, 0.0, 0.0, 16.0),
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                16.0,
+                                              ),
                                               child: _buildPhoneNumberSection(
                                                 context,
                                               ),
@@ -142,7 +154,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                               padding:
                                                   const EdgeInsetsDirectional
                                                       .fromSTEB(
-                                                      0.0, 0.0, 0.0, 16.0),
+                                                0.0,
+                                                0.0,
+                                                0.0,
+                                                16.0,
+                                              ),
                                               child: _buildPasswordSection(
                                                   context),
                                             ),
@@ -275,7 +291,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void onTapMasuk(BuildContext context) async {
     if (enterPhoneController.text != '' && enterPasswordController.text != '') {
       Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.invoiceScreen,
+        AppRoutes.selectOrganisationScreen,
         (route) => false,
       );
     } else {

@@ -65,7 +65,7 @@ class ImageConstant {
   static String imgDiamond2 = '$imagePath/img_diamond_2.png';
 
   // Common images
-  static String imgAppLauncherIcon = '$imagePath/img_app_launcher_icon.png';
+  static String imgAppLauncherIcon = '$imagePath/app_launcher_icon.png';
   static String imgAppLauncherIconPurple =
       '$imagePath/img_app_launcher_icon2.png';
 
@@ -121,4 +121,7 @@ class ImageConstant {
   static String imgLoginAlert = 'assets/images/login_intro.svg';
   static String imgUnderConstruction = 'assets/images/under_construction.png';
   static String imgHistory = 'assets/images/history.png';
+  static String imgKontena = 'assets/images/kontena.png';
+  static String imgRiverstone = 'assets/images/riverstone.png';
+  static String imgSangkudo = 'assets/images/sangkudo.png';
 }
