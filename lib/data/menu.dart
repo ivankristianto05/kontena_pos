@@ -108,7 +108,19 @@ List<Map<String, dynamic>> ListMenu = [
     'type': 'beverage',
     'nama_menu': 'Lemon Tea',
     'harga': 17000
-  }
+  },
+  {
+    'id_menu': 'ADD001',
+    'type': 'addon',
+    'nama_menu': 'Scramble Egg',
+    'harga': 12000
+  },
+  {
+    'id_menu': 'ADD002',
+    'type': 'addon',
+    'nama_menu': 'Cookies Chocolate',
+    'harga': 12000
+  },
 ];
 
 List<dynamic> itemPreference = [

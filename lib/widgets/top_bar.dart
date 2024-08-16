@@ -17,185 +17,227 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: theme.colorScheme.onPrimary, // Set the background color
-      titleSpacing: 0, // Ensure the title starts at the edge
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: smallButtonWidth,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: Colors.white,
-                      width: 1.0,
-                    ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: smallButtonWidth,
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: theme.colorScheme.surface,
+                    width: 1.0,
                   ),
+                  // bottom: BorderSide(
+                  //   color: theme.colorScheme.surface,
+                  //   width: 1.0,
+                  // ),
                 ),
-                child: MaterialButton(
-                  height: 45,
-                  child: const Icon(Icons.refresh, color: Colors.white),
-                  onPressed: () {
-                    // Define the action for the refresh button
-                  },
+                color: theme.colorScheme.primaryContainer,
+              ),
+              child: MaterialButton(
+                height: 51,
+                child: Icon(
+                  Icons.refresh,
+                  color: theme.colorScheme.secondary,
+                ),
+                onPressed: () {
+                  // Define the action for the refresh button
+                },
+              ),
+            ),
+            Container(
+              width: buttonWidth,
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: theme.colorScheme.surface,
+                    width: 1.0,
+                  ),
+                  // bottom: BorderSide(
+                  //   color: theme.colorScheme.surface,
+                  //   width: 1.0,
+                  // ),
                 ),
               ),
-              Container(
-                width: buttonWidth,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: Colors.white,
-                      width: 1.0,
-                    ),
+              child: MaterialButton(
+                height: 51,
+                onPressed: () {
+                  // Define the action for the Order button
+                  onTapOrder(context);
+                },
+                child: Text(
+                  'Order',
+                  style: TextStyle(
+                    color: theme.colorScheme.secondary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                child: MaterialButton(
-                  height: 45,
-                  onPressed: () {
-                    // Define the action for the Order button
-                    onTapOrder(context);
-                  },
-                  child: const Text(
-                    'Order',
+              ),
+            ),
+            // if (isWideScreen) ...[
+            Container(
+              width: buttonWidth,
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: theme.colorScheme.surface,
+                    width: 1.0,
+                  ),
+                  // bottom: BorderSide(
+                  //   color: theme.colorScheme.surface,
+                  //   width: 1.0,
+                  // ),
+                ),
+              ),
+              child: MaterialButton(
+                height: 51,
+                onPressed: () {
+                  // Define the action for the Invoice button
+                  onTapInvoice(context);
+                },
+                child: Text(
+                  'Invoice',
+                  style: TextStyle(
+                    color: theme.colorScheme.secondary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              width: buttonWidth,
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: theme.colorScheme.surface,
+                    width: 1.0,
+                  ),
+                  // bottom: BorderSide(
+                  //   color: theme.colorScheme.surface,
+                  //   width: 1.0,
+                  // ),
+                ),
+              ),
+              child: MaterialButton(
+                height: 51,
+                onPressed: () {
+                  // Define the action for the History button
+                  onTapHistoryInvoice(context);
+                },
+                child: Text(
+                  'History',
+                  style: TextStyle(
+                    color: theme.colorScheme.secondary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            // ],
+          ],
+        ),
+        Row(
+          children: [
+            // if (isWideScreen)
+            Container(
+              width: buttonWidth,
+              height: 51,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: theme.colorScheme.surface,
+                    width: 1.0,
+                  ),
+                  // bottom: BorderSide(
+                  //   color: theme.colorScheme.surface,
+                  //   width: 1.0,
+                  // ),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'Shokudo Restaurant',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: theme.colorScheme.secondary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
-              // if (isWideScreen) ...[
-              Container(
-                width: buttonWidth,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: Colors.white,
-                      width: 1.0,
-                    ),
+            ),
+            Container(
+              width: smallButtonWidth,
+              height: 51,
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: theme.colorScheme.surface,
+                    width: 1.0,
                   ),
+                  // bottom: BorderSide(
+                  //   color: theme.colorScheme.surface,
+                  //   width: 1.0,
+                  // ),
                 ),
-                child: MaterialButton(
-                  height: 45,
-                  onPressed: () {
-                    // Define the action for the Invoice button
-                    onTapInvoice(context);
-                  },
-                  child: const Text(
-                    'Invoice',
+              ),
+              child: MaterialButton(
+                onPressed: () {
+                  // Define the action for the MaterialButton
+                },
+                child: Icon(
+                  Icons.settings,
+                  color: theme.colorScheme.secondary,
+                ),
+              ),
+            ),
+            Container(
+              height: 51,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: theme.colorScheme.surface,
+                    width: 1.0,
+                  ),
+                  // bottom: BorderSide(
+                  //   color: theme.colorScheme.surface,
+                  //   width: 1.0,
+                  // ),
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  Text(
+                    'Administrator',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: theme.colorScheme.secondary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ),
-              Container(
-                width: buttonWidth,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: Colors.white,
-                      width: 1.0,
-                    ),
+                  const SizedBox(width: 8), // Space between text and icon
+                  Icon(
+                    Icons.person,
+                    color: theme.colorScheme.secondary,
                   ),
-                ),
-                child: MaterialButton(
-                  height: 45,
-                  onPressed: () {
-                    // Define the action for the History button
-                    onTapHistoryInvoice(context);
-                  },
-                  child: const Text(
-                    'History',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                ],
               ),
-              // ],
-            ],
-          ),
-          Row(
-            children: [
-              // if (isWideScreen)
-              Container(
-                width: buttonWidth,
-                height: 45,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: Colors.white,
-                      width: 1.0,
-                    ),
-                  ),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      'Shokudo Restaurant',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                width: smallButtonWidth,
-                height: 45,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: Colors.white,
-                      width: 1.0,
-                    ),
-                  ),
-                ),
-                child: MaterialButton(
-                  onPressed: () {
-                    // Define the action for the MaterialButton
-                  },
-                  child: const Icon(Icons.settings, color: Colors.white),
-                ),
-              ),
-              Container(
-                height: 45,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: const Row(
-                  children: [
-                    Text(
-                      'Administrator',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(width: 8), // Space between text and icon
-                    Icon(Icons.person, color: Colors.white),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

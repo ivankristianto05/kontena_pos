@@ -165,16 +165,16 @@ class ColorSchemes {
   static const primaryColorScheme = ColorScheme.light(
     // Primary colors
     primary: Color(0xFF079dd4),
-    secondary: Color(0xFF00ADB5),
+    secondary: Color(0xFF514D4D),
     primaryContainer: Color(0XFFFFFFFF),
-    secondaryContainer: Color(0XFF514D4D),
+    secondaryContainer: Color(0XFFE6F5FB),
 
     background: Color(0xFFEEEEEE),
 
     surface: Color(0xFFE3E6EA),
 
     // Error colors
-    onError: Color(0XFF525DDB),
+    onError: Color(0XFFF81E01),
 
     // On colors(text colors)
     onPrimary: Color(0XFF222831),

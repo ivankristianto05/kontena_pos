@@ -118,9 +118,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           children: [
             Container(
               width: double.infinity,
-              height: 45.0,
+              // height: 40.0,
               decoration: BoxDecoration(
-                color: theme.colorScheme.onBackground,
+                color: theme.colorScheme.primaryContainer,
+                border: Border(
+                  bottom: BorderSide(
+                    color: theme.colorScheme.surface,
+                    width: 1.0,
+                  ),
+                ),
               ),
               child: TopBar(
                 smallButtonWidth: smallButtonWidth,
@@ -155,69 +161,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               child: Align(
                                 alignment:
                                     const AlignmentDirectional(0.00, 0.00),
-                                // child: ProductGrid(
-                                //   items: ListMenu,
-                                //   onTap: () async {
-                                //     await showModalBottomSheet(
-                                //       isScrollControlled: true,
-                                //       enableDrag: false,
-                                //       backgroundColor: Color(0x8A000000),
-                                //       barrierColor: Color(0x00000000),
-                                //       context: context,
-                                //       builder: (context) {
-                                //         return Padding(
-                                //           padding:
-                                //               MediaQuery.viewInsetsOf(context),
-                                //           child: AddToCart(),
-                                //         );
-                                //       },
-                                //     ).then((value) => (value) {
-                                //           print('value, ${value}');
-                                //         });
-                                //   },
-                                // ),
                                 child: SingleChildScrollView(
                                   child: (isLoading == false &&
                                           itemDisplay.isEmpty)
-                                      ?
-                                      //       : Column(
-                                      //           children: [
-                                      //             GridView.builder(
-                                      //               gridDelegate:
-                                      //                   SliverGridDelegateWithFixedCrossAxisCount(
-                                      //                 crossAxisCount: crossAxisCount,
-                                      //                 crossAxisSpacing: 8.0,
-                                      //                 mainAxisSpacing: 8.0,
-                                      //               ),
-                                      //               itemCount: itemDisplay.length,
-                                      //               itemBuilder: ((context, index) {
-                                      //                 print(
-                                      //                     'item display --, ${itemDisplay.length}');
-                                      //                 if (isLoading) {
-                                      //                   print('item 1');
-                                      //                   return Skeletonizer(
-                                      //                     enabled: isLoading,
-                                      //                     child: const ProductGrid(),
-                                      //                   );
-                                      //                 } else {
-                                      //                   print('item 2');
-                                      //                   Map<String, dynamic>
-                                      //                       currentItem =
-                                      //                       itemDisplay[index];
-                                      //                   print(
-                                      //                       'current item, ${currentItem}');
-                                      //                   String itemDescription =
-                                      //                       "${currentItem["description"]}";
-
-                                      //                   return ProductGrid(
-                                      //                       name: currentItem[
-                                      //                           'nama_menu']);
-                                      //                 }
-                                      //               }),
-                                      //             ),
-                                      //           ],
-                                      //         ),
-                                      Container(
+                                      ? Container(
                                           width: MediaQuery.of(context)
                                                   .size
                                                   .width *
@@ -234,8 +181,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                             children: [
                                               MasonryGridView.count(
                                                 crossAxisCount: 5,
-                                                // mainAxisSpacing: 4,
-                                                // crossAxisSpacing: 4,
+                                                mainAxisSpacing: 6,
+                                                crossAxisSpacing: 6,
                                                 shrinkWrap: true,
                                                 itemCount: itemDisplay.length,
                                                 itemBuilder: (context, index) {
