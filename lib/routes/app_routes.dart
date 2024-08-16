@@ -4,7 +4,7 @@ import 'package:kontena_pos/features/invoices/persentation/history_invoice_scree
 import 'package:kontena_pos/features/invoices/persentation/invoice_screen.dart';
 import 'package:kontena_pos/features/orders/persentation/order_screen.dart';
 import 'package:kontena_pos/features/authentication/persentation/login_screen.dart';
- import 'package:kontena_pos/models/cart_item.dart';
+import 'package:kontena_pos/models/cart_item.dart';
 
 class AppRoutes {
   static const String loginScreen = '/login';
@@ -16,9 +16,8 @@ class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     loginScreen: (context) => const LoginScreen(),
     selectOrganisationScreen: (context) => const SelectOrganisationScreen(),
-    orderScreen: (context) => OrderScreen(
-        ),
-    //invoiceScreen: (context) => const InvoiceScreen(),
+    orderScreen: (context) => OrderScreen(),
+    invoiceScreen: (context) => const InvoiceScreen(),
     historyInvoiceScreen: (context) => const HistoryInvoiceScreen(),
   };
 }

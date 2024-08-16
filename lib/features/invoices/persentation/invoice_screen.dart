@@ -3,9 +3,10 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/Screen/components/buttonfilter_section.dart';
 import 'package:kontena_pos/Screen/components/guestinputwithbutton_section.dart';
 import 'package:kontena_pos/Screen/components/dropdown_delete_section.dart';
+import 'package:kontena_pos/Screen/components/itemcart_section.dart';
 // import 'package:kontena_pos/Screen/components/itemcart_section.dart';
 import 'package:kontena_pos/Screen/components/searchbar_section.dart';
-// import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
@@ -29,17 +30,17 @@ class InvoiceScreen extends StatefulWidget {
 
 class _InvoiceScreenState extends State<InvoiceScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  // late List<ItemCart> cartItem;
-  // Cart cart = Cart();
-  // late Map cartRecapData;
+  late List<ItemCart> cartItem;
+  Cart cart = Cart(AppState());
+  late Map cartRecapData;
   late List<CartItem> cartData;
-  // late List<Map<String, dynamic>> cartDataItem = [
-  //   {
-  //     'id': 'test',
-  //     'name': 'Item 1',
-  //     'qty': 3,
-  //   }
-  // ];
+  late List<Map<String, dynamic>> cartDataItem = [
+    {
+      'id': 'test',
+      'name': 'Item 1',
+      'qty': 3,
+    }
+  ];
   String filterSearch = '';
   bool isSearchActive = false;
   bool isLoading = true;
@@ -63,6 +64,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   void initState() {
     super.initState();
     // cartData = cart.getAllItemCart();
+    cartData = [];
 
     Future.delayed(Duration(milliseconds: 300), () {
       setState(() {
@@ -71,9 +73,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         isLoading = false;
 
         // print(itemDisplay);
+        itemDisplay = getItem();
       });
     });
-    itemDisplay = getItem();
   }
 
   @override
@@ -148,7 +150,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 55.0, 8.0, 0.0),
+                                  8.0, 65.0, 8.0, 8.0),
                               child: ButtonFilter(
                                 onFilterSelected: (String type) {},
                               ),
@@ -288,7 +290,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   FocusNode inputPhone = FocusNode();
 
   void onTapOpenItem(BuildContext context, dynamic item) async {
-    print('check item, $item');
     await showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: false,

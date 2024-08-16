@@ -51,50 +51,48 @@ class Cart {
 
   void _recalculateTotalPrice() {
     for (var item in _items) {
-      item.totalPrice = item.qty *
-          (item.variantPrice != 0 ? item.variantPrice : item.price);
+      item.totalPrice =
+          item.qty * (item.variantPrice != 0 ? item.variantPrice : item.price);
     }
   }
 
   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
-  final existingItemIndex = _items.indexWhere((item) =>
-      item.id == newItem.id);
+    final existingItemIndex =
+        _items.indexWhere((item) => item.id == newItem.id);
 
-  if (existingItemIndex >= 0) {
-    // Update existing item jika id-nya sama
-    var existingItem = _items[existingItemIndex];
-    if (mode == CartMode.add) {
-      existingItem.qty += newItem.qty;
+    if (existingItemIndex >= 0) {
+      // Update existing item jika id-nya sama
+      var existingItem = _items[existingItemIndex];
+      if (mode == CartMode.add) {
+        existingItem.qty += newItem.qty;
+      } else {
+        existingItem.qty = newItem.qty;
+      }
+      existingItem.variant = newItem.variant;
+      existingItem.notes = newItem.notes;
+      existingItem.preference = newItem.preference;
+      existingItem.addons = newItem.addons;
+      existingItem.variantPrice = newItem.variantPrice;
+      existingItem.totalPrice = existingItem.qty *
+          (existingItem.variantPrice != 0
+              ? existingItem.variantPrice
+              : existingItem.price);
+      _items[existingItemIndex] = existingItem;
     } else {
-      existingItem.qty = newItem.qty;
+      // Tambah item baru jika tidak ditemukan item dengan id yang sama
+      _items.add(newItem);
     }
-    existingItem.variant = newItem.variant;
-    existingItem.notes = newItem.notes;
-    existingItem.preference = newItem.preference;
-    existingItem.addons = newItem.addons;
-    existingItem.variantPrice = newItem.variantPrice;
-    existingItem.totalPrice = existingItem.qty *
-        (existingItem.variantPrice != 0
-            ? existingItem.variantPrice
-            : existingItem.price);
-    _items[existingItemIndex] = existingItem;
-  } else {
-    // Tambah item baru jika tidak ditemukan item dengan id yang sama
-    _items.add(newItem);
+
+    // Recalculate total price
+    _recalculateTotalPrice();
+
+    // Notify changes
+    _onCartChanged?.call();
+
+    // Update app state
+    appState.addItemToCart(newItem);
   }
 
-  // Recalculate total price
-  _recalculateTotalPrice();
-
-  // Notify changes
-  _onCartChanged?.call();
-
-  // Update app state
-  appState.addItemToCart(newItem);
-}
-
-
-  
   void removeItem(CartItem itemToRemove) {
     final eq = const DeepCollectionEquality().equals;
 
@@ -102,7 +100,8 @@ class Cart {
         item.id == itemToRemove.id &&
         item.variant == itemToRemove.variant &&
         item.notes == itemToRemove.notes &&
-        eq(item.preference, itemToRemove.preference) && // Deep compare for preference
+        eq(item.preference,
+            itemToRemove.preference) && // Deep compare for preference
         eq(item.addons, itemToRemove.addons)); // Deep compare for addons
 
     // Update AppState
@@ -110,7 +109,8 @@ class Cart {
         item.id == itemToRemove.id &&
         item.variant == itemToRemove.variant &&
         item.notes == itemToRemove.notes &&
-        eq(item.preference, itemToRemove.preference) && // Deep compare for preference
+        eq(item.preference,
+            itemToRemove.preference) && // Deep compare for preference
         eq(item.addons, itemToRemove.addons)); // Deep compare for addons
 
     // Notify changes
@@ -150,5 +150,15 @@ class Cart {
     print(itemDetails);
 
     return itemDetails;
+  }
+
+  String getPreferenceText(Map<String, String> data) {
+    // Get the values from the map
+    List<String> values = data.values.cast<String>().toList();
+
+    // Join the values into a comma-separated string
+    String result = values.join(', ');
+
+    return result;
   }
 }

@@ -32,7 +32,7 @@ class CardListItem extends StatelessWidget {
               itemCount: cartData.length,
               itemBuilder: (context, index) {
                 final itemData = cartData[index];
-                String note = getPreferenceText(itemData.preference);
+                String note = itemData.preference as String;
                 String addon2 = '';
                 String catatan = '';
                 totalAddon = 0;
