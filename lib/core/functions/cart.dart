@@ -11,6 +11,7 @@ class CartItem {
   final String id;
   final String name;
   String? variant;
+  String? variantId; // Tambahkan parameter ini
   int qty;
   final int price;
   int variantPrice;
@@ -24,6 +25,7 @@ class CartItem {
     required this.id,
     required this.name,
     this.variant,
+    this.variantId, // Tambahkan parameter ini
     required this.qty,
     required this.price,
     this.variantPrice = 0,
@@ -59,9 +61,10 @@ class Cart {
   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
     final existingItemIndex =
         _items.indexWhere((item) => item.id == newItem.id);
+    final existingItemIndex = _items.indexWhere(
+        (item) => item.id == newItem.id && item.variantId == newItem.variantId);
 
     if (existingItemIndex >= 0) {
-      // Update existing item jika id-nya sama
       var existingItem = _items[existingItemIndex];
       if (mode == CartMode.add) {
         existingItem.qty += newItem.qty;
@@ -69,6 +72,7 @@ class Cart {
         existingItem.qty = newItem.qty;
       }
       existingItem.variant = newItem.variant;
+      existingItem.variantId = newItem.variantId;
       existingItem.notes = newItem.notes;
       existingItem.preference = newItem.preference;
       existingItem.addons = newItem.addons;
@@ -79,12 +83,28 @@ class Cart {
               : existingItem.price);
       _items[existingItemIndex] = existingItem;
     } else {
-      // Tambah item baru jika tidak ditemukan item dengan id yang sama
       _items.add(newItem);
     }
 
     // Recalculate total price
     _recalculateTotalPrice();
+    _recalculateTotalPrice();
+    _onCartChanged?.call();
+    appState.addItemToCart(newItem); // Update AppState
+  }
+
+  void updateItem(String itemId, CartItem updatedItem) {
+    final index = _items.indexWhere((item) =>
+        item.id == itemId &&
+        item.variant == updatedItem.variant &&
+        item.notes == updatedItem.notes &&
+        const DeepCollectionEquality()
+            .equals(item.preference, updatedItem.preference) &&
+        const DeepCollectionEquality().equals(item.addons, updatedItem.addons));
+
+    if (index >= 0) {
+      _items[index] = updatedItem;
+    }
 
     // Notify changes
     _onCartChanged?.call();
@@ -112,6 +132,24 @@ class Cart {
         eq(item.preference,
             itemToRemove.preference) && // Deep compare for preference
         eq(item.addons, itemToRemove.addons)); // Deep compare for addons
+    // Notify changes
+    if (_onCartChanged != null) {
+      _onCartChanged!();
+    }
+    appState.notifyListeners();
+  }
+
+  void removeItem(int index) {
+    if (index < 0 || index >= _items.length) {
+      print('Invalid index: $index');
+      return;
+    }
+
+    // Remove the item from the local cart
+    _items.removeAt(index);
+
+    // Remove the item from the AppState
+    appState.cartItems.removeAt(index);
 
     // Notify changes
     if (_onCartChanged != null) {
