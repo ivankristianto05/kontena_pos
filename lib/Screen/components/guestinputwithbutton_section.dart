@@ -1,31 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class GuestInputWithButton extends StatelessWidget {
-  const GuestInputWithButton({
-    super.key,
-    required this.searchbarWidth,
-    required TextEditingController guestNameController,
-    required this.smallButtonWidth,
-  }) : _guestNameController = guestNameController;
-
-  final double searchbarWidth;
-  final TextEditingController _guestNameController;
+class GuestInputWithButton extends StatefulWidget {
+  final double screenWidth;
+  final TextEditingController guestNameController;
   final double smallButtonWidth;
 
+  const GuestInputWithButton({
+    Key? key,
+    required this.screenWidth,
+    required this.guestNameController,
+    required this.smallButtonWidth,
+  }) : super(key: key);
+
+  @override
+  _GuestInputWithButtonState createState() => _GuestInputWithButtonState();
+}
+
+class _GuestInputWithButtonState extends State<GuestInputWithButton> {
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return Container(
+      width: widget.screenWidth * 0.35,
+      height: 55,
       child: Row(
         children: [
           Expanded(
             child: Container(
-              height: 55, // Ensuring the height is consistent
+              height: 55,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  right: BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                ),
+              ),
               child: Stack(
                 children: [
                   TextField(
-                    controller: _guestNameController,
-                    decoration: const InputDecoration(
+                    controller: widget.guestNameController,
+                    decoration: InputDecoration(
                       hintText: 'Input Guest Name',
                       filled: true,
                       fillColor: Colors.white,
@@ -39,11 +55,11 @@ class GuestInputWithButton extends StatelessWidget {
                     top: 0,
                     bottom: 0,
                     child: Visibility(
-                      visible: _guestNameController.text.isNotEmpty,
+                      visible: widget.guestNameController.text.isNotEmpty,
                       child: IconButton(
                         icon: FaIcon(FontAwesomeIcons.circleXmark),
                         onPressed: () {
-                          _guestNameController.clear();
+                          widget.guestNameController.clear();
                         },
                       ),
                     ),
@@ -53,7 +69,8 @@ class GuestInputWithButton extends StatelessWidget {
             ),
           ),
           Container(
-            width: smallButtonWidth,
+            width: widget.smallButtonWidth,
+            height: 55,
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border(
@@ -61,33 +78,40 @@ class GuestInputWithButton extends StatelessWidget {
                   color: Colors.grey,
                   width: 1.0,
                 ),
-                left: BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
+              ),
+            ),
+            child: MaterialButton(
+              height: 55,
+              padding: EdgeInsets.zero,
+              onPressed: () {
+                // Handle the action for the search button
+              },
+              child: Center(
+                child: FaIcon(
+                  FontAwesomeIcons.magnifyingGlass,
+                  size: 16,
                 ),
               ),
             ),
-              child: MaterialButton(
-                height: 55,
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  // Handle the action for the search button
-                },
-                child: Center(child: FaIcon(FontAwesomeIcons.magnifyingGlass, size: 16,)),
-              ),
-            ),
-
+          ),
           Container(
-            color: Colors.white,
-            width: smallButtonWidth,
+            width: widget.smallButtonWidth,
+            height: 55,
+            decoration: BoxDecoration(
+              color: Colors.white,
+            ),
             child: MaterialButton(
               height: 55,
               padding: EdgeInsets.zero,
               onPressed: () {
                 // Handle the action for the person button
               },
-              child: 
-              Center(child: FaIcon(FontAwesomeIcons.userPlus, size: 16)),
+              child: Center(
+                child: FaIcon(
+                  FontAwesomeIcons.userPlus,
+                  size: 16,
+                ),
+              ),
             ),
           ),
         ],

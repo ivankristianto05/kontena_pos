@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:provider/provider.dart';
 import 'package:kontena_pos/constants.dart';
 
 class DropdownDeleteSection extends StatefulWidget {
@@ -9,13 +12,17 @@ class DropdownDeleteSection extends StatefulWidget {
 }
 
 class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
-  String? selectedValue;
+  String? pickupType;
+  String? Table;
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double smallButtonWidth = 60.0;
-    double searchbarWidth = screenWidth * 0.7;
+    double searchbarWidth = screenWidth * 0.65;
+
+    // Access AppState and Cart
+    final appState = Provider.of<AppState>(context, listen: false);
+    final cart = Cart(appState, onCartChanged: () => setState(() {}));
 
     return Container(
       width: screenWidth - searchbarWidth,
@@ -25,6 +32,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
         children: [
           Expanded(
             child: Container(
+              width: screenWidth * 0.20,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -49,7 +57,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                   child: DropdownButton<String>(
                     isExpanded: true,
                     hint: Text("Select an Option"),
-                    value: selectedValue,
+                    value: pickupType,
                     items: <String>[
                       'Dine in',
                       'Take away',
@@ -65,10 +73,75 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                     }).toList(),
                     onChanged: (String? newValue) {
                       setState(() {
-                        selectedValue = newValue;
+                        pickupType = newValue;
                       });
                     },
                   ),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: screenWidth * 0.10,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                right: BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+                top: BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+                bottom: BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+            ),
+            height: 50,
+            child: DropdownButtonHideUnderline(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  hint: Text("Table"),
+                  value: Table,
+                  items: <String>[
+                    '1',
+                    '2',
+                    '3',
+                  ].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value, // Hanya angka yang ditampilkan dalam pilihan dropdown
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      Table = newValue;
+                    });
+                  },
+                  selectedItemBuilder: (BuildContext context) {
+                    return <String>[
+                      '1',
+                      '2',
+                      '3',
+                    ].map((String value) {
+                      return Text(
+                        'Table $value', // Teks "Table" ditambahkan saat item dipilih
+                        style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                        ),
+                      );
+                    }).toList();
+                  },
                 ),
               ),
             ),
@@ -79,22 +152,25 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border(
-                  bottom: BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  ),
-                  top: BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  )),
+                bottom: BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+                top: BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
             ),
             child: MaterialButton(
               height: 50,
               padding: EdgeInsets.zero,
               onPressed: () {
-                // Handle the action for the delete button
+                // Clear all items from the cart
+                setState(() {
+                  cart.clearAllItems();
+                });
               },
-              
               child: Icon(Icons.delete, color: redcolor),
             ),
           ),

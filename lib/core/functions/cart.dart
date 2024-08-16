@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'package:collection/collection.dart'; // Import for deep equality check
 import 'package:kontena_pos/app_state.dart';
 
 enum CartMode {
@@ -13,12 +13,12 @@ class CartItem {
   String? variant;
   int qty;
   final int price;
+  int variantPrice;
   late int totalPrice;
   Map<String, Map<String, dynamic>>? addons;
-  final String notes;
-  final Map<String, String> preference;
+  String notes;
+  Map<String, String> preference;
   String? type;
-  // final int variantPrice; // Add this field
 
   CartItem({
     required this.id,
@@ -26,172 +26,129 @@ class CartItem {
     this.variant,
     required this.qty,
     required this.price,
+    this.variantPrice = 0,
     this.addons,
     required this.notes,
     required this.preference,
     this.type,
-    // required this.variantPrice, // Add this parameter
   }) {
-    totalPrice = qty * price;
+    totalPrice = qty * (variantPrice != 0 ? variantPrice : price);
   }
 }
 
 class Cart {
   List<CartItem> _items = [];
+  final AppState appState; // Dependency injection for AppState
   VoidCallback? _onCartChanged;
 
-  Cart({VoidCallback? onCartChanged}) : _onCartChanged = onCartChanged {
+  Cart(this.appState, {VoidCallback? onCartChanged})
+      : _onCartChanged = onCartChanged {
     // Set the initial cart items from AppState
-    _items = List.from(AppState.cartItems);
+    _items = List.from(appState.cartItems);
   }
 
   List<CartItem> get items => List.from(_items);
 
   void _recalculateTotalPrice() {
     for (var item in _items) {
-      item.totalPrice = item.qty * item.price;
+      item.totalPrice = item.qty *
+          (item.variantPrice != 0 ? item.variantPrice : item.price);
     }
   }
 
   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
-    // Check if the item with the same ID already exists
-    var existingItem = _items.firstWhere(
-      (item) => item.id == newItem.id,
-      orElse: () => CartItem(
-        id: '',
-        name: '',
-        qty: 0,
-        price: 0,
-        // itemName: '',
-        preference: {},
-        addons: {},
-        notes: '',
-      ),
-    );
+  final existingItemIndex = _items.indexWhere((item) =>
+      item.id == newItem.id);
 
-    if (existingItem.id.isNotEmpty) {
-      // Item already exists, update the quantity
-      if (mode == CartMode.add) {
-        existingItem.qty += newItem.qty;
-      } else {
-        // Default behavior: Add a new item
-        existingItem.qty = newItem.qty;
-      }
+  if (existingItemIndex >= 0) {
+    // Update existing item jika id-nya sama
+    var existingItem = _items[existingItemIndex];
+    if (mode == CartMode.add) {
+      existingItem.qty += newItem.qty;
     } else {
-      // Item doesn't exist, add a new item
-      _items.add(newItem);
+      existingItem.qty = newItem.qty;
     }
-
-    // / Recalculate total price
-    _recalculateTotalPrice();
-
-    // Notify changes
-    _onCartChanged?.call();
-
-    // Update app state
-    AppState.updateCart(_items);
+    existingItem.variant = newItem.variant;
+    existingItem.notes = newItem.notes;
+    existingItem.preference = newItem.preference;
+    existingItem.addons = newItem.addons;
+    existingItem.variantPrice = newItem.variantPrice;
+    existingItem.totalPrice = existingItem.qty *
+        (existingItem.variantPrice != 0
+            ? existingItem.variantPrice
+            : existingItem.price);
+    _items[existingItemIndex] = existingItem;
+  } else {
+    // Tambah item baru jika tidak ditemukan item dengan id yang sama
+    _items.add(newItem);
   }
 
-  void removeItem(String itemId) {
-    _items.removeWhere((item) => item.id == itemId);
+  // Recalculate total price
+  _recalculateTotalPrice();
 
-    // Recalculate total price
-    _recalculateTotalPrice();
+  // Notify changes
+  _onCartChanged?.call();
+
+  // Update app state
+  appState.addItemToCart(newItem);
+}
+
+
+  
+  void removeItem(CartItem itemToRemove) {
+    final eq = const DeepCollectionEquality().equals;
+
+    _items.removeWhere((item) =>
+        item.id == itemToRemove.id &&
+        item.variant == itemToRemove.variant &&
+        item.notes == itemToRemove.notes &&
+        eq(item.preference, itemToRemove.preference) && // Deep compare for preference
+        eq(item.addons, itemToRemove.addons)); // Deep compare for addons
+
+    // Update AppState
+    appState.cartItems.removeWhere((item) =>
+        item.id == itemToRemove.id &&
+        item.variant == itemToRemove.variant &&
+        item.notes == itemToRemove.notes &&
+        eq(item.preference, itemToRemove.preference) && // Deep compare for preference
+        eq(item.addons, itemToRemove.addons)); // Deep compare for addons
 
     // Notify changes
-    _onCartChanged?.call();
-
-    // Update app state
-    AppState.updateCart(_items);
+    if (_onCartChanged != null) {
+      _onCartChanged!();
+    }
+    appState.notifyListeners();
   }
 
-  void clearCart() {
+  void clearAllItems() {
     _items.clear();
-
-    // Recalculate total price
-    _recalculateTotalPrice();
-
-    // Notify changes
-    _onCartChanged?.call();
-
-    // Update app state
-    AppState.updateCart(_items);
+    appState.resetCart(); // Clear items from the AppState as well
+    if (_onCartChanged != null) {
+      _onCartChanged!();
+    }
+    appState.notifyListeners(); // Notify listeners of AppState
   }
 
   bool isItemInCart(String itemId) {
-    return AppState.cartItems.any((item) => item.id == itemId);
+    return _items.any((item) => item.id == itemId);
   }
 
-  Map<String, dynamic> getItemCart(String itemName) {
-    List<CartItem> data = [];
-    Map<String, int> indexes = {};
+  // Method untuk mencetak array idmenu, idvarian, indexpreference, dan indexaddons
+  List<Map<String, dynamic>> printItemDetails() {
+    List<Map<String, dynamic>> itemDetails = [];
 
-    int index = 0;
-    for (var item in AppState.cartItems) {
-      if (item.name == itemName) {
-        indexes[item.id] = index;
-        data.add(item);
-      }
-      index++;
+    for (var item in _items) {
+      itemDetails.add({
+        'idmenu': item.id,
+        'idvarian': item.variant,
+        'indexpreference': item.preference,
+        'indexaddons': item.addons,
+      });
     }
 
-    return {"data": data, "index": indexes};
+    // Print the array
+    print(itemDetails);
 
-    // return {
-    //   "index": indexes,
-    //   "data": result
-    // }
-
-    // return AppState.cartItems
-    //     .where((item) => item.name == itemName)
-    //     .toList();
+    return itemDetails;
   }
-
-  CartItem getItemByIndex(int index) {
-    return AppState.cartItems[index];
-  }
-
-  List<CartItem> getAllItemCart() {
-    return AppState.cartItems.toList();
-  }
-
-  Map<String, dynamic> recapCart() {
-    // Summarize quantities and total price based on item names
-    Map<String, dynamic> recap = {
-      'totalPrice': 0,
-      'totalItem': 0,
-      'items': {},
-    };
-
-    for (var item in AppState.cartItems) {
-      recap['totalPrice'] += item.totalPrice;
-
-      if (!recap['items'].containsKey(item.name)) {
-        recap['items'][item.name] = {
-          'name': item.name,
-          'preference': item.preference,
-          'totalQty': item.qty,
-          'totalPrice': item.totalPrice,
-          'notes': item.notes,
-          'addon': item.addons,
-        };
-        recap['totalItem'] += 1;
-      } else {
-        recap['items'][item.name]['totalQty'] += item.qty;
-        recap['items'][item.name]['totalPrice'] += item.totalPrice;
-      }
-    }
-
-    return recap;
-  }
-}
-
-String getPreferenceText(Map<String, String> data) {
-  // Get the values from the map
-  List<String> values = data.values.cast<String>().toList();
-
-  // Join the values into a comma-separated string
-  String result = values.join(', ');
-
-  return result;
 }

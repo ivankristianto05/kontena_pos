@@ -4,21 +4,21 @@ import 'package:kontena_pos/Screen/popup/addons_section.dart';
 import 'package:kontena_pos/Screen/popup/noteandpreference_section.dart';
 import 'package:kontena_pos/Screen/popup/sumary_section.dart';
 import 'package:kontena_pos/Screen/popup/variant_section.dart';
-import 'package:kontena_pos/models/cart_item.dart';
+import 'package:provider/provider.dart'; // Import Provider package
+import 'package:kontena_pos/app_state.dart';
+import '../../core/functions/cart.dart'; // Import AppState
 
 class ItemDetailsDialog extends StatefulWidget {
   final String name;
   final int price;
   final String idMenu;
   final String type;
-  final void Function(CartItem item) onAddToCart;
 
   ItemDetailsDialog({
     required this.name,
     required this.price,
     required this.idMenu,
     required this.type,
-    required this.onAddToCart,
   });
 
   @override
@@ -39,22 +39,27 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
   final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
 
   void _addItemToCart() {
-    final cartItem = CartItem(
-      idMenu: widget.idMenu,
-      name: widget.name,
-      variant: _selectedVariant ?? '',
-      quantity: _quantity,
-      price: widget.price,
-      addons: _selectedAddons,
-      notes: _notes,
-      preference: _selectedPreference,
-      type: widget.type,
-      variantPrice: _variantPrice,
-    );
+  final cartItem = CartItem(
+    id: widget.idMenu,
+    name: widget.name,
+    variant: _selectedVariant ?? '',
+    qty: _quantity,
+    price: widget.price,
+    variantPrice: _variantPrice, // Masukkan harga varian jika ada
+    addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
+    notes: _notes,
+    preference: {
+      'preference': _selectedPreference,
+      // Add other preferences if any
+    },
+    type: widget.type,
+  );
+  // Access AppState and Cart to add item to cart
+  final appState = Provider.of<AppState>(context, listen: false);
+  appState.addItemToCart(cartItem);
 
-    widget.onAddToCart(cartItem);
-    Navigator.of(context).pop();
-  }
+  Navigator.of(context).pop();
+}
 
   @override
   Widget build(BuildContext context) {
