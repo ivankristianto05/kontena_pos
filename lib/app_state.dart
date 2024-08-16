@@ -49,24 +49,29 @@ class AppState extends ChangeNotifier {
 
   // Menambahkan atau memperbarui item di cart
   void addItemToCart(CartItem newItem) {
-    final existingItemIndex = findItemIndex(newItem);
+  final existingItemIndex = findItemIndex(newItem);
 
-    if (existingItemIndex >= 0) {
-      // Update existing item jika atributnya sama
-      var existingItem = _cartItems[existingItemIndex];
-      existingItem.qty += newItem.qty;
-      existingItem.totalPrice = existingItem.qty *
-        (existingItem.variantPrice != 0 ? 
-        existingItem.variantPrice : 
-        existingItem.price);
-      _cartItems[existingItemIndex] = existingItem;
-    } else {
-      // Tambah item baru jika atributnya berbeda
-      _cartItems.add(newItem);
-    }
-
-    notifyListeners(); // Pemberitahuan bahwa ada perubahan
+  if (existingItemIndex >= 0) {
+    var existingItem = _cartItems[existingItemIndex];
+    existingItem.qty = newItem.qty; // Update quantity
+    existingItem.variant = newItem.variant;
+    existingItem.variantId = newItem.variantId; // Update variantId
+    existingItem.notes = newItem.notes;
+    existingItem.preference = newItem.preference;
+    existingItem.addons = newItem.addons;
+    existingItem.variantPrice = newItem.variantPrice;
+    existingItem.totalPrice = existingItem.qty *
+      (existingItem.variantPrice != 0 ? 
+      existingItem.variantPrice : 
+      existingItem.price);
+    _cartItems[existingItemIndex] = existingItem;
+  } else {
+    _cartItems.add(newItem);
   }
+
+  notifyListeners(); // Pemberitahuan bahwa ada perubahan
+}
+
 
   // Mengatur ulang cart
   void resetCart() {

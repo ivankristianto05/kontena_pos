@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import intl package
+import 'package:intl/intl.dart';
 import 'package:kontena_pos/Screen/popup/addons_section.dart';
 import 'package:kontena_pos/Screen/popup/noteandpreference_section.dart';
 import 'package:kontena_pos/Screen/popup/sumary_section.dart';
 import 'package:kontena_pos/Screen/popup/variant_section.dart';
-import 'package:provider/provider.dart'; // Import Provider package
+import 'package:kontena_pos/data/menuvarian.dart';
+import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
-import '../../core/functions/cart.dart'; // Import AppState
+import '../../core/functions/cart.dart';
 
 class ItemDetailsDialog extends StatefulWidget {
   final String name;
@@ -35,31 +36,43 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
   int _quantity = 1;
   int _variantPrice = 0;
 
-  // Create a NumberFormat instance for Indonesian locale
   final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
 
   void _addItemToCart() {
+  // Print debug information
+  print('Selected Variant Index: $_selectedVariantIndex');
+  
+  // Ensure MenuVarian is correctly filtered based on idMenu
+  final List<Map<String, dynamic>> filteredVariants = MenuVarian
+    .where((variant) => variant['id_menu'] == widget.idMenu)
+    .toList();  
+  final selectedVariant = _selectedVariantIndex >= 0 && _selectedVariantIndex < filteredVariants.length
+      ? filteredVariants[_selectedVariantIndex]
+      : null;
+  
   final cartItem = CartItem(
     id: widget.idMenu,
     name: widget.name,
-    variant: _selectedVariant ?? '',
+    variant: selectedVariant != null ? selectedVariant['nama_varian'] : null,
+    variantId: selectedVariant != null ? selectedVariant['id_varian'] : null,
     qty: _quantity,
     price: widget.price,
-    variantPrice: _variantPrice, // Masukkan harga varian jika ada
+    variantPrice: _variantPrice,
     addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
     notes: _notes,
     preference: {
       'preference': _selectedPreference,
-      // Add other preferences if any
     },
     type: widget.type,
   );
-  // Access AppState and Cart to add item to cart
+
   final appState = Provider.of<AppState>(context, listen: false);
   appState.addItemToCart(cartItem);
 
   Navigator.of(context).pop();
 }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +161,7 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                       name: widget.name,
                       price: _variantPrice != 0
                           ? _variantPrice
-                          : widget.price, // Send price as int
+                          : widget.price,
                       type: widget.type,
                       selectedVariant: _selectedVariant,
                       selectedPreferenceIndex: _selectedPreferenceIndex,

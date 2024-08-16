@@ -41,9 +41,9 @@ class _VariantSectionState extends State<VariantSection> {
 
   @override
   Widget build(BuildContext context) {
-    final variants =
-        MenuVarian.where((variant) => variant['id_menu'] == widget.idMenu)
-            .toList();
+    // Filter MenuVarian based on idMenu
+    final variants = MenuVarian.where((variant) => variant['id_menu'] == widget.idMenu).toList();
+
 
     final numberFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ');
 
@@ -52,8 +52,7 @@ class _VariantSectionState extends State<VariantSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Variant:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('Variant:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           TextField(
             decoration: InputDecoration(
               hintText: 'Search',
@@ -78,8 +77,7 @@ class _VariantSectionState extends State<VariantSection> {
                             widget.onVariantSelected(-1, '', 0);
                           } else {
                             _selectedIndex = index;
-                            widget.onVariantSelected(
-                                index, variant['nama_varian'], variant['harga_varian']);
+                            widget.onVariantSelected(index, variant['nama_varian'], variant['harga_varian']);
                           }
                         });
                       },
@@ -87,9 +85,7 @@ class _VariantSectionState extends State<VariantSection> {
                         decoration: BoxDecoration(
                           color: isSelected ? buttonselectedcolor : Colors.white,
                           border: Border.all(
-                              color: isSelected
-                                  ? buttonselectedcolor
-                                  : Colors.grey),
+                              color: isSelected ? buttonselectedcolor : Colors.grey),
                         ),
                         child: ListTile(
                           title: AutoSizeText(

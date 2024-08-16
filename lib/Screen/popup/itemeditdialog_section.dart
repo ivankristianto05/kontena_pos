@@ -27,6 +27,7 @@ class ItemEditDialog extends StatefulWidget {
 
 class _ItemEditDialogState extends State<ItemEditDialog> {
   int _selectedVariantIndex = -1;
+  String? _selectedVariantId;
   int _selectedPreferenceIndex = -1;
   String _selectedPreference = '';
   Map<String, bool> _selectedAddons = {};
@@ -42,43 +43,81 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
   }
 
   void _initializeFields() {
-    setState(() {
-      _selectedVariant = widget.item.variant;
-      _quantity = widget.item.qty;
-      _notes = widget.item.notes;
-      _selectedPreference = widget.item.preference['preference'] ?? ''; // Make sure to access the preference correctly
-      _selectedAddons = widget.item.addons?.map((key, value) => MapEntry(key, value['selected'] as bool)) ?? {};
-      _variantPrice = widget.item.variantPrice;
+  setState(() {
+    _selectedVariant = widget.item.variant;
+    _selectedVariantId = widget.item.variantId;
+    _quantity = widget.item.qty;
+    _notes = widget.item.notes;
+    _selectedPreference = widget.item.preference['preference'] ?? '';
+    _selectedAddons = widget.item.addons
+            ?.map((key, value) => MapEntry(key, value['selected'] as bool)) ??
+        {};
+    _variantPrice = widget.item.variantPrice;
 
-      List<String> variants = MenuVarian.where((variant) => variant['id_menu'] == widget.item.id)
-          .map((variant) => variant['nama_varian'] as String)
-          .toList();
+    // Filter variants based on the menu ID
+    List<Map<String, dynamic>> filteredVariants = MenuVarian
+        .where((variant) => variant['id_menu'] == widget.item.id)
+        .toList();
 
-      _selectedVariantIndex = variants.indexOf(_selectedVariant ?? '');
-      _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
-    });
-  }
+    // Extract variant names for display
+    List<String> variantNames = filteredVariants
+        .map((variant) => variant['nama_varian'] as String)
+        .toList();
+
+    _selectedVariantIndex = variantNames.indexOf(_selectedVariant ?? '');
+    _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
+
+    // Print for debugging
+    print('Filtered Variants: $filteredVariants');
+    print('Variant Names: $variantNames');
+    print('Initialized with Variant Index: $_selectedVariantIndex');
+    print('Selected Variant: $_selectedVariant');
+    print('Selected Preference Index: $_selectedPreferenceIndex');
+    print('Selected Preference: $_selectedPreference');
+  });
+}
 
 
-  int _getVariantIndex(String? variant) {
-    List<String> variants = _getVariantsBasedOnType();
-    return variants.indexOf(variant ?? '');
-  }
+
+ void _editItem() {
+  // Filter variants based on the menu ID
+  List<Map<String, dynamic>> filteredVariants = MenuVarian
+      .where((variant) => variant['id_menu'] == widget.item.id)
+      .toList();
+
+  final selectedVariant = _selectedVariantIndex >= 0 && _selectedVariantIndex < filteredVariants.length
+      ? filteredVariants[_selectedVariantIndex]
+      : null;
+
+  final editedItem = CartItem(
+    id: widget.item.id,
+    name: widget.item.name,
+    variant: selectedVariant != null ? selectedVariant['nama_varian'] : '',
+    variantId: selectedVariant != null ? selectedVariant['id_varian'] : null,
+    qty: _quantity,
+    price: widget.item.price,
+    addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
+    notes: _notes,
+    preference: {'preference': _selectedPreference},
+    type: widget.item.type ?? 'unknown',
+    variantPrice: _variantPrice,
+  );
+
+  // Print the index and values
+  print('Post-Edit Variant Index: $_selectedVariantIndex');
+  print('Post-Edit Selected Variant: ${selectedVariant != null ? selectedVariant['nama_varian'] : 'None'}');
+  print('Edited Item: ${editedItem.toString()}');
+
+  widget.cart.updateItem(widget.item.id, editedItem);
+  widget.appState.update(() {});
+  widget.onEdit(editedItem);
+  Navigator.of(context).pop();
+}
+
 
   int _getPreferenceIndex(String preference) {
     List<String> preferences = _getPreferencesBasedOnType();
     return preferences.indexOf(preference);
-  }
-
-  List<String> _getVariantsBasedOnType() {
-    if (widget.item.type == 'food') {
-      return ['Variant 1', 'Variant 2', 'Variant 3'];
-    } else if (widget.item.type == 'beverage') {
-      return ['Variant A', 'Variant B', 'Variant C'];
-    } else if (widget.item.type == 'breakfast') {
-      return ['Small', 'Medium', 'Large'];
-    }
-    return [];
   }
 
   List<String> _getPreferencesBasedOnType() {
@@ -91,36 +130,6 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
     }
     return [];
   }
-String printPreference(Map<String, String> preference) {
-  // Menggabungkan semua nilai preference menjadi satu string yang mudah dibaca
-  return preference.entries.map((entry) => "${entry.key}: ${entry.value}").join(', ');
-}
-
- void _editItem() {
-  final editedItem = CartItem(
-    id: widget.item.id,
-    name: widget.item.name,
-    variant: _selectedVariant ?? '',
-    qty: _quantity,
-    price: widget.item.price,
-    addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
-    notes: _notes,
-    preference: {'preference': _selectedPreference},
-    type: widget.item.type ?? 'unknown',
-    variantPrice: _variantPrice,
-  );
-  
-  // Update the cart with the edited item, only match by ID
-  widget.cart.addItem(editedItem, mode: CartMode.update);
-
-  // Notify the app state and the parent widget
-  widget.appState.update(() {});
-
-  widget.onEdit(editedItem); // Callback to notify that the item has been edited
-  Navigator.of(context).pop();
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -171,7 +180,26 @@ String printPreference(Map<String, String> preference) {
                         setState(() {
                           _selectedVariantIndex = index;
                           _selectedVariant = variant;
+
+                          // Filter variants again to get the correct id
+                          List<Map<String, dynamic>> filteredVariants = MenuVarian
+                              .where((variant) => variant['id_menu'] == widget.item.id)
+                              .toList();
+
+                          var selectedVariant = filteredVariants.isNotEmpty
+                              ? filteredVariants[index]
+                              : <String, dynamic>{};
+
+                          _selectedVariantId = selectedVariant.isNotEmpty
+                              ? selectedVariant['id_varian'] as String?
+                              : null;
+
                           _variantPrice = price;
+                          // Print the selected variant index and details
+        print('Selected Variant Index Changed: $_selectedVariantIndex');
+        print('Selected Variant: $_selectedVariant');
+        print('Selected Variant ID: $_selectedVariantId');
+        print('Variant Price: $_variantPrice');
                         });
                       },
                     ),
