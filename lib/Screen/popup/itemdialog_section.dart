@@ -38,10 +38,7 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
 
   final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
 
-  void _addItemToCart() {
-  // Print debug information
-  print('Selected Variant Index: $_selectedVariantIndex');
-  
+  void _addItemToCart() {  
   // Ensure MenuVarian is correctly filtered based on idMenu
   final List<Map<String, dynamic>> filteredVariants = MenuVarian
     .where((variant) => variant['id_menu'] == widget.idMenu)

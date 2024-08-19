@@ -238,5 +238,5 @@ List<Map<String, dynamic>> MenuVarian = [
     'id_menu': 'MENU020',
     'nama_varian': 'Lemon Tea Dingin',
     'harga_varian': 18000
-  }
+  },
 ];

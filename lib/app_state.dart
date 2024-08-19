@@ -48,31 +48,34 @@ class AppState extends ChangeNotifier {
   }
 
   // Menambahkan atau memperbarui item di cart
-  void addItemToCart(CartItem newItem) {
+void addItemToCart(CartItem newItem) {
   final existingItemIndex = findItemIndex(newItem);
 
   if (existingItemIndex >= 0) {
     var existingItem = _cartItems[existingItemIndex];
-    existingItem.qty = newItem.qty; // Update quantity
+    existingItem.qty += newItem.qty; // Update quantity
     existingItem.variant = newItem.variant;
-    existingItem.variantId = newItem.variantId; // Update variantId
+    existingItem.variantId = newItem.variantId;
     existingItem.notes = newItem.notes;
     existingItem.preference = newItem.preference;
     existingItem.addons = newItem.addons;
     existingItem.variantPrice = newItem.variantPrice;
-    existingItem.totalPrice = existingItem.qty *
-      (existingItem.variantPrice != 0 ? 
-      existingItem.variantPrice : 
-      existingItem.price);
-    _cartItems[existingItemIndex] = existingItem;
+    existingItem.totalPrice = existingItem.qty * 
+      (existingItem.variantPrice != 0 ? existingItem.variantPrice : existingItem.price);
+    _cartItems[existingItemIndex] = CartItem.from(existingItem); // Menggunakan salinan item yang diperbarui
   } else {
-    _cartItems.add(newItem);
+    _cartItems.add(CartItem.from(newItem)); // Menambahkan item baru dengan salinan
   }
-
-  notifyListeners(); // Pemberitahuan bahwa ada perubahan
+  notifyListeners(); // Notify listeners of changes
 }
 
-
+void updateItemInCart(int index) {
+  if (index >= 0 && index < _cartItems.length) {
+    notifyListeners();
+  } else {
+    print('Invalid index: $index');
+  }
+}
   // Mengatur ulang cart
   void resetCart() {
     _cartItems = [];
