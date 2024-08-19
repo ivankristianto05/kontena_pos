@@ -24,8 +24,8 @@ class Searchbar extends StatelessWidget {
       child: const TextField(
         decoration: InputDecoration(
           hintText: 'Search Menu',
-          filled: true,
-          fillColor: Colors.white,
+          // filled: true,
+          // fillColor: Colors.white,
           border: InputBorder.none,
           isDense: true,
         ),

@@ -23,12 +23,7 @@ List<Map<String, dynamic>> ListMenu = [
     'nama_menu': 'Roti Canai',
     'harga': 25000
   },
-  {
-    'id_menu': 'MENU005',
-    'type': 'food',
-    'nama_menu': 'Dimsum',
-    'harga': 35000
-  },
+  {'id_menu': 'MENU005', 'type': 'food', 'nama_menu': 'Dimsum', 'harga': 35000},
   {
     'id_menu': 'MENU006',
     'type': 'beverage',
@@ -77,12 +72,7 @@ List<Map<String, dynamic>> ListMenu = [
     'nama_menu': 'Soto Ayam',
     'harga': 30000
   },
-  {
-    'id_menu': 'MENU014',
-    'type': 'food',
-    'nama_menu': 'Bakso',
-    'harga': 25000
-  },
+  {'id_menu': 'MENU014', 'type': 'food', 'nama_menu': 'Bakso', 'harga': 25000},
   {
     'id_menu': 'MENU015',
     'type': 'beverage',
@@ -118,5 +108,28 @@ List<Map<String, dynamic>> ListMenu = [
     'type': 'beverage',
     'nama_menu': 'Lemon Tea',
     'harga': 17000
+  },
+  {
+    'id_menu': 'ADD001',
+    'type': 'addon',
+    'nama_menu': 'Scramble Egg',
+    'harga': 12000
+  },
+  {
+    'id_menu': 'ADD002',
+    'type': 'addon',
+    'nama_menu': 'Cookies Chocolate',
+    'harga': 12000
+  },
+];
+
+List<dynamic> itemPreference = [
+  {
+    'id': 1,
+    'name': 'Normal',
+  },
+  {
+    'id': 2,
+    'name': 'Sedang',
   }
 ];

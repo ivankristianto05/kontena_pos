@@ -19,7 +19,17 @@ class BottomNavigationInvoice extends StatelessWidget {
           child: Container(
             height: MediaQuery.sizeOf(context).height * 0.07,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
+              color: theme.colorScheme.secondaryContainer,
+              border: Border.all(
+                // right: BorderSide(
+                color: theme.colorScheme.primary,
+                width: 2.0,
+                // ),
+                // bottom: BorderSide(
+                //   color: theme.colorScheme.surface,
+                //   width: 1.0,
+                // ),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.max,
@@ -27,7 +37,7 @@ class BottomNavigationInvoice extends StatelessWidget {
               children: [
                 Text(
                   'Produk',
-                  style: theme.textTheme.titleSmall,
+                  style: TextStyle(color: theme.colorScheme.primary),
                 ),
               ],
             ),
@@ -37,7 +47,7 @@ class BottomNavigationInvoice extends StatelessWidget {
           child: Container(
             height: MediaQuery.sizeOf(context).height * 0.07,
             decoration: BoxDecoration(
-              color: theme.colorScheme.onPrimary,
+              color: theme.colorScheme.primaryContainer,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.max,
@@ -45,7 +55,7 @@ class BottomNavigationInvoice extends StatelessWidget {
               children: [
                 Text(
                   'Voucher',
-                  style: theme.textTheme.titleSmall,
+                  style: TextStyle(color: theme.colorScheme.secondary),
                 ),
               ],
             ),
