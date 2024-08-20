@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/functions/cart.dart'; // Pastikan ini mengimpor CartItem dari file yang benar
+import 'models/list_to_confirm.dart'; // Pastikan ini mengimpor ListToConfirm dari file yang benar
 
 class AppState extends ChangeNotifier {
   static AppState _instance = AppState._internal();
@@ -37,6 +38,11 @@ class AppState extends ChangeNotifier {
 
   List<CartItem> get cartItems => _cartItems;
 
+  // List untuk menyimpan order yang dikonfirmasi
+  List<ListToConfirm> _confirmedOrders = [];
+
+  List<ListToConfirm> get confirmedOrders => _confirmedOrders;
+
   // Method untuk mengecek apakah item dengan kombinasi idmenu, idvarian, indexpreference, dan indexaddons sudah ada
   int findItemIndex(CartItem newItem) {
     return _cartItems.indexWhere((item) =>
@@ -48,56 +54,44 @@ class AppState extends ChangeNotifier {
   }
 
   // Menambahkan atau memperbarui item di cart
-void addItemToCart(CartItem newItem) {
-  final existingItemIndex = findItemIndex(newItem);
+  void addItemToCart(CartItem newItem) {
+    final existingItemIndex = findItemIndex(newItem);
 
-  if (existingItemIndex >= 0) {
-    var existingItem = _cartItems[existingItemIndex];
-    existingItem.qty += newItem.qty; // Update quantity
-    existingItem.variant = newItem.variant;
-    existingItem.variantId = newItem.variantId;
-    existingItem.notes = newItem.notes;
-    existingItem.preference = newItem.preference;
-    existingItem.addons = newItem.addons;
-    existingItem.variantPrice = newItem.variantPrice;
-    existingItem.totalPrice = existingItem.qty * 
-      (existingItem.variantPrice != 0 ? existingItem.variantPrice : existingItem.price);
-    _cartItems[existingItemIndex] = CartItem.from(existingItem); // Menggunakan salinan item yang diperbarui
-  } else {
-    _cartItems.add(CartItem.from(newItem)); // Menambahkan item baru dengan salinan
+    if (existingItemIndex >= 0) {
+      var existingItem = _cartItems[existingItemIndex];
+      existingItem.qty += newItem.qty; // Update quantity
+      existingItem.variant = newItem.variant;
+      existingItem.variantId = newItem.variantId;
+      existingItem.notes = newItem.notes;
+      existingItem.preference = newItem.preference;
+      existingItem.addons = newItem.addons;
+      existingItem.variantPrice = newItem.variantPrice;
+      existingItem.totalPrice = existingItem.qty * 
+        (existingItem.variantPrice != 0 ? existingItem.variantPrice : existingItem.price);
+      _cartItems[existingItemIndex] = CartItem.from(existingItem); // Menggunakan salinan item yang diperbarui
+    } else {
+      _cartItems.add(CartItem.from(newItem)); // Menambahkan item baru dengan salinan
+    }
+    notifyListeners(); // Notify listeners of changes
   }
-  notifyListeners(); // Notify listeners of changes
-}
 
-void updateItemInCart(int index) {
-  if (index >= 0 && index < _cartItems.length) {
-    notifyListeners();
-  } else {
-    print('Invalid index: $index');
+  void updateItemInCart(int index) {
+    if (index >= 0 && index < _cartItems.length) {
+      notifyListeners();
+    } else {
+      print('Invalid index: $index');
+    }
   }
-}
+
   // Mengatur ulang cart
   void resetCart() {
     _cartItems = [];
     notifyListeners(); // Pemberitahuan bahwa cart direset
   }
 
-  // Method untuk mencetak array idmenu, idvarian, indexpreference, dan indexaddons
-  List<Map<String, dynamic>> printItemDetails() {
-    List<Map<String, dynamic>> itemDetails = [];
-
-    for (var item in _cartItems) {
-      itemDetails.add({
-        'idmenu': item.id,
-        'idvarian': item.variant,
-        'indexpreference': item.preference,
-        'indexaddons': item.addons,
-      });
-    }
-
-    // Print the array
-    print(itemDetails);
-
-    return itemDetails;
+  // Menambahkan order yang dikonfirmasi ke dalam list
+  void addOrder(ListToConfirm order) {
+    _confirmedOrders.add(order);
+    notifyListeners(); // Pemberitahuan bahwa order telah ditambahkan
   }
 }

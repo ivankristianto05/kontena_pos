@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/constants.dart';
-import 'package:kontena_pos/core/functions/cart.dart'; // Import Cart
+import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:intl/intl.dart';
+import 'package:kontena_pos/models/list_to_confirm.dart';
+import 'package:provider/provider.dart';  // Import Provider
 
 class ActionButton extends StatelessWidget {
   const ActionButton({
@@ -37,7 +40,23 @@ class ActionButton extends StatelessWidget {
         color: buttoncolor2,
         textColor: Colors.white,
         onPressed: () {
-          // Handle the action for the order button
+          // Simpan data ke dalam order hanya ketika tombol ditekan
+          final order = ListToConfirm(
+            idOrder: 'order_${DateTime.now().millisecondsSinceEpoch}',
+            namaPemesan: 'Ivan Kristianto', // Ganti sesuai dengan input pengguna
+            table: 'Table 1', // Ganti sesuai dengan input pengguna
+            items: List.from(cart.items), // Salin item dari cart ke order
+          );
+
+          // Simpan atau kirimkan order, misalnya menggunakan provider atau setState
+          Provider.of<AppState>(context, listen: false).addOrder(order);
+
+          // Tampilkan notifikasi atau pindah halaman
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Order berhasil dikirim!'),
+            ),
+          );
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

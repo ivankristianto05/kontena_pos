@@ -5,8 +5,6 @@ enum CartMode {
   update, // Update the quantity if the item already exists
   add, // Add a new item if it doesn't exist
 }
-
-
 class CartItem {
   final String id;
   final String name;
@@ -74,9 +72,38 @@ class CartItem {
       type: type,
     );
   }
+  // Method to convert CartItem to a Map with specific fields only
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'variant': variant,
+      'variantId': variantId,
+      'qty': qty,
+      'addons': addons,
+      'notes': notes,
+      'preference': preference,
+      'type': type,
+    };
+  }
+
+  // Method to create a CartItem from a Map
+  factory CartItem.fromMap(Map<String, dynamic> map) {
+    return CartItem(
+      id: map['id'],
+      name: map['name'],
+      variant: map['variant'],
+      variantId: map['variantId'],
+      qty: map['qty'],
+      price: map['price'],
+      variantPrice: map['variantPrice'] ?? 0,
+      addons: Map<String, Map<String, dynamic>>.from(map['addons'] ?? {}),
+      notes: map['notes'],
+      preference: Map<String, String>.from(map['preference'] ?? {}),
+      type: map['type'],
+    );
+  }
 }
-
-
 
 class Cart {
   List<CartItem> _items = [];

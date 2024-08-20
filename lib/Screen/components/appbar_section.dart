@@ -23,6 +23,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
     double adjustedButtonWidth = (screenWidth * 0.65 - 100) / 4;
 
     return AppBar(
+      automaticallyImplyLeading: false, // Menghilangkan tombol "Back"
       backgroundColor: buttoncolor,
       titleSpacing: 0,
       toolbarHeight: 50,

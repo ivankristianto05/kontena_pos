@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/constants.dart';
+import 'package:kontena_pos/routes/app_routes.dart';
 
 class Footer extends StatelessWidget {
   const Footer({
@@ -18,6 +19,7 @@ class Footer extends StatelessWidget {
             text: 'Menu',
             onPressed: () {
               // Handle Order button press
+              Navigator.pushNamed(context, AppRoutes.orderScreen);
             },
           ),
         ),
@@ -26,6 +28,7 @@ class Footer extends StatelessWidget {
             text: 'Confirm',
             onPressed: () {
               // Handle Confirm button press
+              Navigator.pushNamed(context, AppRoutes.confirmScreen);
             },
           ),
         ),
