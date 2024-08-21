@@ -63,14 +63,6 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     // Create an instance of Cart and pass AppState to it
     Cart cart = Cart(appState);
 
-    // Create an instance of Order for confirmation
-    ListToConfirm order = ListToConfirm(
-      idOrder: 'order_001',
-      namaPemesan: 'Ivan Kristianto',
-      table: 'Table 1',
-      items: appState.cartItems, // Pass cart items from AppState
-    );
-
     return Scaffold(
       appBar: BuildAppbar(
         smallButtonWidth: smallButtonWidth,
@@ -94,6 +86,10 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   screenWidth: screenWidth,
                   guestNameController: _guestNameController,
                   smallButtonWidth: smallButtonWidth,
+                  onNameSubmitted: (name) {
+                    // Update AppState with the guest name
+                    appState.setNamaPemesan(name);
+                  },
                 ),
               ],
             ),
@@ -110,31 +106,27 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 children: [
                   Expanded(
                     flex: 2,
-                    // Grid list to confirm
-                    child: ListConfirmCard(
-                      screenWidth: screenWidth, order: order
-                      ),
+                    child: ConfirmCard(screenWidth: screenWidth),
                   ),
-                  // Item Cart Section
                   Container(
                     width: screenWidth * 0.35,
                     decoration: BoxDecoration(
                       color: Colors.white,
                     ),
                     child: ItemCart(
-                      cartItems: appState.cartItems, // Pass the cart items from appState
+                      cartItems: appState.cartItems,
                       screenWidth: screenWidth,
                       onEditItem: (editedItem) {
-                        final index = appState.cartItems.indexWhere(
-                            (item) => item.id == editedItem.id);
+                        final index = appState.cartItems
+                            .indexWhere((item) => item.id == editedItem.id);
                         if (index != -1) {
                           setState(() {
                             appState.cartItems[index] = editedItem;
                           });
                         }
                       },
-                      appState: appState, // Pass the appState
-                      cart: cart, // Pass the cart instance
+                      appState: appState,
+                      cart: cart,
                     ),
                   ),
                 ],
@@ -162,4 +154,3 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     );
   }
 }
-

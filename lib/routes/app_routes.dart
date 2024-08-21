@@ -19,7 +19,7 @@ class AppRoutes {
     loginScreen: (context) => const LoginScreen(),
     selectOrganisationScreen: (context) => const SelectOrganisationScreen(),
     orderScreen: (context) => OrderScreen(),
-    invoiceScreen: (context) => const InvoiceScreen(),
+    //invoiceScreen: (context) => const InvoiceScreen(),
     historyInvoiceScreen: (context) => const HistoryInvoiceScreen(),
     confirmScreen: (context) => ConfirmScreen(), // pastikan ConfirmScreen adalah class
   };

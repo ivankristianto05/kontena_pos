@@ -23,27 +23,8 @@ class ItemCart extends StatelessWidget {
 
   final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
 
-  void printCartItemsDetails() {
-    for (int i = 0; i < cartItems.length; i++) {
-      final item = cartItems[i];
-      print('--------------------');
-      print('Index: $i');
-      //print('Item Details:');
-      print('id: ${item.id}');
-      print('Name: ${item.name}');
-      //print('Quantity: ${item.qty}');
-      print('Variant id: ${item.variantId}');
-      //print('Addons: ${item.addons}');
-      print('Preference: ${item.preference}');
-      print('--------------------');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    // Call the print function to debug
-    printCartItemsDetails();
-
     return Container(
       width: screenWidth * 0.3,
       child: ListView.separated(

@@ -43,6 +43,21 @@ class AppState extends ChangeNotifier {
 
   List<ListToConfirm> get confirmedOrders => _confirmedOrders;
 
+  // Menyimpan status konfirmasi
+  bool _isOrderConfirmed = false;
+
+  bool get isOrderConfirmed => _isOrderConfirmed;
+
+  // Menyimpan nama pemesan
+  String _namaPemesan = '';
+
+  String get namaPemesan => _namaPemesan;
+
+  void setNamaPemesan(String name) {
+    _namaPemesan = name;
+    notifyListeners();
+  }
+
   // Method untuk mengecek apakah item dengan kombinasi idmenu, idvarian, indexpreference, dan indexaddons sudah ada
   int findItemIndex(CartItem newItem) {
     return _cartItems.indexWhere((item) =>
@@ -56,7 +71,6 @@ class AppState extends ChangeNotifier {
   // Menambahkan atau memperbarui item di cart
   void addItemToCart(CartItem newItem) {
     final existingItemIndex = findItemIndex(newItem);
-
     if (existingItemIndex >= 0) {
       var existingItem = _cartItems[existingItemIndex];
       existingItem.qty += newItem.qty; // Update quantity
@@ -89,9 +103,42 @@ class AppState extends ChangeNotifier {
     notifyListeners(); // Pemberitahuan bahwa cart direset
   }
 
-  // Menambahkan order yang dikonfirmasi ke dalam list
+  // Metode untuk membuat dan mengonfirmasi order
+  void confirmOrder(String idOrder, String table) {
+    final List<CartItem> allItems = List.from(_cartItems); // Mengambil semua item dalam keranjang
+
+    final ListToConfirm order = ListToConfirm(
+      idOrder: idOrder,
+      namaPemesan: _namaPemesan, // Gunakan nama pemesan yang sudah di-set
+      table: table,
+      items: allItems,
+    );
+
+    _confirmedOrders.add(order); // Menambahkan order yang dikonfirmasi ke dalam list
+    _isOrderConfirmed = true; // Set order as confirmed
+
+    resetCart(); // Kosongkan keranjang setelah konfirmasi
+    notifyListeners(); // Pemberitahuan bahwa order telah dikonfirmasi
+  }
+
+  void createOrder() {
+    final List<CartItem> allItems = List.from(_cartItems);
+
+    final ListToConfirm order = ListToConfirm(
+      idOrder: DateTime.now().toIso8601String(), // Gunakan ID unik untuk setiap order
+      namaPemesan: _namaPemesan, // Gunakan nama pemesan yang sudah di-set
+      table: 'Table 1', // Gantilah dengan nomor meja yang sesuai
+      items: allItems, // Masukkan semua item dari cart
+    );
+
+    addOrder(order); // Tambahkan order ke dalam daftar konfirmasi
+    resetCart(); // Kosongkan cart setelah konfirmasi order
+  }
+
+  // Menambahkan order yang dikonfirmasi ke dalam list (tidak perlu jika sudah ada `confirmOrder`)
   void addOrder(ListToConfirm order) {
-    _confirmedOrders.add(order);
+    _confirmedOrders.add(order); // Tambahkan order ke daftar konfirmasi
+    _isOrderConfirmed = true; // Set order sebagai dikonfirmasi
     notifyListeners(); // Pemberitahuan bahwa order telah ditambahkan
   }
 }

@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kontena_pos/app_state.dart';
+import 'package:provider/provider.dart';
 
 class GuestInputWithButton extends StatefulWidget {
   final double screenWidth;
   final TextEditingController guestNameController;
   final double smallButtonWidth;
+  final Function(String) onNameSubmitted; // Add this callback
 
   const GuestInputWithButton({
     Key? key,
     required this.screenWidth,
     required this.guestNameController,
     required this.smallButtonWidth,
+    required this.onNameSubmitted, // Initialize the callback
   }) : super(key: key);
 
   @override
@@ -49,6 +53,12 @@ class _GuestInputWithButtonState extends State<GuestInputWithButton> {
                       contentPadding:
                           EdgeInsets.symmetric(vertical: 18, horizontal: 8),
                     ),
+                    onChanged: (text) {
+                      // Set nama pemesan di AppState ketika teks berubah
+                      final appState =
+                          Provider.of<AppState>(context, listen: false);
+                      appState.setNamaPemesan(text);
+                    },
                   ),
                   Positioned(
                     right: 0,
@@ -84,7 +94,8 @@ class _GuestInputWithButtonState extends State<GuestInputWithButton> {
               height: 55,
               padding: EdgeInsets.zero,
               onPressed: () {
-                // Handle the action for the search button
+                widget.onNameSubmitted(widget.guestNameController
+                    .text); // Call the callback with the input text
               },
               child: Center(
                 child: FaIcon(

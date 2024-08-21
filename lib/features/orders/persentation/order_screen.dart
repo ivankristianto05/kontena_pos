@@ -101,6 +101,10 @@ class _OrderScreenState extends State<OrderScreen> {
                   screenWidth: screenWidth,
                   guestNameController: _guestNameController,
                   smallButtonWidth: smallButtonWidth,
+                  onNameSubmitted: (name) {
+                    // Update AppState with the guest name
+                    appState.setNamaPemesan(name);
+                  },
                 ),
               ],
             ),
@@ -136,7 +140,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       color: Colors.white,
                     ),
                     child: ItemCart(
-                      cartItems: appState.cartItems, // Pass the cart items from appState
+                      cartItems: appState.cartItems,
                       screenWidth: screenWidth,
                       onEditItem: (editedItem) {
                         final index = appState.cartItems.indexWhere(
@@ -147,8 +151,8 @@ class _OrderScreenState extends State<OrderScreen> {
                           });
                         }
                       },
-                      appState: appState, // Pass the appState
-                      cart: cart, // Pass the cart instance
+                      appState: appState,
+                      cart: cart,
                     ),
                   ),
                 ],

@@ -40,23 +40,9 @@ class ActionButton extends StatelessWidget {
         color: buttoncolor2,
         textColor: Colors.white,
         onPressed: () {
-          // Simpan data ke dalam order hanya ketika tombol ditekan
-          final order = ListToConfirm(
-            idOrder: 'order_${DateTime.now().millisecondsSinceEpoch}',
-            namaPemesan: 'Ivan Kristianto', // Ganti sesuai dengan input pengguna
-            table: 'Table 1', // Ganti sesuai dengan input pengguna
-            items: List.from(cart.items), // Salin item dari cart ke order
-          );
-
-          // Simpan atau kirimkan order, misalnya menggunakan provider atau setState
-          Provider.of<AppState>(context, listen: false).addOrder(order);
-
-          // Tampilkan notifikasi atau pindah halaman
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Order berhasil dikirim!'),
-            ),
-          );
+          final appState = Provider.of<AppState>(context, listen: false);
+          // Call createOrder on AppState, which handles the order creation
+          appState.createOrder(); // Ensure this method is properly defined in AppState
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
