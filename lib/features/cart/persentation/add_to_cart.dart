@@ -3,6 +3,7 @@ import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/data/menuvarian.dart';
+import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
 
 class AddToCart extends StatefulWidget {
@@ -784,21 +785,18 @@ class _AddToCartState extends State<AddToCart> {
                         color: theme.colorScheme.primary,
                         borderRadius: BorderRadius.circular(2.0),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(
-                            8.0, 8.0, 8.0, 8.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Tambahkan Produk',
-                              style: TextStyle(
-                                color: theme.colorScheme.primaryContainer,
-                              ),
-                            ),
-                          ],
-                        ),
+                      child: CustomElevatedButton(
+                        text: "Add Item To Cart",
+                        onPressed: () {
+                          // onTapMasuk(context);
+                          addToCart(
+                            context,
+                            widget.dataMenu,
+                            selectedVarian,
+                            addonDisplay,
+                            int.parse(qtyController.text),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -1121,7 +1119,7 @@ class _AddToCartState extends State<AddToCart> {
   TextEditingController qtyController = TextEditingController();
   // qtyController.text = qty;
   Widget _buildQtySection(BuildContext context) {
-    qtyController.text = qty.toString();
+    // qtyController.text = qty.toString();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       CustomTextFormField(
         controller: qtyController,
@@ -1140,16 +1138,29 @@ class _AddToCartState extends State<AddToCart> {
           ),
         ),
         hintText: "Qty",
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'No Varian';
-          }
-          return null;
-        },
+        // validator: (value) {
+        //   if (value == null || value.isEmpty) {
+        //     return 'No Varian';
+        //   }
+        //   return null;
+        // },
         onTapOutside: (value) {
           // inputSearchVarian.unfocus();
         },
       ),
     ]);
   }
+}
+
+void addToCart(
+  BuildContext context,
+  dynamic item,
+  dynamic varian,
+  List<dynamic> addon,
+  int qty,
+) {
+  print('check item, $item');
+  print('check varian, $varian');
+  print('check addon, $addon');
+  print('check qty, $qty');
 }
