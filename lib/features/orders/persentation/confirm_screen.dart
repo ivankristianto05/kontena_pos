@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/Screen/components/ConfirmCard_section.dart';
+import 'package:kontena_pos/Screen/components/confirmlist_section.dart';
 import 'package:kontena_pos/models/list_to_confirm.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/Screen/components/actionbutton_section.dart';
@@ -104,17 +105,17 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             Expanded(
               child: Row(
                 children: [
-                  Container(
-                    width: screenWidth * 0.65,
-                    alignment: Alignment.topLeft,
-                    child: ConfirmCard(screenWidth: screenWidth),
-                  ),
+                  // Container(
+                  //   width: screenWidth * 0.65,
+                  //   alignment: Alignment.topLeft,
+                  //   child: ConfirmCard(screenWidth: screenWidth),
+                  // ),
                   Container(
                     width: screenWidth * 0.35,
                     decoration: BoxDecoration(
                       color: Colors.white,
                     ),
-                    child: ItemCart(
+                    child: ConfirmList(
                       cartItems: appState.cartItems,
                       screenWidth: screenWidth,
                       onEditItem: (editedItem) {
