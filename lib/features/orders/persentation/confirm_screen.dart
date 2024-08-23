@@ -104,8 +104,9 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             Expanded(
               child: Row(
                 children: [
-                  Expanded(
-                    flex: 2,
+                  Container(
+                    width: screenWidth * 0.65,
+                    alignment: Alignment.topLeft,
                     child: ConfirmCard(screenWidth: screenWidth),
                   ),
                   Container(
