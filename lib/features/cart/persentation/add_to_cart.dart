@@ -28,6 +28,7 @@ class _AddToCartState extends State<AddToCart> {
   String notes = '';
   List<dynamic> selectedAddon = [];
   int qty = 0;
+  late List<TextEditingController> qtyAddonController;
 
   @override
   void setState(VoidCallback callback) {
@@ -47,6 +48,10 @@ class _AddToCartState extends State<AddToCart> {
         varianDisplay = getVarian();
         prefDisplay = itemPreference;
         addonDisplay = geAddon();
+        qtyAddonController = List.generate(
+          addonDisplay.length,
+          (_) => TextEditingController(text: '0'),
+        );
       });
     });
   }
@@ -893,15 +898,10 @@ class _AddToCartState extends State<AddToCart> {
   // widget addon
   Widget _buildAddonSection(BuildContext context, List<dynamic> addon) {
     List<TextEditingController> qtyAddonController = [];
-    // selectedAddon = [];
-    int idx = 0;
-    addon.forEach((add) {
-      qtyAddonController.add(TextEditingController());
-      qtyAddonController[idx].text = '0';
-      // add['qty'] = 0;
-      // selectedAddon.add(add);
-      idx++;
-    });
+
+    for (int idx = 0; idx < addon.length; idx++) {
+      qtyAddonController.add(TextEditingController(text: '0'));
+    }
 
     return Builder(
       builder: (context) {
@@ -912,178 +912,112 @@ class _AddToCartState extends State<AddToCart> {
             ListView.builder(
               physics: const BouncingScrollPhysics(),
               shrinkWrap: true,
-              itemCount: addonDisplay.length,
+              itemCount: addon.length,
               itemBuilder: (context, index) {
-                if (isLoading) {
-                  return Column();
-                } else {
-                  final currentAddon = addonDisplay[index];
-                  return Container(
+                final currentAddon = addon[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Container(
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
+                      color: Theme.of(context).colorScheme.primaryContainer,
                       border: Border.all(
-                        color: theme.colorScheme.surface,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          0.0, 0.0, 0.0, 4.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              width: double.infinity,
-                              child: Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                  12.0,
-                                  12.0,
-                                  12.0,
-                                  12.0,
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      currentAddon['nama_menu'],
-                                      style: theme.textTheme.labelMedium,
-                                    ),
-                                    Text(
-                                      numberFormat(
-                                          'idr', currentAddon['harga']),
-                                      style: theme.textTheme.labelMedium,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                InkWell(
-                                  onTap: () {
-                                    qtyAddon(
-                                      'minus',
-                                      index,
-                                      qtyAddonController,
-                                      addon,
-                                    );
-                                  },
-                                  child: Container(
-                                    width: 34,
-                                    height: 34,
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        right: BorderSide(
-                                          color: appTheme.gray200,
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      color:
-                                          theme.colorScheme.secondaryContainer,
-                                    ),
-                                    child: Icon(
-                                      Icons.remove,
-                                      color: theme.colorScheme.primary,
-                                      size: 14.0,
-                                    ),
-                                  ),
+                                Text(
+                                  currentAddon['nama_menu'],
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium,
                                 ),
-                                Container(
-                                  width: 34,
-                                  decoration: BoxDecoration(
-                                    // border:
-                                    //     Border(
-                                    //   top:
-                                    //       BorderSide(
-                                    //     color: theme.colorScheme.surface,
-                                    //   ),
-                                    //   bottom:
-                                    //       BorderSide(
-                                    //     color: theme.colorScheme.surface,
-                                    //   ),
-                                    // ),
-                                    color: theme.colorScheme.surface,
-                                  ),
-                                  child: Container(
-                                    decoration: const BoxDecoration(),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          CustomTextFormField(
-                                            controller:
-                                                qtyAddonController[index],
-                                            // focusNode: inputSearchVarian,
-                                            maxLines: 1,
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                              horizontal: 3.h,
-                                              vertical: 9.v,
-                                            ),
-
-                                            borderDecoration:
-                                                OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(0.h),
-                                              borderSide: BorderSide(
-                                                color:
-                                                    theme.colorScheme.surface,
-                                                width: 0,
-                                              ),
-                                            ),
-                                            hintText: "Qty",
-                                          ),
-                                        ]),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () async {
-                                    qtyAddon(
-                                      'add',
-                                      index,
-                                      qtyAddonController,
-                                      addon,
-                                    );
-                                  },
-                                  child: Container(
-                                    width: 34,
-                                    height: 34,
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        left: BorderSide(
-                                          color: appTheme.gray200,
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      color:
-                                          theme.colorScheme.secondaryContainer,
-                                    ),
-                                    child: Icon(
-                                      Icons.add,
-                                      color: theme.colorScheme.primary,
-                                      size: 14.0,
-                                    ),
-                                  ),
+                                Text(
+                                  numberFormat('idr', currentAddon['harga']),
+                                  style:
+                                      Theme.of(context).textTheme.labelMedium,
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        _buildQuantityControl(context, index),
+                      ],
                     ),
-                  );
-                }
+                  ),
+                );
               },
             ),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildQuantityControl(BuildContext context, int index) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildQuantityButton(
+              context, Icons.remove, () => qtyChange('minus', index)),
+          Container(
+            width: 34,
+            color: Theme.of(context).colorScheme.surface,
+            child: CustomTextFormField(
+              controller: qtyAddonController[index],
+              maxLines: 1,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 3,
+                vertical: 9,
+              ),
+              borderDecoration: OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.surface,
+                  width: 0,
+                ),
+              ),
+              hintText: "Qty",
+            ),
+          ),
+          _buildQuantityButton(
+              context, Icons.add, () => qtyChange('add', index)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuantityButton(
+      BuildContext context, IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          border: Border(
+            left: BorderSide(
+              color: Theme.of(context).colorScheme.surface,
+              width: 2.0,
+            ),
+          ),
+          color: Theme.of(context).colorScheme.secondaryContainer,
+        ),
+        child: Icon(
+          icon,
+          color: Theme.of(context).colorScheme.primary,
+          size: 14.0,
+        ),
+      ),
     );
   }
 
@@ -1100,18 +1034,19 @@ class _AddToCartState extends State<AddToCart> {
     if (type == 'add') {
       qtyEditor += 1;
     } else {
-      if (qtyEditor == 0) {
-        qtyEditor = 0;
-      } else {
-        qtyEditor -= 1;
-      }
+      // if (qtyEditor == 0) {
+      //   qtyEditor = 0;
+      // } else {
+      //   qtyEditor -= 1;
+      // }
+      qtyEditor -= 1;
     }
     qty = qtyEditor;
     print('qty, $qty');
     print('index, $idx');
-    // setState(() {
-    qtyCont[idx].text = qty.toString();
-    // });
+    setState(() {
+      qtyCont[idx].text = qty.toString();
+    });
     // selectedAddon[idx].qty = qty;
   }
 
