@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:kontena_pos/models/list_to_confirm.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
 
@@ -7,42 +7,17 @@ class ConfirmCard extends StatefulWidget {
   const ConfirmCard({
     super.key,
     required this.screenWidth,
+    required this.orderId, // Tambahkan properti ini
   });
 
   final double screenWidth;
+  final String orderId; // Tambahkan properti ini
 
   @override
   _ConfirmCardState createState() => _ConfirmCardState();
 }
 
 class _ConfirmCardState extends State<ConfirmCard> {
-  final List<GlobalKey> _cardKeys = [];
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final appState = Provider.of<AppState>(context, listen: false);
-      _logMaxCardHeights(appState);
-    });
-  }
-
-  void _logMaxCardHeights(AppState appState) {
-    final rowCount = (appState.confirmedOrders.length / getColumnCount()).ceil();
-    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-      final cardKeysInRow = _cardKeys.skip(rowIndex * getColumnCount()).take(getColumnCount()).toList();
-      final heights = cardKeysInRow.map((key) => key.currentContext?.size?.height ?? 0.0).toList();
-      final maxHeight = heights.isEmpty ? 0.0 : heights.reduce((a, b) => a > b ? a : b);
-      print('Max height for row ${rowIndex + 1}: $maxHeight');
-    }
-  }
-
-  int getColumnCount() {
-    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-    final isTablet = widget.screenWidth >= 600;
-    return isTablet ? 3 : (isLandscape ? 3 : 1);
-  }
-
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -52,32 +27,36 @@ class _ConfirmCardState extends State<ConfirmCard> {
         child: Text('No order confirmed yet.'),
       );
     }
-    if (appState.confirmedOrders.isEmpty) {
+
+    // Filter confirmedOrders berdasarkan orderId
+    final filteredOrder = appState.confirmedOrders.firstWhere(
+      (order) => order.idOrder == widget.orderId,
+      orElse: () => ListToConfirm(
+        idOrder: '',
+        namaPemesan: '',
+        table: '',
+        items: [],
+      ),
+    );
+
+    if (filteredOrder.items.isEmpty) {
       return const Center(
-        child: Text('No order available.'),
+        child: Text('No items found for this order.'),
       );
     }
 
-    // Create a list of keys for each card
-    if (_cardKeys.length != appState.confirmedOrders.length) {
-      _cardKeys.clear();
-      _cardKeys.addAll(List.generate(appState.confirmedOrders.length, (_) => GlobalKey()));
-    }
+    final cardWidth = (widget.screenWidth * 0.65) / 3 - 12;
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: StaggeredGrid.count(
-        crossAxisCount: getColumnCount(),
-        mainAxisSpacing: 8.0,
-        crossAxisSpacing: 8.0,
-        children: List.generate(appState.confirmedOrders.length, (index) {
-          final order = appState.confirmedOrders[index];
-          return StaggeredGridTile.fit(
-            crossAxisCellCount: 1,
-            child: Align(
-              alignment: Alignment.topLeft,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Wrap(
+          spacing: 8.0,  // Jarak horizontal antar kartu
+          runSpacing: 8.0,  // Jarak vertikal antar baris
+          children: [
+            SizedBox(
+              width: cardWidth,  // Lebar kartu yang dihitung
               child: Card(
-                key: _cardKeys[index], // Assign a unique key to each card
                 elevation: 8,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -91,7 +70,7 @@ class _ConfirmCardState extends State<ConfirmCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            order.table,
+                            filteredOrder.table,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -108,7 +87,7 @@ class _ConfirmCardState extends State<ConfirmCard> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        order.namaPemesan,
+                        filteredOrder.namaPemesan,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -118,9 +97,9 @@ class _ConfirmCardState extends State<ConfirmCard> {
                       ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: order.items.length,
+                        itemCount: filteredOrder.items.length,
                         itemBuilder: (context, i) {
-                          final cartItem = order.items[i];
+                          final cartItem = filteredOrder.items[i];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
                             child: Column(
@@ -187,8 +166,8 @@ class _ConfirmCardState extends State<ConfirmCard> {
                 ),
               ),
             ),
-          );
-        }),
+          ],
+        ),
       ),
     );
   }
