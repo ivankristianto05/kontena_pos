@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/Screen/components/ConfirmCard_section.dart';
-import 'package:kontena_pos/Screen/components/confirmlist_section.dart';
+import 'package:kontena_pos/Screen/components/Confirm/ConfirmCard_section.dart';
+import 'package:kontena_pos/Screen/components/Confirm/confirmbutton_section.dart';
+import 'package:kontena_pos/Screen/components/Confirm/confirmlist_section.dart';
 import 'package:kontena_pos/models/list_to_confirm.dart';
 import 'package:provider/provider.dart';
-import 'package:kontena_pos/Screen/components/actionbutton_section.dart';
+import 'package:kontena_pos/Screen/components/Menu/orderutton_section.dart';
 import 'package:kontena_pos/Screen/components/appbar_section.dart';
-import 'package:kontena_pos/Screen/components/dropdown_delete_section.dart';
+import 'package:kontena_pos/Screen/components/Menu/dropdown_delete_section.dart';
 import 'package:kontena_pos/Screen/components/footer_section.dart';
-import 'package:kontena_pos/Screen/components/guestinputwithbutton_section.dart';
-import 'package:kontena_pos/Screen/components/itemcart_section.dart';
+import 'package:kontena_pos/Screen/components/Menu/guestinputwithbutton_section.dart';
+import 'package:kontena_pos/Screen/components/Menu/itemcart_section.dart';
 import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
@@ -23,6 +24,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
   final TextEditingController _guestNameController = TextEditingController();
   String _selectedFilterType = 'All';
   String _searchQuery = '';
+  bool allItemsChecked = false; // To track if all items are checked
 
   @override
   void initState() {
@@ -61,7 +63,6 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     double smallButtonWidth = screenWidth * 0.05;
     double buttonWidth = screenWidth * 0.15;
 
-    // Create an instance of Cart and pass AppState to it
     Cart cart = Cart(appState);
 
     return Scaffold(
@@ -88,7 +89,6 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   guestNameController: _guestNameController,
                   smallButtonWidth: smallButtonWidth,
                   onNameSubmitted: (name) {
-                    // Update AppState with the guest name
                     appState.setNamaPemesan(name);
                   },
                 ),
@@ -105,30 +105,31 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             Expanded(
               child: Row(
                 children: [
-                  // Container(
-                  //   width: screenWidth * 0.65,
-                  //   alignment: Alignment.topLeft,
-                  //   child: ConfirmCard(screenWidth: screenWidth),
-                  // ),
+                  Container(
+                    width: screenWidth * 0.65,
+                    alignment: Alignment.topLeft,
+                    child: ConfirmCard(
+                      screenWidth: screenWidth,
+                      onOrderSelected: (orderId) {
+                        appState.setCurrentOrderId(orderId);
+                        appState.printCurrentOrderId();
+                      },
+                    ),
+                  ),
                   Container(
                     width: screenWidth * 0.35,
                     decoration: BoxDecoration(
                       color: Colors.white,
                     ),
                     child: ConfirmList(
-                      cartItems: appState.cartItems,
+                      listToConfirm: appState.confirmedOrders,
                       screenWidth: screenWidth,
-                      onEditItem: (editedItem) {
-                        final index = appState.cartItems
-                            .indexWhere((item) => item.id == editedItem.id);
-                        if (index != -1) {
-                          setState(() {
-                            appState.cartItems[index] = editedItem;
-                          });
-                        }
-                      },
                       appState: appState,
-                      cart: cart,
+                      onAllChecked: (bool isChecked) {
+                        setState(() {
+                          allItemsChecked = isChecked;
+                        });
+                      },
                     ),
                   ),
                 ],
@@ -143,9 +144,9 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                     width: screenWidth * 0.65,
                     child: Footer(screenWidth: screenWidth),
                   ),
-                  ActionButton(
+                  ConfirmButton(
                     screenWidth: screenWidth,
-                    cart: cart,
+                    isEnabled: allItemsChecked,
                   ),
                 ],
               ),

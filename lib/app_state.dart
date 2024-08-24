@@ -58,6 +58,19 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  String _currentOrderId = ''; // Field to store the selected order ID
+
+  String get currentOrderId => _currentOrderId; // Getter for the current order ID
+
+  void setCurrentOrderId(String orderId) {
+    _currentOrderId = orderId;
+    notifyListeners(); // Notify listeners of changes
+  }
+
+   void printCurrentOrderId() {
+    print('Current Order ID: $_currentOrderId');
+  }
+
   // Method untuk mengecek apakah item dengan kombinasi idmenu, idvarian, indexpreference, dan indexaddons sudah ada
   int findItemIndex(CartItem newItem) {
     return _cartItems.indexWhere((item) =>
