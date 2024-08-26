@@ -13,12 +13,13 @@ class DropdownDeleteSection extends StatefulWidget {
 
 class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
   String? pickupType;
-  String? Table;
+  String? table;
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double searchbarWidth = screenWidth * 0.65;
+    double dropdownWidth = (screenWidth - searchbarWidth - 32) / 2; // Adjust width for two columns with spacing
 
     // Access AppState and Cart
     final appState = Provider.of<AppState>(context, listen: false);
@@ -27,56 +28,43 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
     return Container(
       width: screenWidth - searchbarWidth,
       height: 50,
-      alignment: Alignment.topRight,
+      alignment: Alignment.centerRight, // Center the content horizontally
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center, // Center the row contents
         children: [
-          Expanded(
-            child: Container(
-              width: screenWidth * 0.20,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(
-                  right: BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  ),
-                  top: BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  ),
-                  bottom: BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  ),
-                ),
-              ),
-              height: 50,
-              child: DropdownButtonHideUnderline(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    hint: Text("Select an Option"),
-                    value: pickupType,
-                    items: <String>[
-                      'Dine in',
-                      'Take away',
-                      'Gojek',
-                    ].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
+          Container(
+            width: screenWidth * 0.20,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.grey, width: 1.0),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  hint: Text("Select an Option"),
+                  value: pickupType,
+                  items: <String>[
+                    'Dine in',
+                    'Take away',
+                    'Gojek',
+                  ].map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Center( // Center the text inside the dropdown
                         child: Text(
                           value,
                           style: TextStyle(fontWeight: FontWeight.normal),
                         ),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        pickupType = newValue;
-                      });
-                    },
-                  ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      pickupType = newValue;
+                    });
+                  },
                 ),
               ),
             ),
@@ -85,59 +73,66 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
             width: screenWidth * 0.10,
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border(
-                right: BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                top: BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                bottom: BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-              ),
+              border: Border.all(color: Colors.grey, width: 1.0),
             ),
-            height: 50,
             child: DropdownButtonHideUnderline(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButton<String>(
                   isExpanded: true,
                   hint: Text("Table"),
-                  value: Table,
+                  value: table,
                   items: <String>[
                     '1',
                     '2',
                     '3',
+                    '4',
+                    '5',
+                    '6',
+                    '7',
+                    '8',
+                    '9',
+                    '10',
                   ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text(
-                        value, // Hanya angka yang ditampilkan dalam pilihan dropdown
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
+                      child: Center( // Center the text inside the dropdown
+                        child: Text(
+                          value,
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                       ),
                     );
                   }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
-                      Table = newValue;
+                      table = newValue;
                     });
+                    if (newValue != null) {
+                      appState.setSelectedTable(newValue); // Save selected table to AppState
+                    }
                   },
                   selectedItemBuilder: (BuildContext context) {
                     return <String>[
                       '1',
                       '2',
                       '3',
+                      '4',
+                      '5',
+                      '6',
+                      '7',
+                      '8',
+                      '9',
+                      '10',
                     ].map((String value) {
-                      return Text(
-                        'Table $value', // Teks "Table" ditambahkan saat item dipilih
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
+                      return Center( // Center the text inside the selected item
+                        child: Text(
+                          'Table $value',
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                       );
                     }).toList();
@@ -147,20 +142,11 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
             ),
           ),
           Container(
-            width: 60,
+            width: screenWidth*0.05,
             height: 50,
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                top: BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-              ),
+              border: Border.all(color: Colors.grey, width: 1.0),
             ),
             child: MaterialButton(
               height: 50,

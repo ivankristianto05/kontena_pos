@@ -7,18 +7,18 @@ class ConfirmCard extends StatefulWidget {
   const ConfirmCard({
     super.key,
     required this.screenWidth,
-    required this.onOrderSelected, // Tambahkan parameter callback
+    required this.onOrderSelected,
   });
 
   final double screenWidth;
-  final void Function(String orderId) onOrderSelected; // Callback untuk pemilihan order
+  final void Function(String orderId) onOrderSelected;
 
   @override
   _ConfirmCardState createState() => _ConfirmCardState();
 }
 
 class _ConfirmCardState extends State<ConfirmCard> {
-  String? _selectedOrderId; // Menyimpan ID order yang dipilih
+  String? _selectedOrderId;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class _ConfirmCardState extends State<ConfirmCard> {
 
     if (!appState.isOrderConfirmed) {
       return const Center(
-        child: Text('No order confirmed yet.'),
+        child: Text('No order inputed.'),
       );
     }
     if (appState.confirmedOrders.isEmpty) {
@@ -35,14 +35,14 @@ class _ConfirmCardState extends State<ConfirmCard> {
       );
     }
 
-    final cardWidth = (widget.screenWidth * 0.65) / 3 - 20; // Mendapatkan lebar kartu yang dihitung
+    final cardWidth = (widget.screenWidth * 0.65) / 3 - 20;
 
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Wrap(
-          spacing: 8.0,  // Jarak horizontal antar kartu
-          runSpacing: 8.0,  // Jarak vertikal antar baris
+          spacing: 8.0,
+          runSpacing: 8.0,
           children: List.generate(appState.confirmedOrders.length, (index) {
             final order = appState.confirmedOrders[index];
             final isSelected = order.idOrder == _selectedOrderId;
@@ -50,12 +50,12 @@ class _ConfirmCardState extends State<ConfirmCard> {
             return GestureDetector(
               onTap: () {
                 setState(() {
-                  _selectedOrderId = order.idOrder; // Update selected order ID
+                  _selectedOrderId = order.idOrder;
                 });
-                widget.onOrderSelected(order.idOrder); // Panggil callback dengan orderId
+                widget.onOrderSelected(order.idOrder);
               },
               child: SizedBox(
-                width: cardWidth,  // Lebar kartu yang dihitung
+                width: cardWidth,
                 child: Card(
                   elevation: 8,
                   shape: RoundedRectangleBorder(
@@ -74,7 +74,7 @@ class _ConfirmCardState extends State<ConfirmCard> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              order.table,
+                              'Table ${order.table}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,

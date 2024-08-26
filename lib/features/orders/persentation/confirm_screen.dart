@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/Screen/components/Confirm/CUD_iconbutton_section.dart';
 import 'package:kontena_pos/Screen/components/Confirm/ConfirmCard_section.dart';
 import 'package:kontena_pos/Screen/components/Confirm/confirmbutton_section.dart';
 import 'package:kontena_pos/Screen/components/Confirm/confirmlist_section.dart';
-import 'package:kontena_pos/models/list_to_confirm.dart';
+import 'package:kontena_pos/Screen/components/Confirm/dropdown_section.dart';
+import 'package:kontena_pos/Screen/components/Confirm/guestname_section.dart';
 import 'package:provider/provider.dart';
-import 'package:kontena_pos/Screen/components/Menu/orderutton_section.dart';
 import 'package:kontena_pos/Screen/components/appbar_section.dart';
-import 'package:kontena_pos/Screen/components/Menu/dropdown_delete_section.dart';
 import 'package:kontena_pos/Screen/components/footer_section.dart';
-import 'package:kontena_pos/Screen/components/Menu/guestinputwithbutton_section.dart';
-import 'package:kontena_pos/Screen/components/Menu/itemcart_section.dart';
 import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
@@ -84,13 +82,10 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                     onSearchChanged: _handleSearchChanged,
                   ),
                 ),
-                GuestInputWithButton(
+                GuestNameTextFieldButton(
                   screenWidth: screenWidth,
                   guestNameController: _guestNameController,
                   smallButtonWidth: smallButtonWidth,
-                  onNameSubmitted: (name) {
-                    appState.setNamaPemesan(name);
-                  },
                 ),
               ],
             ),
@@ -99,7 +94,24 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 Container(
                   width: searchbarWidth,
                 ),
-                DropdownDeleteSection(),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                      bottom: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                    )
+                  ),
+                  child: DropdownCUD()
+                  ),
+                  Container(
+                    child: CUDIconButton(),
+                  )
               ],
             ),
             Expanded(
@@ -112,7 +124,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                       screenWidth: screenWidth,
                       onOrderSelected: (orderId) {
                         appState.setCurrentOrderId(orderId);
-                        appState.printCurrentOrderId();
+                        appState.printConfirmedOrders();
                       },
                     ),
                   ),
