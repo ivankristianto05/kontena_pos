@@ -31,7 +31,7 @@ class InvoiceScreen extends StatefulWidget {
 class _InvoiceScreenState extends State<InvoiceScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   late List<ItemCart> cartItem;
-  Cart cart = Cart(AppState());
+  Cart cart = Cart();
   late Map cartRecapData;
   late List<CartItem> cartData;
   late List<Map<String, dynamic>> cartDataItem = [
@@ -64,7 +64,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   void initState() {
     super.initState();
     // cartData = cart.getAllItemCart();
-    cartData = [];
+    cartData = cart.getAllItemCart();
 
     Future.delayed(Duration(milliseconds: 300), () {
       setState(() {
@@ -266,10 +266,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  if (cartData.isNotEmpty)
-                                    CardListItem(
-                                      cartData: cartData,
-                                    ),
+                                  if (cartData.isNotEmpty) CardListItem(),
                                   if (cartData.isEmpty) EmptyCart()
                                 ],
                               ),

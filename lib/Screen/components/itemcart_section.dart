@@ -179,7 +179,7 @@ class ItemCart extends StatelessWidget {
                             padding: EdgeInsets.symmetric(horizontal: 16),
                           ),
                           onPressed: () {
-                            cart.removeItem(index);
+                            cart.removeItem(index as String);
                             appState.update(() {
                               appState.cartItems.remove(item);
                             });

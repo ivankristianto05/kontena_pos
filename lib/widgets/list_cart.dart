@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:styled_divider/styled_divider.dart';
 
 class ListCart extends StatelessWidget {
   final MainAxisAlignment mainAxisAlignment;
   final CrossAxisAlignment crossAxisAlignment;
   final String title;
+  final String subtitle;
   final TextStyle titleStyle;
+  final String qty;
   final String addon;
   final String note;
   final TextStyle
@@ -12,6 +16,8 @@ class ListCart extends StatelessWidget {
   final String editLabel;
   final TextStyle editLabelStyle;
   final String price;
+  final String total;
+  final List<dynamic> addons;
   final TextStyle priceStyle;
   final EdgeInsets padding;
   final Color lineColor;
@@ -22,9 +28,11 @@ class ListCart extends StatelessWidget {
   ListCart({
     this.mainAxisAlignment = MainAxisAlignment.spaceBetween,
     this.crossAxisAlignment = CrossAxisAlignment.start,
-    this.title = "1 X Hot Chocolate Large",
+    this.title = "Hot Chocolate",
     this.titleStyle = const TextStyle(
         fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+    this.subtitle = 'Hot Chocolate Large',
+    this.qty = '1x',
     this.addon = "",
     this.note = "Less Ice, Less Sugar",
     this.secondaryStyle =
@@ -35,9 +43,13 @@ class ListCart extends StatelessWidget {
     this.price = "IDR 120.000",
     this.priceStyle = const TextStyle(
         fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+    this.total = "IDR 120.000",
     this.padding = const EdgeInsets.all(8.0),
     this.lineColor = Colors.black, // Default line color is black
     this.labelStyle = const TextStyle(fontSize: 14, color: Colors.black),
+    this.addons = const [
+      {'name': 'Extra 1 Shoot', 'qty': 1, 'price': 5000}
+    ],
     this.onTap,
     this.catatan = "",
   });
@@ -50,48 +62,94 @@ class ListCart extends StatelessWidget {
         children: [
           Padding(
             padding: padding,
-            child: Row(
+            child: Column(
               mainAxisAlignment: mainAxisAlignment,
               crossAxisAlignment: crossAxisAlignment,
               children: [
-                Expanded(
-                  flex: 2, // Title takes up 2/3 of the space
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: titleStyle),
-                      SizedBox(height: 6),
-                      if (addon.isNotEmpty) ...[
-                        Text("Addon:", style: labelStyle),
-                        SizedBox(height: 2),
-                        Text(addon, style: secondaryStyle),
-                      ],
-                      if (note.isNotEmpty) ...[
-                        Text("Preferensi:", style: labelStyle),
-                        SizedBox(height: 2),
-                        Text(note, style: secondaryStyle),
-                        SizedBox(height: 16),
-                      ],
-                      if (catatan.isNotEmpty) ...[
-                        Text("Catatan:", style: labelStyle),
-                        SizedBox(height: 2),
-                        Text(catatan, style: secondaryStyle),
-                      ],
-                      SizedBox(height: 4),
-                      Text("Edit", style: editLabelStyle),
-                    ],
+                Text(title, style: titleStyle),
+                StyledDivider(
+                  height: 15.0,
+                  thickness: 2.0,
+                  color: theme.colorScheme.surface,
+                  lineStyle: DividerLineStyle.dotted,
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: theme.colorScheme.secondary,
                   ),
                 ),
-                SizedBox(width: 16), // Add spacing between title and price
-                Container(
-                  width: 120, // Fixed width for the price section
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(price, style: priceStyle),
-                    ],
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("${qty}X ${price}"),
+                    Text(total),
+                  ],
                 ),
+                if (addons.isNotEmpty)
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 8.0, 0.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Addon:',
+                          style: theme.textTheme.labelSmall,
+                        ),
+                        Builder(builder: (context) {
+                          final addonList = addons;
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: addonList.length,
+                            itemBuilder: (context, index) {
+                              final addonItem = addonList[index];
+                              return Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    0.0, 0.0, 0.0, 4.0),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text('+ ${addonItem['name']}'),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              10.0, 0.0, 0.0, 0.0),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                              '${addonItem['qty']}X ${addonItem['price']}'),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                if (note != null)
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 8.0, 0.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Notes:',
+                          style: theme.textTheme.labelSmall,
+                        ),
+                        Text(note),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),

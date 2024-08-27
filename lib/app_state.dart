@@ -33,6 +33,15 @@ class AppState extends ChangeNotifier {
     _item = _value;
   }
 
+  static List<CartItem> cartItem = []; // New static list to store cart items
+  static void updateCart(List<CartItem> items) {
+    cartItem = items;
+  }
+
+  static void resetCartt() {
+    cartItem = [];
+  }
+
   // List untuk menyimpan item di cart
   List<CartItem> _cartItems = [];
 
@@ -61,33 +70,36 @@ class AppState extends ChangeNotifier {
   // Method untuk mengecek apakah item dengan kombinasi idmenu, idvarian, indexpreference, dan indexaddons sudah ada
   int findItemIndex(CartItem newItem) {
     return _cartItems.indexWhere((item) =>
-      item.id == newItem.id &&
-      item.variant == newItem.variant &&
-      item.preference.toString() == newItem.preference.toString() &&
-      item.addons.toString() == newItem.addons.toString()
-    );
+        item.id == newItem.id &&
+        item.variant == newItem.variant &&
+        item.preference.toString() == newItem.preference.toString() &&
+        item.addons.toString() == newItem.addons.toString());
   }
 
   // Menambahkan atau memperbarui item di cart
-  void addItemToCart(CartItem newItem) {
-    final existingItemIndex = findItemIndex(newItem);
-    if (existingItemIndex >= 0) {
-      var existingItem = _cartItems[existingItemIndex];
-      existingItem.qty += newItem.qty; // Update quantity
-      existingItem.variant = newItem.variant;
-      existingItem.variantId = newItem.variantId;
-      existingItem.notes = newItem.notes;
-      existingItem.preference = newItem.preference;
-      existingItem.addons = newItem.addons;
-      existingItem.variantPrice = newItem.variantPrice;
-      existingItem.totalPrice = existingItem.qty * 
-        (existingItem.variantPrice != 0 ? existingItem.variantPrice : existingItem.price);
-      _cartItems[existingItemIndex] = CartItem.from(existingItem); // Menggunakan salinan item yang diperbarui
-    } else {
-      _cartItems.add(CartItem.from(newItem)); // Menambahkan item baru dengan salinan
-    }
-    notifyListeners(); // Notify listeners of changes
-  }
+  // void addItemToCart(CartItem newItem) {
+  //   final existingItemIndex = findItemIndex(newItem);
+  //   if (existingItemIndex >= 0) {
+  //     var existingItem = _cartItems[existingItemIndex];
+  //     existingItem.qty += newItem.qty; // Update quantity
+  //     existingItem.variant = newItem.variant;
+  //     existingItem.variantId = newItem.variantId;
+  //     existingItem.notes = newItem.notes;
+  //     existingItem.preference = newItem.preference;
+  //     existingItem.addons = newItem.addons;
+  //     existingItem.variantPrice = newItem.variantPrice;
+  //     existingItem.totalPrice = existingItem.qty *
+  //         (existingItem.variantPrice != 0
+  //             ? existingItem.variantPrice
+  //             : existingItem.price);
+  //     _cartItems[existingItemIndex] = CartItem.from(
+  //         existingItem); // Menggunakan salinan item yang diperbarui
+  //   } else {
+  //     _cartItems
+  //         .add(CartItem.from(newItem)); // Menambahkan item baru dengan salinan
+  //   }
+  //   notifyListeners(); // Notify listeners of changes
+  // }
 
   void updateItemInCart(int index) {
     if (index >= 0 && index < _cartItems.length) {
@@ -105,7 +117,8 @@ class AppState extends ChangeNotifier {
 
   // Metode untuk membuat dan mengonfirmasi order
   void confirmOrder(String idOrder, String table) {
-    final List<CartItem> allItems = List.from(_cartItems); // Mengambil semua item dalam keranjang
+    final List<CartItem> allItems =
+        List.from(_cartItems); // Mengambil semua item dalam keranjang
 
     final ListToConfirm order = ListToConfirm(
       idOrder: idOrder,
@@ -114,7 +127,8 @@ class AppState extends ChangeNotifier {
       items: allItems,
     );
 
-    _confirmedOrders.add(order); // Menambahkan order yang dikonfirmasi ke dalam list
+    _confirmedOrders
+        .add(order); // Menambahkan order yang dikonfirmasi ke dalam list
     _isOrderConfirmed = true; // Set order as confirmed
 
     resetCart(); // Kosongkan keranjang setelah konfirmasi
@@ -125,7 +139,8 @@ class AppState extends ChangeNotifier {
     final List<CartItem> allItems = List.from(_cartItems);
 
     final ListToConfirm order = ListToConfirm(
-      idOrder: DateTime.now().toIso8601String(), // Gunakan ID unik untuk setiap order
+      idOrder: DateTime.now()
+          .toIso8601String(), // Gunakan ID unik untuk setiap order
       namaPemesan: _namaPemesan, // Gunakan nama pemesan yang sudah di-set
       table: 'Table 1', // Gantilah dengan nomor meja yang sesuai
       items: allItems, // Masukkan semua item dari cart

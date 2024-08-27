@@ -38,38 +38,39 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
 
   final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
 
-  void _addItemToCart() {  
-  // Ensure MenuVarian is correctly filtered based on idMenu
-  final List<Map<String, dynamic>> filteredVariants = MenuVarian
-    .where((variant) => variant['id_menu'] == widget.idMenu)
-    .toList();  
-  final selectedVariant = _selectedVariantIndex >= 0 && _selectedVariantIndex < filteredVariants.length
-      ? filteredVariants[_selectedVariantIndex]
-      : null;
-  
-  final cartItem = CartItem(
-    id: widget.idMenu,
-    name: widget.name,
-    variant: selectedVariant != null ? selectedVariant['nama_varian'] : null,
-    variantId: selectedVariant != null ? selectedVariant['id_varian'] : null,
-    qty: _quantity,
-    price: widget.price,
-    variantPrice: _variantPrice,
-    addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
-    notes: _notes,
-    preference: {
-      'preference': _selectedPreference,
-    },
-    type: widget.type,
-  );
+  void _addItemToCart() {
+    // Ensure MenuVarian is correctly filtered based on idMenu
+    final List<Map<String, dynamic>> filteredVariants =
+        MenuVarian.where((variant) => variant['id_menu'] == widget.idMenu)
+            .toList();
+    final selectedVariant = _selectedVariantIndex >= 0 &&
+            _selectedVariantIndex < filteredVariants.length
+        ? filteredVariants[_selectedVariantIndex]
+        : null;
 
-  final appState = Provider.of<AppState>(context, listen: false);
-  appState.addItemToCart(cartItem);
+    final cartItem = CartItem(
+      id: widget.idMenu,
+      name: widget.name,
+      itemName: widget.name,
+      variant: selectedVariant != null ? selectedVariant['nama_varian'] : null,
+      variantId: selectedVariant != null ? selectedVariant['id_varian'] : null,
+      qty: _quantity,
+      price: widget.price,
+      variantPrice: _variantPrice,
+      addons: _selectedAddons
+          .map((key, value) => MapEntry(key, {'selected': value})),
+      notes: _notes,
+      preference: {
+        'preference': _selectedPreference,
+      },
+      type: widget.type,
+    );
 
-  Navigator.of(context).pop();
-}
+    final appState = Provider.of<AppState>(context, listen: false);
+    // appState.addItemToCart(cartItem);
 
-
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,9 +157,7 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
                     flex: 2,
                     child: SummarySection(
                       name: widget.name,
-                      price: _variantPrice != 0
-                          ? _variantPrice
-                          : widget.price,
+                      price: _variantPrice != 0 ? _variantPrice : widget.price,
                       type: widget.type,
                       selectedVariant: _selectedVariant,
                       selectedPreferenceIndex: _selectedPreferenceIndex,

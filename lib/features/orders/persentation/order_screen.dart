@@ -41,7 +41,8 @@ class _OrderScreenState extends State<OrderScreen> {
     setState(() {});
   }
 
-  void _showItemDetailsDialog(String name, int price, String idMenu, String type) {
+  void _showItemDetailsDialog(
+      String name, int price, String idMenu, String type) {
     showDialog(
       context: context,
       builder: (context) {
@@ -76,7 +77,7 @@ class _OrderScreenState extends State<OrderScreen> {
     double buttonWidth = screenWidth * 0.15;
 
     // Create an instance of Cart and pass AppState to it
-    Cart cart = Cart(appState);
+    Cart cart = Cart();
 
     return Scaffold(
       appBar: BuildAppbar(
@@ -143,8 +144,8 @@ class _OrderScreenState extends State<OrderScreen> {
                       cartItems: appState.cartItems,
                       screenWidth: screenWidth,
                       onEditItem: (editedItem) {
-                        final index = appState.cartItems.indexWhere(
-                            (item) => item.id == editedItem.id);
+                        final index = appState.cartItems
+                            .indexWhere((item) => item.id == editedItem.id);
                         if (index != -1) {
                           setState(() {
                             appState.cartItems[index] = editedItem;

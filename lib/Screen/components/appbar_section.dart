@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:kontena_pos/constants.dart';
+import 'package:kontena_pos/routes/app_routes.dart';
 
 class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
   const BuildAppbar({
@@ -95,11 +96,15 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                   minWidth: 0,
                   onPressed: () {
                     // Action for Invoice button
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      AppRoutes.invoiceScreen,
+                      (route) => false,
+                    );
                   },
                   child: const Text(
                     'Invoice',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Color.fromARGB(255, 37, 26, 26),
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -207,5 +212,6 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(50); // Adjust preferred size of AppBar if needed
+  Size get preferredSize =>
+      Size.fromHeight(50); // Adjust preferred size of AppBar if needed
 }

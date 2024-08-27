@@ -1,4 +1,3 @@
-
 import 'package:kontena_pos/core/functions/cart.dart';
 
 class ListToConfirm {
@@ -20,7 +19,7 @@ class ListToConfirm {
       'idOrder': idOrder,
       'namaPemesan': namaPemesan,
       'table': table,
-      'items': items.map((item) => item.toMap()).toList(),
+      // 'items': items.map((item) => item.toMap()).toList(),
     };
   }
 
@@ -31,7 +30,7 @@ class ListToConfirm {
       namaPemesan: map['namaPemesan'],
       table: map['table'],
       items: List<CartItem>.from(
-        map['items']?.map((item) => CartItem.fromMap(item)) ?? [],
+        [],
       ),
     );
   }

@@ -62,7 +62,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     double buttonWidth = screenWidth * 0.15;
 
     // Create an instance of Cart and pass AppState to it
-    Cart cart = Cart(appState);
+    Cart cart = Cart();
 
     return Scaffold(
       appBar: BuildAppbar(

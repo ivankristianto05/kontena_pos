@@ -22,7 +22,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
 
     // Access AppState and Cart
     final appState = Provider.of<AppState>(context, listen: false);
-    final cart = Cart(appState, onCartChanged: () => setState(() {}));
+    final cart = Cart(onCartChanged: () => setState(() {}));
 
     return Container(
       width: screenWidth - searchbarWidth,
@@ -168,7 +168,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
               onPressed: () {
                 // Clear all items from the cart
                 setState(() {
-                  cart.clearAllItems();
+                  cart.clearCart();
                 });
               },
               child: Icon(Icons.delete, color: redcolor),

@@ -5,6 +5,7 @@ import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/data/menuvarian.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
 
 class AddToCart extends StatefulWidget {
   AddToCart({
@@ -24,11 +25,12 @@ class _AddToCartState extends State<AddToCart> {
   List<dynamic> prefDisplay = [];
   List<dynamic> addonDisplay = [];
   dynamic selectedVarian;
-  dynamic selectedPref;
+  List<dynamic> selectedPref = [];
   String notes = '';
   List<dynamic> selectedAddon = [];
   int qty = 0;
   late List<TextEditingController> qtyAddonController;
+  Cart cart = Cart();
 
   @override
   void setState(VoidCallback callback) {
@@ -52,12 +54,16 @@ class _AddToCartState extends State<AddToCart> {
           addonDisplay.length,
           (_) => TextEditingController(text: '0'),
         );
+        qtyController.text = '1';
       });
     });
   }
 
   @override
   void dispose() {
+    for (var controller in qtyAddonController) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -380,6 +386,8 @@ class _AddToCartState extends State<AddToCart> {
                                               .fromSTEB(0.0, 8.0, 0.0, 8.0),
                                           child: Builder(
                                             builder: (context) {
+                                              String prefGroup = '';
+                                              int idxPref = 0;
                                               return Column(
                                                 mainAxisSize: MainAxisSize.max,
                                                 crossAxisAlignment:
@@ -390,52 +398,60 @@ class _AddToCartState extends State<AddToCart> {
                                                         const BouncingScrollPhysics(),
                                                     shrinkWrap: true,
                                                     itemCount:
-                                                        varianDisplay.length,
+                                                        prefDisplay.length,
                                                     itemBuilder:
-                                                        (context, index) {
+                                                        (context, prefIndex) {
                                                       if (isLoading) {
                                                       } else {
                                                         final currentPref =
-                                                            prefDisplay[index];
+                                                            prefDisplay[
+                                                                prefIndex];
+
+                                                        if (prefGroup !=
+                                                            currentPref[
+                                                                'type']) {
+                                                          prefGroup =
+                                                              currentPref[
+                                                                  'type'];
+                                                          idxPref = 0;
+                                                        } else {
+                                                          idxPref++;
+                                                        }
 
                                                         return Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
+                                                            if (idxPref == 0)
+                                                              Text(
+                                                                prefGroup,
+                                                                style: theme
+                                                                    .textTheme
+                                                                    .labelSmall,
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .start,
+                                                              ),
                                                             InkWell(
                                                               onTap: () {
-                                                                if (selectedPref ==
-                                                                    null) {
-                                                                  setState(() {
-                                                                    selectedPref =
-                                                                        currentPref;
-                                                                  });
-                                                                } else {
-                                                                  if (selectedPref[
-                                                                          'id'] ==
-                                                                      currentPref[
-                                                                          'id']) {
-                                                                    setState(
-                                                                        () {
-                                                                      selectedPref =
-                                                                          null;
-                                                                    });
-                                                                  } else {
-                                                                    setState(
-                                                                        () {
-                                                                      selectedPref =
-                                                                          currentPref;
-                                                                    });
-                                                                  }
-                                                                }
+                                                                selctedPref(
+                                                                  context,
+                                                                  prefIndex,
+                                                                  currentPref,
+                                                                );
                                                               },
                                                               child: Container(
                                                                 width: double
                                                                     .infinity,
                                                                 decoration:
                                                                     BoxDecoration(
-                                                                  color: ((selectedPref != null) &&
-                                                                          (selectedPref['id'] ==
-                                                                              currentPref[
-                                                                                  'id']))
+                                                                  color: (selectedPref.contains(
+                                                                              currentPref) ==
+                                                                          true)
                                                                       ? theme
                                                                           .colorScheme
                                                                           .primary
@@ -444,11 +460,8 @@ class _AddToCartState extends State<AddToCart> {
                                                                           .primaryContainer,
                                                                   border: Border
                                                                       .all(
-                                                                    color: ((selectedPref !=
-                                                                                null) &&
-                                                                            (selectedPref['id'] ==
-                                                                                currentPref[
-                                                                                    'id']))
+                                                                    color: (selectedPref.contains(currentPref) ==
+                                                                            true)
                                                                         ? theme
                                                                             .colorScheme
                                                                             .primary
@@ -477,8 +490,8 @@ class _AddToCartState extends State<AddToCart> {
                                                                       Text(
                                                                         currentPref[
                                                                             'name'],
-                                                                        style: ((selectedPref != null) &&
-                                                                                (selectedPref['id'] == currentPref['id']))
+                                                                        style: (selectedPref.contains(currentPref) ==
+                                                                                true)
                                                                             ? TextStyle(color: theme.colorScheme.background)
                                                                             : theme.textTheme.labelMedium,
                                                                       ),
@@ -606,11 +619,45 @@ class _AddToCartState extends State<AddToCart> {
                                             'Preference:',
                                             style: theme.textTheme.labelMedium,
                                           ),
-                                          Text(
-                                            (selectedPref != null)
-                                                ? selectedPref['name']
-                                                : '-',
-                                            style: theme.textTheme.bodyMedium,
+                                          Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(0.0, 8.0, 0.0, 8.0),
+                                            child: Builder(
+                                              builder: (context) {
+                                                return Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    ListView.builder(
+                                                      physics:
+                                                          const BouncingScrollPhysics(),
+                                                      shrinkWrap: true,
+                                                      itemCount:
+                                                          selectedPref.length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        final selPref =
+                                                            selectedPref[index];
+
+                                                        return Column(
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                Text(
+                                                                  "${selPref['name'].toString()}",
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            ),
                                           ),
                                           const SizedBox(height: 8.0),
                                           Text(
@@ -650,9 +697,16 @@ class _AddToCartState extends State<AddToCart> {
                                                                 index];
                                                         return Column(
                                                           children: [
-                                                            Text(
-                                                              selAddon['qty']
-                                                                  .toString(),
+                                                            Row(
+                                                              children: [
+                                                                Text(
+                                                                  "${selAddon['qty'].toString()}x ",
+                                                                ),
+                                                                Text(
+                                                                  selAddon[
+                                                                      'nama_menu'],
+                                                                ),
+                                                              ],
                                                             ),
                                                           ],
                                                         );
@@ -698,70 +752,7 @@ class _AddToCartState extends State<AddToCart> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            InkWell(
-                                              onTap: () {},
-                                              child: Container(
-                                                width: 54,
-                                                height: 34,
-                                                decoration: BoxDecoration(
-                                                  border: Border(
-                                                    right: BorderSide(
-                                                      color: appTheme.gray200,
-                                                      width: 4.0,
-                                                    ),
-                                                  ),
-                                                  color: theme.colorScheme
-                                                      .secondaryContainer,
-                                                ),
-                                                child: Icon(
-                                                  Icons.remove,
-                                                  color:
-                                                      theme.colorScheme.primary,
-                                                  size: 16.0,
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Container(
-                                                // height: 34,
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: theme
-                                                          .colorScheme.surface),
-                                                  color:
-                                                      theme.colorScheme.surface,
-                                                ),
-                                                child: Container(
-                                                  decoration:
-                                                      const BoxDecoration(),
-                                                  child:
-                                                      _buildQtySection(context),
-                                                ),
-                                              ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {},
-                                              child: Container(
-                                                width: 54,
-                                                height: 34,
-                                                decoration: BoxDecoration(
-                                                  border: Border(
-                                                    left: BorderSide(
-                                                      color: appTheme.gray200,
-                                                      width: 4.0,
-                                                    ),
-                                                  ),
-                                                  color: theme.colorScheme
-                                                      .secondaryContainer,
-                                                ),
-                                                child: Icon(
-                                                  Icons.add,
-                                                  color:
-                                                      theme.colorScheme.primary,
-                                                  size: 16.0,
-                                                ),
-                                              ),
-                                            ),
+                                            _buildQtySection(context),
                                           ],
                                         ),
                                       ),
@@ -793,12 +784,12 @@ class _AddToCartState extends State<AddToCart> {
                       child: CustomElevatedButton(
                         text: "Add Item To Cart",
                         onPressed: () {
-                          // onTapMasuk(context);
                           addToCart(
                             context,
                             widget.dataMenu,
                             selectedVarian,
-                            addonDisplay,
+                            selectedAddon,
+                            notesController.text,
                             int.parse(qtyController.text),
                           );
                         },
@@ -895,14 +886,67 @@ class _AddToCartState extends State<AddToCart> {
   }
 
   // widget preference
-  // widget addon
-  Widget _buildAddonSection(BuildContext context, List<dynamic> addon) {
-    List<TextEditingController> qtyAddonController = [];
-
-    for (int idx = 0; idx < addon.length; idx++) {
-      qtyAddonController.add(TextEditingController(text: '0'));
+  void selctedPref(BuildContext context, int index, dynamic data) {
+    print('check, ${data['id']} ${selectedPref.contains(data)}');
+    dynamic tmp = data['type'];
+    print('check--, ${selectedPref.contains(tmp)}');
+    print('check==, ${checkSameField(selectedPref, 'type', data['type'])}');
+    dynamic sameData = checkSameField(selectedPref, 'type', data['type']);
+    if (selectedPref.contains(data) == false) {
+      if (sameData != null) {
+        setState(() {
+          selectedPref.remove(sameData);
+        });
+      }
+      setState(() {
+        selectedPref.add(data);
+      });
+    } else {
+      // dynamic tmp = prefDisplay[index];
+      setState(() {
+        selectedPref.remove(data);
+      });
     }
+  }
 
+  dynamic checkSameField(List<dynamic> data, String field, String value) {
+    dynamic tmp;
+    data.forEach((element) {
+      if (element[field] == value) {
+        tmp = element;
+      }
+    });
+    // return element;
+    return tmp;
+  }
+
+  // widget addon
+  void qtyChangeAddon(String type, int index) {
+    int qty = int.parse(qtyAddonController[index].text);
+    qty = type == 'add' ? qty + 1 : qty - 1;
+    qty = qty.clamp(
+        0, 99); // Prevent negative quantities and set a reasonable upper limit
+    setState(() {
+      qtyAddonController[index].text = qty.toString();
+    });
+
+    addonDisplay[index]['qty'] = qty;
+    checkSelectedAddon(index, qty);
+  }
+
+  void checkSelectedAddon(int index, int qty) {
+    if (selectedAddon.elementAtOrNull(index) == null) {
+      dynamic tmp = addonDisplay[index];
+      tmp['qty'] = qty;
+      selectedAddon.add(tmp);
+    } else {
+      setState(() {
+        selectedAddon[index]['qty'] = qty;
+      });
+    }
+  }
+
+  Widget _buildAddonSection(BuildContext context, List<dynamic> addon) {
     return Builder(
       builder: (context) {
         return Column(
@@ -919,9 +963,9 @@ class _AddToCartState extends State<AddToCart> {
                   padding: const EdgeInsets.only(bottom: 4.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
+                      color: theme.colorScheme.primaryContainer,
                       border: Border.all(
-                        color: Theme.of(context).colorScheme.surface,
+                        color: theme.colorScheme.surface,
                       ),
                     ),
                     child: Row(
@@ -968,21 +1012,24 @@ class _AddToCartState extends State<AddToCart> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildQuantityButton(
-              context, Icons.remove, () => qtyChange('minus', index)),
+            context,
+            Icons.remove,
+            () => qtyChangeAddon('minus', index),
+          ),
           Container(
-            width: 34,
-            color: Theme.of(context).colorScheme.surface,
+            width: 40,
+            color: theme.colorScheme.surface,
             child: CustomTextFormField(
               controller: qtyAddonController[index],
               maxLines: 1,
               contentPadding: EdgeInsets.symmetric(
-                horizontal: 3,
-                vertical: 9,
+                horizontal: 3.h,
+                vertical: 9.v,
               ),
               borderDecoration: OutlineInputBorder(
                 borderRadius: BorderRadius.zero,
                 borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.surface,
+                  color: theme.colorScheme.surface,
                   width: 0,
                 ),
               ),
@@ -990,112 +1037,127 @@ class _AddToCartState extends State<AddToCart> {
             ),
           ),
           _buildQuantityButton(
-              context, Icons.add, () => qtyChange('add', index)),
+            context,
+            Icons.add,
+            () => qtyChangeAddon('add', index),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildQuantityButton(
-      BuildContext context, IconData icon, VoidCallback onTap) {
+      BuildContext context, IconData icon, VoidCallback onTap,
+      [double? size]) {
     return InkWell(
       onTap: onTap,
       child: Container(
-        width: 34,
-        height: 34,
+        width: size ?? 34,
+        height: size ?? 34,
         decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(
-              color: Theme.of(context).colorScheme.surface,
-              width: 2.0,
-            ),
-          ),
-          color: Theme.of(context).colorScheme.secondaryContainer,
+          color: theme.colorScheme.secondaryContainer,
         ),
         child: Icon(
           icon,
-          color: Theme.of(context).colorScheme.primary,
+          color: theme.colorScheme.primary,
           size: 14.0,
         ),
       ),
     );
   }
 
-  void qtyAddon(
-    String type,
-    int idx,
-    List<TextEditingController> qtyCont,
-    List<dynamic> addon,
-  ) {
-    print('check ${qtyCont[idx].value}');
-    print('check ${qtyCont[idx].text}');
-    int qtyEditor = int.parse(qtyCont[idx].text);
-    print('qty editor, ${qtyEditor}');
-    if (type == 'add') {
-      qtyEditor += 1;
-    } else {
-      // if (qtyEditor == 0) {
-      //   qtyEditor = 0;
-      // } else {
-      //   qtyEditor -= 1;
-      // }
-      qtyEditor -= 1;
-    }
-    qty = qtyEditor;
-    print('qty, $qty');
-    print('index, $idx');
-    setState(() {
-      qtyCont[idx].text = qty.toString();
-    });
-    // selectedAddon[idx].qty = qty;
-  }
-
   // widget qty
   TextEditingController qtyController = TextEditingController();
-  // qtyController.text = qty;
+  // qtyController.text = '1';
+  void qtyChange(String type) {
+    int qty = int.parse(qtyController.text);
+    qty = type == 'add' ? qty + 1 : qty - 1;
+    qty = qty.clamp(
+        0, 99); // Prevent negative quantities and set a reasonable upper limit
+    setState(() {
+      qtyController.text = qty.toString();
+    });
+  }
+
   Widget _buildQtySection(BuildContext context) {
     // qtyController.text = qty.toString();
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      CustomTextFormField(
-        controller: qtyController,
-        // focusNode: inputSearchVarian,
-        maxLines: 1,
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: 3.h,
-          vertical: 9.v,
-        ),
-
-        borderDecoration: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(0.h),
-          borderSide: BorderSide(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildQuantityButton(
+              context, Icons.remove, () => qtyChange('minus'), 45.0),
+          // Expanded(
+          Container(
+            // height: 50,
+            width: 150,
+            // constraints: BoxConstraints(minWidth: 40),
             color: theme.colorScheme.surface,
-            width: 0,
+            child: CustomTextFormField(
+              controller: qtyController,
+              maxLines: 1,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 3.h,
+                vertical: 12.v,
+              ),
+              borderDecoration: OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(
+                  color: theme.colorScheme.surface,
+                  width: 0,
+                ),
+              ),
+              hintText: "Qty",
+              textAlign: TextAlign.center,
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
-        ),
-        hintText: "Qty",
-        // validator: (value) {
-        //   if (value == null || value.isEmpty) {
-        //     return 'No Varian';
-        //   }
-        //   return null;
-        // },
-        onTapOutside: (value) {
-          // inputSearchVarian.unfocus();
-        },
-      ),
-    ]);
-  }
-}
 
-void addToCart(
-  BuildContext context,
-  dynamic item,
-  dynamic varian,
-  List<dynamic> addon,
-  int qty,
-) {
-  print('check item, $item');
-  print('check varian, $varian');
-  print('check addon, $addon');
-  print('check qty, $qty');
+          _buildQuantityButton(
+              context, Icons.add, () => qtyChange('add'), 45.0),
+        ],
+      ),
+    );
+  }
+
+  void addToCart(
+    BuildContext context,
+    dynamic item,
+    dynamic varian,
+    List<dynamic> addon,
+    String note,
+    int qty,
+  ) {
+    // print('check item, $item');
+    // print('check varian, $varian');
+    // print('check addon, $addon');
+    // print('check qty, $qty');
+
+    String id = item['nama_menu'];
+
+    if (note != '') {
+      var notes = note.toLowerCase();
+      id += "-n${notes.hashCode}";
+    }
+
+    CartItem newItem = CartItem(
+      id: id,
+      name: item['nama_menu'],
+      itemName: item['nama_menu'],
+      notes: note,
+      preference: {},
+      pref: selectedPref,
+      price: varian['harga_varian'].toInt(),
+      qty: qty,
+      addon: addon,
+    );
+
+    cart.addItem(newItem, mode: CartMode.add);
+
+    Navigator.pop(context);
+  }
 }
