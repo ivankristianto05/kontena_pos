@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/Screen/components/ConfirmCard_section.dart';
-import 'package:kontena_pos/Screen/components/confirmlist_section.dart';
-import 'package:kontena_pos/models/list_to_confirm.dart';
+import 'package:kontena_pos/Screen/components/Confirm/CUD_iconbutton_section.dart';
+import 'package:kontena_pos/Screen/components/Confirm/ConfirmCard_section.dart';
+import 'package:kontena_pos/Screen/components/Confirm/confirmbutton_section.dart';
+import 'package:kontena_pos/Screen/components/Confirm/confirmlist_section.dart';
+import 'package:kontena_pos/Screen/components/Confirm/dropdown_section.dart';
+import 'package:kontena_pos/Screen/components/Confirm/guestname_section.dart';
 import 'package:provider/provider.dart';
-import 'package:kontena_pos/Screen/components/actionbutton_section.dart';
 import 'package:kontena_pos/Screen/components/appbar_section.dart';
-import 'package:kontena_pos/Screen/components/dropdown_delete_section.dart';
 import 'package:kontena_pos/Screen/components/footer_section.dart';
-import 'package:kontena_pos/Screen/components/guestinputwithbutton_section.dart';
-import 'package:kontena_pos/Screen/components/itemcart_section.dart';
 import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
@@ -23,6 +22,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
   final TextEditingController _guestNameController = TextEditingController();
   String _selectedFilterType = 'All';
   String _searchQuery = '';
+  bool allItemsChecked = false; // To track if all items are checked
 
   @override
   void initState() {
@@ -61,8 +61,8 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     double smallButtonWidth = screenWidth * 0.05;
     double buttonWidth = screenWidth * 0.15;
 
-    // Create an instance of Cart and pass AppState to it
     Cart cart = Cart();
+    // Cart cart = Cart(appState);
 
     return Scaffold(
       appBar: BuildAppbar(
@@ -83,14 +83,10 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                     onSearchChanged: _handleSearchChanged,
                   ),
                 ),
-                GuestInputWithButton(
+                GuestNameTextFieldButton(
                   screenWidth: screenWidth,
                   guestNameController: _guestNameController,
                   smallButtonWidth: smallButtonWidth,
-                  onNameSubmitted: (name) {
-                    // Update AppState with the guest name
-                    appState.setNamaPemesan(name);
-                  },
                 ),
               ],
             ),
@@ -99,36 +95,52 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 Container(
                   width: searchbarWidth,
                 ),
-                DropdownDeleteSection(),
+                Container(
+                    decoration: BoxDecoration(
+                        border: Border(
+                      top: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                      bottom: BorderSide(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                    )),
+                    child: DropdownCUD()),
+                Container(
+                  child: CUDIconButton(),
+                )
               ],
             ),
             Expanded(
               child: Row(
                 children: [
-                  // Container(
-                  //   width: screenWidth * 0.65,
-                  //   alignment: Alignment.topLeft,
-                  //   child: ConfirmCard(screenWidth: screenWidth),
-                  // ),
+                  Container(
+                    width: screenWidth * 0.65,
+                    alignment: Alignment.topLeft,
+                    child: ConfirmCard(
+                      screenWidth: screenWidth,
+                      onOrderSelected: (orderId) {
+                        appState.setCurrentOrderId(orderId);
+                        appState.printConfirmedOrders();
+                      },
+                    ),
+                  ),
                   Container(
                     width: screenWidth * 0.35,
                     decoration: BoxDecoration(
                       color: Colors.white,
                     ),
                     child: ConfirmList(
-                      cartItems: appState.cartItems,
+                      listToConfirm: appState.confirmedOrders,
                       screenWidth: screenWidth,
-                      onEditItem: (editedItem) {
-                        final index = appState.cartItems
-                            .indexWhere((item) => item.id == editedItem.id);
-                        if (index != -1) {
-                          setState(() {
-                            appState.cartItems[index] = editedItem;
-                          });
-                        }
-                      },
                       appState: appState,
-                      cart: cart,
+                      onAllChecked: (bool isChecked) {
+                        setState(() {
+                          allItemsChecked = isChecked;
+                        });
+                      },
                     ),
                   ),
                 ],
@@ -143,9 +155,9 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                     width: screenWidth * 0.65,
                     child: Footer(screenWidth: screenWidth),
                   ),
-                  ActionButton(
+                  ConfirmButton(
                     screenWidth: screenWidth,
-                    cart: cart,
+                    isEnabled: allItemsChecked,
                   ),
                 ],
               ),
