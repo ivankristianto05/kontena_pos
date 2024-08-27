@@ -19,24 +19,25 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double searchbarWidth = screenWidth * 0.65;
-    double dropdownWidth = (screenWidth - searchbarWidth - 32) / 2; // Adjust width for two columns with spacing
+    double dropdownWidth = (screenWidth - searchbarWidth - 32) / 2;
 
-    // Access AppState and Cart
     final appState = Provider.of<AppState>(context, listen: false);
     final cart = Cart(appState, onCartChanged: () => setState(() {}));
 
     return Container(
       width: screenWidth - searchbarWidth,
       height: 50,
-      alignment: Alignment.centerRight, // Center the content horizontally
+      alignment: Alignment.centerRight,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center, // Center the row contents
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             width: screenWidth * 0.20,
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: Colors.grey, width: 1.0),
+              border: Border(
+                right: BorderSide(color: Colors.grey, width: 1)
+              )
             ),
             child: DropdownButtonHideUnderline(
               child: Padding(
@@ -52,7 +53,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                   ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Center( // Center the text inside the dropdown
+                      child: Center(
                         child: Text(
                           value,
                           style: TextStyle(fontWeight: FontWeight.normal),
@@ -73,7 +74,9 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
             width: screenWidth * 0.10,
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: Colors.grey, width: 1.0),
+              border: Border(
+                right: BorderSide(color: Colors.grey, width: 1)
+              )
             ),
             child: DropdownButtonHideUnderline(
               child: Padding(
@@ -83,20 +86,11 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                   hint: Text("Table"),
                   value: table,
                   items: <String>[
-                    '1',
-                    '2',
-                    '3',
-                    '4',
-                    '5',
-                    '6',
-                    '7',
-                    '8',
-                    '9',
-                    '10',
+                    '1','2','3','4','5','6','7','8','9','10',
                   ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Center( // Center the text inside the dropdown
+                      child: Center(
                         child: Text(
                           value,
                           style: TextStyle(
@@ -111,23 +105,14 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                       table = newValue;
                     });
                     if (newValue != null) {
-                      appState.setSelectedTable(newValue); // Save selected table to AppState
+                      appState.setSelectedTable(newValue);
                     }
                   },
                   selectedItemBuilder: (BuildContext context) {
                     return <String>[
-                      '1',
-                      '2',
-                      '3',
-                      '4',
-                      '5',
-                      '6',
-                      '7',
-                      '8',
-                      '9',
-                      '10',
+                      '1','2','3','4','5','6','7','8','9','10',
                     ].map((String value) {
-                      return Center( // Center the text inside the selected item
+                      return Center(
                         child: Text(
                           'Table $value',
                           style: TextStyle(
@@ -146,13 +131,11 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
             height: 50,
             decoration: BoxDecoration(
               color: Colors.white,
-              border: Border.all(color: Colors.grey, width: 1.0),
             ),
             child: MaterialButton(
               height: 50,
               padding: EdgeInsets.zero,
               onPressed: () {
-                // Clear all items from the cart
                 setState(() {
                   cart.clearAllItems();
                 });
@@ -163,5 +146,13 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
         ],
       ),
     );
+  }
+
+  // Function to reset dropdown values
+  void resetDropdown() {
+    setState(() {
+      pickupType = null;
+      table = null;
+    });
   }
 }

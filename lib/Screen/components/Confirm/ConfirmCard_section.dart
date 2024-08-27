@@ -80,9 +80,9 @@ class _ConfirmCardState extends State<ConfirmCard> {
                                 fontSize: 14,
                               ),
                             ),
-                            const Text(
-                              "Draft",
-                              style: TextStyle(
+                            Text(
+                              order.status, // Display the order's status
+                              style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 12,
                               ),

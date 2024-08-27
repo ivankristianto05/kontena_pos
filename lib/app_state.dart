@@ -35,10 +35,7 @@ class AppState extends ChangeNotifier {
 
   // List untuk menyimpan item di cart
   List<CartItem> _cartItems = [];
-
   List<CartItem> get cartItems => _cartItems;
-
-  
 
   // Method untuk mengecek apakah item dengan kombinasi idmenu, idvarian, indexpreference, dan indexaddons sudah ada
   int findItemIndex(CartItem newItem) {
@@ -85,23 +82,22 @@ class AppState extends ChangeNotifier {
     notifyListeners(); // Pemberitahuan bahwa cart direset
   }
 
+
   // List untuk menyimpan order yang dikonfirmasi
   List<ListToConfirm> _confirmedOrders = [];
-
   List<ListToConfirm> get confirmedOrders => _confirmedOrders;
 
   // Menyimpan status konfirmasi
   bool _isOrderConfirmed = false;
-
   bool get isOrderConfirmed => _isOrderConfirmed;
 
   // Menyimpan nama pemesan
   String _namaPemesan = '';
   String get namaPemesan => _namaPemesan;
   void setNamaPemesan(String name) {
-    _namaPemesan = name;
-    notifyListeners();
-  }
+  _namaPemesan = name.isEmpty ? '' : name; // Reset nama jika input kosong
+  notifyListeners();
+}
 
   String _currentOrderId = ''; // Field to store the selected order ID 
   String get currentOrderId => _currentOrderId; // Getter for the current order ID
@@ -116,13 +112,16 @@ class AppState extends ChangeNotifier {
     _selectedTable = table;
     notifyListeners(); // Notify listeners of changes
   }
+  void resetSelectedTable() {
+  _selectedTable = '';
+  notifyListeners(); // Pemberitahuan kepada UI
+}
   String getTableForCurrentOrder() {
   final currentOrderId = _currentOrderId;
   
   // Temukan order dengan currentOrderId
   final order = _confirmedOrders
       .firstWhere((order) => order.idOrder == currentOrderId, orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []));
-  
   return order.table; // Kembalikan nilai tabel dari order
 }
 
@@ -135,7 +134,6 @@ class AppState extends ChangeNotifier {
 }
   ListToConfirm _generateOrder(String idOrder) {
     final List<CartItem> allItems = List.from(_cartItems);
-    
     return ListToConfirm(
       idOrder: idOrder,
       namaPemesan: _namaPemesan,
@@ -147,24 +145,42 @@ class AppState extends ChangeNotifier {
   // Metode untuk membuat dan mengonfirmasi order
   void confirmOrder(String idOrder) {
     final ListToConfirm order = _generateOrder(idOrder);
-    
     _confirmedOrders.add(order); // Add the confirmed order to the list
     _isOrderConfirmed = true; // Set order as confirmed
-
     resetCart(); // Clear the cart after confirmation
     notifyListeners(); // Notify listeners that the order has been confirmed
   }
-
-  void createOrder() {
-    final String idOrder = DateTime.now().toIso8601String(); // Generate a unique ID for the order
-    final ListToConfirm order = _generateOrder(idOrder);
-    
-    addOrder(order); // Add the order to the list
-    resetCart(); // Clear the cart after creating the order
-
-    notifyListeners(); // Notify listeners to refresh the UI
-
+  void confirmOrderStatus(String orderId) {
+    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    if (index >= 0) {
+      // Assuming you add a status field to ListToConfirm
+      _confirmedOrders[index] = _confirmedOrders[index].copyWith(status: 'Confirmed');
+      notifyListeners(); // Notify listeners that the status has changed
+    }
   }
+  void createOrder({
+  required TextEditingController guestNameController,
+  required VoidCallback resetDropdown,
+}) async {
+  if (_cartItems.isEmpty || guestNameController.text.isEmpty) {
+    print('Error: Nama pemesan tidak boleh kosong.');
+    return;
+  }
+
+  final String idOrder = DateTime.now().toIso8601String();
+  final ListToConfirm order = _generateOrder(idOrder);
+  addOrder(order);
+  resetCart();
+  resetSelectedTable();
+  guestNameController.clear();
+  setNamaPemesan('');
+
+  await Future.delayed(Duration(milliseconds: 100)); // Tunggu sejenak
+
+  resetDropdown(); // Panggil resetDropdown setelah menunggu
+  notifyListeners();
+}
+
 
   // Menambahkan order yang dikonfirmasi ke dalam list (tidak perlu jika sudah ada `confirmOrder`)
   void addOrder(ListToConfirm order) {
