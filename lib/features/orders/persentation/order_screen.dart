@@ -23,6 +23,8 @@ class _OrderScreenState extends State<OrderScreen> {
   final TextEditingController _guestNameController = TextEditingController();
   String _selectedFilterType = 'All';
   String _searchQuery = '';
+  String? table;
+  String? pickupType;
 
   @override
   void initState() {
@@ -119,7 +121,21 @@ class _OrderScreenState extends State<OrderScreen> {
                     ],
                   ),
                 ),
-                DropdownDeleteSection(),
+                Container(
+                    width: screenWidth - searchbarWidth,
+                    decoration: BoxDecoration(
+                      border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey,
+                            width: 1,
+                          ),
+                          top: BorderSide(
+                            color: Colors.grey,
+                            width: 1,
+                          )),
+                    ),
+                    child: DropdownDeleteSection(
+                    )),
               ],
             ),
             Expanded(
@@ -171,6 +187,13 @@ class _OrderScreenState extends State<OrderScreen> {
                   ActionButton(
                     screenWidth: screenWidth,
                     cart: cart,
+                    guestNameController: _guestNameController,
+                    resetDropdown: () {
+                      setState(() {
+                        table = null;
+                        pickupType = null;
+                      });
+                    },
                   ),
                 ],
               ),

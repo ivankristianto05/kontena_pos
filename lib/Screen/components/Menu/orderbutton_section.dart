@@ -3,17 +3,21 @@ import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';  // Import Provider
+import 'package:provider/provider.dart';
 
 class ActionButton extends StatelessWidget {
   const ActionButton({
     super.key,
     required this.screenWidth,
     required this.cart,
+    required this.guestNameController,
+    required this.resetDropdown,
   });
 
   final double screenWidth;
   final Cart cart;
+  final TextEditingController guestNameController;
+  final VoidCallback resetDropdown;
 
   @override
   Widget build(BuildContext context) {
@@ -21,16 +25,15 @@ class ActionButton extends StatelessWidget {
 
     return Consumer<AppState>(
       builder: (context, appState, child) {
-        // Calculate the number of selected item IDs
         int numberOfSelectedItemIds = cart.items.length;
 
-        // Calculate the total price of all items in the cart
         double totalPrice = cart.items.fold(0.0, (sum, item) {
-          double price = (item.variantPrice != 0) ? item.variantPrice.toDouble() : item.price.toDouble();
+          double price = (item.variantPrice != 0)
+              ? item.variantPrice.toDouble()
+              : item.price.toDouble();
           return sum + price * item.qty;
         });
 
-        // Format the total price to the appropriate currency format
         final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
         String formattedTotalPrice = 'Rp ${currencyFormat.format(totalPrice)}';
 
@@ -41,8 +44,10 @@ class ActionButton extends StatelessWidget {
             color: buttoncolor2,
             textColor: Colors.white,
             onPressed: () {
-              // Call createOrder on AppState, which handles the order creation
-              appState.createOrder(); // Ensure this method is properly defined in AppState
+              appState.createOrder(
+                guestNameController: guestNameController,
+                resetDropdown: resetDropdown,
+              );
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
