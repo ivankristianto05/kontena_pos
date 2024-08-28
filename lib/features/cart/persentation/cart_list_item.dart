@@ -40,17 +40,15 @@ class _CardListItem extends State<CardListItem> {
             height: MediaQuery.of(context).size.height -
                 AppBar().preferredSize.height -
                 MediaQuery.of(context).padding.top -
-                130,
+                165,
             child: ListView.builder(
               itemCount: cartData.length,
               itemBuilder: (context, index) {
                 final itemData = cartData[index];
-                print('itemData addons, ${itemData.preference}');
-                print('itemData addon, ${itemData.qty.runtimeType}');
-                print('itemData addon, ${itemData.price.runtimeType}');
-                // String note = itemData.preference as String;
+
                 String addon2 = '';
                 String catatan = '';
+                String preference = '';
                 totalAddon = 0;
                 List<dynamic> addons = [];
 
@@ -60,9 +58,6 @@ class _CardListItem extends State<CardListItem> {
 
                 if (itemData.addon!.isNotEmpty) {
                   itemData.addon!.forEach((value) {
-                    // print('key, $key');
-                    print('value, ${value['harga'].runtimeType}');
-                    print('value, ${value['qty'].runtimeType}');
                     addons.add({
                       'name': value['nama_menu'],
                       'qty': value['qty'],
@@ -79,6 +74,17 @@ class _CardListItem extends State<CardListItem> {
                   });
                 }
 
+                if (itemData.pref != null) {
+                  int i = 1;
+                  itemData.pref?.forEach((element) {
+                    preference += "${element['type']}: ${element['name']}";
+                    if (i < itemData.pref!.length) {
+                      preference += ", ";
+                    }
+                    i++;
+                  });
+                }
+
                 return Container(
                   child: ListCart(
                     title: "${itemData.name} (${itemData.qty})",
@@ -86,7 +92,7 @@ class _CardListItem extends State<CardListItem> {
                     // addon: addon2,
                     addons: addons,
                     qty: itemData.qty.toString(),
-                    catatan: catatan,
+                    catatan: preference,
                     titleStyle: CustomTextStyles.labelLargeBlack,
                     price: numberFormat('idr', itemData.price),
                     total: numberFormat(

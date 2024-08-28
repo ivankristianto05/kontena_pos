@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/core/utils/number_ui.dart';
 
 class BottomNavigationInvoice extends StatelessWidget {
   final double dataContentWidth;
 
-  const BottomNavigationInvoice({
-    Key? key,
+  Cart cart = Cart();
+
+  BottomNavigationInvoice({
+    super.key,
     required this.dataContentWidth,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    print('total, ${cart.getTotal()}');
     return Row(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -73,7 +78,9 @@ class BottomNavigationInvoice extends StatelessWidget {
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
+                    color: cart.items.isNotEmpty
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.surface,
                   ),
                   child: Padding(
                     padding:
@@ -89,17 +96,36 @@ class BottomNavigationInvoice extends StatelessWidget {
                           children: [
                             Text(
                               'Bayar',
-                              style: theme.textTheme.labelLarge,
+                              style: cart.items.isNotEmpty
+                                  ? TextStyle(
+                                      color: theme.colorScheme.primaryContainer,
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.w600,
+                                    )
+                                  : theme.textTheme.labelLarge,
                             ),
                             Text(
-                              '0 item',
-                              style: theme.textTheme.labelSmall,
+                              '${cart.items.length} item',
+                              style: cart.items.isNotEmpty
+                                  ? TextStyle(
+                                      color: theme.colorScheme.primaryContainer,
+                                    )
+                                  : theme.textTheme.labelSmall,
                             ),
                           ],
                         ),
                         Text(
-                          'IDR 0',
-                          style: theme.textTheme.labelLarge,
+                          numberFormat(
+                            'idr',
+                            cart.getTotal(),
+                          ),
+                          style: cart.items.isNotEmpty
+                              ? TextStyle(
+                                  color: theme.colorScheme.primaryContainer,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w600,
+                                )
+                              : theme.textTheme.labelLarge,
                         ),
                       ],
                     ),

@@ -219,9 +219,6 @@ class Cart {
       });
     }
 
-    // Print the array
-    print(itemDetails);
-
     return itemDetails;
   }
 
@@ -231,5 +228,21 @@ class Cart {
 
   List<CartItem> getAllItemCart() {
     return AppState.cartItem.toList();
+  }
+
+  double getTotal() {
+    double tmp = 0;
+    for (var itm in _items) {
+      double tmpAddon = 0;
+      if (itm.addon != null) {
+        itm.addon?.forEach((element) {
+          tmpAddon += element['qty'] * element['harga'];
+          print('check $element');
+        });
+      }
+      tmp += itm.qty * (itm.price + tmpAddon);
+    }
+    // if ()
+    return tmp.toDouble();
   }
 }

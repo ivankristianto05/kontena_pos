@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:kontena_pos/Screen/components/buttonfilter_section.dart';
-import 'package:kontena_pos/Screen/components/guestinputwithbutton_section.dart';
-import 'package:kontena_pos/Screen/components/dropdown_delete_section.dart';
-import 'package:kontena_pos/Screen/components/itemcart_section.dart';
+import 'package:kontena_pos/Screen/components/Menu/buttonfilter_section.dart';
+import 'package:kontena_pos/Screen/components/Menu/guestinputwithbutton_section.dart';
+import 'package:kontena_pos/Screen/components/Menu/dropdown_delete_section.dart';
+import 'package:kontena_pos/Screen/components/Menu/itemcart_section.dart';
 // import 'package:kontena_pos/Screen/components/itemcart_section.dart';
 import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/app_state.dart';
@@ -30,7 +30,7 @@ class InvoiceScreen extends StatefulWidget {
 
 class _InvoiceScreenState extends State<InvoiceScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late List<ItemCart> cartItem;
+  // late List<ItemCart> cartItem;
   Cart cart = Cart();
   late Map cartRecapData;
   late List<CartItem> cartData;
@@ -257,7 +257,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                           Expanded(
                             child: Container(
                               width: dataContentWidth,
-                              height: 300.0,
+                              height: double.infinity,
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.primaryContainer,
                               ),
@@ -318,6 +318,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           child: AddToCart(dataMenu: item),
         );
       },
-    ).then((value) => {});
+    ).then((value) => {print('check value, $value')});
   }
 }

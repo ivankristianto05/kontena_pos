@@ -18,16 +18,16 @@ class _DropdownCUDState extends State<DropdownCUD> {
 
   @override
   void didChangeDependencies() {
-  super.didChangeDependencies();
-  final appState = Provider.of<AppState>(context, listen: true);
+    super.didChangeDependencies();
+    final appState = Provider.of<AppState>(context, listen: true);
 
-  // Update the table value based on the current selected table from AppState
-  setState(() {
-    table = appState.getTableForCurrentOrder(); // Ambil nilai table untuk currentOrderId
-  });
-}
+    // Update the table value based on the current selected table from AppState
+    setState(() {
+      table = appState
+          .getTableForCurrentOrder(); // Ambil nilai table untuk currentOrderId
+    });
+  }
 
-  
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -35,7 +35,7 @@ class _DropdownCUDState extends State<DropdownCUD> {
 
     // Access AppState and Cart
     final appState = Provider.of<AppState>(context);
-    final cart = Cart(appState, onCartChanged: () => setState(() {}));
+    final cart = Cart(onCartChanged: () => setState(() {}));
 
     // Define table options
     final List<String> tableOptions = <String>[
@@ -55,7 +55,7 @@ class _DropdownCUDState extends State<DropdownCUD> {
     final hasOrderId = appState.currentOrderId.isNotEmpty;
 
     return Container(
-      width: screenWidth *0.2,
+      width: screenWidth * 0.2,
       height: 50,
       alignment: Alignment.topRight,
       child: Row(
@@ -123,7 +123,7 @@ class _DropdownCUDState extends State<DropdownCUD> {
                 child: DropdownButton<String>(
                   isExpanded: true,
                   hint: Text("Table"),
-                  value: table,  // Use the value stored in the state
+                  value: table, // Use the value stored in the state
                   items: hasOrderId
                       ? tableOptions.map((String value) {
                           return DropdownMenuItem<String>(
@@ -144,7 +144,8 @@ class _DropdownCUDState extends State<DropdownCUD> {
                       table = newValue;
                     });
                     if (newValue != null) {
-                      appState.setSelectedTable(newValue); // Save selected table to AppState
+                      appState.setSelectedTable(
+                          newValue); // Save selected table to AppState
                     }
                   },
                   selectedItemBuilder: (BuildContext context) {

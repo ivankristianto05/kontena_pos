@@ -1156,8 +1156,14 @@ class _AddToCartState extends State<AddToCart> {
       addon: addon,
     );
 
-    cart.addItem(newItem, mode: CartMode.add);
+    setState(() {
+      cart.addItem(newItem, mode: CartMode.add);
+    });
 
     Navigator.pop(context);
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.invoiceScreen,
+      (route) => false,
+    );
   }
 }

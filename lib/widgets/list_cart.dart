@@ -66,7 +66,7 @@ class ListCart extends StatelessWidget {
               mainAxisAlignment: mainAxisAlignment,
               crossAxisAlignment: crossAxisAlignment,
               children: [
-                Text(title, style: titleStyle),
+                Text(title, style: theme.textTheme.titleMedium),
                 StyledDivider(
                   height: 15.0,
                   thickness: 2.0,
@@ -83,8 +83,11 @@ class ListCart extends StatelessWidget {
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("${qty}X ${price}"),
-                    Text(total),
+                    Text("${qty}X $price"),
+                    Text(
+                      total,
+                      style: theme.textTheme.bodyMedium,
+                    ),
                   ],
                 ),
                 if (addons.isNotEmpty)
@@ -135,7 +138,25 @@ class ListCart extends StatelessWidget {
                       ],
                     ),
                   ),
-                if (note != null)
+                if (catatan != '')
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 8.0, 0.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Preference:',
+                          style: theme.textTheme.labelSmall,
+                        ),
+                        Text(
+                          catatan,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                if (note != '')
                   Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 8.0, 0.0),
                     child: Column(
