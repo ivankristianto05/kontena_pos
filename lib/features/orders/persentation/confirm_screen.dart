@@ -107,7 +107,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                       ),
                     )
                   ),
-                  child: DropdownCUD()
+                  child: Dropdown()
                   ),
                   Container(
                     child: CUDIconButton(),

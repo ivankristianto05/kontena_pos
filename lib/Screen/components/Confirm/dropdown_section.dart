@@ -5,29 +5,30 @@ import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/constants.dart';
 
-class DropdownCUD extends StatefulWidget {
-  const DropdownCUD({super.key});
+class Dropdown extends StatefulWidget {
+  const Dropdown({super.key});
 
   @override
-  _DropdownCUDState createState() => _DropdownCUDState();
+  _DropdownState createState() => _DropdownState();
 }
 
-class _DropdownCUDState extends State<DropdownCUD> {
+class _DropdownState extends State<Dropdown> {
   String? pickupType;
   String? table;
 
   @override
   void didChangeDependencies() {
-  super.didChangeDependencies();
-  final appState = Provider.of<AppState>(context, listen: true);
+    super.didChangeDependencies();
+    final appState = Provider.of<AppState>(context, listen: true);
 
-  // Update the table value based on the current selected table from AppState
-  setState(() {
-    table = appState.getTableForCurrentOrder(); // Ambil nilai table untuk currentOrderId
-  });
-}
+    // Update the table value based on the current selected table from AppState
+    setState(() {
+      final fetchedTable = appState.getTableForCurrentOrder();
+      // Jika table adalah '', set nilai table menjadi null
+      table = fetchedTable.isNotEmpty ? fetchedTable : null; 
+    });
+  }
 
-  
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -55,7 +56,7 @@ class _DropdownCUDState extends State<DropdownCUD> {
     final hasOrderId = appState.currentOrderId.isNotEmpty;
 
     return Container(
-      width: screenWidth *0.2,
+      width: screenWidth * 0.2,
       height: 50,
       alignment: Alignment.topRight,
       child: Row(
@@ -123,7 +124,7 @@ class _DropdownCUDState extends State<DropdownCUD> {
                 child: DropdownButton<String>(
                   isExpanded: true,
                   hint: Text("Table"),
-                  value: table,  // Use the value stored in the state
+                  value: table, // Use the value stored in the state
                   items: hasOrderId
                       ? tableOptions.map((String value) {
                           return DropdownMenuItem<String>(

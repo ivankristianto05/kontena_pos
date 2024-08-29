@@ -32,10 +32,7 @@ class _ConfirmButtonState extends State<ConfirmButton> {
         textColor: Colors.white,
         onPressed: widget.isEnabled
             ? () {
-                if (orderId.isNotEmpty) {
-                  appState.confirmOrderStatus(orderId); // Update order status
-                  print("Order $orderId confirmed");
-                }
+                
               }
             : null, // Disable button when not enabled
         child: Center(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'core/functions/cart.dart'; // Pastikan ini mengimpor CartItem dari file yang benar
-import 'models/list_to_confirm.dart'; // Pastikan ini mengimpor ListToConfirm dari file yang benar
+import 'core/functions/cart.dart'; // Ensure this correctly imports CartItem from the right file
+import 'models/list_to_confirm.dart'; // Ensure this correctly imports ListToConfirm from the right file
 
 class AppState extends ChangeNotifier {
   static AppState _instance = AppState._internal();
@@ -33,11 +33,11 @@ class AppState extends ChangeNotifier {
     _item = _value;
   }
 
-  // List untuk menyimpan item di cart
+  // List for storing cart items
   List<CartItem> _cartItems = [];
   List<CartItem> get cartItems => _cartItems;
 
-  // Method untuk mengecek apakah item dengan kombinasi idmenu, idvarian, indexpreference, dan indexaddons sudah ada
+  // Method to check if an item with a combination of idmenu, idvarian, indexpreference, and indexaddons already exists
   int findItemIndex(CartItem newItem) {
     return _cartItems.indexWhere((item) =>
       item.id == newItem.id &&
@@ -47,7 +47,7 @@ class AppState extends ChangeNotifier {
     );
   }
 
-  // Menambahkan atau memperbarui item di cart
+  // Add or update item in cart
   void addItemToCart(CartItem newItem) {
     final existingItemIndex = findItemIndex(newItem);
     if (existingItemIndex >= 0) {
@@ -59,11 +59,11 @@ class AppState extends ChangeNotifier {
       existingItem.preference = newItem.preference;
       existingItem.addons = newItem.addons;
       existingItem.variantPrice = newItem.variantPrice;
-      existingItem.totalPrice = existingItem.qty * 
-        (existingItem.variantPrice != 0 ? existingItem.variantPrice : existingItem.price);
-      _cartItems[existingItemIndex] = CartItem.from(existingItem); // Menggunakan salinan item yang diperbarui
+      existingItem.totalPrice = existingItem.qty *
+          (existingItem.variantPrice != 0 ? existingItem.variantPrice : existingItem.price);
+      _cartItems[existingItemIndex] = CartItem.from(existingItem); // Use a copy of the updated item
     } else {
-      _cartItems.add(CartItem.from(newItem)); // Menambahkan item baru dengan salinan
+      _cartItems.add(CartItem.from(newItem)); // Add a new item with a copy
     }
     notifyListeners(); // Notify listeners of changes
   }
@@ -76,62 +76,112 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  // Mengatur ulang cart
+  // Reset cart
   void resetCart() {
     _cartItems = [];
-    notifyListeners(); // Pemberitahuan bahwa cart direset
+    notifyListeners(); // Notify listeners that the cart is reset
   }
 
-
-  // List untuk menyimpan order yang dikonfirmasi
+  // List for storing confirmed orders
   List<ListToConfirm> _confirmedOrders = [];
   List<ListToConfirm> get confirmedOrders => _confirmedOrders;
 
-  // Menyimpan status konfirmasi
+  // Checked items map
+  Map<String, bool> checkedItems = {};
+
+  // Checked status of orders
+  Map<String, bool> orderCheckedStatus = {}; // Initialize the orderCheckedStatus map
+
+  // Initialize checkedItems for new order
+  void initializeCheckedItems(String orderId) {
+    final order = _confirmedOrders.firstWhere(
+      (order) => order.idOrder == orderId,
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
+    );
+    for (var item in order.items) {
+      String uniqueKey = "${orderId}_${item.id}";
+      checkedItems[uniqueKey] = false; // Initialize all items with false (unchecked)
+    }
+  }
+
+  // Check if all items for a specific orderId are checked
+  bool checkAllItemsChecked(String orderId) {
+    final order = _confirmedOrders.firstWhere(
+      (order) => order.idOrder == orderId,
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
+    );
+    if (order.items.isEmpty) return false;
+
+    for (var item in order.items) {
+      String uniqueKey = "${orderId}_${item.id}";
+      if (!checkedItems.containsKey(uniqueKey) || checkedItems[uniqueKey] == false) {
+        return false; // Return false if there is an unchecked item
+      }
+    }
+    return true; // All items are checked
+  }
+
+  // Update the checked status of an order
+  void updateOrderCheckedStatus(String orderId, bool allChecked) {
+    orderCheckedStatus[orderId] = allChecked; // Update the order's checked status
+    notifyListeners();
+  }
+
+  void setCurrentOrderId(String orderId) {
+    _currentOrderId = orderId;
+    initializeCheckedItems(orderId); // Initialize checkedItems for the new order
+    checkAllItemsChecked(orderId); // Check if all items in the new order are checked
+    notifyListeners(); // Notify UI of the change
+  }
+
+  // Store confirmation status
   bool _isOrderConfirmed = false;
   bool get isOrderConfirmed => _isOrderConfirmed;
 
-  // Menyimpan nama pemesan
+  // Store customer name
   String _namaPemesan = '';
   String get namaPemesan => _namaPemesan;
-  void setNamaPemesan(String name) {
-  _namaPemesan = name.isEmpty ? '' : name; // Reset nama jika input kosong
-  notifyListeners();
-}
 
-  String _currentOrderId = ''; // Field to store the selected order ID 
-  String get currentOrderId => _currentOrderId; // Getter for the current order ID
-  void setCurrentOrderId(String orderId) {
-    _currentOrderId = orderId;
-    notifyListeners(); // Notify listeners of changes
+  void setNamaPemesan(String name) {
+    _namaPemesan = name.isEmpty ? '' : name; // Reset name if input is empty
+    notifyListeners();
   }
+
+  String _currentOrderId = ''; // Field to store the selected order ID
+  String get currentOrderId => _currentOrderId; // Getter for the current order ID
 
   String _selectedTable = ''; // Field to store the selected table
   String get selectedTable => _selectedTable;
+
   void setSelectedTable(String table) {
     _selectedTable = table;
     notifyListeners(); // Notify listeners of changes
   }
+
   void resetSelectedTable() {
-  _selectedTable = '';
-  notifyListeners(); // Pemberitahuan kepada UI
-}
+    _selectedTable = '';
+    notifyListeners(); // Notify UI
+  }
+
   String getTableForCurrentOrder() {
-  final currentOrderId = _currentOrderId;
-  
-  // Temukan order dengan currentOrderId
-  final order = _confirmedOrders
-      .firstWhere((order) => order.idOrder == currentOrderId, orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []));
-  return order.table; // Kembalikan nilai tabel dari order
-}
+    final currentOrderId = _currentOrderId;
+
+    // Find the order with currentOrderId
+    final order = _confirmedOrders.firstWhere(
+      (order) => order.idOrder == currentOrderId,
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
+    );
+    return order.table; // Return the table value from the order
+  }
 
   void printConfirmedOrders() {
-  for (var order in _confirmedOrders) {
-    print('Order ID: ${order.idOrder}');
-    print('Nama Pemesan: ${order.namaPemesan}');
-    print('Table: ${order.table}');
+    for (var order in _confirmedOrders) {
+      print('Order ID: ${order.idOrder}');
+      print('Nama Pemesan: ${order.namaPemesan}');
+      print('Table: ${order.table}');
+    }
   }
-}
+
   ListToConfirm _generateOrder(String idOrder) {
     final List<CartItem> allItems = List.from(_cartItems);
     return ListToConfirm(
@@ -142,7 +192,7 @@ class AppState extends ChangeNotifier {
     );
   }
 
-  // Metode untuk membuat dan mengonfirmasi order
+  // Method to create and confirm an order
   void confirmOrder(String idOrder) {
     final ListToConfirm order = _generateOrder(idOrder);
     _confirmedOrders.add(order); // Add the confirmed order to the list
@@ -150,6 +200,7 @@ class AppState extends ChangeNotifier {
     resetCart(); // Clear the cart after confirmation
     notifyListeners(); // Notify listeners that the order has been confirmed
   }
+
   void confirmOrderStatus(String orderId) {
     final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
     if (index >= 0) {
@@ -158,34 +209,34 @@ class AppState extends ChangeNotifier {
       notifyListeners(); // Notify listeners that the status has changed
     }
   }
+
   void createOrder({
-  required TextEditingController guestNameController,
-  required VoidCallback resetDropdown,
-}) async {
-  if (_cartItems.isEmpty || guestNameController.text.isEmpty) {
-    print('Error: Nama pemesan tidak boleh kosong.');
-    return;
+    required TextEditingController guestNameController,
+    required VoidCallback resetDropdown,
+  }) async {
+    if (_cartItems.isEmpty || guestNameController.text.isEmpty) {
+      print('Error: Nama pemesan tidak boleh kosong.');
+      return;
+    }
+
+    final String idOrder = DateTime.now().toIso8601String();
+    final ListToConfirm order = _generateOrder(idOrder);
+    addOrder(order);
+    resetCart();
+    resetSelectedTable();
+    guestNameController.clear();
+    setNamaPemesan('');
+
+    await Future.delayed(Duration(milliseconds: 100)); // Wait a bit
+
+    resetDropdown(); // Call resetDropdown after waiting
+    notifyListeners();
   }
 
-  final String idOrder = DateTime.now().toIso8601String();
-  final ListToConfirm order = _generateOrder(idOrder);
-  addOrder(order);
-  resetCart();
-  resetSelectedTable();
-  guestNameController.clear();
-  setNamaPemesan('');
-
-  await Future.delayed(Duration(milliseconds: 100)); // Tunggu sejenak
-
-  resetDropdown(); // Panggil resetDropdown setelah menunggu
-  notifyListeners();
-}
-
-
-  // Menambahkan order yang dikonfirmasi ke dalam list (tidak perlu jika sudah ada `confirmOrder`)
+  // Add confirmed order to the list
   void addOrder(ListToConfirm order) {
-    _confirmedOrders.add(order); // Tambahkan order ke daftar konfirmasi
-    _isOrderConfirmed = true; // Set order sebagai dikonfirmasi
-    notifyListeners(); // Pemberitahuan bahwa order telah ditambahkan
+    _confirmedOrders.add(order); // Add order to the confirmation list
+    _isOrderConfirmed = true; // Set order as confirmed
+    notifyListeners(); // Notify listeners that the order has been added
   }
 }

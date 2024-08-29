@@ -7,13 +7,13 @@ class ConfirmList extends StatefulWidget {
   final List<ListToConfirm> listToConfirm;
   final double screenWidth;
   final AppState appState;
-  final ValueChanged<bool>? onAllChecked; // Optional, based on the first code
+  final ValueChanged<bool>? onAllChecked;
 
   ConfirmList({
     required this.listToConfirm,
     required this.screenWidth,
     required this.appState,
-    this.onAllChecked, // Optional
+    this.onAllChecked,
   });
 
   @override
@@ -21,37 +21,56 @@ class ConfirmList extends StatefulWidget {
 }
 
 class _ConfirmListState extends State<ConfirmList> {
-  // Map to hold the checked status of each item
   Map<String, bool> checkedItems = {};
 
   @override
   void initState() {
     super.initState();
-    // Initialize the checkedItems map based on the items in the list
+    initializeCheckedItems();
+  }
+
+  @override
+  void didUpdateWidget(covariant ConfirmList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.appState.currentOrderId != oldWidget.appState.currentOrderId) {
+      initializeCheckedItems(); // Reinitialize items when switching order IDs
+      _checkAllCheckedStatus(); // Automatically check all items' status
+    }
+  }
+
+  // Initialize checked items for the current order
+  void initializeCheckedItems() {
+    checkedItems.clear(); // Clear existing checked items map
     for (var order in widget.listToConfirm) {
-      for (var item in order.items) {
-        checkedItems[item.id] = false; // Assume each item has a unique ID
+      if (order.idOrder == widget.appState.currentOrderId) {
+        for (var item in order.items) {
+          // Use a unique identifier combining order ID and item ID
+          String uniqueKey = "${order.idOrder}_${item.id}";
+          checkedItems[uniqueKey] = false;
+        }
       }
     }
   }
 
- void _checkAllCheckedStatus() {
-  final currentOrderId = widget.appState.currentOrderId;
-  
-  // Filter items to only check those in the current order
-  final filteredItems = widget.listToConfirm
-      .where((order) => order.idOrder == currentOrderId)
-      .expand((order) => order.items)
-      .toList();
+  void _checkAllCheckedStatus() {
+    final currentOrderId = widget.appState.currentOrderId;
+    final filteredItems = widget.listToConfirm
+        .where((order) => order.idOrder == currentOrderId)
+        .expand((order) => order.items)
+        .toList();
 
-  // Check if all items in the current order are checked
-  bool allChecked = filteredItems.every((item) => checkedItems[item.id] == true);
+    bool allChecked = filteredItems.every((item) {
+      String uniqueKey = "${currentOrderId}_${item.id}";
+      return checkedItems[uniqueKey] == true;
+    });
 
-  print("All Checked: $allChecked");
-  if (widget.onAllChecked != null) {
-    widget.onAllChecked!(allChecked);
+    // Update AppState with whether all items are checked for this order
+    widget.appState.updateOrderCheckedStatus(currentOrderId, allChecked);
+
+    if (widget.onAllChecked != null) {
+      widget.onAllChecked!(allChecked);
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -103,16 +122,17 @@ class _ConfirmListState extends State<ConfirmList> {
                                 ),
                               ),
                               Checkbox(
-                                value: checkedItems[listItem.items[i].id] ??
+                                value: checkedItems[
+                                        "${listItem.idOrder}_${listItem.items[i].id}"] ??
                                     false,
                                 onChanged: (bool? value) {
                                   setState(() {
-                                    checkedItems[listItem.items[i].id] =
+                                    checkedItems[
+                                            "${listItem.idOrder}_${listItem.items[i].id}"] =
                                         value ?? false;
-                                    _checkAllCheckedStatus(); // Check status after any change
+                                    _checkAllCheckedStatus();
                                   });
-                                    print("Checked Items: $checkedItems");
-
+                                  print("Checked Items: $checkedItems");
                                 },
                               ),
                             ],
@@ -137,55 +157,31 @@ class _ConfirmListState extends State<ConfirmList> {
                         SizedBox(height: 4),
                         if (listItem.items[i].addons != null &&
                             listItem.items[i].addons!.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Addons:',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              ...listItem.items[i].addons!.entries
-                                  .where((addon) =>
-                                      addon.value['selected'] == true)
-                                  .map((addon) => Text('${addon.key}',
-                                      style: TextStyle(fontSize: 14))),
-                            ],
-                          ),
-                        if (listItem.items[i].preference['preference'] !=
-                                null &&
-                            listItem.items[i].preference['preference']!
-                                .isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Preference:',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                  listItem.items[i].preference['preference']!,
-                                  style: TextStyle(fontSize: 14)),
-                            ],
+                          Text(
+                            'Addons: ${listItem.items[i].addons!.keys.join(', ')}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                            ),
                           ),
                         if (listItem.items[i].notes.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Notes:',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Text(listItem.items[i].notes,
-                                  style: TextStyle(fontSize: 14)),
-                            ],
+                          Text(
+                            'Notes: ${listItem.items[i].notes}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                            ),
                           ),
-                      ],
+                        if (listItem.items[i].preference.isNotEmpty)
+                          Text(
+                            'Preference: ${listItem.items[i].preference.values.join(', ')}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        SizedBox(height: 4),
+                      ]
                     ],
                   ),
                 );
