@@ -4,25 +4,24 @@ import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 
 class BottomNavigationInvoice extends StatelessWidget {
-  final double dataContentWidth;
+  // final double contentHeight;
 
   Cart cart = Cart();
 
   BottomNavigationInvoice({
     super.key,
-    required this.dataContentWidth,
+    // required this.contentHeight,
   });
 
   @override
   Widget build(BuildContext context) {
-    print('total, ${cart.getTotal()}');
     return Row(
       mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Container(
-            height: MediaQuery.sizeOf(context).height * 0.07,
+            height: MediaQuery.sizeOf(context).width * 0.07,
             decoration: BoxDecoration(
               color: theme.colorScheme.secondaryContainer,
               border: Border.all(
@@ -50,7 +49,7 @@ class BottomNavigationInvoice extends StatelessWidget {
         ),
         Expanded(
           child: Container(
-            height: MediaQuery.sizeOf(context).height * 0.07,
+            height: MediaQuery.sizeOf(context).width * 0.07,
             decoration: BoxDecoration(
               color: theme.colorScheme.primaryContainer,
             ),
@@ -67,8 +66,8 @@ class BottomNavigationInvoice extends StatelessWidget {
           ),
         ),
         Container(
-          width: dataContentWidth,
-          height: MediaQuery.sizeOf(context).height * 0.07,
+          width: MediaQuery.sizeOf(context).width * 0.25,
+          height: MediaQuery.sizeOf(context).width * 0.07,
           decoration: BoxDecoration(
             color: Colors.transparent,
           ),

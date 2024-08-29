@@ -17,6 +17,7 @@ import 'package:kontena_pos/widgets/card_item.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
 import 'package:kontena_pos/widgets/empty_cart.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
+import 'package:kontena_pos/widgets/type_transaction.dart';
 // import 'package:kontena_pos/models/cart_item.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
@@ -102,12 +103,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double searchbarWidth = screenWidth * 0.65;
     double smallButtonWidth = screenWidth * 0.05;
     double buttonWidth = screenWidth * 0.15;
     double dataContentWidth = MediaQuery.sizeOf(context).width * 0.25;
-    bool isWideScreen = screenWidth > 800;
-    int crossAxisCount = isWideScreen ? 5 : 2;
 
     return Scaffold(
       key: scaffoldKey,
@@ -250,9 +248,77 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               hintText: "Input guest name",
                             ),
                           ),
-                          SizedBox(
-                            width: dataContentWidth,
-                            child: const DropdownDeleteSection(),
+                          Expanded(
+                            child: Container(
+                              width: MediaQuery.sizeOf(context).width * 0.25,
+                              height: 400.0,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primaryContainer,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Expanded(
+                                        child: InkWell(
+                                          splashColor: Colors.transparent,
+                                          focusColor: Colors.transparent,
+                                          hoverColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
+                                          onTap: () {
+                                            onTapTypeTransaction(context);
+                                          },
+                                          child: Container(
+                                            height: MediaQuery.sizeOf(context)
+                                                    .height *
+                                                0.06,
+                                            decoration: BoxDecoration(
+                                              color: theme.colorScheme.primaryContainer,
+                                              border: Border(
+                                                bottom: BorderSide(
+                                                  color: theme.colorScheme.surface,
+                                                  width: 0.5,
+                                                ),
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(
+                                                      8.0, 0.0, 8.0, 0.0),
+                                              child: Row(
+                                                mainAxisSize:
+                                                    MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    'Pilih Jenis Transaksi',
+                                                    style: theme.textTheme.labelMedium,
+                                                  ),
+                                                  Icon(
+                                                    Icons
+                                                        .keyboard_arrow_down_rounded,
+                                                    color: theme.colorScheme.outline,
+                                                    size: 24.0,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                           Expanded(
                             child: Container(
@@ -281,13 +347,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             ),
             Container(
               width: double.infinity,
-              height: 60.0,
+              height: MediaQuery.sizeOf(context).height * 0.07,
               decoration: BoxDecoration(
-                color: theme.colorScheme.onBackground,
+                color: Colors.transparent,
               ),
-              child: BottomNavigationInvoice(
-                dataContentWidth: dataContentWidth,
-              ),
+              child: BottomNavigationInvoice(),
             ),
           ],
         ),
@@ -316,6 +380,29 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           //   onAddToCart: (item) {},
           // ),
           child: AddToCart(dataMenu: item),
+        );
+      },
+    ).then((value) => {print('check value, $value')});
+  }
+
+  void onTapTypeTransaction(BuildContext context) async {
+   showModalBottomSheet(
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: const Color(0x8A000000),
+      barrierColor: const Color(0x00000000),
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: MediaQuery.viewInsetsOf(context),
+          // child: ItemDetailsDialog(
+          //   name: item['nama_menu'],
+          //   price: int.parse(item['harga'].toString()),
+          //   idMenu: item['id_menu'],
+          //   type: item['type'],
+          //   onAddToCart: (item) {},
+          // ),
+          child: TypeTransaction(),
         );
       },
     ).then((value) => {print('check value, $value')});

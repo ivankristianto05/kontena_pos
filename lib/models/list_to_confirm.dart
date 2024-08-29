@@ -33,7 +33,7 @@ class ListToConfirm {
       'namaPemesan': namaPemesan,
       'table': table,
       // 'items': items.map((item) => item.toMap()).toList(),
-      'items': items.map((item) => item.toMap()).toList(),
+      // 'items': items.map((item) => item.toMap()).toList(),
       'status': status, // Include status in the map
     };
   }

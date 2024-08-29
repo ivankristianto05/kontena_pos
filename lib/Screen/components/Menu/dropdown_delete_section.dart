@@ -29,7 +29,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
       height: 50,
       alignment: Alignment.centerRight,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
             width: screenWidth * 0.20,
@@ -53,12 +53,10 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                   ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Center(
-                        child: Text(
+                      child: Text(
                           value,
                           style: TextStyle(fontWeight: FontWeight.normal),
                         ),
-                      ),
                     );
                   }).toList(),
                   onChanged: (String? newValue) {

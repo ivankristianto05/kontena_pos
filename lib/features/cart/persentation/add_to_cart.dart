@@ -557,7 +557,7 @@ class _AddToCartState extends State<AddToCart> {
                                             padding: const EdgeInsetsDirectional
                                                 .fromSTEB(0.0, 8.0, 0.0, 16.0),
                                             child: _buildAddonSection(
-                                                context, addonDisplay)),
+                                                context, addonDisplay,)),
                                       ],
                                     ),
                                   ),
@@ -887,10 +887,7 @@ class _AddToCartState extends State<AddToCart> {
 
   // widget preference
   void selctedPref(BuildContext context, int index, dynamic data) {
-    print('check, ${data['id']} ${selectedPref.contains(data)}');
     dynamic tmp = data['type'];
-    print('check--, ${selectedPref.contains(tmp)}');
-    print('check==, ${checkSameField(selectedPref, 'type', data['type'])}');
     dynamic sameData = checkSameField(selectedPref, 'type', data['type']);
     if (selectedPref.contains(data) == false) {
       if (sameData != null) {
@@ -902,7 +899,6 @@ class _AddToCartState extends State<AddToCart> {
         selectedPref.add(data);
       });
     } else {
-      // dynamic tmp = prefDisplay[index];
       setState(() {
         selectedPref.remove(data);
       });
@@ -911,12 +907,12 @@ class _AddToCartState extends State<AddToCart> {
 
   dynamic checkSameField(List<dynamic> data, String field, String value) {
     dynamic tmp;
-    data.forEach((element) {
+    for (var element in data) {
       if (element[field] == value) {
         tmp = element;
       }
-    });
-    // return element;
+    }
+  
     return tmp;
   }
 
@@ -1024,13 +1020,13 @@ class _AddToCartState extends State<AddToCart> {
               maxLines: 1,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 3.h,
-                vertical: 9.v,
+                vertical: 13.v,
               ),
               borderDecoration: OutlineInputBorder(
                 borderRadius: BorderRadius.zero,
                 borderSide: BorderSide(
                   color: theme.colorScheme.surface,
-                  width: 0,
+                  width: 1,
                 ),
               ),
               hintText: "Qty",
@@ -1056,6 +1052,7 @@ class _AddToCartState extends State<AddToCart> {
         height: size ?? 34,
         decoration: BoxDecoration(
           color: theme.colorScheme.secondaryContainer,
+          border: Border.all(width: 0.0, color: Colors.transparent,),
         ),
         child: Icon(
           icon,
@@ -1080,18 +1077,17 @@ class _AddToCartState extends State<AddToCart> {
   }
 
   Widget _buildQtySection(BuildContext context) {
-    // qtyController.text = qty.toString();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildQuantityButton(
-              context, Icons.remove, () => qtyChange('minus'), 45.0),
+              context, Icons.remove, () => qtyChange('minus'), 36.0,),
           // Expanded(
           Container(
-            // height: 50,
-            width: 150,
+            // height: 50.0,
+            width: MediaQuery.sizeOf(context).width * 0.08,
             // constraints: BoxConstraints(minWidth: 40),
             color: theme.colorScheme.surface,
             child: CustomTextFormField(
@@ -1099,13 +1095,13 @@ class _AddToCartState extends State<AddToCart> {
               maxLines: 1,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 3.h,
-                vertical: 12.v,
+                vertical: 13.v,
               ),
               borderDecoration: OutlineInputBorder(
                 borderRadius: BorderRadius.zero,
                 borderSide: BorderSide(
                   color: theme.colorScheme.surface,
-                  width: 0,
+                  width: 1,
                 ),
               ),
               hintText: "Qty",
@@ -1118,7 +1114,7 @@ class _AddToCartState extends State<AddToCart> {
           ),
 
           _buildQuantityButton(
-              context, Icons.add, () => qtyChange('add'), 45.0),
+              context, Icons.add, () => qtyChange('add'), 36.0,),
         ],
       ),
     );
