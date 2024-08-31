@@ -7,13 +7,13 @@ class ConfirmList extends StatefulWidget {
   final List<ListToConfirm> listToConfirm;
   final double screenWidth;
   final AppState appState;
-  final ValueChanged<bool>? onAllChecked;
+  final ValueChanged<bool>? onAllChecked; // Optional, based on the first code
 
   ConfirmList({
     required this.listToConfirm,
     required this.screenWidth,
     required this.appState,
-    this.onAllChecked,
+    this.onAllChecked, // Optional
   });
 
   @override
@@ -26,46 +26,28 @@ class _ConfirmListState extends State<ConfirmList> {
   @override
   void initState() {
     super.initState();
-    initializeCheckedItems();
-  }
-
-  @override
-  void didUpdateWidget(covariant ConfirmList oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.appState.currentOrderId != oldWidget.appState.currentOrderId) {
-      initializeCheckedItems(); // Reinitialize items when switching order IDs
-      _checkAllCheckedStatus(); // Automatically check all items' status
-    }
-  }
-
-  // Initialize checked items for the current order
-  void initializeCheckedItems() {
-    checkedItems.clear(); // Clear existing checked items map
     for (var order in widget.listToConfirm) {
-      if (order.idOrder == widget.appState.currentOrderId) {
-        for (var item in order.items) {
-          // Use a unique identifier combining order ID and item ID
-          String uniqueKey = "${order.idOrder}_${item.id}";
-          checkedItems[uniqueKey] = false;
-        }
+      for (var item in order.items) {
+        checkedItems[item.id] = false;
       }
     }
   }
 
   void _checkAllCheckedStatus() {
     final currentOrderId = widget.appState.currentOrderId;
+
     final filteredItems = widget.listToConfirm
         .where((order) => order.idOrder == currentOrderId)
         .expand((order) => order.items)
         .toList();
 
-    bool allChecked = filteredItems.every((item) {
-      String uniqueKey = "${currentOrderId}_${item.id}";
-      return checkedItems[uniqueKey] == true;
-    });
+    bool allChecked = filteredItems.every((item) => checkedItems[item.id] == true);
 
-    // Update AppState with whether all items are checked for this order
-    widget.appState.updateOrderCheckedStatus(currentOrderId, allChecked);
+    if (allChecked) {
+      widget.appState.addFullyCheckedOrder(currentOrderId);
+    } else {
+      widget.appState.removeFullyCheckedOrder(currentOrderId);
+    }
 
     if (widget.onAllChecked != null) {
       widget.onAllChecked!(allChecked);
@@ -122,17 +104,12 @@ class _ConfirmListState extends State<ConfirmList> {
                                 ),
                               ),
                               Checkbox(
-                                value: checkedItems[
-                                        "${listItem.idOrder}_${listItem.items[i].id}"] ??
-                                    false,
+                                value: checkedItems[listItem.items[i].id] ?? false,
                                 onChanged: (bool? value) {
                                   setState(() {
-                                    checkedItems[
-                                            "${listItem.idOrder}_${listItem.items[i].id}"] =
-                                        value ?? false;
+                                    checkedItems[listItem.items[i].id] = value ?? false;
                                     _checkAllCheckedStatus();
                                   });
-                                  print("Checked Items: $checkedItems");
                                 },
                               ),
                             ],
@@ -157,31 +134,55 @@ class _ConfirmListState extends State<ConfirmList> {
                         SizedBox(height: 4),
                         if (listItem.items[i].addons != null &&
                             listItem.items[i].addons!.isNotEmpty)
-                          Text(
-                            'Addons: ${listItem.items[i].addons!.keys.join(', ')}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[700],
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Addons:',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              ...listItem.items[i].addons!.entries
+                                  .where((addon) =>
+                                      addon.value['selected'] == true)
+                                  .map((addon) => Text('${addon.key}',
+                                      style: TextStyle(fontSize: 14))),
+                            ],
+                          ),
+                        if (listItem.items[i].preference['preference'] !=
+                                null &&
+                            listItem.items[i].preference['preference']!
+                                .isNotEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Preference:',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                  listItem.items[i].preference['preference']!,
+                                  style: TextStyle(fontSize: 14)),
+                            ],
                           ),
                         if (listItem.items[i].notes.isNotEmpty)
-                          Text(
-                            'Notes: ${listItem.items[i].notes}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[700],
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Notes:',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Text(listItem.items[i].notes,
+                                  style: TextStyle(fontSize: 14)),
+                            ],
                           ),
-                        if (listItem.items[i].preference.isNotEmpty)
-                          Text(
-                            'Preference: ${listItem.items[i].preference.values.join(', ')}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                        SizedBox(height: 4),
-                      ]
+                      ],
                     ],
                   ),
                 );

@@ -129,13 +129,13 @@ class TextThemes {
         ),
         labelMedium: TextStyle(
           color: appTheme.gray500,
-          fontSize: 13.0,
+          fontSize: 14.0,
           fontFamily: 'Urbanist',
           fontWeight: FontWeight.w700,
         ),
         labelSmall: TextStyle(
           color: appTheme.gray500,
-          fontSize: 11.0,
+          fontSize: 12.0,
           fontFamily: 'Urbanist',
           fontWeight: FontWeight.w700,
         ),
@@ -179,6 +179,7 @@ class ColorSchemes {
     // On colors(text colors)
     onPrimary: Color(0XFF222831),
     onPrimaryContainer: Color(0XFFF81E01),
+    outline: Color(0XFF9E9E9E),
   );
 }
 

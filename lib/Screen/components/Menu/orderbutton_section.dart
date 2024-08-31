@@ -3,6 +3,7 @@ import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:intl/intl.dart';
+import 'package:kontena_pos/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 
 class ActionButton extends StatelessWidget {
@@ -43,10 +44,17 @@ class ActionButton extends StatelessWidget {
           child: MaterialButton(
             color: buttoncolor2,
             textColor: Colors.white,
-            onPressed: () {
-              appState.createOrder(
+            onPressed: () async {
+              await appState.createOrder(
                 guestNameController: guestNameController,
                 resetDropdown: resetDropdown,
+                onSuccess: () {
+                  // Navigate back to the OrderScreen immediately after order creation
+                  Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.orderScreen,
+                  );
+                },
               );
             },
             child: Row(

@@ -81,7 +81,7 @@ class _ConfirmCardState extends State<ConfirmCard> {
                               ),
                             ),
                             Text(
-                              order.status,
+                              order.status, // Display the order's status
                               style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 12,
@@ -158,7 +158,7 @@ class _ConfirmCardState extends State<ConfirmCard> {
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Text(
-                            "19:25", // Replace with actual time
+                            "19:25", // Replace with actual time if available
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[700],

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
-import 'package:provider/provider.dart';
-import 'package:kontena_pos/constants.dart';
 
 class Dropdown extends StatefulWidget {
   const Dropdown({super.key});

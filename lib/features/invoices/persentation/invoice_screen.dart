@@ -1,9 +1,9 @@
 // import 'package:flutter/material.dart';
 // import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-// import 'package:kontena_pos/Screen/components/buttonfilter_section.dart';
-// import 'package:kontena_pos/Screen/components/guestinputwithbutton_section.dart';
-// import 'package:kontena_pos/Screen/components/dropdown_delete_section.dart';
-// import 'package:kontena_pos/Screen/components/itemcart_section.dart';
+// import 'package:kontena_pos/Screen/components/Menu/buttonfilter_section.dart';
+// import 'package:kontena_pos/Screen/components/Menu/guestinputwithbutton_section.dart';
+// import 'package:kontena_pos/Screen/components/Menu/dropdown_delete_section.dart';
+// import 'package:kontena_pos/Screen/components/Menu/itemcart_section.dart';
 // // import 'package:kontena_pos/Screen/components/itemcart_section.dart';
 // import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 // import 'package:kontena_pos/app_state.dart';
@@ -17,6 +17,7 @@
 // import 'package:kontena_pos/widgets/custom_text_form_field.dart';
 // import 'package:kontena_pos/widgets/empty_cart.dart';
 // import 'package:kontena_pos/widgets/top_bar.dart';
+// import 'package:kontena_pos/widgets/type_transaction.dart';
 // // import 'package:kontena_pos/models/cart_item.dart';
 // import 'package:skeletonizer/skeletonizer.dart';
 // import 'package:kontena_pos/core/functions/cart.dart';
@@ -30,8 +31,8 @@
 
 // class _InvoiceScreenState extends State<InvoiceScreen> {
 //   final scaffoldKey = GlobalKey<ScaffoldState>();
-//   late List<ItemCart> cartItem;
-//   Cart cart = Cart(AppState());
+//   // late List<ItemCart> cartItem;
+//   Cart cart = Cart();
 //   late Map cartRecapData;
 //   late List<CartItem> cartData;
 //   late List<Map<String, dynamic>> cartDataItem = [
@@ -49,22 +50,22 @@
 //   List<dynamic> itemDisplay = [];
 //   String searchItemQuery = '';
 
-// // //   //  final String id;
-// // //   // final String name;
-// // //   // String? variant;
-// // //   // int qty;
-// // //   // final int price;
-// // //   // late int totalPrice;
-// // //   // Map<String, Map<String, dynamic>>? addons;
-// // //   // final String notes;
-// // //   // final Map<String, String> preference;
-// // //   // String? type;
+// // // //   //  final String id;
+// // // //   // final String name;
+// // // //   // String? variant;
+// // // //   // int qty;
+// // // //   // final int price;
+// // // //   // late int totalPrice;
+// // // //   // Map<String, Map<String, dynamic>>? addons;
+// // // //   // final String notes;
+// // // //   // final Map<String, String> preference;
+// // // //   // String? type;
 
 //   @override
 //   void initState() {
 //     super.initState();
 //     // cartData = cart.getAllItemCart();
-//     cartData = [];
+//     cartData = cart.getAllItemCart();
 
 //     Future.delayed(Duration(milliseconds: 300), () {
 //       setState(() {
@@ -102,12 +103,9 @@
 //   @override
 //   Widget build(BuildContext context) {
 //     double screenWidth = MediaQuery.of(context).size.width;
-//     double searchbarWidth = screenWidth * 0.65;
 //     double smallButtonWidth = screenWidth * 0.05;
 //     double buttonWidth = screenWidth * 0.15;
 //     double dataContentWidth = MediaQuery.sizeOf(context).width * 0.25;
-//     bool isWideScreen = screenWidth > 800;
-//     int crossAxisCount = isWideScreen ? 5 : 2;
 
 //     return Scaffold(
 //       key: scaffoldKey,
@@ -231,21 +229,29 @@
 //                             decoration: BoxDecoration(
 //                               color: theme.colorScheme.primaryContainer,
 //                             ),
-//                             child: GuestInputWithButton(
-//                               screenWidth: screenWidth * 0.3,
-//                               guestNameController: enterGuestNameController,
-//                               smallButtonWidth: smallButtonWidth,
-//                               // searchbarWidth: 10,
+//                             child: CustomTextFormField(
+//                               controller: enterGuestNameController,
+//                               // focusNode: inputSearchVarian,
+//                               maxLines: 1,
+//                               // contentPadding: EdgeInsets.symmetric(
+//                               //   horizontal: 3.h,
+//                               //   vertical: 9.v,
+//                               // ),
+
+//                               borderDecoration: OutlineInputBorder(
+//                                 borderRadius: BorderRadius.circular(0.h),
+//                                 borderSide: BorderSide(
+//                                   color: theme.colorScheme.surface,
+//                                   width: 0,
+//                                 ),
+//                               ),
+//                               hintText: "Input guest name",
 //                             ),
-//                           ),
-//                           SizedBox(
-//                             width: dataContentWidth,
-//                             child: const DropdownDeleteSection(),
 //                           ),
 //                           Expanded(
 //                             child: Container(
-//                               width: dataContentWidth,
-//                               height: 300.0,
+//                               width: MediaQuery.sizeOf(context).width * 0.25,
+//                               height: 400.0,
 //                               decoration: BoxDecoration(
 //                                 color: theme.colorScheme.primaryContainer,
 //                               ),
@@ -254,10 +260,79 @@
 //                                 mainAxisAlignment: MainAxisAlignment.start,
 //                                 crossAxisAlignment: CrossAxisAlignment.center,
 //                                 children: [
-//                                   if (cartData.isNotEmpty)
-//                                     CardListItem(
-//                                       cartData: cartData,
-//                                     ),
+//                                   Row(
+//                                     mainAxisSize: MainAxisSize.max,
+//                                     children: [
+//                                       Expanded(
+//                                         child: InkWell(
+//                                           splashColor: Colors.transparent,
+//                                           focusColor: Colors.transparent,
+//                                           hoverColor: Colors.transparent,
+//                                           highlightColor: Colors.transparent,
+//                                           onTap: () {
+//                                             onTapTypeTransaction(context);
+//                                           },
+//                                           child: Container(
+//                                             height: MediaQuery.sizeOf(context)
+//                                                     .height *
+//                                                 0.06,
+//                                             decoration: BoxDecoration(
+//                                               color: theme.colorScheme.primaryContainer,
+//                                               border: Border(
+//                                                 bottom: BorderSide(
+//                                                   color: theme.colorScheme.surface,
+//                                                   width: 0.5,
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                             child: Padding(
+//                                               padding: EdgeInsetsDirectional
+//                                                   .fromSTEB(
+//                                                       8.0, 0.0, 8.0, 0.0),
+//                                               child: Row(
+//                                                 mainAxisSize:
+//                                                     MainAxisSize.max,
+//                                                 mainAxisAlignment:
+//                                                     MainAxisAlignment
+//                                                         .spaceBetween,
+//                                                 crossAxisAlignment:
+//                                                     CrossAxisAlignment.center,
+//                                                 children: [
+//                                                   Text(
+//                                                     'Pilih Jenis Transaksi',
+//                                                     style: theme.textTheme.labelMedium,
+//                                                   ),
+//                                                   Icon(
+//                                                     Icons
+//                                                         .keyboard_arrow_down_rounded,
+//                                                     color: theme.colorScheme.outline,
+//                                                     size: 24.0,
+//                                                   ),
+//                                                 ],
+//                                               ),
+//                                             ),
+//                                           ),
+//                                         ),
+//                                       )
+//                                     ],
+//                                   ),
+//                                 ],
+//                               ),
+//                             ),
+//                           ),
+//                           Expanded(
+//                             child: Container(
+//                               width: dataContentWidth,
+//                               height: double.infinity,
+//                               decoration: BoxDecoration(
+//                                 color: theme.colorScheme.primaryContainer,
+//                               ),
+//                               child: Column(
+//                                 mainAxisSize: MainAxisSize.max,
+//                                 mainAxisAlignment: MainAxisAlignment.start,
+//                                 crossAxisAlignment: CrossAxisAlignment.center,
+//                                 children: [
+//                                   if (cartData.isNotEmpty) CardListItem(),
 //                                   if (cartData.isEmpty) EmptyCart()
 //                                 ],
 //                               ),
@@ -272,13 +347,11 @@
 //             ),
 //             Container(
 //               width: double.infinity,
-//               height: 60.0,
+//               height: MediaQuery.sizeOf(context).height * 0.07,
 //               decoration: BoxDecoration(
-//                 color: theme.colorScheme.onBackground,
+//                 color: Colors.transparent,
 //               ),
-//               child: BottomNavigationInvoice(
-//                 dataContentWidth: dataContentWidth,
-//               ),
+//               child: BottomNavigationInvoice(),
 //             ),
 //           ],
 //         ),
@@ -309,195 +382,29 @@
 //           child: AddToCart(dataMenu: item),
 //         );
 //       },
-//     ).then((value) => {});
+//     ).then((value) => {print('check value, $value')});
+//   }
+
+//   void onTapTypeTransaction(BuildContext context) async {
+//    showModalBottomSheet(
+//       isScrollControlled: true,
+//       enableDrag: false,
+//       backgroundColor: const Color(0x8A000000),
+//       barrierColor: const Color(0x00000000),
+//       context: context,
+//       builder: (context) {
+//         return Padding(
+//           padding: MediaQuery.viewInsetsOf(context),
+//           // child: ItemDetailsDialog(
+//           //   name: item['nama_menu'],
+//           //   price: int.parse(item['harga'].toString()),
+//           //   idMenu: item['id_menu'],
+//           //   type: item['type'],
+//           //   onAddToCart: (item) {},
+//           // ),
+//           child: TypeTransaction(),
+//         );
+//       },
+//     ).then((value) => {print('check value, $value')});
 //   }
 // }
-// // =======
-// //     return Scaffold(
-// //       key: scaffoldKey,
-// //       backgroundColor: theme.colorScheme.background,
-// //       body: SafeArea(
-// //         top: false,
-// //         child: Column(
-// //           children: [
-// //             Container(
-// //               width: double.infinity,
-// //               height: 45.0,
-// //               decoration: BoxDecoration(
-// //                 color: theme.colorScheme.onBackground,
-// //               ),
-// //               child: TopBar(
-// //                 smallButtonWidth: smallButtonWidth,
-// //                 buttonWidth: buttonWidth,
-// //                 isWideScreen: true,
-// //               ),
-// //             ),
-// //             Expanded(
-// //               child: Stack(
-// //                 children: [
-// //                   Row(
-// //                     mainAxisSize: MainAxisSize.max,
-// //                     // crossAxisAlignment: CrossAxisAlignment.left,
-// //                     children: [
-// //                       Expanded(
-// //                         child: Stack(
-// //                           children: [
-// //                             Searchbar(
-// //                               screenWidth: MediaQuery.sizeOf(context).width,
-// //                               onSearchChanged: (val) => {filterSearch = val},
-// //                             ),
-// //                             Padding(
-// //                               padding: const EdgeInsetsDirectional.fromSTEB(
-// //                                   8.0, 55.0, 8.0, 0.0),
-// //                               child: ButtonFilter(
-// //                                 onFilterSelected: (String type) {},
-// //                               ),
-// //                             ),
-// //                             Padding(
-// //                               padding: const EdgeInsetsDirectional.fromSTEB(
-// //                                   8.0, 120.0, 8.0, 0.0),
-// //                               child: Align(
-// //                                 alignment:
-// //                                     const AlignmentDirectional(0.00, 0.00),
-// //                                 // child: ProductGrid(
-// //                                 //   items: ListMenu,
-// //                                 //   onTap: () async {
-// //                                 //     await showModalBottomSheet(
-// //                                 //       isScrollControlled: true,
-// //                                 //       enableDrag: false,
-// //                                 //       backgroundColor: Color(0x8A000000),
-// //                                 //       barrierColor: Color(0x00000000),
-// //                                 //       context: context,
-// //                                 //       builder: (context) {
-// //                                 //         return Padding(
-// //                                 //           padding:
-// //                                 //               MediaQuery.viewInsetsOf(context),
-// //                                 //           child: AddToCart(),
-// //                                 //         );
-// //                                 //       },
-// //                                 //     ).then((value) => (value) {
-// //                                 //           print('value, ${value}');
-// //                                 //         });
-// //                                 //   },
-// //                                 // ),
-// //                                 child: SingleChildScrollView(
-// //                                     child: (isLoading == false &&
-// //                                             itemDisplay.isEmpty)
-// //                                         ? Container()
-// //                                         //       : Column(
-// //                                         //           children: [
-// //                                         //             GridView.builder(
-// //                                         //               gridDelegate:
-// //                                         //                   SliverGridDelegateWithFixedCrossAxisCount(
-// //                                         //                 crossAxisCount: crossAxisCount,
-// //                                         //                 crossAxisSpacing: 8.0,
-// //                                         //                 mainAxisSpacing: 8.0,
-// //                                         //               ),
-// //                                         //               itemCount: itemDisplay.length,
-// //                                         //               itemBuilder: ((context, index) {
-// //                                         //                 print(
-// //                                         //                     'item display --, ${itemDisplay.length}');
-// //                                         //                 if (isLoading) {
-// //                                         //                   print('item 1');
-// //                                         //                   return Skeletonizer(
-// //                                         //                     enabled: isLoading,
-// //                                         //                     child: const ProductGrid(),
-// //                                         //                   );
-// //                                         //                 } else {
-// //                                         //                   print('item 2');
-// //                                         //                   Map<String, dynamic>
-// //                                         //                       currentItem =
-// //                                         //                       itemDisplay[index];
-// //                                         //                   print(
-// //                                         //                       'current item, ${currentItem}');
-// //                                         //                   String itemDescription =
-// //                                         //                       "${currentItem["description"]}";
-
-// //                                         //                   return ProductGrid(
-// //                                         //                       name: currentItem[
-// //                                         //                           'nama_menu']);
-// //                                         //                 }
-// //                                         //               }),
-// //                                         //             ),
-// //                                         //           ],
-// //                                         //         ),
-// //                                         : Container(
-// //                                             width: MediaQuery.of(context)
-// //                                                     .size
-// //                                                     .width *
-// //                                                 0.7,
-// //                                             child: Text('test'),
-// //                                           )),
-// //                               ),
-// //                             ),
-// //                           ],
-// //                         ),
-// //                       ),
-// //                       Column(
-// //                         // mainAxisSize: MainAxisSize.max,
-// //                         children: [
-// //                           Container(
-// //                             width: dataContentWidth,
-// //                             height: MediaQuery.sizeOf(context).height * 0.06,
-// //                             decoration: BoxDecoration(
-// //                               color: theme.colorScheme.primaryContainer,
-// //                             ),
-// //                             child: GuestInputWithButton(
-// //                               // width: screenWidth * 0.3,
-// //                               guestNameController: enterGuestNameController,
-// //                               smallButtonWidth: smallButtonWidth,
-// //                               searchbarWidth: 10,
-// //                             ),
-// //                           ),
-// //                           Container(
-// //                             width: dataContentWidth,
-// //                             child: DropdownDeleteSection(),
-// //                           ),
-// //                           Expanded(
-// //                             child: Container(
-// //                               width: dataContentWidth,
-// //                               height: 300.0,
-// //                               decoration: BoxDecoration(
-// //                                 color: theme.colorScheme.primaryContainer,
-// //                               ),
-// //                               child: Column(
-// //                                 mainAxisSize: MainAxisSize.max,
-// //                                 mainAxisAlignment: MainAxisAlignment.start,
-// //                                 crossAxisAlignment: CrossAxisAlignment.center,
-// //                                 children: [
-// //                                   if (cartData.isNotEmpty)
-// //                                     CardListItem(
-// //                                       cartData: cartData,
-// //                                     ),
-// //                                   if (cartData.isEmpty) EmptyCart()
-// //                                 ],
-// //                               ),
-// //                             ),
-// //                           ),
-// //                         ],
-// //                       )
-// //                     ],
-// //                   ),
-// //                 ],
-// //               ),
-// //             ),
-// //             Container(
-// //               width: double.infinity,
-// //               height: 60.0,
-// //               decoration: BoxDecoration(
-// //                 color: theme.colorScheme.onBackground,
-// //               ),
-// //               child: BottomNavigationInvoice(
-// //                 dataContentWidth: dataContentWidth,
-// //               ),
-// //             ),
-// //           ],
-// //         ),
-// //       ),
-// //     );
-// //   }
-
-// //   TextEditingController enterGuestNameController = TextEditingController();
-// //   FocusNode inputPhone = FocusNode();
-// // }
-// // >>>>>>> 0153992fc6a94871d2d1e0edbf4d2ff9bcb301c8

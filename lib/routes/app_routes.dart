@@ -13,7 +13,8 @@ class AppRoutes {
   static const String orderScreen = '/order';
   static const String invoiceScreen = '/invoice';
   static const String historyInvoiceScreen = '/history';
-  static const String confirmScreen = '/confirm'; // ganti ConfirmScreen dengan confirmScreen untuk naming convention yang konsisten
+  static const String confirmScreen =
+      '/confirm'; // ganti ConfirmScreen dengan confirmScreen untuk naming convention yang konsisten
 
   static Map<String, WidgetBuilder> routes = {
     loginScreen: (context) => const LoginScreen(),
@@ -21,6 +22,7 @@ class AppRoutes {
     orderScreen: (context) => OrderScreen(),
     //invoiceScreen: (context) => const InvoiceScreen(),
     historyInvoiceScreen: (context) => const HistoryInvoiceScreen(),
-    confirmScreen: (context) => ConfirmScreen(), // pastikan ConfirmScreen adalah class
+    confirmScreen: (context) =>
+        ConfirmScreen(), // pastikan ConfirmScreen adalah class
   };
 }

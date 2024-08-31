@@ -43,8 +43,7 @@ class _OrderScreenState extends State<OrderScreen> {
     setState(() {});
   }
 
-  void _showItemDetailsDialog(
-      String name, int price, String idMenu, String type) {
+  void _showItemDetailsDialog(String name, int price, String idMenu, String type) {
     showDialog(
       context: context,
       builder: (context) {
@@ -72,59 +71,60 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-    double screenWidth = MediaQuery.of(context).size.width;
-    double searchbarWidth = screenWidth * 0.65;
-    double smallButtonWidth = screenWidth * 0.05;
-    double buttonWidth = screenWidth * 0.15;
+    return Consumer<AppState>(
+      builder: (context, appState, child) {
+        double screenWidth = MediaQuery.of(context).size.width;
+        double searchbarWidth = screenWidth * 0.65;
+        double smallButtonWidth = screenWidth * 0.05;
+        double buttonWidth = screenWidth * 0.15;
 
-    // Create an instance of Cart and pass AppState to it
-    Cart cart = Cart(appState);
+        // Create an instance of Cart and pass AppState to it
+        Cart cart = Cart(appState);
 
-    return Scaffold(
-      appBar: BuildAppbar(
-        smallButtonWidth: smallButtonWidth,
-        buttonWidth: buttonWidth,
-      ),
-      body: Container(
-        color: itembackgroundcolor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        return Scaffold(
+          appBar: BuildAppbar(
+            smallButtonWidth: smallButtonWidth,
+            buttonWidth: buttonWidth,
+          ),
+          body: Container(
+            color: itembackgroundcolor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: 55,
-                  child: Searchbar(
-                    screenWidth: searchbarWidth,
-                    onSearchChanged: _handleSearchChanged,
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      height: 55,
+                      child: Searchbar(
+                        screenWidth: searchbarWidth,
+                        onSearchChanged: _handleSearchChanged,
+                      ),
+                    ),
+                    GuestInputWithButton(
+                      screenWidth: screenWidth,
+                      guestNameController: _guestNameController,
+                      smallButtonWidth: smallButtonWidth,
+                      onNameSubmitted: (name) {
+                        // Update AppState with the guest name
+                        appState.setNamaPemesan(name);
+                      },
+                    ),
+                  ],
                 ),
-                GuestInputWithButton(
-                  screenWidth: screenWidth,
-                  guestNameController: _guestNameController,
-                  smallButtonWidth: smallButtonWidth,
-                  onNameSubmitted: (name) {
-                    // Update AppState with the guest name
-                    appState.setNamaPemesan(name);
-                  },
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Container(
-                  width: searchbarWidth,
-                  child: Row(
-                    children: [
-                      ButtonFilter(onFilterSelected: _handleFilterSelected),
-                    ],
-                  ),
-                ),
-                Container(
-                    width: screenWidth - searchbarWidth,
-                    decoration: BoxDecoration(
-                      border: Border(
+                Row(
+                  children: [
+                    Container(
+                      width: searchbarWidth,
+                      child: Row(
+                        children: [
+                          ButtonFilter(onFilterSelected: _handleFilterSelected),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: screenWidth - searchbarWidth,
+                      decoration: BoxDecoration(
+                        border: Border(
                           bottom: BorderSide(
                             color: Colors.grey,
                             width: 1,
@@ -132,75 +132,77 @@ class _OrderScreenState extends State<OrderScreen> {
                           top: BorderSide(
                             color: Colors.grey,
                             width: 1,
-                          )),
+                          ),
+                        ),
+                      ),
+                      child: DropdownDeleteSection(),
                     ),
-                    child: DropdownDeleteSection(
-                    )),
+                  ],
+                ),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: CardMenu(
+                          onMenuTap: (name, price, idMenu, type) {
+                            _showItemDetailsDialog(name, price, idMenu, type);
+                          },
+                          filterType: _selectedFilterType,
+                          searchQuery: _searchQuery,
+                        ),
+                      ),
+                      Container(
+                        width: screenWidth * 0.35,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                        ),
+                        child: ItemCart(
+                          cartItems: appState.cartItems,
+                          screenWidth: screenWidth,
+                          onEditItem: (editedItem) {
+                            final index = appState.cartItems.indexWhere((item) => item.id == editedItem.id);
+                            if (index != -1) {
+                              setState(() {
+                                appState.cartItems[index] = editedItem;
+                              });
+                            }
+                          },
+                          appState: appState,
+                          cart: cart,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: screenWidth * 0.65,
+                        child: Footer(screenWidth: screenWidth),
+                      ),
+                      ActionButton(
+                        screenWidth: screenWidth,
+                        cart: cart,
+                        guestNameController: _guestNameController,
+                        resetDropdown: () {
+                          setState(() {
+                            table = null;
+                            pickupType = null;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: CardMenu(
-                      onMenuTap: (name, price, idMenu, type) {
-                        _showItemDetailsDialog(name, price, idMenu, type);
-                      },
-                      filterType: _selectedFilterType,
-                      searchQuery: _searchQuery,
-                    ),
-                  ),
-                  Container(
-                    width: screenWidth * 0.35,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                    ),
-                    child: ItemCart(
-                      cartItems: appState.cartItems,
-                      screenWidth: screenWidth,
-                      onEditItem: (editedItem) {
-                        final index = appState.cartItems
-                            .indexWhere((item) => item.id == editedItem.id);
-                        if (index != -1) {
-                          setState(() {
-                            appState.cartItems[index] = editedItem;
-                          });
-                        }
-                      },
-                      appState: appState,
-                      cart: cart,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: screenWidth * 0.65,
-                    child: Footer(screenWidth: screenWidth),
-                  ),
-                  ActionButton(
-                    screenWidth: screenWidth,
-                    cart: cart,
-                    guestNameController: _guestNameController,
-                    resetDropdown: () {
-                      setState(() {
-                        table = null;
-                        pickupType = null;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

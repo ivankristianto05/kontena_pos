@@ -46,12 +46,13 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
     _quantity = _item.qty;
     _notes = _item.notes;
     _selectedPreference = _item.preference['preference'] ?? '';
-    _selectedAddons = _item.addons?.map((key, value) => MapEntry(key, value['selected'] as bool)) ?? {};
+    _selectedAddons = _item.addons
+            ?.map((key, value) => MapEntry(key, value['selected'] as bool)) ??
+        {};
     _variantPrice = _item.variantPrice;
 
-    List<Map<String, dynamic>> filteredVariants = MenuVarian
-        .where((variant) => variant['id_menu'] == _item.id)
-        .toList();
+    List<Map<String, dynamic>> filteredVariants =
+        MenuVarian.where((variant) => variant['id_menu'] == _item.id).toList();
 
     List<String> variantNames = filteredVariants
         .map((variant) => variant['nama_varian'] as String)
@@ -61,35 +62,34 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
     _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
   }
 
- void _editItem() {
-  List<Map<String, dynamic>> filteredVariants = MenuVarian
-      .where((variant) => variant['id_menu'] == _item.id)
-      .toList();
+  void _editItem() {
+    List<Map<String, dynamic>> filteredVariants =
+        MenuVarian.where((variant) => variant['id_menu'] == _item.id).toList();
 
-  final selectedVariant = _selectedVariantIndex >= 0 && _selectedVariantIndex < filteredVariants.length
-      ? filteredVariants[_selectedVariantIndex]
-      : null;
+    final selectedVariant = _selectedVariantIndex >= 0 &&
+            _selectedVariantIndex < filteredVariants.length
+        ? filteredVariants[_selectedVariantIndex]
+        : null;
 
-  final editedItem = _item.copyWith(
-    variant: selectedVariant?['nama_varian'] ?? '',
-    variantId: selectedVariant?['id_varian'],
-    qty: _quantity,
-    addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
-    notes: _notes,
-    preference: {'preference': _selectedPreference},
-    variantPrice: _variantPrice,
-  );
+    // final editedItem = _item.copyWith(
+    //   variant: selectedVariant?['nama_varian'] ?? '',
+    //   variantId: selectedVariant?['id_varian'],
+    //   qty: _quantity,
+    //   addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
+    //   notes: _notes,
+    //   preference: {'preference': _selectedPreference},
+    //   variantPrice: _variantPrice,
+    // );
 
-  widget.cart.updateItem(widget.index, editedItem);
-  
-  // Pastikan bahwa update ke AppState dilakukan
-  widget.appState.update(() {
-    widget.appState.cartItems[widget.index] = editedItem;
-  });
+    // widget.cart.updateItem(widget.index, editedItem);
 
-  Navigator.of(context).pop();
-}
+    // Pastikan bahwa update ke AppState dilakukan
+    // widget.appState.update(() {
+    //   widget.appState.cartItems[widget.index] = editedItem;
+    // });
 
+    Navigator.of(context).pop();
+  }
 
   int _getPreferenceIndex(String preference) {
     List<String> preferences = _getPreferencesBasedOnType();
@@ -253,7 +253,8 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
         width: double.infinity,
         child: ElevatedButton(
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF00ADB5)),
+            backgroundColor:
+                MaterialStateProperty.all<Color>(const Color(0xFF00ADB5)),
           ),
           onPressed: _editItem,
           child: Text(

@@ -22,7 +22,7 @@ class _ConfirmButtonState extends State<ConfirmButton> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final orderId = appState.currentOrderId;
-    var buttoncolor2 = widget.isEnabled ? buttoncolor : Colors.grey;
+    var buttoncolor2 = widget.isEnabled && appState.isOrderFullyChecked(orderId) ? buttoncolor : Colors.grey;
 
     return Container(
       height: 50,
@@ -30,19 +30,16 @@ class _ConfirmButtonState extends State<ConfirmButton> {
       child: MaterialButton(
         color: buttoncolor2,
         textColor: Colors.white,
-        onPressed: widget.isEnabled
+        onPressed: buttoncolor2 == buttoncolor
             ? () {
-                
+                if (orderId.isNotEmpty) {
+                  appState.confirmOrderStatus(orderId);
+                  print("Order $orderId confirmed");
+                }
               }
-            : null, // Disable button when not enabled
+            : null,
         child: Center(
-          child: Text(
-            "Confirm",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          child: Text('Confirm',style: TextStyle(fontSize: 18),),
         ),
       ),
     );

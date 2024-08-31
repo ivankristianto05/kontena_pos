@@ -124,12 +124,8 @@ List<Map<String, dynamic>> ListMenu = [
 ];
 
 List<dynamic> itemPreference = [
-  {
-    'id': 1,
-    'name': 'Normal',
-  },
-  {
-    'id': 2,
-    'name': 'Sedang',
-  }
+  {'id': 1, 'name': 'Normal', 'type': 'size'},
+  {'id': 2, 'name': 'Sedang', 'type': 'size'},
+  {'id': 3, 'name': 'Tidak Pedas', 'type': 'pedas'},
+  {'id': 4, 'name': 'Level 1', 'type': 'pedas'}
 ];

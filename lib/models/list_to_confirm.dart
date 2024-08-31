@@ -32,7 +32,8 @@ class ListToConfirm {
       'idOrder': idOrder,
       'namaPemesan': namaPemesan,
       'table': table,
-      'items': items.map((item) => item.toMap()).toList(),
+      // 'items': items.map((item) => item.toMap()).toList(),
+      // 'items': items.map((item) => item.toMap()).toList(),
       'status': status, // Include status in the map
     };
   }
@@ -44,7 +45,7 @@ class ListToConfirm {
       namaPemesan: map['namaPemesan'],
       table: map['table'],
       items: List<CartItem>.from(
-        map['items']?.map((item) => CartItem.fromMap(item)) ?? [],
+        [],
       ),
       status: map['status'] ?? 'Draft', // Ensure status defaults to 'Draft'
     );
