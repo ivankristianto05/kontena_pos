@@ -6,7 +6,7 @@ class ListToConfirm {
   final String table;
   final List<CartItem> items;
   final String status; // Add this field
-
+  
   ListToConfirm({
     required this.idOrder,
     required this.namaPemesan,
@@ -14,7 +14,6 @@ class ListToConfirm {
     required this.items,
     this.status = 'Draft', // Default to 'Draft'
   });
-
   // Method to copy the model with an updated status
   ListToConfirm copyWith({String? status}) {
     return ListToConfirm(
@@ -25,7 +24,6 @@ class ListToConfirm {
       status: status ?? this.status,
     );
   }
-
   // Method to convert the model to a map format
   Map<String, dynamic> toMap() {
     return {
@@ -37,7 +35,6 @@ class ListToConfirm {
       'status': status, // Include status in the map
     };
   }
-
   // Method to create the model from a map format
   factory ListToConfirm.fromMap(Map<String, dynamic> map) {
     return ListToConfirm(

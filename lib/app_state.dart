@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/core/functions/order.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'core/functions/cart.dart'; // Pastikan ini mengimpor CartItem dari file yang benar
-import 'models/list_to_confirm.dart'; // Pastikan ini mengimpor ListToConfirm dari file yang benar
+import 'core/functions/cart.dart';
+import 'models/list_to_confirm.dart';
 
 class AppState extends ChangeNotifier {
   static AppState _instance = AppState._internal();
@@ -18,6 +19,8 @@ class AppState extends ChangeNotifier {
 
   Future initializeState() async {
     prefs = await SharedPreferences.getInstance();
+    orderManager = OrderManager(this);
+    notifyListeners();
   }
 
   void update(VoidCallback callback) {
@@ -27,18 +30,23 @@ class AppState extends ChangeNotifier {
 
   late SharedPreferences prefs;
 
-  List<dynamic> _item = [];
-  List<dynamic> get item => _item;
-  set item(List<dynamic> _value) {
-    _item = _value;
+  late OrderManager orderManager;
+
+  void _ensureInitialized() {
+    if (!isInitialized) {
+      throw StateError('AppState has not been initialized.');
+    }
   }
 
-  // List untuk menyimpan item di cart
+  bool get isInitialized => orderManager != null;
+
+  // List to store cart items
   List<CartItem> _cartItems = [];
   List<CartItem> get cartItems => _cartItems;
 
-  // Method untuk mengecek apakah item dengan kombinasi idmenu, idvarian, indexpreference, dan indexaddons sudah ada
+  // Method to find the index of an item in the cart
   int findItemIndex(CartItem newItem) {
+    _ensureInitialized();
     return _cartItems.indexWhere((item) =>
       item.id == newItem.id &&
       item.variant == newItem.variant &&
@@ -47,12 +55,13 @@ class AppState extends ChangeNotifier {
     );
   }
 
-  // Menambahkan atau memperbarui item di cart
+  // Method to add or update an item in the cart
   void addItemToCart(CartItem newItem) {
+    _ensureInitialized();
     final existingItemIndex = findItemIndex(newItem);
     if (existingItemIndex >= 0) {
       var existingItem = _cartItems[existingItemIndex];
-      existingItem.qty += newItem.qty; // Update quantity
+      existingItem.qty += newItem.qty;
       existingItem.variant = newItem.variant;
       existingItem.variantId = newItem.variantId;
       existingItem.notes = newItem.notes;
@@ -61,14 +70,15 @@ class AppState extends ChangeNotifier {
       existingItem.variantPrice = newItem.variantPrice;
       existingItem.totalPrice = existingItem.qty * 
         (existingItem.variantPrice != 0 ? existingItem.variantPrice : existingItem.price);
-      _cartItems[existingItemIndex] = CartItem.from(existingItem); // Menggunakan salinan item yang diperbarui
+      _cartItems[existingItemIndex] = CartItem.from(existingItem);
     } else {
-      _cartItems.add(CartItem.from(newItem)); // Menambahkan item baru dengan salinan
+      _cartItems.add(CartItem.from(newItem));
     }
-    notifyListeners(); // Notify listeners of changes
+    notifyListeners();
   }
 
   void updateItemInCart(int index) {
+    _ensureInitialized();
     if (index >= 0 && index < _cartItems.length) {
       notifyListeners();
     } else {
@@ -76,137 +86,120 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  // Mengatur ulang cart
+  // Reset the cart
   void resetCart() {
+    _ensureInitialized();
     _cartItems = [];
-    notifyListeners(); // Pemberitahuan bahwa cart direset
+    notifyListeners();
   }
 
-
-  // List untuk menyimpan order yang dikonfirmasi
-  List<ListToConfirm> _confirmedOrders = [];
-  List<ListToConfirm> get confirmedOrders => _confirmedOrders;
-
-  // Menyimpan status konfirmasi
-  bool _isOrderConfirmed = false;
-  bool get isOrderConfirmed => _isOrderConfirmed;
-
-  // Menyimpan nama pemesan
-  String _namaPemesan = '';
-  String get namaPemesan => _namaPemesan;
+  // Proxy method calls to OrderManager
   void setNamaPemesan(String name) {
-  _namaPemesan = name.isEmpty ? '' : name; // Reset nama jika input kosong
-  notifyListeners();
-}
-
-  String _currentOrderId = ''; // Field to store the selected order ID 
-  String get currentOrderId => _currentOrderId; // Getter for the current order ID
-  void setCurrentOrderId(String orderId) {
-    _currentOrderId = orderId;
-    notifyListeners(); // Notify listeners of changes
+    _ensureInitialized();
+    orderManager.setNamaPemesan(name);
   }
 
-  String _selectedTable = ''; // Field to store the selected table
-  String get selectedTable => _selectedTable;
-  void setSelectedTable(String table) {
-    _selectedTable = table;
-    notifyListeners(); // Notify listeners of changes
+  String get namaPemesan {
+    _ensureInitialized();
+    return orderManager.namaPemesan;
   }
-  void resetSelectedTable() {
-  _selectedTable = '';
-  notifyListeners(); // Pemberitahuan kepada UI
-}
-  String getTableForCurrentOrder() {
-  final currentOrderId = _currentOrderId;
+
+  String get currentOrderId {
+    _ensureInitialized();
+    return orderManager.currentOrderId;
+  }
   
-  // Temukan order dengan currentOrderId
-  final order = _confirmedOrders
-      .firstWhere((order) => order.idOrder == currentOrderId, orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []));
-  return order.table; // Kembalikan nilai tabel dari order
-}
+  void setCurrentOrderId(String orderId) {
+    _ensureInitialized();
+    orderManager.setCurrentOrderId(orderId);
+    notifyListeners();
+  }
+
+  void setSelectedTable(String table) {
+    _ensureInitialized();
+    orderManager.setSelectedTable(table);
+  }
+
+  String get selectedTable {
+    _ensureInitialized();
+    return orderManager.selectedTable;
+  }
+
+  void resetSelectedTable() {
+    _ensureInitialized();
+    orderManager.resetSelectedTable();
+  }
+
+  String getTableForCurrentOrder() {
+    _ensureInitialized();
+    return orderManager.getTableForCurrentOrder();
+  }
 
   void printConfirmedOrders() {
-  for (var order in _confirmedOrders) {
-    print('Order ID: ${order.idOrder}');
-    print('Nama Pemesan: ${order.namaPemesan}');
-    print('Table: ${order.table}');
+    _ensureInitialized();
+    orderManager.printConfirmedOrders();
   }
-}
-  ListToConfirm _generateOrder(String idOrder) {
-    final List<CartItem> allItems = List.from(_cartItems);
-    return ListToConfirm(
-      idOrder: idOrder,
-      namaPemesan: _namaPemesan,
-      table: _selectedTable,
-      items: allItems,
+
+  void confirmOrder(String idOrder) {
+    _ensureInitialized();
+    orderManager.confirmOrder(idOrder, _cartItems);
+  }
+
+  void confirmOrderStatus(String orderId) {
+    _ensureInitialized();
+    orderManager.confirmOrderStatus(orderId);
+  }
+
+  Future<void> createOrder({
+    required TextEditingController guestNameController,
+    required VoidCallback resetDropdown,
+    required VoidCallback onSuccess,
+  }) async {
+    _ensureInitialized();
+    await orderManager.createOrder(
+      guestNameController: guestNameController,
+      resetDropdown: resetDropdown,
+      onSuccess: onSuccess,
+      cartItems: _cartItems,
     );
   }
 
-  // Metode untuk membuat dan mengonfirmasi order
-  void confirmOrder(String idOrder) {
-    final ListToConfirm order = _generateOrder(idOrder);
-    _confirmedOrders.add(order); // Add the confirmed order to the list
-    _isOrderConfirmed = true; // Set order as confirmed
-    resetCart(); // Clear the cart after confirmation
-    notifyListeners(); // Notify listeners that the order has been confirmed
-  }
-  void confirmOrderStatus(String orderId) {
-    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
-    if (index >= 0) {
-      // Assuming you add a status field to ListToConfirm
-      _confirmedOrders[index] = _confirmedOrders[index].copyWith(status: 'Confirmed');
-      notifyListeners(); // Notify listeners that the status has changed
-    }
-  }
-  Future<void> createOrder({
-  required TextEditingController guestNameController,
-  required VoidCallback resetDropdown,
-  required VoidCallback onSuccess,
-}) async {
-  if (_cartItems.isEmpty || guestNameController.text.isEmpty) {
-    print('Error: Nama pemesan tidak boleh kosong.');
-    return;
-  }
-
-  final String idOrder = DateTime.now().toIso8601String();
-  final ListToConfirm order = _generateOrder(idOrder);
-  addOrder(order);
-  resetCart();
-  resetSelectedTable();
-  guestNameController.clear();
-  setNamaPemesan('');
-  resetDropdown(); // Panggil resetDropdown setelah menunggu
-
-  // Call the onSuccess callback
-  onSuccess(); 
-
-  notifyListeners();
-}
-
-  // Menambahkan order yang dikonfirmasi ke dalam list (tidak perlu jika sudah ada `confirmOrder`)
   void addOrder(ListToConfirm order) {
-    _confirmedOrders.add(order); // Tambahkan order ke daftar konfirmasi
-    _isOrderConfirmed = true; // Set order sebagai dikonfirmasi
-    notifyListeners(); // Pemberitahuan bahwa order telah ditambahkan
+    _ensureInitialized();
+    orderManager.addOrder(order);
   }
-   // Variabel untuk menyimpan ID order yang semua itemnya telah ter-check
-  Set<String> _fullyCheckedOrders = {};
-  Set<String> get fullyCheckedOrders => _fullyCheckedOrders;
 
-  // Fungsi untuk menambahkan ID order yang semua itemnya telah ter-check
+  Set<String> get fullyCheckedOrders {
+    _ensureInitialized();
+    return orderManager.fullyCheckedOrders;
+  }
+
   void addFullyCheckedOrder(String orderId) {
-    _fullyCheckedOrders.add(orderId);
+    _ensureInitialized();
+    orderManager.addFullyCheckedOrder(orderId);
     notifyListeners();
   }
 
-  // Fungsi untuk menghapus ID order dari daftar
   void removeFullyCheckedOrder(String orderId) {
-    _fullyCheckedOrders.remove(orderId);
+    _ensureInitialized();
+    orderManager.removeFullyCheckedOrder(orderId);
     notifyListeners();
   }
 
-  // Fungsi untuk memeriksa apakah ID order telah ter-check semua itemnya
   bool isOrderFullyChecked(String orderId) {
-    return _fullyCheckedOrders.contains(orderId);
+    _ensureInitialized();
+    return orderManager.isOrderFullyChecked(orderId);
+  }
+
+  // Getter to check if any orders are confirmed
+  bool get isOrderConfirmed {
+    _ensureInitialized();
+    return orderManager.confirmedOrders.isNotEmpty;
+  }
+
+  // Getter to retrieve the list of confirmed orders
+  List<ListToConfirm> get confirmedOrders {
+    _ensureInitialized();
+    return orderManager.confirmedOrders;
   }
 }

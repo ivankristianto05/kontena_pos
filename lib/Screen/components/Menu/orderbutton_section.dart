@@ -26,6 +26,11 @@ class ActionButton extends StatelessWidget {
 
     return Consumer<AppState>(
       builder: (context, appState, child) {
+        // Ensure AppState is initialized
+        if (!appState.isInitialized) {
+          return Center(child: CircularProgressIndicator());
+        }
+
         int numberOfSelectedItemIds = cart.items.length;
 
         double totalPrice = cart.items.fold(0.0, (sum, item) {
@@ -45,17 +50,24 @@ class ActionButton extends StatelessWidget {
             color: buttoncolor2,
             textColor: Colors.white,
             onPressed: () async {
-              await appState.createOrder(
-                guestNameController: guestNameController,
-                resetDropdown: resetDropdown,
-                onSuccess: () {
-                  // Navigate back to the OrderScreen immediately after order creation
-                  Navigator.pushReplacementNamed(
-                    context,
-                    AppRoutes.orderScreen,
-                  );
-                },
-              );
+              try {
+                await appState.createOrder(
+                  guestNameController: guestNameController,
+                  resetDropdown: resetDropdown,
+                  onSuccess: () {
+                    // Navigate back to the OrderScreen immediately after order creation
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.orderScreen,
+                    );
+                  },
+                );
+              } catch (e) {
+                // Handle any errors that may occur during order creation
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error: $e')),
+                );
+              }
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

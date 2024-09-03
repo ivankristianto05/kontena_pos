@@ -1,170 +1,137 @@
-// import 'package:flutter/material.dart';
-// import 'package:kontena_pos/models/list_to_confirm.dart';
-// import 'package:kontena_pos/core/functions/cart.dart';
-// import 'package:kontena_pos/app_state.dart';
+import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/models/list_to_confirm.dart';
 
-// class OrderManager extends ChangeNotifier {
-//   final AppState appState;
-
-//   OrderManager(this.appState);
-
-//   List<ListToConfirm> _confirmedOrders = [];
-//   List<ListToConfirm> get confirmedOrders => _confirmedOrders;
-
-//   String _namaPemesan = '';
-//   String get namaPemesan => _namaPemesan;
-
-//   String _selectedTable = '';
-//   String get selectedTable => _selectedTable;
-
-//   String _currentOrderId = '';
-//   String get currentOrderId => _currentOrderId;
+class OrderManager extends ChangeNotifier {
+  List<ListToConfirm> _confirmedOrders = [];
+  List<ListToConfirm> get confirmedOrders => _confirmedOrders;
   
-// // Method to get an order by its ID
-//   ListToConfirm getOrderById(String orderId) {
-//     return _confirmedOrders.firstWhere(
-//       (order) => order.idOrder == orderId,
-//       orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
-//     );
-//   }
+  // Dependency injection for AppState
+  final AppState appState;
+  OrderManager(this.appState);
 
-//   bool _isOrderConfirmed = false;
-//   bool get isOrderConfirmed => _isOrderConfirmed;
+  bool _isOrderConfirmed = false;
+  bool get isOrderConfirmed => _isOrderConfirmed;
 
-//   Set<String> fullyCheckedOrders = {};
-//   Map<String, bool> checkedItems = {};
+  String _namaPemesan = '';
+  String get namaPemesan => _namaPemesan;
+  void setNamaPemesan(String name) {
+    _namaPemesan = name.isEmpty ? '' : name;
+    notifyListeners();
+  }
 
-//   void setNamaPemesan(String name) {
-//     _namaPemesan = name.isEmpty ? '' : name;
-//     notifyListeners();
-//   }
+  String _currentOrderId = '';
+  String get currentOrderId => _currentOrderId;
+  void setCurrentOrderId(String orderId) {
+    _currentOrderId = orderId;
+    notifyListeners();
+  }
 
-//   void setSelectedTable(String table) {
-//     _selectedTable = table;
-//     notifyListeners();
-//   }
+  String _selectedTable = '';
+  String get selectedTable => _selectedTable;
+  void setSelectedTable(String table) {
+    _selectedTable = table;
+    notifyListeners();
+  }
+  
+  void resetSelectedTable() {
+    _selectedTable = '';
+    notifyListeners();
+  }
 
-//   void resetSelectedTable() {
-//     _selectedTable = '';
-//     notifyListeners();
-//   }
+  String getTableForCurrentOrder() {
+    final currentOrderId = _currentOrderId;
+    final order = _confirmedOrders.firstWhere(
+      (order) => order.idOrder == currentOrderId,
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
+    );
+    return order.table;
+  }
 
-//   void setCurrentOrderId(String orderId) {
-//     _currentOrderId = orderId;
-//     initializeCheckedItems(orderId);
-//     bool allChecked = areAllItemsChecked(orderId);
-//     updateOrderCheckedStatus(orderId, allChecked);
-//     notifyListeners();
-//   }
+  void printConfirmedOrders() {
+    for (var order in _confirmedOrders) {
+      print('Order ID: ${order.idOrder}');
+      print('Nama Pemesan: ${order.namaPemesan}');
+      print('Table: ${order.table}');
+    }
+  }
 
-//   void initializeCheckedItems(String orderId) {
-//     checkedItems.clear();
-//     final order = _confirmedOrders.firstWhere(
-//       (order) => order.idOrder == orderId,
-//       orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
-//     );
-//     for (var item in order.items) {
-//       String uniqueKey = "${orderId}_${item.id}";
-//       checkedItems[uniqueKey] = false;
-//     }
-//   }
-//   // Method to get the table for the current order
-//   String getTableForCurrentOrder() {
-//     return _selectedTable; // Return the current table for the selected order
-//   }
+  ListToConfirm _generateOrder(String idOrder, List<CartItem> cartItems) {
+    return ListToConfirm(
+      idOrder: idOrder,
+      namaPemesan: _namaPemesan,
+      table: _selectedTable,
+      items: List.from(cartItems),
+    );
+  }
 
-//   bool areAllItemsChecked(String orderId) {
-//     final order = _confirmedOrders.firstWhere(
-//       (order) => order.idOrder == orderId,
-//       orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
-//     );
-//     if (order.items.isEmpty) return false;
+  void confirmOrder(String idOrder, List<CartItem> cartItems) {
+    final ListToConfirm order = _generateOrder(idOrder, cartItems);
+    _confirmedOrders.add(order);
+    _isOrderConfirmed = true;
+    appState.resetCart();
+    notifyListeners();
+  }
 
-//     for (var item in order.items) {
-//       String uniqueKey = "${orderId}_${item.id}";
-//       if (!checkedItems.containsKey(uniqueKey) || checkedItems[uniqueKey] == false) {
-//         return false;
-//       }
-//     }
-//     return true;
-//   }
+  void confirmOrderStatus(String orderId) {
+    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    if (index >= 0) {
+      _confirmedOrders[index] = _confirmedOrders[index].copyWith(status: 'Confirmed');
+      notifyListeners();
+    }
+  }
 
-//   void updateCheckedItems(String orderId, String itemId, bool isChecked) {
-//     String uniqueKey = "${orderId}_${itemId}";
-//     checkedItems[uniqueKey] = isChecked;
+  Future<void> createOrder({
+    required TextEditingController guestNameController,
+    required VoidCallback resetDropdown,
+    required VoidCallback onSuccess,
+    required List<CartItem> cartItems,
+  }) async {
+    if (cartItems.isEmpty || guestNameController.text.isEmpty) {
+      print('Error: Nama pemesan tidak boleh kosong.');
+      return;
+    }
 
-//     bool allChecked = areAllItemsChecked(orderId);
+    final String idOrder = DateTime.now().toIso8601String();
+    final ListToConfirm order = _generateOrder(idOrder, cartItems);
+    addOrder(order);
+    appState.resetCart();
+    resetSelectedTable();
+    guestNameController.clear();
+    setNamaPemesan('');
+    resetDropdown();
+    onSuccess();
+    notifyListeners();
+  }
 
-//     if (allChecked) {
-//       fullyCheckedOrders.add(orderId);
-//     } else {
-//       fullyCheckedOrders.remove(orderId);
-//     }
+  void addOrder(ListToConfirm order) {
+    _confirmedOrders.add(order);
+    notifyListeners();
+  }
 
-//     updateOrderCheckedStatus(orderId, allChecked);
-//     notifyListeners();
-//   }
+  Set<String> get fullyCheckedOrders {
+    return _confirmedOrders
+        .where((order) => order.items.every((item) => item.qty > 0))
+        .map((order) => order.idOrder)
+        .toSet();
+  }
 
-//   void updateOrderCheckedStatus(String orderId, bool isChecked) {
-//     if (isChecked) {
-//       fullyCheckedOrders.add(orderId);
-//     } else {
-//       fullyCheckedOrders.remove(orderId);
-//     }
-//     notifyListeners();
-//   }
+  void addFullyCheckedOrder(String orderId) {
+    // Implementation based on your logic
+    notifyListeners();
+  }
 
-//   void confirmOrder(String idOrder) {
-//     final ListToConfirm order = _generateOrder(idOrder);
+  void removeFullyCheckedOrder(String orderId) {
+    // Implementation based on your logic
+    notifyListeners();
+  }
 
-//     _confirmedOrders.add(order);
-//     appState.addConfirmedOrder(order); // Call method on AppState
-//     _isOrderConfirmed = true;
-//     notifyListeners();
-//   }
-
-//   void createOrder({
-//     required TextEditingController guestNameController,
-//     required VoidCallback resetDropdown,
-//   }) async {
-//     if (guestNameController.text.isEmpty) {
-//       print('Error: Nama pemesan tidak boleh kosong.');
-//       return;
-//     }
-
-//     final String idOrder = DateTime.now().toIso8601String();
-//     final ListToConfirm order = _generateOrder(idOrder);
-//     addOrder(order);
-//     resetSelectedTable();
-//     guestNameController.clear();
-//     setNamaPemesan('');
-
-//     await Future.delayed(Duration(milliseconds: 100));
-
-//     resetDropdown();
-//     notifyListeners();
-//   }
-
-//   void addOrder(ListToConfirm order) {
-//     _confirmedOrders.add(order);
-//     appState.addConfirmedOrder(order); // Call method on AppState
-//     _isOrderConfirmed = true;
-//     notifyListeners();
-//   }
-
-//   ListToConfirm _generateOrder(String idOrder) {
-//     final List<CartItem> allItems = List.from(appState.cartItems); // Get items from AppState
-//     return ListToConfirm(
-//       idOrder: idOrder,
-//       namaPemesan: _namaPemesan,
-//       table: _selectedTable,
-//       items: allItems,
-//     );
-//   }
-
-//   bool isOrderFullyChecked(String orderId) {
-//     bool result = fullyCheckedOrders.contains(orderId);
-//     print('Order $orderId is fully checked: $result');
-//     return result;
-//   }
-// }
+  bool isOrderFullyChecked(String orderId) {
+    final order = _confirmedOrders.firstWhere(
+      (order) => order.idOrder == orderId,
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
+    );
+    return order.items.every((item) => item.qty > 0);
+  }
+}

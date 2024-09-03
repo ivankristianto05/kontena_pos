@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/core/functions/order.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/routes/app_routes.dart';
 import 'package:kontena_pos/app_state.dart';
@@ -6,8 +7,25 @@ import 'package:kontena_pos/app_state.dart';
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize AppState and ensure it's fully initialized
+  final appState = AppState();
+  await appState.initializeState(); // Ensure this completes before running the app
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => appState),
+        ChangeNotifierProxyProvider<AppState, OrderManager>(
+          create: (context) => appState.orderManager,
+          update: (context, appState, orderManager) => appState.orderManager,
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -25,8 +43,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<String> _checkStoredUser() async {
-    // Uncomment and adjust based on actual implementation
-    // return AppRoutes.orderScreen;
+    // Adjust based on actual implementation
+    // For now, we return the login screen as the initial route
     return AppRoutes.loginScreen;
   }
 
@@ -40,19 +58,13 @@ class _MyAppState extends State<MyApp> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          return MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (_) => AppState()),
-              // Tambahkan provider lain jika diperlukan
-            ],
-            child: MaterialApp(
-              theme: ThemeData(useMaterial3: false),
-              title: 'KONTENA',
-              debugShowCheckedModeBanner: false,
-              initialRoute: snapshot.data ?? AppRoutes.loginScreen,
-              navigatorKey: navigatorKey,
-              routes: AppRoutes.routes,
-            ),
+          return MaterialApp(
+            theme: ThemeData(useMaterial3: false),
+            title: 'KONTENA',
+            debugShowCheckedModeBanner: false,
+            initialRoute: snapshot.data ?? AppRoutes.loginScreen,
+            navigatorKey: navigatorKey,
+            routes: AppRoutes.routes,
           );
         }
       },
