@@ -3,7 +3,7 @@ import 'package:kontena_pos/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
 
-class ConfirmCard extends StatefulWidget {
+class ConfirmCard extends StatelessWidget {
   const ConfirmCard({
     super.key,
     required this.screenWidth,
@@ -12,13 +12,6 @@ class ConfirmCard extends StatefulWidget {
 
   final double screenWidth;
   final void Function(String orderId) onOrderSelected;
-
-  @override
-  _ConfirmCardState createState() => _ConfirmCardState();
-}
-
-class _ConfirmCardState extends State<ConfirmCard> {
-  String? _selectedOrderId;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +28,8 @@ class _ConfirmCardState extends State<ConfirmCard> {
           );
         }
 
-        final cardWidth = (widget.screenWidth * 0.65) / 3 - 20;
+        final cardWidth = (screenWidth * 0.65) / 3 - 20;
+        final currentOrderId = appState.currentOrderId; // Assume currentOrderId is managed by AppState
 
         return SingleChildScrollView(
           child: Padding(
@@ -45,14 +39,12 @@ class _ConfirmCardState extends State<ConfirmCard> {
               runSpacing: 8.0,
               children: List.generate(appState.confirmedOrders.length, (index) {
                 final order = appState.confirmedOrders[index];
-                final isSelected = order.idOrder == _selectedOrderId;
+                final isSelected = order.idOrder == currentOrderId;
 
                 return GestureDetector(
                   onTap: () {
-                    setState(() {
-                      _selectedOrderId = order.idOrder;
-                    });
-                    widget.onOrderSelected(order.idOrder);
+                    appState.setCurrentOrderId(order.idOrder); // Update the currentOrderId in AppState
+                    onOrderSelected(order.idOrder);
                   },
                   child: SizedBox(
                     width: cardWidth,
@@ -98,61 +90,66 @@ class _ConfirmCardState extends State<ConfirmCard> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: order.items.length,
-                              itemBuilder: (context, i) {
-                                final cartItem = order.items[i];
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "${cartItem.qty}x ${cartItem.name} - ${cartItem.variant ?? ''}",
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      if (cartItem.addons != null && cartItem.addons!.isNotEmpty)
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 16.0),
-                                          child: Text(
-                                            "+ ${cartItem.addons!.keys.join(', ')}",
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black,
-                                            ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: 200, // Ensure consistent card height
+                              ),
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: order.items.length,
+                                itemBuilder: (context, i) {
+                                  final cartItem = order.items[i];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${cartItem.qty}x ${cartItem.name} - ${cartItem.variant ?? ''}",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
                                           ),
                                         ),
-                                      if (cartItem.preference.isNotEmpty)
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 16.0),
-                                          child: Text(
-                                            "Preference: ${cartItem.preference.values.join(', ')}",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey[700],
+                                        if (cartItem.addons != null && cartItem.addons!.isNotEmpty)
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 16.0),
+                                            child: Text(
+                                              "+ ${cartItem.addons!.keys.join(', ')}",
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.black,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      if (cartItem.notes.isNotEmpty)
-                                        Padding(
-                                          padding: const EdgeInsets.only(left: 16.0),
-                                          child: Text(
-                                            "Note: ${cartItem.notes}",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey[700],
+                                        if (cartItem.preference.isNotEmpty)
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 16.0),
+                                            child: Text(
+                                              "Preference: ${cartItem.preference.values.join(', ')}",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey[700],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                    ],
-                                  ),
-                                );
-                              },
+                                        if (cartItem.notes.isNotEmpty)
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 16.0),
+                                            child: Text(
+                                              "Note: ${cartItem.notes}",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey[700],
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                             const Divider(),
                             Align(

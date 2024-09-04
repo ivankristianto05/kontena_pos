@@ -48,11 +48,10 @@ class AppState extends ChangeNotifier {
   int findItemIndex(CartItem newItem) {
     _ensureInitialized();
     return _cartItems.indexWhere((item) =>
-      item.id == newItem.id &&
-      item.variant == newItem.variant &&
-      item.preference.toString() == newItem.preference.toString() &&
-      item.addons.toString() == newItem.addons.toString()
-    );
+        item.id == newItem.id &&
+        item.variant == newItem.variant &&
+        item.preference.toString() == newItem.preference.toString() &&
+        item.addons.toString() == newItem.addons.toString());
   }
 
   // Method to add or update an item in the cart
@@ -68,8 +67,8 @@ class AppState extends ChangeNotifier {
       existingItem.preference = newItem.preference;
       existingItem.addons = newItem.addons;
       existingItem.variantPrice = newItem.variantPrice;
-      existingItem.totalPrice = existingItem.qty * 
-        (existingItem.variantPrice != 0 ? existingItem.variantPrice : existingItem.price);
+      existingItem.totalPrice = existingItem.qty *
+          (existingItem.variantPrice != 0 ? existingItem.variantPrice : existingItem.price);
       _cartItems[existingItemIndex] = CartItem.from(existingItem);
     } else {
       _cartItems.add(CartItem.from(newItem));
@@ -97,6 +96,7 @@ class AppState extends ChangeNotifier {
   void setNamaPemesan(String name) {
     _ensureInitialized();
     orderManager.setNamaPemesan(name);
+    notifyListeners();
   }
 
   String get namaPemesan {
@@ -108,7 +108,7 @@ class AppState extends ChangeNotifier {
     _ensureInitialized();
     return orderManager.currentOrderId;
   }
-  
+
   void setCurrentOrderId(String orderId) {
     _ensureInitialized();
     orderManager.setCurrentOrderId(orderId);
@@ -118,6 +118,7 @@ class AppState extends ChangeNotifier {
   void setSelectedTable(String table) {
     _ensureInitialized();
     orderManager.setSelectedTable(table);
+    notifyListeners();
   }
 
   String get selectedTable {
@@ -128,6 +129,7 @@ class AppState extends ChangeNotifier {
   void resetSelectedTable() {
     _ensureInitialized();
     orderManager.resetSelectedTable();
+    notifyListeners();
   }
 
   String getTableForCurrentOrder() {
@@ -143,11 +145,13 @@ class AppState extends ChangeNotifier {
   void confirmOrder(String idOrder) {
     _ensureInitialized();
     orderManager.confirmOrder(idOrder, _cartItems);
+    notifyListeners();
   }
 
   void confirmOrderStatus(String orderId) {
     _ensureInitialized();
     orderManager.confirmOrderStatus(orderId);
+    notifyListeners();
   }
 
   Future<void> createOrder({
@@ -162,11 +166,13 @@ class AppState extends ChangeNotifier {
       onSuccess: onSuccess,
       cartItems: _cartItems,
     );
+    notifyListeners();
   }
 
   void addOrder(ListToConfirm order) {
     _ensureInitialized();
     orderManager.addOrder(order);
+    notifyListeners();
   }
 
   Set<String> get fullyCheckedOrders {

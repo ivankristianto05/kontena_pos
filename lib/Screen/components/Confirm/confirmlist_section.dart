@@ -28,7 +28,7 @@ class _ConfirmListState extends State<ConfirmList> {
     super.initState();
     for (var order in widget.listToConfirm) {
       for (var item in order.items) {
-        checkedItems[item.id] = false;
+        checkedItems['${order.idOrder}-${item.id}'] = false; // Use a composite key
       }
     }
   }
@@ -41,7 +41,7 @@ class _ConfirmListState extends State<ConfirmList> {
         .expand((order) => order.items)
         .toList();
 
-    bool allChecked = filteredItems.every((item) => checkedItems[item.id] == true);
+    bool allChecked = filteredItems.every((item) => checkedItems['${currentOrderId}-${item.id}'] == true); // Use composite key
 
     if (allChecked) {
       widget.appState.addFullyCheckedOrder(currentOrderId);
@@ -104,10 +104,10 @@ class _ConfirmListState extends State<ConfirmList> {
                                 ),
                               ),
                               Checkbox(
-                                value: checkedItems[listItem.items[i].id] ?? false,
+                                value: checkedItems['${listItem.idOrder}-${listItem.items[i].id}'] ?? false, // Use composite key
                                 onChanged: (bool? value) {
                                   setState(() {
-                                    checkedItems[listItem.items[i].id] = value ?? false;
+                                    checkedItems['${listItem.idOrder}-${listItem.items[i].id}'] = value ?? false; // Use composite key
                                     _checkAllCheckedStatus();
                                   });
                                 },

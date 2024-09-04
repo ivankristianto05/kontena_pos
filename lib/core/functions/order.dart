@@ -11,11 +11,15 @@ class OrderManager extends ChangeNotifier {
   final AppState appState;
   OrderManager(this.appState);
 
+  // Set to store fully checked order IDs
+  Set<String> _fullyCheckedOrders = {};
+
   bool _isOrderConfirmed = false;
   bool get isOrderConfirmed => _isOrderConfirmed;
 
   String _namaPemesan = '';
   String get namaPemesan => _namaPemesan;
+
   void setNamaPemesan(String name) {
     _namaPemesan = name.isEmpty ? '' : name;
     notifyListeners();
@@ -23,13 +27,17 @@ class OrderManager extends ChangeNotifier {
 
   String _currentOrderId = '';
   String get currentOrderId => _currentOrderId;
+
   void setCurrentOrderId(String orderId) {
     _currentOrderId = orderId;
+    // Check if all items in the new order are fully checked and update the state
+    checkOrderItems(orderId);
     notifyListeners();
   }
 
   String _selectedTable = '';
   String get selectedTable => _selectedTable;
+
   void setSelectedTable(String table) {
     _selectedTable = table;
     notifyListeners();
@@ -41,9 +49,8 @@ class OrderManager extends ChangeNotifier {
   }
 
   String getTableForCurrentOrder() {
-    final currentOrderId = _currentOrderId;
     final order = _confirmedOrders.firstWhere(
-      (order) => order.idOrder == currentOrderId,
+      (order) => order.idOrder == _currentOrderId,
       orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
     );
     return order.table;
@@ -74,11 +81,13 @@ class OrderManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void confirmOrderStatus(String orderId) {
+   void confirmOrderStatus(String orderId) {
     final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
     if (index >= 0) {
       _confirmedOrders[index] = _confirmedOrders[index].copyWith(status: 'Confirmed');
       notifyListeners();
+    } else {
+      print('Order with orderId $orderId not found.');
     }
   }
 
@@ -110,28 +119,30 @@ class OrderManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  Set<String> get fullyCheckedOrders {
-    return _confirmedOrders
-        .where((order) => order.items.every((item) => item.qty > 0))
-        .map((order) => order.idOrder)
-        .toSet();
+  Set<String> get fullyCheckedOrders => _fullyCheckedOrders;
+
+  bool isOrderFullyChecked(String orderId) {
+      return _fullyCheckedOrders.contains(orderId);
+
+  }
+
+  void checkOrderItems(String orderId) {
+    final isFullyChecked = isOrderFullyChecked(orderId);
+    if (isFullyChecked) {
+      addFullyCheckedOrder(orderId);
+    } else {
+      removeFullyCheckedOrder(orderId);
+    }
+    notifyListeners();
   }
 
   void addFullyCheckedOrder(String orderId) {
-    // Implementation based on your logic
+    _fullyCheckedOrders.add(orderId);
     notifyListeners();
   }
 
   void removeFullyCheckedOrder(String orderId) {
-    // Implementation based on your logic
+    _fullyCheckedOrders.remove(orderId);
     notifyListeners();
-  }
-
-  bool isOrderFullyChecked(String orderId) {
-    final order = _confirmedOrders.firstWhere(
-      (order) => order.idOrder == orderId,
-      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
-    );
-    return order.items.every((item) => item.qty > 0);
   }
 }

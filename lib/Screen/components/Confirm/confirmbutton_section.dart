@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Add this for accessing AppState
+import 'package:provider/provider.dart'; // For accessing AppState
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/app_state.dart'; // Import the AppState
 
 class ConfirmButton extends StatefulWidget {
   final double screenWidth;
-  final bool isEnabled;
 
   ConfirmButton({
     super.key,
     required this.screenWidth,
-    required this.isEnabled,
   });
 
   @override
@@ -22,15 +20,18 @@ class _ConfirmButtonState extends State<ConfirmButton> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final orderId = appState.currentOrderId;
-    var buttoncolor2 = widget.isEnabled && appState.isOrderFullyChecked(orderId) ? buttoncolor : Colors.grey;
+
+    // Enable button only if the current order ID is fully checked
+    bool isEnabled = appState.isOrderFullyChecked(orderId);
+    var buttonColor = isEnabled ? buttoncolor : Colors.grey;
 
     return Container(
       height: 50,
       width: widget.screenWidth * 0.35,
       child: MaterialButton(
-        color: buttoncolor2,
+        color: buttonColor,
         textColor: Colors.white,
-        onPressed: buttoncolor2 == buttoncolor
+        onPressed: isEnabled
             ? () {
                 if (orderId.isNotEmpty) {
                   appState.confirmOrderStatus(orderId);
@@ -39,7 +40,10 @@ class _ConfirmButtonState extends State<ConfirmButton> {
               }
             : null,
         child: Center(
-          child: Text('Confirm',style: TextStyle(fontSize: 18),),
+          child: Text(
+            'Confirm',
+            style: TextStyle(fontSize: 18),
+          ),
         ),
       ),
     );

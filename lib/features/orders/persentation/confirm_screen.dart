@@ -158,7 +158,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   ),
                   ConfirmButton(
                     screenWidth: screenWidth,
-                    isEnabled: allItemsChecked,
+                    //isEnabled: allItemsChecked,
                   ),
                 ],
               ),
