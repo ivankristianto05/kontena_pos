@@ -7,7 +7,7 @@ class ConfirmList extends StatefulWidget {
   final List<ListToConfirm> listToConfirm;
   final double screenWidth;
   final AppState appState;
-  final ValueChanged<bool>? onAllChecked; // Optional, based on the first code
+  final ValueChanged<bool>? onAllChecked; // Optional
 
   ConfirmList({
     required this.listToConfirm,
@@ -23,35 +23,34 @@ class ConfirmList extends StatefulWidget {
 class _ConfirmListState extends State<ConfirmList> {
   Map<String, bool> checkedItems = {};
 
-  @override
-  void initState() {
-    super.initState();
-    for (var order in widget.listToConfirm) {
-      for (var item in order.items) {
-        checkedItems['${order.idOrder}-${item.id}'] = false; // Use a composite key
-      }
-    }
-  }
-
   void _checkAllCheckedStatus() {
     final currentOrderId = widget.appState.currentOrderId;
+    final allChecked = widget.listToConfirm
+        .firstWhere((order) => order.idOrder == currentOrderId)
+        .items
+        .every((item) => checkedItems['${currentOrderId}-${item.id}'] ?? false);
 
-    final filteredItems = widget.listToConfirm
-        .where((order) => order.idOrder == currentOrderId)
-        .expand((order) => order.items)
-        .toList();
-
-    bool allChecked = filteredItems.every((item) => checkedItems['${currentOrderId}-${item.id}'] == true); // Use composite key
-
-    if (allChecked) {
-      widget.appState.addFullyCheckedOrder(currentOrderId);
-    } else {
-      widget.appState.removeFullyCheckedOrder(currentOrderId);
-    }
+    print('Checked Items: $checkedItems'); // Debug print
+    print('All Checked: $allChecked'); // Debug print
 
     if (widget.onAllChecked != null) {
       widget.onAllChecked!(allChecked);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final currentOrderId = widget.appState.currentOrderId;
+      if (currentOrderId.isNotEmpty) {
+        // Load the saved item checked statuses
+        await widget.appState.loadAndSetItemCheckedStatuses(currentOrderId);
+        setState(() {
+          checkedItems = widget.appState.getItemCheckedStatuses(currentOrderId);
+        });
+      }
+    });
   }
 
   @override
@@ -104,11 +103,19 @@ class _ConfirmListState extends State<ConfirmList> {
                                 ),
                               ),
                               Checkbox(
-                                value: checkedItems['${listItem.idOrder}-${listItem.items[i].id}'] ?? false, // Use composite key
+                                value: checkedItems['${currentOrderId}-${listItem.items[i].id}'] ?? false,
                                 onChanged: (bool? value) {
                                   setState(() {
-                                    checkedItems['${listItem.idOrder}-${listItem.items[i].id}'] = value ?? false; // Use composite key
+                                    checkedItems['${currentOrderId}-${listItem.items[i].id}'] = value ?? false;
+                                    widget.appState.setItemCheckedStatus(
+                                      currentOrderId,
+                                      listItem.items[i].id,
+                                      value ?? true,
+                                    );
                                     _checkAllCheckedStatus();
+
+                                    // Debug prints for checkbox value changes
+                                    print('Checkbox ${listItem.items[i].id} changed to: ${value ?? false}');
                                   });
                                 },
                               ),

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/Screen/components/Confirm/CUD_iconbutton_section.dart';
-import 'package:kontena_pos/Screen/components/Confirm/ConfirmCard_section.dart';
+import 'package:kontena_pos/Screen/components/appbar_section.dart';
+import 'package:provider/provider.dart';
+import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/Screen/components/Confirm/confirmbutton_section.dart';
+import 'package:kontena_pos/Screen/components/Confirm/confirmcard_section.dart';
 import 'package:kontena_pos/Screen/components/Confirm/confirmlist_section.dart';
 import 'package:kontena_pos/Screen/components/Confirm/dropdown_section.dart';
 import 'package:kontena_pos/Screen/components/Confirm/guestname_section.dart';
-import 'package:provider/provider.dart';
-import 'package:kontena_pos/Screen/components/appbar_section.dart';
 import 'package:kontena_pos/Screen/components/footer_section.dart';
 import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/constants.dart';
-import 'package:kontena_pos/core/functions/cart.dart';
-import 'package:kontena_pos/app_state.dart';
 
 class ConfirmScreen extends StatefulWidget {
   @override
@@ -27,18 +26,24 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
   @override
   void initState() {
     super.initState();
-    _guestNameController.addListener(_updateState);
+    _guestNameController.addListener(_handleTextChanged);
   }
 
   @override
   void dispose() {
-    _guestNameController.removeListener(_updateState);
+    _guestNameController.removeListener(_handleTextChanged);
     _guestNameController.dispose();
     super.dispose();
   }
 
-  void _updateState() {
-    setState(() {});
+  void _handleTextChanged() {
+    // Optionally debounce the input change
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Implement debouncing if needed to avoid frequent state updates
+      setState(() {
+        // Update your state here if needed
+      });
+    });
   }
 
   void _handleFilterSelected(String type) {
@@ -60,8 +65,6 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     double searchbarWidth = screenWidth * 0.65;
     double smallButtonWidth = screenWidth * 0.05;
     double buttonWidth = screenWidth * 0.15;
-
-    Cart cart = Cart(appState);
 
     return Scaffold(
       appBar: BuildAppbar(
@@ -105,13 +108,13 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                         color: Colors.grey,
                         width: 1.0,
                       ),
-                    )
+                    ),
                   ),
-                  child: Dropdown()
-                  ),
-                  Container(
-                    child: CUDIconButton(),
-                  )
+                  child: Dropdown(),
+                ),
+                Container(
+                  child: CUDIconButton(),
+                ),
               ],
             ),
             Expanded(
@@ -158,7 +161,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   ),
                   ConfirmButton(
                     screenWidth: screenWidth,
-                    //isEnabled: allItemsChecked,
+                    // isEnabled: allItemsChecked,
                   ),
                 ],
               ),

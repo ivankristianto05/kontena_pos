@@ -19,7 +19,7 @@ class ConfirmCard extends StatelessWidget {
       builder: (context, appState, child) {
         if (!appState.isOrderConfirmed) {
           return const Center(
-            child: Text('No order inputed.'),
+            child: Text('No order inputted.'),
           );
         }
         if (appState.confirmedOrders.isEmpty) {
@@ -73,10 +73,10 @@ class ConfirmCard extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  order.status, // Display the order's status
-                                  style: const TextStyle(
-                                    color: Colors.grey,
+                                  "19:25", // Display the time here
+                                  style: TextStyle(
                                     fontSize: 12,
+                                    color: Colors.grey[700],
                                   ),
                                 ),
                               ],
@@ -105,12 +105,24 @@ class ConfirmCard extends StatelessWidget {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          "${cartItem.qty}x ${cartItem.name} - ${cartItem.variant ?? ''}",
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14,
-                                          ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "${cartItem.qty}x ${cartItem.name} - ${cartItem.variant ?? ''}",
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            Text(
+                                              order.status,
+                                              style: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         if (cartItem.addons != null && cartItem.addons!.isNotEmpty)
                                           Padding(
@@ -149,17 +161,6 @@ class ConfirmCard extends StatelessWidget {
                                     ),
                                   );
                                 },
-                              ),
-                            ),
-                            const Divider(),
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: Text(
-                                "19:25", // Replace with actual time if available
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[700],
-                                ),
                               ),
                             ),
                           ],

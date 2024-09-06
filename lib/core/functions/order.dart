@@ -14,6 +14,8 @@ class OrderManager extends ChangeNotifier {
   // Set to store fully checked order IDs
   Set<String> _fullyCheckedOrders = {};
 
+    final Map<String, Map<String, bool>> _orderItemCheckedStatuses = {};
+
   bool _isOrderConfirmed = false;
   bool get isOrderConfirmed => _isOrderConfirmed;
 
@@ -59,8 +61,9 @@ class OrderManager extends ChangeNotifier {
   void printConfirmedOrders() {
     for (var order in _confirmedOrders) {
       print('Order ID: ${order.idOrder}');
-      print('Nama Pemesan: ${order.namaPemesan}');
-      print('Table: ${order.table}');
+      //print('Nama Pemesan: ${order.namaPemesan}');
+      //print('Table: ${order.table}');
+      print('Item Checked Statuses: ${order.itemCheckedStatuses}');
     }
   }
 
@@ -81,7 +84,7 @@ class OrderManager extends ChangeNotifier {
     notifyListeners();
   }
 
-   void confirmOrderStatus(String orderId) {
+  void confirmOrderStatus(String orderId) {
     final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
     if (index >= 0) {
       _confirmedOrders[index] = _confirmedOrders[index].copyWith(status: 'Confirmed');
@@ -122,18 +125,39 @@ class OrderManager extends ChangeNotifier {
   Set<String> get fullyCheckedOrders => _fullyCheckedOrders;
 
   bool isOrderFullyChecked(String orderId) {
-      return _fullyCheckedOrders.contains(orderId);
-
+    return _fullyCheckedOrders.contains(orderId);
   }
 
   void checkOrderItems(String orderId) {
-    final isFullyChecked = isOrderFullyChecked(orderId);
-    if (isFullyChecked) {
+    final order = _confirmedOrders.firstWhere(
+      (order) => order.idOrder == orderId,
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
+    );
+    final allChecked = order.items.every((item) => order.itemCheckedStatuses[item.id] ?? false);
+    if (allChecked) {
       addFullyCheckedOrder(orderId);
     } else {
       removeFullyCheckedOrder(orderId);
     }
     notifyListeners();
+  }
+
+  void setItemCheckedStatus(String orderId, String itemId, bool isChecked) {
+    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    if (index >= 0) {
+      final order = _confirmedOrders[index];
+      final updatedItemCheckedStatuses = Map<String, bool>.from(order.itemCheckedStatuses);
+      updatedItemCheckedStatuses[itemId] = isChecked;
+      _confirmedOrders[index] = order.copyWith(itemCheckedStatuses: updatedItemCheckedStatuses);
+      checkOrderItems(orderId); // Recheck order items after updating
+      notifyListeners();
+    } else {
+      print('Order with orderId $orderId not found.');
+    }
+  }
+
+   Map<String, bool> getItemCheckedStatuses(String orderId) {
+    return _orderItemCheckedStatuses[orderId] ?? {};
   }
 
   void addFullyCheckedOrder(String orderId) {
@@ -145,4 +169,27 @@ class OrderManager extends ChangeNotifier {
     _fullyCheckedOrders.remove(orderId);
     notifyListeners();
   }
+
+  void setItemCheckedStatuses(String orderId, Map<String, bool> statuses) {
+    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    if (index >= 0) {
+      final order = _confirmedOrders[index];
+      _confirmedOrders[index] = order.copyWith(itemCheckedStatuses: statuses);
+      notifyListeners();
+    }
+  }
+
+  // Method to load item checked statuses when the order is set
+  Future<void> loadAndSetItemCheckedStatuses(String orderId) async {
+    final statuses = await appState.loadItemCheckedStatuses(orderId);
+    setItemCheckedStatuses(orderId, statuses);
+  }
+
+  ListToConfirm getConfirmedOrderById(String orderId) {
+  return _confirmedOrders.firstWhere(
+    (order) => order.idOrder == orderId,
+    orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
+  );
+}
+
 }
