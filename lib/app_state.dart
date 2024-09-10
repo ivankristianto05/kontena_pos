@@ -1,4 +1,5 @@
   import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
   import 'package:kontena_pos/core/functions/order.dart';
   import 'package:shared_preferences/shared_preferences.dart';
   import 'core/functions/cart.dart';
@@ -259,5 +260,13 @@
     final statuses = await loadItemCheckedStatuses(orderId);
     orderManager.setItemCheckedStatuses(orderId, statuses);
     notifyListeners();
+  }
+    bool isItemChecked(String orderId, String itemId) {
+    _ensureInitialized();
+    return orderManager.isItemChecked(orderId, itemId);
+  }
+  String formatDateTime(DateTime dateTime) {
+    final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
+    return formatter.format(dateTime);
   }
   }

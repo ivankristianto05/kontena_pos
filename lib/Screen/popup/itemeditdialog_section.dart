@@ -65,28 +65,27 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
   void _editItem() {
     List<Map<String, dynamic>> filteredVariants =
         MenuVarian.where((variant) => variant['id_menu'] == _item.id).toList();
-
     final selectedVariant = _selectedVariantIndex >= 0 &&
             _selectedVariantIndex < filteredVariants.length
         ? filteredVariants[_selectedVariantIndex]
         : null;
 
-    // final editedItem = _item.copyWith(
-    //   variant: selectedVariant?['nama_varian'] ?? '',
-    //   variantId: selectedVariant?['id_varian'],
-    //   qty: _quantity,
-    //   addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
-    //   notes: _notes,
-    //   preference: {'preference': _selectedPreference},
-    //   variantPrice: _variantPrice,
-    // );
+    final editedItem = _item.copyWith(
+      variant: selectedVariant?['nama_varian'] ?? '',
+      variantId: selectedVariant?['id_varian'],
+      qty: _quantity,
+      addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
+      notes: _notes,
+      preference: {'preference': _selectedPreference},
+      variantPrice: _variantPrice,
+    );
 
-    // widget.cart.updateItem(widget.index, editedItem);
+    widget.cart.updateItem(widget.index, editedItem);
 
-    // Pastikan bahwa update ke AppState dilakukan
-    // widget.appState.update(() {
-    //   widget.appState.cartItems[widget.index] = editedItem;
-    // });
+    //Pastikan bahwa update ke AppState dilakukan
+    widget.appState.update(() {
+      widget.appState.cartItems[widget.index] = editedItem;
+    });
 
     Navigator.of(context).pop();
   }

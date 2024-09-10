@@ -29,10 +29,6 @@ class _ConfirmListState extends State<ConfirmList> {
         .firstWhere((order) => order.idOrder == currentOrderId)
         .items
         .every((item) => checkedItems['${currentOrderId}-${item.id}'] ?? false);
-
-    print('Checked Items: $checkedItems'); // Debug print
-    print('All Checked: $allChecked'); // Debug print
-
     if (widget.onAllChecked != null) {
       widget.onAllChecked!(allChecked);
     }
@@ -103,19 +99,18 @@ class _ConfirmListState extends State<ConfirmList> {
                                 ),
                               ),
                               Checkbox(
-                                value: checkedItems['${currentOrderId}-${listItem.items[i].id}'] ?? false,
+                                value: widget.appState.isItemChecked(
+                                    currentOrderId, listItem.items[i].id),
                                 onChanged: (bool? value) {
                                   setState(() {
-                                    checkedItems['${currentOrderId}-${listItem.items[i].id}'] = value ?? false;
+                                    // Memperbarui status centang menggunakan AppState
                                     widget.appState.setItemCheckedStatus(
                                       currentOrderId,
                                       listItem.items[i].id,
-                                      value ?? true,
+                                      value ?? false,
                                     );
+                                    // Periksa kembali status 'checked' untuk semua item setelah perubahan
                                     _checkAllCheckedStatus();
-
-                                    // Debug prints for checkbox value changes
-                                    print('Checkbox ${listItem.items[i].id} changed to: ${value ?? false}');
                                   });
                                 },
                               ),
@@ -147,8 +142,7 @@ class _ConfirmListState extends State<ConfirmList> {
                               Text(
                                 'Addons:',
                                 style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold),
+                                    fontSize: 14, fontWeight: FontWeight.bold),
                               ),
                               ...listItem.items[i].addons!.entries
                                   .where((addon) =>
@@ -159,19 +153,17 @@ class _ConfirmListState extends State<ConfirmList> {
                           ),
                         if (listItem.items[i].preference['preference'] !=
                                 null &&
-                            listItem.items[i].preference['preference']!
-                                .isNotEmpty)
+                            listItem
+                                .items[i].preference['preference']!.isNotEmpty)
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Preference:',
                                 style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold),
+                                    fontSize: 14, fontWeight: FontWeight.bold),
                               ),
-                              Text(
-                                  listItem.items[i].preference['preference']!,
+                              Text(listItem.items[i].preference['preference']!,
                                   style: TextStyle(fontSize: 14)),
                             ],
                           ),
@@ -182,8 +174,7 @@ class _ConfirmListState extends State<ConfirmList> {
                               Text(
                                 'Notes:',
                                 style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold),
+                                    fontSize: 14, fontWeight: FontWeight.bold),
                               ),
                               Text(listItem.items[i].notes,
                                   style: TextStyle(fontSize: 14)),

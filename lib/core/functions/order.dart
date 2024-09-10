@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
-import 'package:kontena_pos/models/list_to_confirm.dart';
+import 'package:kontena_pos/models/list_to_confirm.dart'; // Import untuk formatting tanggal
 
 class OrderManager extends ChangeNotifier {
   List<ListToConfirm> _confirmedOrders = [];
@@ -13,8 +14,7 @@ class OrderManager extends ChangeNotifier {
 
   // Set to store fully checked order IDs
   Set<String> _fullyCheckedOrders = {};
-
-    final Map<String, Map<String, bool>> _orderItemCheckedStatuses = {};
+  final Map<String, Map<String, bool>> _orderItemCheckedStatuses = {};
 
   bool _isOrderConfirmed = false;
   bool get isOrderConfirmed => _isOrderConfirmed;
@@ -53,7 +53,7 @@ class OrderManager extends ChangeNotifier {
   String getTableForCurrentOrder() {
     final order = _confirmedOrders.firstWhere(
       (order) => order.idOrder == _currentOrderId,
-      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: [], time: DateTime.now()),
     );
     return order.table;
   }
@@ -61,9 +61,7 @@ class OrderManager extends ChangeNotifier {
   void printConfirmedOrders() {
     for (var order in _confirmedOrders) {
       print('Order ID: ${order.idOrder}');
-      //print('Nama Pemesan: ${order.namaPemesan}');
-      //print('Table: ${order.table}');
-      print('Item Checked Statuses: ${order.itemCheckedStatuses}');
+      print('Order Time: ${formatDateTime(order.time)}'); // Use the new function here
     }
   }
 
@@ -73,6 +71,7 @@ class OrderManager extends ChangeNotifier {
       namaPemesan: _namaPemesan,
       table: _selectedTable,
       items: List.from(cartItems),
+      time: DateTime.now(), // Set current time
     );
   }
 
@@ -131,7 +130,7 @@ class OrderManager extends ChangeNotifier {
   void checkOrderItems(String orderId) {
     final order = _confirmedOrders.firstWhere(
       (order) => order.idOrder == orderId,
-      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: [], time: DateTime.now()),
     );
     final allChecked = order.items.every((item) => order.itemCheckedStatuses[item.id] ?? false);
     if (allChecked) {
@@ -156,7 +155,7 @@ class OrderManager extends ChangeNotifier {
     }
   }
 
-   Map<String, bool> getItemCheckedStatuses(String orderId) {
+  Map<String, bool> getItemCheckedStatuses(String orderId) {
     return _orderItemCheckedStatuses[orderId] ?? {};
   }
 
@@ -186,10 +185,24 @@ class OrderManager extends ChangeNotifier {
   }
 
   ListToConfirm getConfirmedOrderById(String orderId) {
-  return _confirmedOrders.firstWhere(
-    (order) => order.idOrder == orderId,
-    orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
-  );
-}
+    return _confirmedOrders.firstWhere(
+      (order) => order.idOrder == orderId,
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: [], time: DateTime.now()),
+    );
+  }
 
+  bool isItemChecked(String orderId, String itemId) {
+    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    if (index >= 0) {
+      final order = _confirmedOrders[index];
+      return order.itemCheckedStatuses[itemId] ?? false; // Default to false if not found
+    }
+    return false;
+  }
+
+  // Function to format DateTime to the desired format
+  String formatDateTime(DateTime dateTime) {
+    final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
+    return formatter.format(dateTime);
+  }
 }
