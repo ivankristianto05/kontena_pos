@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/Screen/popup/itemeditdialog_section.dart';
 import 'package:kontena_pos/constants.dart';
+import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:intl/intl.dart';
-import 'package:kontena_pos/app_state.dart'; // Import the AppState
+import 'package:kontena_pos/app_state.dart';
 
 class ItemCart extends StatelessWidget {
   final List<CartItem> cartItems;
   final double screenWidth;
   final void Function(CartItem editedItem) onEditItem;
-  final AppState appState; // Add this line to include appState
-  final Cart cart; // Add this line to include the cart
+  final AppState appState; // Include appState
+  final Cart cart; // Include the cart
 
   ItemCart({
     required this.cartItems,
     required this.screenWidth,
     required this.onEditItem,
-    required this.appState, // Add this line to require appState
-    required this.cart, // Add this line to require cart
+    required this.appState,
+    required this.cart,
   });
 
   final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
@@ -42,156 +43,120 @@ class ItemCart extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Menu title
-                Text(
-                  '${item.name} - (${item.qty})',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: DottedLine(
-                    dashColor: Colors.grey,
-                    lineThickness: 1.0,
-                    dashLength: 4.0,
-                    dashGapLength: 4.0,
-                  ),
-                ),
-                // Menu name - quantity
+                // Quantity and Name-Variant
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Quantity
+                    Text(
+                      '${item.qty}x ',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    // Name and Variant
                     Expanded(
-                      child: Text(
-                        '${item.name} - ${item.variant ?? ''} (${item.qty})',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w500),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${item.name} - ${item.variant ?? ''}',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      'Rp ${currencyFormat.format(price * item.qty)}',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                    ),
                   ],
                 ),
-                SizedBox(height: 4),
-                // Price calculation
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${item.qty}x Rp ${currencyFormat.format(price)}',
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
-                    ),
-                  ],
+
+                SizedBox(height: 8),
+                // Dotted Divider Line
+                DottedLine(
+                  dashColor: Colors.grey,
+                  lineThickness: 1.0,
+                  dashLength: 4.0,
+                  dashGapLength: 4.0,
                 ),
                 SizedBox(height: 8),
-                // Addons
-                if (item.addons != null && item.addons!.isNotEmpty)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Addons:',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      ...item.addons!.entries
-                          .where((addon) => addon.value['selected'] == true)
-                          .map((addon) => Text('${addon.key}',
-                              style: TextStyle(fontSize: 14))),
-                    ],
-                  ),
+                // Quantity x Price
+                Text(
+                  '${item.qty} x Rp ${currencyFormat.format(price)}',
+                  style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                ),
+                SizedBox(height: 8),
                 // Preference
                 if (item.preference['preference'] != null &&
                     item.preference['preference']!.isNotEmpty)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Preference:',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      Text(item.preference['preference']!,
-                          style: TextStyle(fontSize: 14)),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      'Preference: ${item.preference['preference']!}',
+                      style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                // Addons
+                if (item.addons != null && item.addons!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      'Addons: ${item.addons!.entries.where((addon) => addon.value['selected'] == true).map((addon) => addon.key).join(', ')}',
+                      style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                    ),
                   ),
                 // Notes
                 if (item.notes.isNotEmpty)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Notes:',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      Text(item.notes, style: TextStyle(fontSize: 14)),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      'Notes: ${item.notes}',
+                      style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                    ),
                   ),
                 SizedBox(height: 8),
-                // Stack for buttons
-                Container(
-                  height: 40,
-                  child: Stack(
-                    children: [
-                      // Edit button at bottom left
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: buttonselectedcolor,
-                            padding: EdgeInsets.symmetric(horizontal: 16),
+                // Action Buttons (Edit & Delete)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: buttonselectedcolor,
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => ItemEditDialog(
+                            index: cartItems.indexOf(item),
+                            cart: cart,
+                            appState: appState,
                           ),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => ItemEditDialog(
-                                index: cartItems
-                                    .indexOf(item), // Menentukan indeks item
-                                cart: cart,
-                                appState: appState,
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'Edit',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
+                        );
+                      },
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
                         ),
                       ),
-                      // Delete button at bottom right
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                redcolor, // Change color to red for delete
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                          onPressed: () {
-                            cart.removeItem(index);
-                            appState.update(() {
-                              appState.cartItems.remove(item);
-                            });
-                          },
-                          child: Text(
-                            'Delete',
-                            style: TextStyle(color: Colors.white, fontSize: 14),
-                          ),
-                        ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: redcolor,
+                        padding: EdgeInsets.symmetric(horizontal: 16),
                       ),
-                    ],
-                  ),
+                      onPressed: () {
+                        cart.removeItem(index);
+                        appState.update(() {
+                          appState.cartItems.remove(item);
+                        });
+                      },
+                      child: Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/models/list_to_confirm.dart';
 import 'package:kontena_pos/app_state.dart';
@@ -86,100 +87,73 @@ class _ConfirmListState extends State<ConfirmList> {
                             thickness: 1.0,
                             color: Colors.grey[400],
                           ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '${listItem.items[i].name} - (${listItem.items[i].qty})',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              Checkbox(
-                                value: widget.appState.isItemChecked(
-                                    currentOrderId, listItem.items[i].id),
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    // Memperbarui status centang menggunakan AppState
-                                    widget.appState.setItemCheckedStatus(
-                                      currentOrderId,
-                                      listItem.items[i].id,
-                                      value ?? false,
-                                    );
-                                    // Periksa kembali status 'checked' untuk semua item setelah perubahan
-                                    _checkAllCheckedStatus();
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text(
+                              '${listItem.items[i].qty}', // Display qty on the left
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(width: 8), // Space between qty and name-variant
                             Expanded(
-                              child: Text(
-                                '${listItem.items[i].name} - ${listItem.items[i].variant ?? ''} (${listItem.items[i].qty})',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${listItem.items[i].name} - ${listItem.items[i].variant ?? ''}',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  // Display additional information like preferences, addons, and notes
+                                  if (listItem.items[i].preference['preference'] != null &&
+                                      listItem.items[i].preference['preference']!.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4.0),
+                                      child: Text(
+                                        'Preference: ${listItem.items[i].preference['preference']!}',
+                                        style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                                      ),
+                                    ),
+                                  if (listItem.items[i].addons != null &&
+                                      listItem.items[i].addons!.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4.0),
+                                      child: Text(
+                                        'Addons: ${listItem.items[i].addons!.entries.where((addon) => addon.value['selected'] == true).map((addon) => addon.key).join(', ')}',
+                                        style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                                      ),
+                                    ),
+                                  if (listItem.items[i].notes.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4.0),
+                                      child: Text(
+                                        'Notes: ${listItem.items[i].notes}',
+                                        style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                                      ),
+                                    ),
+                                ],
                               ),
+                            ),
+                            Checkbox(
+                              value: widget.appState.isItemChecked(
+                                  currentOrderId, listItem.items[i].id),
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  // Update checked status using AppState
+                                  widget.appState.setItemCheckedStatus(
+                                    currentOrderId,
+                                    listItem.items[i].id,
+                                    value ?? false,
+                                  );
+                                  // Re-check all items' checked status after change
+                                  _checkAllCheckedStatus();
+                                });
+                              },
                             ),
                           ],
                         ),
-                        SizedBox(height: 4),
-                        if (listItem.items[i].addons != null &&
-                            listItem.items[i].addons!.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Addons:',
-                                style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.bold),
-                              ),
-                              ...listItem.items[i].addons!.entries
-                                  .where((addon) =>
-                                      addon.value['selected'] == true)
-                                  .map((addon) => Text('${addon.key}',
-                                      style: TextStyle(fontSize: 14))),
-                            ],
-                          ),
-                        if (listItem.items[i].preference['preference'] !=
-                                null &&
-                            listItem
-                                .items[i].preference['preference']!.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Preference:',
-                                style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.bold),
-                              ),
-                              Text(listItem.items[i].preference['preference']!,
-                                  style: TextStyle(fontSize: 14)),
-                            ],
-                          ),
-                        if (listItem.items[i].notes.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Notes:',
-                                style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.bold),
-                              ),
-                              Text(listItem.items[i].notes,
-                                  style: TextStyle(fontSize: 14)),
-                            ],
-                          ),
                       ],
                     ],
                   ),

@@ -82,7 +82,13 @@ class _NotesAndPreferenceSectionState extends State<NotesAndPreferenceSection> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          widget.onPreferenceSelected(index, preference);
+                          if (isSelected) {
+                            // Deselect if the same preference is selected
+                            widget.onPreferenceSelected(-1, '');
+                          } else {
+                            // Select the new preference
+                            widget.onPreferenceSelected(index, preference);
+                          }
                         },
                         child: Container(
                           decoration: BoxDecoration(

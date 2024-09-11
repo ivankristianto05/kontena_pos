@@ -7,3 +7,4 @@ const itembackgroundcolor = Color(0xFFD9D9D9);
 const redcolor = Color(0xFFCB2929);
 const greencolor = Color(0xFF158B21);
 const bluecolor = Color(0xFF009688);
+const textdetailcolor = Color(0xFF758694);

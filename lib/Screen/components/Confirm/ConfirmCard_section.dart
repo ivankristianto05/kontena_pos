@@ -121,7 +121,7 @@ class ConfirmCard extends StatelessWidget {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "${cartItem.qty}x",
+                                            "${cartItem.qty}",
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 14,
