@@ -61,7 +61,8 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     double smallButtonWidth = screenWidth * 0.05;
     double buttonWidth = screenWidth * 0.15;
 
-    Cart cart = Cart(appState);
+    // Cart cart = Cart(appState);
+    Cart cart = Cart();
 
     return Scaffold(
       appBar: BuildAppbar(
@@ -95,8 +96,8 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   width: searchbarWidth,
                 ),
                 Container(
-                  decoration: BoxDecoration(
-                    border: Border(
+                    decoration: BoxDecoration(
+                        border: Border(
                       top: BorderSide(
                         color: Colors.grey,
                         width: 1.0,
@@ -105,13 +106,11 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                         color: Colors.grey,
                         width: 1.0,
                       ),
-                    )
-                  ),
-                  child: Dropdown()
-                  ),
-                  Container(
-                    child: CUDIconButton(),
-                  )
+                    )),
+                    child: Dropdown()),
+                Container(
+                  child: CUDIconButton(),
+                )
               ],
             ),
             Expanded(

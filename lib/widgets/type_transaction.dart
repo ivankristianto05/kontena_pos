@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 
 class TypeTransaction extends StatefulWidget {
-  TypeTransaction({
-    super.key
-  });
+  TypeTransaction({Key? key}) : super(key: key);
 
   @override
   _TypeTransactionState createState() => _TypeTransactionState();
@@ -47,7 +46,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                   Row(
+                  Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -115,15 +114,30 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                       hoverColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
-                                        typeTransaction = 'dine-in';
+                                        setState(() {
+                                          if (typeTransaction == '') {
+                                            typeTransaction = 'dine-in';
+                                          } else if (typeTransaction !=
+                                              'dine-in') {
+                                            typeTransaction = 'dine-in';
+                                          } else {
+                                            typeTransaction = '';
+                                          }
+                                        });
                                         print('check, $typeTransaction');
                                       },
                                       child: Container(
                                         width: double.infinity,
                                         decoration: BoxDecoration(
-                                          color:theme.colorScheme.primaryContainer,
+                                          color: (typeTransaction == "dine-in")
+                                              ? theme.colorScheme.primary
+                                              : theme
+                                                  .colorScheme.primaryContainer,
                                           border: Border.all(
-                                            color: theme.colorScheme.surface,
+                                            color:
+                                                (typeTransaction == "dine-in")
+                                                    ? theme.colorScheme.primary
+                                                    : theme.colorScheme.surface,
                                             width: 1.0,
                                           ),
                                         ),
@@ -138,143 +152,23 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                             children: [
                                               Text(
                                                 'DINE-IN',
-                                                style: theme.textTheme.labelMedium,
+                                                style: (typeTransaction ==
+                                                        "dine-in")
+                                                    ? TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer)
+                                                    : theme
+                                                        .textTheme.labelMedium,
                                               ),
                                               Text(
                                                 'Pesanan Dine In',
-                                                style: theme.textTheme.labelSmall,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0, 4.0, 8.0, 4.0),
-                                    child: InkWell(
-                                      splashColor: Colors.transparent,
-                                      focusColor: Colors.transparent,
-                                      hoverColor: Colors.transparent,
-                                      highlightColor: Colors.transparent,
-                                      onTap: () async {
-                                        typeTransaction = 'ta';
-                                        print('check, $typeTransaction');
-                                      },
-                                      child: Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          color:theme.colorScheme.primaryContainer,
-                                          border: Border.all(
-                                            color: theme.colorScheme.surface,
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0.0, 6.0, 0.0, 6.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                'TA',
-                                                style: theme.textTheme.labelMedium,
-                                              ),
-                                              Text(
-                                                'Pesanan Take Away',
-                                                style: theme.textTheme.labelSmall,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0, 4.0, 8.0, 4.0),
-                                    child: InkWell(
-                                      splashColor: Colors.transparent,
-                                      focusColor: Colors.transparent,
-                                      hoverColor: Colors.transparent,
-                                      highlightColor: Colors.transparent,
-                                      onTap: () async {
-                                        typeTransaction = 'gojek';
-                                        print('check, $typeTransaction');
-                                      },
-                                      child: Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          color:theme.colorScheme.primaryContainer,
-                                          border: Border.all(
-                                            color: theme.colorScheme.surface,
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0.0, 6.0, 0.0, 6.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                'GOJEK',
-                                                style: theme.textTheme.labelMedium,
-                                              ),
-                                              Text(
-                                                'Pesanan GoFood',
-                                                style: theme.textTheme.labelSmall,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        8.0, 4.0, 8.0, 4.0),
-                                    child: InkWell(
-                                      splashColor: Colors.transparent,
-                                      focusColor: Colors.transparent,
-                                      hoverColor: Colors.transparent,
-                                      highlightColor: Colors.transparent,
-                                      onTap: () async {
-                                        typeTransaction = 'grab';
-                                        print('check, $typeTransaction');
-                                      },
-                                      child: Container(
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          color:theme.colorScheme.primaryContainer,
-                                          border: Border.all(
-                                            color: theme.colorScheme.surface,
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        child: Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  0.0, 6.0, 0.0, 6.0),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                'GRAB',
-                                                style: theme.textTheme.labelMedium,
-                                              ),
-                                              Text(
-                                                'Pesanan GrabFood',
-                                                style: theme.textTheme.labelSmall,
+                                                style: (typeTransaction ==
+                                                        "dine-in")
+                                                    ? TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer)
+                                                    : theme
+                                                        .textTheme.labelSmall,
                                               ),
                                             ],
                                           ),
@@ -292,14 +186,231 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
                                         setState(() {
-                                          typeTransaction = 'shopee';
+                                          if (typeTransaction == '') {
+                                            typeTransaction = 'ta';
+                                          } else if (typeTransaction != 'ta') {
+                                            typeTransaction = 'ta';
+                                          } else {
+                                            typeTransaction = '';
+                                          }
                                         });
                                         print('check, $typeTransaction');
                                       },
                                       child: Container(
                                         width: double.infinity,
                                         decoration: BoxDecoration(
-                                          color: ((typeTransaction != null) && (typeTransaction == 'shopee')) ? theme.colorScheme.primary : theme.colorScheme.primaryContainer,
+                                          color: (typeTransaction == "ta")
+                                              ? theme.colorScheme.primary
+                                              : theme
+                                                  .colorScheme.primaryContainer,
+                                          border: Border.all(
+                                            color: (typeTransaction == "ta")
+                                                ? theme.colorScheme.primary
+                                                : theme.colorScheme.surface,
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0.0, 6.0, 0.0, 6.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'TA',
+                                                style: (typeTransaction == "ta")
+                                                    ? TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer)
+                                                    : theme
+                                                        .textTheme.labelMedium,
+                                              ),
+                                              Text(
+                                                'Pesanan Take Away',
+                                                style: (typeTransaction == "ta")
+                                                    ? TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer)
+                                                    : theme
+                                                        .textTheme.labelSmall,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        8.0, 4.0, 8.0, 4.0),
+                                    child: InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        setState(() {
+                                          if (typeTransaction == '') {
+                                            typeTransaction = 'gojek';
+                                          } else if (typeTransaction !=
+                                              'gojek') {
+                                            typeTransaction = 'gojek';
+                                          } else {
+                                            typeTransaction = '';
+                                          }
+                                        });
+                                        print('check, $typeTransaction');
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: (typeTransaction == "gojek")
+                                              ? theme.colorScheme.primary
+                                              : theme
+                                                  .colorScheme.primaryContainer,
+                                          border: Border.all(
+                                            color: (typeTransaction == "gojek")
+                                                ? theme.colorScheme.primary
+                                                : theme.colorScheme.surface,
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0.0, 6.0, 0.0, 6.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'GOJEK',
+                                                style: (typeTransaction ==
+                                                        "gojek")
+                                                    ? TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer)
+                                                    : theme
+                                                        .textTheme.labelMedium,
+                                              ),
+                                              Text(
+                                                'Pesanan GoFood',
+                                                style: (typeTransaction ==
+                                                        "gojek")
+                                                    ? TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer)
+                                                    : theme
+                                                        .textTheme.labelSmall,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        8.0, 4.0, 8.0, 4.0),
+                                    child: InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        setState(() {
+                                          if (typeTransaction == '') {
+                                            typeTransaction = 'grab';
+                                          } else if (typeTransaction !=
+                                              'grab') {
+                                            typeTransaction = 'grab';
+                                          } else {
+                                            typeTransaction = '';
+                                          }
+                                        });
+                                        print('check, $typeTransaction');
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: (typeTransaction == "grab")
+                                              ? theme.colorScheme.primary
+                                              : theme
+                                                  .colorScheme.primaryContainer,
+                                          border: Border.all(
+                                            color: (typeTransaction == "grab")
+                                                ? theme.colorScheme.primary
+                                                : theme.colorScheme.surface,
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  0.0, 6.0, 0.0, 6.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'GRAB',
+                                                style: (typeTransaction ==
+                                                        "grab")
+                                                    ? TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer)
+                                                    : theme
+                                                        .textTheme.labelMedium,
+                                              ),
+                                              Text(
+                                                'Pesanan GrabFood',
+                                                style: (typeTransaction ==
+                                                        "grab")
+                                                    ? TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer)
+                                                    : theme
+                                                        .textTheme.labelSmall,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        8.0, 4.0, 8.0, 4.0),
+                                    child: InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        setState(() {
+                                          if (typeTransaction == '') {
+                                            typeTransaction = 'shopee';
+                                          } else if (typeTransaction !=
+                                              'shopee') {
+                                            typeTransaction = 'shopee';
+                                          } else {
+                                            typeTransaction = '';
+                                          }
+                                        });
+                                        print('check, $typeTransaction');
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: (typeTransaction == "shopee")
+                                              ? theme.colorScheme.primary
+                                              : theme
+                                                  .colorScheme.primaryContainer,
                                           border: Border.all(
                                             color: theme.colorScheme.surface,
                                             width: 1.0,
@@ -316,11 +427,19 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                             children: [
                                               Text(
                                                 'SHOPEE',
-                                                style: ((typeTransaction != null) && (typeTransaction == 'shopee')) ? theme.textTheme.titleSmall : theme.textTheme.labelMedium,
+                                                style: (typeTransaction ==
+                                                        "shopee")
+                                                    ? theme.textTheme.titleSmall
+                                                    : theme
+                                                        .textTheme.labelMedium,
                                               ),
                                               Text(
                                                 'Pesanan ShopeeFood',
-                                                style: ((typeTransaction != null) && (typeTransaction == 'shopee')) ? theme.textTheme.titleSmall : theme.textTheme.labelSmall,
+                                                style: (typeTransaction ==
+                                                        "shopee")
+                                                    ? theme.textTheme.titleSmall
+                                                    : theme
+                                                        .textTheme.labelSmall,
                                               ),
                                             ],
                                           ),
@@ -355,6 +474,20 @@ class _TypeTransactionState extends State<TypeTransaction> {
                             highlightColor: Colors.transparent,
                             onTap: () async {
                               // typeTransaction = 'dinein';
+                              setState(() {
+                                AppState().typeTransaction = typeTransaction;
+                              });
+                              // AppState().update(() {
+                              //   AppState().typeTransaction = typeTransaction;
+                              // });
+                              // Navigator.pop(context);
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                AppRoutes.invoiceScreen,
+                                (route) => false,
+                              );
+                              // context.pushNamed('');
+                              setState(() {});
                             },
                             child: Container(
                               width: double.infinity,

@@ -23,7 +23,7 @@ class _DropdownState extends State<Dropdown> {
     setState(() {
       final fetchedTable = appState.getTableForCurrentOrder();
       // Jika table adalah '', set nilai table menjadi null
-      table = fetchedTable.isNotEmpty ? fetchedTable : null; 
+      table = fetchedTable.isNotEmpty ? fetchedTable : null;
     });
   }
 
@@ -34,7 +34,7 @@ class _DropdownState extends State<Dropdown> {
 
     // Access AppState and Cart
     final appState = Provider.of<AppState>(context);
-    final cart = Cart(appState, onCartChanged: () => setState(() {}));
+    final cart = Cart(onCartChanged: () => setState(() {}));
 
     // Define table options
     final List<String> tableOptions = <String>[
@@ -143,7 +143,8 @@ class _DropdownState extends State<Dropdown> {
                       table = newValue;
                     });
                     if (newValue != null) {
-                      appState.setSelectedTable(newValue); // Save selected table to AppState
+                      appState.setSelectedTable(
+                          newValue); // Save selected table to AppState
                     }
                   },
                   selectedItemBuilder: (BuildContext context) {
