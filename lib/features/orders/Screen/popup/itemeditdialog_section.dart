@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
-import 'package:kontena_pos/Screen/popup/variant_section.dart';
-import 'package:kontena_pos/Screen/popup/noteandpreference_section.dart';
-import 'package:kontena_pos/Screen/popup/addons_section.dart';
-import 'package:kontena_pos/Screen/popup/sumary_section.dart';
+import 'package:kontena_pos/features/orders/Screen/popup/variant_section.dart';
+import 'package:kontena_pos/features/orders/Screen/popup/noteandpreference_section.dart';
+import 'package:kontena_pos/features/orders/Screen/popup/addons_section.dart';
+import 'package:kontena_pos/features/orders/Screen/popup/sumary_section.dart';
 import 'package:kontena_pos/data/menuvarian.dart';
 
 class ItemEditDialog extends StatefulWidget {

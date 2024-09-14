@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/data/addons_preference.dart';
 
 class AddonSection extends StatefulWidget {
   final String type;
@@ -26,21 +27,8 @@ class _AddonSectionState extends State<AddonSection> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> addons = [];
-    if (widget.type == 'food') {
-      addons = ['Extra Cheese', 'Extra Sauce', 'Extra Spice'];
-    } else if (widget.type == 'beverage') {
-      addons = [
-        'Coconut Jelly',
-        'Whipped Cream',
-        'Soy Milk',
-        'Boba',
-        'Chocolate',
-        'Oreo'
-      ];
-    } else if (widget.type == 'breakfast') {
-      addons = ['Extra Egg', 'Bacon', 'Sausage'];
-    }
+    // Gunakan data dari addons_data.dart
+    Map<String, double> addons = addonsByType[widget.type] ?? {};
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -53,12 +41,13 @@ class _AddonSectionState extends State<AddonSection> {
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: List.generate(addons.length, (index) {
-                  final addon = addons[index];
+                children: addons.entries.map((entry) {
+                  final addon = entry.key;
+                  final price = entry.value;
                   return Column(
                     children: [
                       CheckboxListTile(
-                        title: Text(addon),
+                        title: Text('$addon - \$${price.toStringAsFixed(2)}'),
                         value: _selectedAddons[addon] ?? false,
                         onChanged: (bool? value) {
                           setState(() {
@@ -70,7 +59,7 @@ class _AddonSectionState extends State<AddonSection> {
                       SizedBox(height: 8.0), // Add spacing between Checkboxes
                     ],
                   );
-                }),
+                }).toList(),
               ),
             ),
           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kontena_pos/Screen/popup/confirm_menu.dart';
+import 'package:kontena_pos/features/orders/Screen/popup/confirm_input.dart';
 import 'package:kontena_pos/constants.dart';
 
 class CUDIconButton extends StatefulWidget {
@@ -37,7 +37,7 @@ class _CUDIconButtonState extends State<CUDIconButton> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return ConfirmInputMenu(); // Panggil widget ConfirmInputMenu di sini
+                    return ConfirmInput(); // Panggil widget ConfirmInputMenu di sini
                   },
                 );
               },

@@ -76,6 +76,7 @@ class ConfirmCard extends StatelessWidget {
                                   maxFontSize: 14,
                                   overflow: TextOverflow.ellipsis,
                                 ),
+                                
                                 AutoSizeText(
                                   appState.formatDateTime(order.time), // Use formatted date here
                                   style: TextStyle(

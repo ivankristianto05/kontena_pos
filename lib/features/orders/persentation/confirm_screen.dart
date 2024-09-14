@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/Screen/components/Confirm/CUD_iconbutton_section.dart';
-import 'package:kontena_pos/Screen/components/appbar_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Confirm/CUD_iconbutton_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Confirm/ConfirmCard_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/appbar_section.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
-import 'package:kontena_pos/Screen/components/Confirm/confirmbutton_section.dart';
-import 'package:kontena_pos/Screen/components/Confirm/confirmcard_section.dart';
-import 'package:kontena_pos/Screen/components/Confirm/confirmlist_section.dart';
-import 'package:kontena_pos/Screen/components/Confirm/dropdown_section.dart';
-import 'package:kontena_pos/Screen/components/Confirm/guestname_section.dart';
-import 'package:kontena_pos/Screen/components/footer_section.dart';
-import 'package:kontena_pos/Screen/components/searchbar_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Confirm/confirmbutton_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Confirm/confirmlist_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Confirm/dropdown_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Confirm/guestname_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/footer_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/constants.dart';
 
 class ConfirmScreen extends StatefulWidget {
