@@ -42,6 +42,7 @@ class _ConfirmInputDetailState extends State<ConfirmInputDetail> {
     final List<Map<String, dynamic>> filteredVariants = MenuVarian
       .where((variant) => variant['id_menu'] == widget.idMenu)
       .toList();
+
     final selectedVariant = _selectedVariantIndex >= 0 && _selectedVariantIndex < filteredVariants.length
         ? filteredVariants[_selectedVariantIndex]
         : null;
@@ -78,13 +79,13 @@ class _ConfirmInputDetailState extends State<ConfirmInputDetail> {
         // AppBar
         Container(
           color: Colors.white,
-          height: screenHeight*0.08,
-          padding: EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+          height: screenHeight * 0.08,
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'Ayam Goreng',
+                widget.name,
                 style: TextStyle(color: Colors.black, fontSize: 20),
               ),
             ],

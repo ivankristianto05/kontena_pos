@@ -44,10 +44,24 @@ class _AddonSectionState extends State<AddonSection> {
                 children: addons.entries.map((entry) {
                   final addon = entry.key;
                   final price = entry.value;
+
                   return Column(
                     children: [
                       CheckboxListTile(
-                        title: Text('$addon - \$${price.toStringAsFixed(2)}'),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              addon,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Rp ${price.toStringAsFixed(0)}',
+                            style: TextStyle(color: Colors.grey,fontSize: 14,fontWeight: FontWeight.w500)
+                            ),
+                          ],
+                        ),
                         value: _selectedAddons[addon] ?? false,
                         onChanged: (bool? value) {
                           setState(() {
@@ -55,6 +69,7 @@ class _AddonSectionState extends State<AddonSection> {
                             widget.onAddonChanged(_selectedAddons);
                           });
                         },
+                        controlAffinity: ListTileControlAffinity.trailing, // Align checkbox to the right
                       ),
                       SizedBox(height: 8.0), // Add spacing between Checkboxes
                     ],

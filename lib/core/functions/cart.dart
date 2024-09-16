@@ -14,6 +14,7 @@ class CartItem {
   final int price;
   int variantPrice;
   int totalPrice;
+  int addonsPrice; // New field to store the total price of addons
   Map<String, Map<String, dynamic>>? addons;
   String notes;
   Map<String, String> preference;
@@ -27,11 +28,14 @@ class CartItem {
     required this.qty,
     required this.price,
     this.variantPrice = 0,
+    this.addonsPrice = 0, // Initialize with 0
     this.addons,
     required this.notes,
     required this.preference,
     this.type,
-  }) : totalPrice = qty * (variantPrice != 0 ? variantPrice : price);
+  }) : totalPrice = qty *
+            (variantPrice != 0 ? variantPrice : price) + // Existing price calculation
+            (addonsPrice); // Add addonsPrice to totalPrice
 
   // Constructor for creating a copy of an existing CartItem
   CartItem.from(CartItem item)
@@ -42,6 +46,7 @@ class CartItem {
         qty = item.qty,
         price = item.price,
         variantPrice = item.variantPrice,
+        addonsPrice = item.addonsPrice, // Copy addonsPrice
         totalPrice = item.totalPrice,
         addons = item.addons != null ? Map.from(item.addons!) : null,
         notes = item.notes,
@@ -54,6 +59,7 @@ class CartItem {
     String? variantId,
     int? qty,
     int? variantPrice,
+    int? addonsPrice, // Add addonsPrice to copyWith
     Map<String, Map<String, dynamic>>? addons,
     String? notes,
     Map<String, String>? preference,
@@ -66,12 +72,19 @@ class CartItem {
       qty: qty ?? this.qty,
       price: price,
       variantPrice: variantPrice ?? this.variantPrice,
+      addonsPrice: addonsPrice ?? this.addonsPrice, // Add addonsPrice
       addons: addons ?? this.addons,
       notes: notes ?? this.notes,
       preference: preference ?? this.preference,
       type: type,
     );
   }
+
+  // Method to calculate total price (qty * (variantPrice or price) + addonsPrice)
+  void calculateTotalPrice() {
+    totalPrice = qty * (variantPrice != 0 ? variantPrice : price) + addonsPrice;
+  }
+
   // Method to convert CartItem to a Map with specific fields only
   Map<String, dynamic> toMap() {
     return {
@@ -85,23 +98,6 @@ class CartItem {
       'preference': preference,
       'type': type,
     };
-  }
-
-  // Method to create a CartItem from a Map
-  factory CartItem.fromMap(Map<String, dynamic> map) {
-    return CartItem(
-      id: map['id'],
-      name: map['name'],
-      variant: map['variant'],
-      variantId: map['variantId'],
-      qty: map['qty'],
-      price: map['price'],
-      variantPrice: map['variantPrice'] ?? 0,
-      addons: Map<String, Map<String, dynamic>>.from(map['addons'] ?? {}),
-      notes: map['notes'],
-      preference: Map<String, String>.from(map['preference'] ?? {}),
-      type: map['type'],
-    );
   }
 }
 
@@ -118,21 +114,34 @@ class Cart {
 
   List<CartItem> get items => List.from(_items);
 
+  int _calculateAddonsPrice(Map<String, Map<String, dynamic>>? addons) {
+    int total = 0;
+    if (addons != null) {
+      addons.forEach((addonCategory, addonDetails) {
+        if (addonDetails.containsKey('price')) {
+          total += addonDetails['price'] as int;
+        }
+      });
+    }
+    return total;
+  }
+  
   void _recalculateTotalPrice() {
     for (var item in _items) {
-      item.totalPrice = item.qty *
-          (item.variantPrice != 0 ? item.variantPrice : item.price);
+      item.addonsPrice = _calculateAddonsPrice(item.addons); // Calculate addons price
+      item.calculateTotalPrice(); // Recalculate the total price with addons
+      print('total harga $item.calculateTotalPrice');
     }
   }
 
-  void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
+   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
     final existingItemIndex = _items.indexWhere((item) =>
         item.id == newItem.id && item.variantId == newItem.variantId);
 
     if (existingItemIndex >= 0) {
       var existingItem = _items[existingItemIndex];
       if (mode == CartMode.add) {
-        existingItem.qty += newItem.qty; // Menambah quantity
+        existingItem.qty += newItem.qty; // Update quantity
       } else {
         existingItem.qty = newItem.qty;
       }
@@ -143,14 +152,15 @@ class Cart {
         preference: newItem.preference,
         addons: newItem.addons,
         variantPrice: newItem.variantPrice,
+        addonsPrice: _calculateAddonsPrice(newItem.addons), // Calculate addons price
       );
       _items[existingItemIndex] = existingItem;
     } else {
       _items.add(CartItem.from(newItem));
     }
 
-    _recalculateTotalPrice();
-    _onCartChanged?.call();
+    _recalculateTotalPrice(); // Recalculate total price after adding/updating item
+    _onCartChanged?.call(); // Notify listeners
     appState.addItemToCart(newItem); // Update AppState
   }
 
