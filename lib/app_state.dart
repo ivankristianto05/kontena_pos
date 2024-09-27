@@ -1,218 +1,252 @@
-  import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-  import 'package:kontena_pos/core/functions/order.dart';
-  import 'package:shared_preferences/shared_preferences.dart';
-  import 'core/functions/cart.dart';
-  import 'models/list_to_confirm.dart';
-  import 'dart:convert';
+import 'package:kontena_pos/core/functions/order.dart';
+import 'package:kontena_pos/models/cartitem.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'core/functions/cart.dart';
+import 'models/list_to_confirm.dart';
+import 'dart:convert';
 
+class AppState extends ChangeNotifier {
+  static AppState _instance = AppState._internal();
 
-  class AppState extends ChangeNotifier {
-    static AppState _instance = AppState._internal();
+  factory AppState() {
+    return _instance;
+  }
 
-    factory AppState() {
-      return _instance;
+  AppState._internal();
+
+  static void reset() {
+    _instance = AppState._internal();
+  }
+
+  Future initializeState() async {
+    prefs = await SharedPreferences.getInstance();
+    orderManager = OrderManager(this);
+    notifyListeners();
+  }
+
+  void update(VoidCallback callback) {
+    callback();
+    notifyListeners();
+  }
+
+  late SharedPreferences prefs;
+  late OrderManager orderManager;
+
+  void _ensureInitialized() {
+    if (!isInitialized) {
+      throw StateError('AppState has not been initialized.');
     }
+  }
 
-    AppState._internal();
+  bool get isInitialized => orderManager != null;
 
-    static void reset() {
-      _instance = AppState._internal();
-    }
+  // List to store cart items
+  List<CartItem> _cartItems = [];
+  List<CartItem> get cartItems => _cartItems;
 
-    Future initializeState() async {
-      prefs = await SharedPreferences.getInstance();
-      orderManager = OrderManager(this);
-      notifyListeners();
-    }
+  // Variabel untuk menyimpan total harga
+  double _totalPrice = 0.0;  // Inisialisasi dengan nilai awal 0
 
-    void update(VoidCallback callback) {
-      callback();
-      notifyListeners();
-    }
+  // Getter untuk mengambil nilai total harga
+  double get totalPrice => _totalPrice;
 
-    late SharedPreferences prefs;
+  // Method untuk menemukan indeks item di cart
+  int findItemIndex(CartItem newItem) {
+    _ensureInitialized();
+    return _cartItems.indexWhere((item) =>
+        item.id == newItem.id &&
+        item.variant == newItem.variant &&
+        item.preference.toString() == newItem.preference.toString() &&
+        item.addons.toString() == newItem.addons.toString());
+  }
 
-    late OrderManager orderManager;
+  // Method untuk menambahkan atau mengupdate item di cart
+void addItemToCart(CartItem newItem) {
+  _ensureInitialized();
 
-    void _ensureInitialized() {
-      if (!isInitialized) {
-        throw StateError('AppState has not been initialized.');
-      }
-    }
+  final existingItemIndex = findItemIndex(newItem);
 
-    bool get isInitialized => orderManager != null;
+  if (existingItemIndex >= 0) {
+    // If item already exists, update quantity and total price
+    var existingItem = _cartItems[existingItemIndex];
+    existingItem.qty += newItem.qty;
+    existingItem.variant = newItem.variant;
+    existingItem.variantId = newItem.variantId;
+    existingItem.notes = newItem.notes;
+    existingItem.preference = newItem.preference;
+    existingItem.addons = newItem.addons;
+    existingItem.variantPrice = newItem.variantPrice;
 
-    // List to store cart items
-    List<CartItem> _cartItems = [];
-    List<CartItem> get cartItems => _cartItems;
+    // Update the total price for the updated item
+    existingItem.totalPrice = existingItem.qty *
+        (existingItem.variantPrice != 0
+            ? existingItem.variantPrice
+            : existingItem.price);
 
-    // Method to find the index of an item in the cart
-    int findItemIndex(CartItem newItem) {
-      _ensureInitialized();
-      return _cartItems.indexWhere((item) =>
-          item.id == newItem.id &&
-          item.variant == newItem.variant &&
-          item.preference.toString() == newItem.preference.toString() &&
-          item.addons.toString() == newItem.addons.toString());
-    }
+    // Update the cart item list
+    _cartItems[existingItemIndex] = CartItem.from(existingItem);
+  } else {
+    // If item is new, add it to the cart
+    _cartItems.add(CartItem.from(newItem));
+  }
 
-    // Method to add or update an item in the cart
-    void addItemToCart(CartItem newItem) {
-      _ensureInitialized();
-      final existingItemIndex = findItemIndex(newItem);
-      if (existingItemIndex >= 0) {
-        var existingItem = _cartItems[existingItemIndex];
-        existingItem.qty += newItem.qty;
-        existingItem.variant = newItem.variant;
-        existingItem.variantId = newItem.variantId;
-        existingItem.notes = newItem.notes;
-        existingItem.preference = newItem.preference;
-        existingItem.addons = newItem.addons;
-        existingItem.variantPrice = newItem.variantPrice;
-        existingItem.totalPrice = existingItem.qty *
-            (existingItem.variantPrice != 0 ? existingItem.variantPrice : existingItem.price);
-        _cartItems[existingItemIndex] = CartItem.from(existingItem);
-      } else {
-        _cartItems.add(CartItem.from(newItem));
-      }
-      notifyListeners();
-    }
+  // Recalculate total price for all items after updating the cart
+  recalculateAppStateTotalPrice();
 
-    void updateItemInCart(int index) {
-      _ensureInitialized();
-      if (index >= 0 && index < _cartItems.length) {
-        notifyListeners();
-      } else {
-        print('Invalid index: $index');
-      }
-    }
+  // Log the added/updated item
+  print('Adding item: ${newItem.name}, Qty: ${newItem.qty}, Total Price: Rp ${newItem.totalPrice}');
+  print('Cart contains ${_cartItems.length} items');
+}
 
-    // Reset the cart
-    void resetCart() {
-      _ensureInitialized();
-      _cartItems = [];
-      notifyListeners();
-    }
 
-    // Proxy method calls to OrderManager
-    void setNamaPemesan(String name) {
-      _ensureInitialized();
-      orderManager.setNamaPemesan(name);
-      notifyListeners();
-    }
+void updateTotalPrice(double newTotalPrice) {
+  if (_totalPrice != newTotalPrice) {
+    _totalPrice = newTotalPrice;
+    notifyListeners();  // Notify only when there's an actual update
+    print('AppState - Total Price Updated: Rp $_totalPrice');
+  }
+}
 
-    String get namaPemesan {
-      _ensureInitialized();
-      return orderManager.namaPemesan;
-    }
+void recalculateAppStateTotalPrice() {
+  double recalculatedTotalPrice = _cartItems.fold(0.0, (sum, item) => sum + item.totalPrice);
 
-    String get currentOrderId {
-      _ensureInitialized();
-      return orderManager.currentOrderId;
-    }
+  // Update total price if it has changed
+  if (recalculatedTotalPrice != _totalPrice) {
+    updateTotalPrice(recalculatedTotalPrice);
+  }
 
-    void setCurrentOrderId(String orderId) {
-      _ensureInitialized();
-      orderManager.setCurrentOrderId(orderId);
-      notifyListeners();
-    }
+  print('AppState - Total Price Recalculated: Rp $recalculatedTotalPrice');
+}
 
-    void setSelectedTable(String table) {
-      _ensureInitialized();
-      orderManager.setSelectedTable(table);
-      notifyListeners();
-    }
 
-    String get selectedTable {
-      _ensureInitialized();
-      return orderManager.selectedTable;
-    }
+void resetCart() {
+  _ensureInitialized();
+  _cartItems = [];
+  _totalPrice = 0.0; // Reset total price when the cart is cleared
+  notifyListeners();
+}
 
-    void resetSelectedTable() {
-      _ensureInitialized();
-      orderManager.resetSelectedTable();
-      notifyListeners();
-    }
+  
+  // Proxy method calls to OrderManager
+  void setNamaPemesan(String name) {
+    _ensureInitialized();
+    orderManager.setNamaPemesan(name);
+    notifyListeners();
+  }
 
-    String getTableForCurrentOrder() {
-      _ensureInitialized();
-      return orderManager.getTableForCurrentOrder();
-    }
+  String get namaPemesan {
+    _ensureInitialized();
+    return orderManager.namaPemesan;
+  }
 
-    void printConfirmedOrders() {
-      _ensureInitialized();
-      orderManager.printConfirmedOrders();
-    }
+  String get currentOrderId {
+    _ensureInitialized();
+    return orderManager.currentOrderId;
+  }
 
-    void confirmOrder(String idOrder) {
-      _ensureInitialized();
-      orderManager.confirmOrder(idOrder, _cartItems);
-      notifyListeners();
-    }
+  void setCurrentOrderId(String orderId) {
+    _ensureInitialized();
+    orderManager.setCurrentOrderId(orderId);
+    notifyListeners();
+  }
 
-    void confirmOrderStatus(String orderId) {
-      _ensureInitialized();
-      orderManager.confirmOrderStatus(orderId);
-      notifyListeners();
-    }
+  void setSelectedTable(String table) {
+    _ensureInitialized();
+    orderManager.setSelectedTable(table);
+    notifyListeners();
+  }
 
-    Future<void> createOrder({
-      required TextEditingController guestNameController,
-      required VoidCallback resetDropdown,
-      required VoidCallback onSuccess,
-    }) async {
-      _ensureInitialized();
-      await orderManager.createOrder(
-        guestNameController: guestNameController,
-        resetDropdown: resetDropdown,
-        onSuccess: onSuccess,
-        cartItems: _cartItems,
-      );
-      notifyListeners();
-    }
+  String get selectedTable {
+    _ensureInitialized();
+    return orderManager.selectedTable;
+  }
 
-    void addOrder(ListToConfirm order) {
-      _ensureInitialized();
-      orderManager.addOrder(order);
-      notifyListeners();
-    }
+  void resetSelectedTable() {
+    _ensureInitialized();
+    orderManager.resetSelectedTable();
+    notifyListeners();
+  }
 
-    Set<String> get fullyCheckedOrders {
-      _ensureInitialized();
-      return orderManager.fullyCheckedOrders;
-    }
+  String getTableForCurrentOrder() {
+    _ensureInitialized();
+    return orderManager.getTableForCurrentOrder();
+  }
 
-    void addFullyCheckedOrder(String orderId) {
-      _ensureInitialized();
-      orderManager.addFullyCheckedOrder(orderId);
-      notifyListeners();
-    }
+  void printConfirmedOrders() {
+    _ensureInitialized();
+    orderManager.printConfirmedOrders();
+  }
 
-    void removeFullyCheckedOrder(String orderId) {
-      _ensureInitialized();
-      orderManager.removeFullyCheckedOrder(orderId);
-      notifyListeners();
-    }
+  void confirmOrder(String idOrder) {
+    _ensureInitialized();
+    orderManager.confirmOrder(idOrder, _cartItems);
+    notifyListeners();
+  }
 
-    bool isOrderFullyChecked(String orderId) {
-      _ensureInitialized();
-      return orderManager.isOrderFullyChecked(orderId);
-    }
+  void confirmOrderStatus(String orderId) {
+    _ensureInitialized();
+    orderManager.confirmOrderStatus(orderId);
+    notifyListeners();
+  }
 
-    // Getter to check if any orders are confirmed
-    bool get isOrderConfirmed {
-      _ensureInitialized();
-      return orderManager.confirmedOrders.isNotEmpty;
-    }
+  Future<void> createOrder({
+    required TextEditingController guestNameController,
+    required VoidCallback resetDropdown,
+    required VoidCallback onSuccess,
+  }) async {
+    _ensureInitialized();
+    await orderManager.createOrder(
+      guestNameController: guestNameController,
+      resetDropdown: resetDropdown,
+      onSuccess: onSuccess,
+      cartItems: _cartItems,
+    );
+    notifyListeners();
+  }
 
-    // Getter to retrieve the list of confirmed orders
-    List<ListToConfirm> get confirmedOrders {
-      _ensureInitialized();
-      return orderManager.confirmedOrders;
-    }
+  void addOrder(ListToConfirm order) {
+    _ensureInitialized();
+    orderManager.addOrder(order);
+    notifyListeners();
+  }
 
-    void checkOrderItems(String orderId) {
+  Set<String> get fullyCheckedOrders {
+    _ensureInitialized();
+    return orderManager.fullyCheckedOrders;
+  }
+
+  void addFullyCheckedOrder(String orderId) {
+    _ensureInitialized();
+    orderManager.addFullyCheckedOrder(orderId);
+    notifyListeners();
+  }
+
+  void removeFullyCheckedOrder(String orderId) {
+    _ensureInitialized();
+    orderManager.removeFullyCheckedOrder(orderId);
+    notifyListeners();
+  }
+
+  bool isOrderFullyChecked(String orderId) {
+    _ensureInitialized();
+    return orderManager.isOrderFullyChecked(orderId);
+  }
+
+  // Getter to check if any orders are confirmed
+  bool get isOrderConfirmed {
+    _ensureInitialized();
+    return orderManager.confirmedOrders.isNotEmpty;
+  }
+
+  // Getter to retrieve the list of confirmed orders
+  List<ListToConfirm> get confirmedOrders {
+    _ensureInitialized();
+    return orderManager.confirmedOrders;
+  }
+
+  void checkOrderItems(String orderId) {
     _ensureInitialized();
     orderManager.checkOrderItems(orderId);
     notifyListeners();
@@ -224,12 +258,13 @@ import 'package:intl/intl.dart';
   //     notifyListeners();
   //   }
 
-    Map<String, bool> getItemCheckedStatuses(String orderId) {
-      _ensureInitialized();
-      return orderManager.getItemCheckedStatuses(orderId);
-    }
+  Map<String, bool> getItemCheckedStatuses(String orderId) {
+    _ensureInitialized();
+    return orderManager.getItemCheckedStatuses(orderId);
+  }
 
-    Future<void> saveItemCheckedStatuses(String orderId, Map<String, bool> statuses) async {
+  Future<void> saveItemCheckedStatuses(
+      String orderId, Map<String, bool> statuses) async {
     _ensureInitialized();
     final prefs = await SharedPreferences.getInstance();
     final jsonString = jsonEncode(statuses);
@@ -243,10 +278,12 @@ import 'package:intl/intl.dart';
     return Map<String, bool>.from(jsonDecode(jsonString));
   }
 
-  void setItemCheckedStatus(String orderId, String itemId, bool isChecked) async {
+  void setItemCheckedStatus(
+      String orderId, String itemId, bool isChecked) async {
     _ensureInitialized();
     final order = orderManager.getConfirmedOrderById(orderId);
-    final updatedItemCheckedStatuses = Map<String, bool>.from(order.itemCheckedStatuses);
+    final updatedItemCheckedStatuses =
+        Map<String, bool>.from(order.itemCheckedStatuses);
     updatedItemCheckedStatuses[itemId] = isChecked;
 
     // Save the updated statuses
@@ -261,12 +298,14 @@ import 'package:intl/intl.dart';
     orderManager.setItemCheckedStatuses(orderId, statuses);
     notifyListeners();
   }
-    bool isItemChecked(String orderId, String itemId) {
+
+  bool isItemChecked(String orderId, String itemId) {
     _ensureInitialized();
     return orderManager.isItemChecked(orderId, itemId);
   }
+
   String formatDateTime(DateTime dateTime) {
     final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
     return formatter.format(dateTime);
   }
-  }
+}

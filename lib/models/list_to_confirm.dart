@@ -1,4 +1,4 @@
-import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/models/cartitem.dart';
 
 class ListToConfirm {
   final String idOrder;

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/constants.dart';
-import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:intl/intl.dart';
 import 'package:kontena_pos/routes/app_routes.dart';
 import 'package:provider/provider.dart';
@@ -10,13 +9,11 @@ class ActionButton extends StatelessWidget {
   const ActionButton({
     super.key,
     required this.screenWidth,
-    required this.cart,
     required this.guestNameController,
     required this.resetDropdown,
   });
 
   final double screenWidth;
-  final Cart cart;
   final TextEditingController guestNameController;
   final VoidCallback resetDropdown;
 
@@ -27,19 +24,18 @@ class ActionButton extends StatelessWidget {
     return Consumer<AppState>(
       builder: (context, appState, child) {
         // Ensure AppState is initialized
+              double totalPrice = appState.totalPrice; // This will trigger a rebuild if totalPrice changes
+
         if (!appState.isInitialized) {
           return Center(child: CircularProgressIndicator());
         }
 
-        int numberOfSelectedItemIds = cart.items.length;
+        // Get number of selected items from the cart
+        int numberOfSelectedItemIds = appState.cartItems.length;
 
-        double totalPrice = cart.items.fold(0.0, (sum, item) {
-          double price = (item.variantPrice != 0)
-              ? item.variantPrice.toDouble()
-              : item.price.toDouble();
-          return sum + price * item.qty;
-        });
+        // Get total price directly from AppState
 
+        // Format total price
         final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
         String formattedTotalPrice = 'Rp ${currencyFormat.format(totalPrice)}';
 

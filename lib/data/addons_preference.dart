@@ -19,8 +19,6 @@ const Map<String, Map<String, double>> addonsByType = {
   },
 };
 
-
-
 const Map<String, List<String>> preferencesByType = {
   'food': [
     'original',

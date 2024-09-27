@@ -5,9 +5,9 @@ import 'package:kontena_pos/features/orders/Screen/popup/noteandpreference_secti
 import 'package:kontena_pos/features/orders/Screen/popup/sumary_section.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/variant_section.dart';
 import 'package:kontena_pos/data/menuvarian.dart';
+import 'package:kontena_pos/models/cartitem.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
-import '../../../../core/functions/cart.dart';
 
 class ItemDetailsDialog extends StatefulWidget {
   final String name;
@@ -30,11 +30,17 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
   int _selectedVariantIndex = -1;
   int _selectedPreferenceIndex = -1;
   String _selectedPreference = '';
-  Map<String, bool> _selectedAddons = {};
+  Map<String, Map<String, dynamic>> _selectedAddons = {};
   String _notes = '';
   String? _selectedVariant;
   int _quantity = 1;
   int _variantPrice = 0;
+  int _addonsTotalPrice = 0; // Add this variable to store the total addons price
+void _calculateAddonsTotalPrice() {
+    _addonsTotalPrice = _selectedAddons.values
+        .where((addon) => addon['selected'] == true)
+        .fold(0, (total, addon) => total + (addon['price'] as int));
+  }
 
   final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
 
@@ -46,7 +52,8 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
   final selectedVariant = _selectedVariantIndex >= 0 && _selectedVariantIndex < filteredVariants.length
       ? filteredVariants[_selectedVariantIndex]
       : null;
-  
+      _calculateAddonsTotalPrice(); // Update total addons price
+
   final cartItem = CartItem(
     id: widget.idMenu,
     name: widget.name,
@@ -55,7 +62,8 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
     qty: _quantity,
     price: widget.price,
     variantPrice: _variantPrice,
-    addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
+    addonsPrice: _addonsTotalPrice, // Include total addons price
+    addons: _selectedAddons,
     notes: _notes,
     preference: {
       'preference': _selectedPreference,

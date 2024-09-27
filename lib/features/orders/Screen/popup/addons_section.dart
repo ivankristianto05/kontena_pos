@@ -3,8 +3,8 @@ import 'package:kontena_pos/data/addons_preference.dart';
 
 class AddonSection extends StatefulWidget {
   final String type;
-  final Map<String, bool> selectedAddons;
-  final Function(Map<String, bool>) onAddonChanged;
+  final Map<String, Map<String, dynamic>> selectedAddons; // Add Map to store addon prices
+  final Function(Map<String, Map<String, dynamic>>) onAddonChanged;
 
   AddonSection({
     required this.type,
@@ -17,7 +17,7 @@ class AddonSection extends StatefulWidget {
 }
 
 class _AddonSectionState extends State<AddonSection> {
-  late Map<String, bool> _selectedAddons;
+  late Map<String, Map<String, dynamic>> _selectedAddons;
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _AddonSectionState extends State<AddonSection> {
 
   @override
   Widget build(BuildContext context) {
-    // Gunakan data dari addons_data.dart
+    // Use the addons data from addons_data.dart
     Map<String, double> addons = addonsByType[widget.type] ?? {};
 
     return Padding(
@@ -35,7 +35,7 @@ class _AddonSectionState extends State<AddonSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Addon:',
+          Text('Addons:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           Expanded(
             child: SingleChildScrollView(
@@ -44,7 +44,6 @@ class _AddonSectionState extends State<AddonSection> {
                 children: addons.entries.map((entry) {
                   final addon = entry.key;
                   final price = entry.value;
-
                   return Column(
                     children: [
                       CheckboxListTile(
@@ -58,18 +57,26 @@ class _AddonSectionState extends State<AddonSection> {
                             SizedBox(height: 4),
                             Text(
                               'Rp ${price.toStringAsFixed(0)}',
-                            style: TextStyle(color: Colors.grey,fontSize: 14,fontWeight: FontWeight.w500)
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
-                        value: _selectedAddons[addon] ?? false,
+                        value: _selectedAddons[addon]?['selected'] ?? false,
                         onChanged: (bool? value) {
                           setState(() {
-                            _selectedAddons[addon] = value ?? false;
+                            _selectedAddons[addon] = {
+                              'selected': value ?? false,
+                              'price': price,
+                               'name': addon, // Tambahkan name di sini
+                            };
                             widget.onAddonChanged(_selectedAddons);
                           });
                         },
-                        controlAffinity: ListTileControlAffinity.trailing, // Align checkbox to the right
+                        controlAffinity:
+                            ListTileControlAffinity.trailing, // Align checkbox to the right
                       ),
                       SizedBox(height: 8.0), // Add spacing between Checkboxes
                     ],

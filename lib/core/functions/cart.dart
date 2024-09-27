@@ -1,107 +1,14 @@
 import 'dart:ui';
 import 'package:kontena_pos/app_state.dart'; // Import for deep equality check
+import 'package:flutter/material.dart';
+import 'package:kontena_pos/models/cartitem.dart';
 
 enum CartMode {
   update, // Update the quantity if the item already exists
   add, // Add a new item if it doesn't exist
 }
-class CartItem {
-  final String id;
-  final String name;
-  String? variant;
-  String? variantId;
-  int qty;
-  final int price;
-  int variantPrice;
-  int totalPrice;
-  int addonsPrice; // New field to store the total price of addons
-  Map<String, Map<String, dynamic>>? addons;
-  String notes;
-  Map<String, String> preference;
-  String? type;
 
-  CartItem({
-    required this.id,
-    required this.name,
-    this.variant,
-    this.variantId,
-    required this.qty,
-    required this.price,
-    this.variantPrice = 0,
-    this.addonsPrice = 0, // Initialize with 0
-    this.addons,
-    required this.notes,
-    required this.preference,
-    this.type,
-  }) : totalPrice = qty *
-            (variantPrice != 0 ? variantPrice : price) + // Existing price calculation
-            (addonsPrice); // Add addonsPrice to totalPrice
-
-  // Constructor for creating a copy of an existing CartItem
-  CartItem.from(CartItem item)
-      : id = item.id,
-        name = item.name,
-        variant = item.variant,
-        variantId = item.variantId,
-        qty = item.qty,
-        price = item.price,
-        variantPrice = item.variantPrice,
-        addonsPrice = item.addonsPrice, // Copy addonsPrice
-        totalPrice = item.totalPrice,
-        addons = item.addons != null ? Map.from(item.addons!) : null,
-        notes = item.notes,
-        preference = Map.from(item.preference),
-        type = item.type;
-
-  // Method to copy with modifications
-  CartItem copyWith({
-    String? variant,
-    String? variantId,
-    int? qty,
-    int? variantPrice,
-    int? addonsPrice, // Add addonsPrice to copyWith
-    Map<String, Map<String, dynamic>>? addons,
-    String? notes,
-    Map<String, String>? preference,
-  }) {
-    return CartItem(
-      id: id,
-      name: name,
-      variant: variant ?? this.variant,
-      variantId: variantId ?? this.variantId,
-      qty: qty ?? this.qty,
-      price: price,
-      variantPrice: variantPrice ?? this.variantPrice,
-      addonsPrice: addonsPrice ?? this.addonsPrice, // Add addonsPrice
-      addons: addons ?? this.addons,
-      notes: notes ?? this.notes,
-      preference: preference ?? this.preference,
-      type: type,
-    );
-  }
-
-  // Method to calculate total price (qty * (variantPrice or price) + addonsPrice)
-  void calculateTotalPrice() {
-    totalPrice = qty * (variantPrice != 0 ? variantPrice : price) + addonsPrice;
-  }
-
-  // Method to convert CartItem to a Map with specific fields only
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'variant': variant,
-      'variantId': variantId,
-      'qty': qty,
-      'addons': addons,
-      'notes': notes,
-      'preference': preference,
-      'type': type,
-    };
-  }
-}
-
-class Cart {
+class Cart extends ChangeNotifier {
   List<CartItem> _items = [];
   final AppState appState; // Dependency injection for AppState
   VoidCallback? _onCartChanged;
@@ -114,62 +21,76 @@ class Cart {
 
   List<CartItem> get items => List.from(_items);
 
-  int _calculateAddonsPrice(Map<String, Map<String, dynamic>>? addons) {
-    int total = 0;
-    if (addons != null) {
-      addons.forEach((addonCategory, addonDetails) {
-        if (addonDetails.containsKey('price')) {
-          total += addonDetails['price'] as int;
-        }
-      });
-    }
-    return total;
-  }
-  
-  void _recalculateTotalPrice() {
-    for (var item in _items) {
-      item.addonsPrice = _calculateAddonsPrice(item.addons); // Calculate addons price
-      item.calculateTotalPrice(); // Recalculate the total price with addons
-      print('total harga $item.calculateTotalPrice');
-    }
-  }
-
-   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
-    final existingItemIndex = _items.indexWhere((item) =>
-        item.id == newItem.id && item.variantId == newItem.variantId);
-
-    if (existingItemIndex >= 0) {
-      var existingItem = _items[existingItemIndex];
-      if (mode == CartMode.add) {
-        existingItem.qty += newItem.qty; // Update quantity
-      } else {
-        existingItem.qty = newItem.qty;
+int _calculateAddonsPrice(Map<String, Map<String, dynamic>>? addons) {
+  int total = 0;
+  if (addons != null) {
+    addons.forEach((addonCategory, addonDetails) {
+      if (addonDetails.containsKey('price')) {
+        total += addonDetails['price'] as int;
+        print('Addon Price: ${addonDetails['price']}');
       }
-      existingItem = existingItem.copyWith(
-        variant: newItem.variant,
-        variantId: newItem.variantId,
-        notes: newItem.notes,
-        preference: newItem.preference,
-        addons: newItem.addons,
-        variantPrice: newItem.variantPrice,
-        addonsPrice: _calculateAddonsPrice(newItem.addons), // Calculate addons price
-      );
-      _items[existingItemIndex] = existingItem;
-    } else {
-      _items.add(CartItem.from(newItem));
-    }
-
-    _recalculateTotalPrice(); // Recalculate total price after adding/updating item
-    _onCartChanged?.call(); // Notify listeners
-    appState.addItemToCart(newItem); // Update AppState
+    });
   }
+  print('Total Addon Price: $total');
+  return total;
+}
+
+  // Pastikan bahwa total price di AppState hanya diperbarui sekali setelah semua perubahan
+void _recalculateTotalPrice() {
+  // Ensure that the total price is calculated only once after all changes
+  for (var item in _items) {
+    item.addonsPrice = _calculateAddonsPrice(item.addons);
+    item.calculateTotalPrice();
+    print('Item: ${item.name}, Qty: ${item.qty}, Total Price: Rp ${item.totalPrice}');
+  }
+
+  // Calculate the total price of all items in the cart
+  double totalPrice = _items.fold(0.0, (sum, item) => sum + item.totalPrice);
+
+  // Update the total price in AppState only if it has changed
+  if (totalPrice != appState.totalPrice) {
+    appState.updateTotalPrice(totalPrice);
+  }
+}
+
+  void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
+  final existingItemIndex = _items.indexWhere((item) =>
+      item.id == newItem.id && item.variantId == newItem.variantId);
+
+  if (existingItemIndex >= 0) {
+    var existingItem = _items[existingItemIndex];
+    if (mode == CartMode.add) {
+      existingItem.qty += newItem.qty; // Update quantity
+    } else {
+      existingItem.qty = newItem.qty;
+    }
+    existingItem = existingItem.copyWith(
+      variant: newItem.variant,
+      variantId: newItem.variantId,
+      notes: newItem.notes,
+      preference: newItem.preference,
+      addons: newItem.addons,
+      variantPrice: newItem.variantPrice,
+      addonsPrice: _calculateAddonsPrice(newItem.addons),
+    );
+    _items[existingItemIndex] = existingItem;
+  } else {
+    _items.add(CartItem.from(newItem));
+  }
+
+  // Recalculate total price after adding or updating an item
+  _recalculateTotalPrice(); 
+  _onCartChanged?.call(); // Notify listener
+}
 
   void updateItem(int index, CartItem updatedItem) {
     if (index >= 0 && index < _items.length) {
       _items[index] = CartItem.from(updatedItem);
       _recalculateTotalPrice(); // Recalculate the total price after updating the item
+          appState.recalculateAppStateTotalPrice(); // Hitung ulang total harga di AppState
       _onCartChanged?.call(); // Notify about the changes
-      appState.updateItemInCart(index); // Ensure AppState is updated as well
+      //appState.updateItemInCart(index); // Ensure AppState is updated as well
+      notifyListeners();
     } else {
       print('Item to update not found in the cart');
     }

@@ -6,6 +6,7 @@ import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:intl/intl.dart';
 import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/models/cartitem.dart';
 
 class ItemCart extends StatelessWidget {
   final List<CartItem> cartItems;
