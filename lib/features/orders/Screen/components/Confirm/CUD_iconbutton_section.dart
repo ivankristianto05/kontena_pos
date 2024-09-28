@@ -34,12 +34,12 @@ class _CUDIconButtonState extends State<CUDIconButton> {
               height: 50,
               padding: EdgeInsets.zero,
               onPressed: () {
-                // showDialog(
-                //   context: context,
-                //   builder: (BuildContext context) {
-                //     return ConfirmInput(); // Panggil widget ConfirmInputMenu di sini
-                //   },
-                // );
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ConfirmInput(); // Panggil widget ConfirmInputMenu di sini
+                  },
+                );
               },
               child: FaIcon(FontAwesomeIcons.plus, color: Colors.grey),
             ),

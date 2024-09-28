@@ -18,40 +18,31 @@ class Cart extends ChangeNotifier {
     // Set the initial cart items from AppState
     _items = List.from(appState.cartItems);
   }
-
   List<CartItem> get items => List.from(_items);
 
-int _calculateAddonsPrice(Map<String, Map<String, dynamic>>? addons) {
-  int total = 0;
-  if (addons != null) {
-    addons.forEach((addonCategory, addonDetails) {
-      if (addonDetails.containsKey('price')) {
-        total += addonDetails['price'] as int;
-        print('Addon Price: ${addonDetails['price']}');
-      }
-    });
+ int _calculateAddonsPrice(Map<String, Map<String, dynamic>>? addons) {
+    int total = 0;
+    if (addons != null) {
+      addons.forEach((addonCategory, addonDetails) {
+        if (addonDetails.containsKey('price')) {
+          total += addonDetails['price'] as int;
+        }
+      });
+    }
+    return total;
   }
-  print('Total Addon Price: $total');
-  return total;
-}
 
   // Pastikan bahwa total price di AppState hanya diperbarui sekali setelah semua perubahan
-void _recalculateTotalPrice() {
-  // Ensure that the total price is calculated only once after all changes
-  for (var item in _items) {
-    item.addonsPrice = _calculateAddonsPrice(item.addons);
-    item.calculateTotalPrice();
-    print('Item: ${item.name}, Qty: ${item.qty}, Total Price: Rp ${item.totalPrice}');
+ void _recalculateTotalPrice() {
+    double totalPrice = 0.0;
+    
+    for (var item in _items) {
+      item.addonsPrice = _calculateAddonsPrice(item.addons); 
+      item.calculateTotalPrice(); 
+      totalPrice += item.totalPrice; // Aggregate total price for each item
+    }
+    appState.setTotalPrice(totalPrice); // Update AppState with the new total
   }
-
-  // Calculate the total price of all items in the cart
-  double totalPrice = _items.fold(0.0, (sum, item) => sum + item.totalPrice);
-
-  // Update the total price in AppState only if it has changed
-  if (totalPrice != appState.totalPrice) {
-    appState.updateTotalPrice(totalPrice);
-  }
-}
 
   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
   final existingItemIndex = _items.indexWhere((item) =>
@@ -72,13 +63,12 @@ void _recalculateTotalPrice() {
       addons: newItem.addons,
       variantPrice: newItem.variantPrice,
       addonsPrice: _calculateAddonsPrice(newItem.addons),
+      qty: existingItem.qty + newItem.qty, // Update quantity
     );
     _items[existingItemIndex] = existingItem;
   } else {
-    _items.add(CartItem.from(newItem));
+    _items.add(CartItem.from(newItem)); 
   }
-
-  // Recalculate total price after adding or updating an item
   _recalculateTotalPrice(); 
   _onCartChanged?.call(); // Notify listener
 }
@@ -86,10 +76,8 @@ void _recalculateTotalPrice() {
   void updateItem(int index, CartItem updatedItem) {
     if (index >= 0 && index < _items.length) {
       _items[index] = CartItem.from(updatedItem);
-      _recalculateTotalPrice(); // Recalculate the total price after updating the item
-          appState.recalculateAppStateTotalPrice(); // Hitung ulang total harga di AppState
-      _onCartChanged?.call(); // Notify about the changes
-      //appState.updateItemInCart(index); // Ensure AppState is updated as well
+      _recalculateTotalPrice();
+      _onCartChanged?.call();
       notifyListeners();
     } else {
       print('Item to update not found in the cart');
@@ -97,23 +85,18 @@ void _recalculateTotalPrice() {
   }
 
   void removeItem(int index) {
-    if (index < 0 || index >= _items.length) {
-      print('Invalid index: $index');
-      return;
-    }
-
-    // Remove the item from the local cart
-    _items.removeAt(index);
-
-    // Remove the item from the AppState
-    appState.cartItems.removeAt(index);
-
-    // Notify changes
-    if (_onCartChanged != null) {
-      _onCartChanged!();
-    }
-    appState.notifyListeners();
+  if (index < 0 || index >= _items.length) {
+    print('Invalid index: $index');
+    return;
   }
+  _items.removeAt(index);
+  appState.cartItems.removeAt(index);
+  _recalculateTotalPrice();
+  if (_onCartChanged != null) {
+    _onCartChanged!();
+  }
+  appState.notifyListeners();
+}
 
   void clearAllItems() {
     _items.clear();
@@ -128,7 +111,6 @@ void _recalculateTotalPrice() {
     return _items.any((item) => item.id == itemId);
   }
 
-  // Method untuk mencetak array idmenu, idvarian, indexpreference, dan indexaddons
   List<Map<String, dynamic>> printItemDetails() {
     List<Map<String, dynamic>> itemDetails = [];
 
@@ -140,10 +122,7 @@ void _recalculateTotalPrice() {
         'indexaddons': item.addons,
       });
     }
-
-    // Print the array
     print(itemDetails);
-
     return itemDetails;
   }
 }
