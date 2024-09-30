@@ -21,14 +21,14 @@ class BottomNavigationInvoice extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            height: MediaQuery.sizeOf(context).width * 0.07,
+            height: MediaQuery.sizeOf(context).width * 0.05,
             decoration: BoxDecoration(
-              color: theme.colorScheme.secondaryContainer,
-              border: Border.all(
-                // right: BorderSide(
-                color: theme.colorScheme.primary,
-                width: 2.0,
-                // ),
+              color: theme.colorScheme.secondary,
+              border: Border(
+                right: BorderSide(
+                  color: theme.colorScheme.surface,
+                  width: 2.0,
+                ),
                 // bottom: BorderSide(
                 //   color: theme.colorScheme.surface,
                 //   width: 1.0,
@@ -41,7 +41,11 @@ class BottomNavigationInvoice extends StatelessWidget {
               children: [
                 Text(
                   'Produk',
-                  style: TextStyle(color: theme.colorScheme.primary),
+                  style: TextStyle(
+                    color: theme.colorScheme.primaryContainer,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -51,7 +55,7 @@ class BottomNavigationInvoice extends StatelessWidget {
           child: Container(
             height: MediaQuery.sizeOf(context).width * 0.07,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer,
+              color: theme.colorScheme.secondary,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.max,
@@ -59,7 +63,11 @@ class BottomNavigationInvoice extends StatelessWidget {
               children: [
                 Text(
                   'Voucher',
-                  style: TextStyle(color: theme.colorScheme.secondary),
+                  style: TextStyle(
+                    color: theme.colorScheme.primaryContainer,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),

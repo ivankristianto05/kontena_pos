@@ -117,7 +117,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
               width: double.infinity,
               // height: 40.0,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
+                color: theme.colorScheme.secondary,
                 border: Border(
                   bottom: BorderSide(
                     color: theme.colorScheme.surface,
@@ -222,30 +222,69 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       Column(
                         // mainAxisSize: MainAxisSize.max,
                         children: [
-                          Container(
-                            width: dataContentWidth,
-                            height: MediaQuery.sizeOf(context).height * 0.06,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer,
-                            ),
-                            child: CustomTextFormField(
-                              controller: enterGuestNameController,
-                              // focusNode: inputSearchVarian,
-                              maxLines: 1,
-                              // contentPadding: EdgeInsets.symmetric(
-                              //   horizontal: 3.h,
-                              //   vertical: 9.v,
+                          Row(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              // Expanded(
+                              //   child:
                               // ),
+                              Container(
+                                width:
+                                    (MediaQuery.sizeOf(context).width * 0.25) -
+                                        50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primaryContainer,
+                                ),
+                                child: CustomTextFormField(
+                                  controller: enterGuestNameController,
+                                  // focusNode: inputSearchVarian,
+                                  maxLines: 1,
+                                  // contentPadding: EdgeInsets.symmetric(
+                                  //   horizontal: 3.h,
+                                  //   vertical: 9.v,
+                                  // ),
 
-                              borderDecoration: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(0.h),
-                                borderSide: BorderSide(
-                                  color: theme.colorScheme.surface,
-                                  width: 0,
+                                  borderDecoration: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(0.h),
+                                    borderSide: BorderSide(
+                                      color: theme.colorScheme.surface,
+                                      width: 0,
+                                    ),
+                                  ),
+                                  hintText: "Input guest name",
+                                  hintStyle: theme.textTheme.labelMedium,
                                 ),
                               ),
-                              hintText: "Input guest name",
-                            ),
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: theme.colorScheme.surface,
+                                      width: 1.0,
+                                    ),
+                                    // bottom: BorderSide(
+                                    //   color: theme.colorScheme.surface,
+                                    //   width: 1.0,
+                                    // ),
+                                  ),
+                                  color: theme.colorScheme.primaryContainer,
+                                ),
+                                child: MaterialButton(
+                                  height: 50,
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: theme.colorScheme.onError,
+                                    size: 22,
+                                  ),
+                                  onPressed: () {
+                                    // Define the action for the refresh button
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                           Container(
                             width: MediaQuery.sizeOf(context).width * 0.25,
@@ -271,7 +310,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           onTapTypeTransaction(context);
                                         },
                                         child: Container(
-                                          height: 40,
+                                          height: 50,
                                           decoration: BoxDecoration(
                                             color: theme
                                                 .colorScheme.primaryContainer,
@@ -359,7 +398,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             ),
             Container(
               width: double.infinity,
-              height: MediaQuery.sizeOf(context).height * 0.07,
+              height: MediaQuery.sizeOf(context).height * 0.06,
               decoration: BoxDecoration(
                 color: Colors.transparent,
               ),

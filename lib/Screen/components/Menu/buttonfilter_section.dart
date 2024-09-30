@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:kontena_pos/core/app_export.dart';
 
 class ButtonFilter extends StatefulWidget {
   final void Function(String type) onFilterSelected;
@@ -29,7 +29,8 @@ class _ButtonFilterState extends State<ButtonFilter> {
   Widget build(BuildContext context) {
     // Calculate button width based on screen width
     double screenWidth = MediaQuery.of(context).size.width;
-    double buttonWidth = (screenWidth * 0.65 - 145) / 4; // 65% of screen width divided among 4 buttons, minus padding
+    double buttonWidth = (screenWidth * 0.65 - 145) /
+        4; // 65% of screen width divided among 4 buttons, minus padding
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -57,7 +58,9 @@ class _ButtonFilterState extends State<ButtonFilter> {
       width: width,
       child: MaterialButton(
         onPressed: () => _handleFilterButtonPressed(type),
-        color: isSelected ? buttonselectedcolor : buttoncolor, // Change color based on selection
+        color: isSelected
+            ? theme.colorScheme.primary
+            : buttoncolor, // Change color based on selection
         textColor: Colors.white,
         height: 50,
         child: AutoSizeText(

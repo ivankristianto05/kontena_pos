@@ -165,7 +165,7 @@ class ColorSchemes {
   static const primaryColorScheme = ColorScheme.light(
     // Primary colors
     primary: Color(0xFF079dd4),
-    secondary: Color(0xFF514D4D),
+    secondary: Color(0xFF393E46),
     primaryContainer: Color(0XFFFFFFFF),
     secondaryContainer: Color(0XFFE6F5FB),
 

@@ -35,13 +35,13 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   //   width: 1.0,
                   // ),
                 ),
-                color: theme.colorScheme.primaryContainer,
+                color: theme.colorScheme.secondary,
               ),
               child: MaterialButton(
                 height: 51,
                 child: Icon(
                   Icons.refresh,
-                  color: theme.colorScheme.secondary,
+                  color: theme.colorScheme.primaryContainer,
                 ),
                 onPressed: () {
                   // Define the action for the refresh button
@@ -71,7 +71,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Text(
                   'Order',
                   style: TextStyle(
-                    color: theme.colorScheme.secondary,
+                    color: theme.colorScheme.primaryContainer,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -102,7 +102,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Text(
                   'Invoice',
                   style: TextStyle(
-                    color: theme.colorScheme.secondary,
+                    color: theme.colorScheme.primaryContainer,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -132,7 +132,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Text(
                   'History',
                   style: TextStyle(
-                    color: theme.colorScheme.secondary,
+                    color: theme.colorScheme.primaryContainer,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -168,7 +168,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Text(
                     'Shokudo Restaurant',
                     style: TextStyle(
-                      color: theme.colorScheme.secondary,
+                      color: theme.colorScheme.primaryContainer,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -197,7 +197,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 },
                 child: Icon(
                   Icons.settings,
-                  color: theme.colorScheme.secondary,
+                  color: theme.colorScheme.primaryContainer,
                 ),
               ),
             ),
@@ -222,7 +222,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   Text(
                     'Administrator',
                     style: TextStyle(
-                      color: theme.colorScheme.secondary,
+                      color: theme.colorScheme.primaryContainer,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -230,9 +230,34 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   const SizedBox(width: 8), // Space between text and icon
                   Icon(
                     Icons.person,
-                    color: theme.colorScheme.secondary,
+                    color: theme.colorScheme.primaryContainer,
                   ),
                 ],
+              ),
+            ),
+            Container(
+              width: smallButtonWidth,
+              height: 51,
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: theme.colorScheme.surface,
+                    width: 1.0,
+                  ),
+                  // bottom: BorderSide(
+                  //   color: theme.colorScheme.surface,
+                  //   width: 1.0,
+                  // ),
+                ),
+              ),
+              child: MaterialButton(
+                onPressed: () {
+                  // Define the action for the MaterialButton
+                },
+                child: Icon(
+                  Icons.logout,
+                  color: theme.colorScheme.primaryContainer,
+                ),
               ),
             ),
           ],
