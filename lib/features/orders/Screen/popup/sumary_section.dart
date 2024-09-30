@@ -7,7 +7,7 @@ class SummarySection extends StatelessWidget {
   final String type;
   final String? selectedVariant;
   final int selectedPreferenceIndex;
-  final Map<String, bool> selectedAddons;
+  final Map<String, Map<String, dynamic>> selectedAddons; // Now using Map<String, dynamic>
   final String notes;
   final int quantity;
   final Function(int) onQuantityChanged;
@@ -31,9 +31,10 @@ class SummarySection extends StatelessWidget {
     final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
 
     final selectedAddonList = selectedAddons.entries
-        .where((entry) => entry.value)
-        .map((entry) => entry.key)
-        .join(', ') ?? '-';
+    .where((entry) => entry.value['selected'] == true)
+    .map((entry) => entry.value['name']) // Mengakses key 'name'
+    .join(', ') ?? '-';
+
 
     final selectedPreference = selectedPreferenceIndex >= 0
         ? type == 'food'
@@ -62,7 +63,6 @@ class SummarySection extends StatelessWidget {
       builder: (context, constraints) {
         final double popupHeight = MediaQuery.of(context).size.height * 0.7;
         final double verticalSpacing = popupHeight * 0.01;
-
         return Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
-import 'package:kontena_pos/Screen/popup/variant_section.dart';
-import 'package:kontena_pos/Screen/popup/noteandpreference_section.dart';
-import 'package:kontena_pos/Screen/popup/addons_section.dart';
-import 'package:kontena_pos/Screen/popup/sumary_section.dart';
+import 'package:kontena_pos/features/orders/Screen/popup/variant_section.dart';
+import 'package:kontena_pos/features/orders/Screen/popup/noteandpreference_section.dart';
+import 'package:kontena_pos/features/orders/Screen/popup/addons_section.dart';
+import 'package:kontena_pos/features/orders/Screen/popup/sumary_section.dart';
 import 'package:kontena_pos/data/menuvarian.dart';
+import 'package:kontena_pos/models/cartitem.dart';
 
 class ItemEditDialog extends StatefulWidget {
   final int index;
@@ -28,11 +29,12 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
   String? _selectedVariantId;
   int _selectedPreferenceIndex = -1;
   String _selectedPreference = '';
-  Map<String, bool> _selectedAddons = {};
+  Map<String, Map<String, dynamic>> _selectedAddons = {}; // Update here
   String _notes = '';
   int _quantity = 1;
   int _variantPrice = 0;
   String? _selectedVariant;
+  int _addonsTotalPrice = 0;
 
   @override
   void initState() {
@@ -46,9 +48,9 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
     _quantity = _item.qty;
     _notes = _item.notes;
     _selectedPreference = _item.preference['preference'] ?? '';
-    _selectedAddons = _item.addons
-            ?.map((key, value) => MapEntry(key, value['selected'] as bool)) ??
-        {};
+
+    // Parse _item.addons from Map<String, dynamic> to the new Map<String, Map<String, dynamic>>
+    _selectedAddons = _item.addons ?? {};
     _variantPrice = _item.variantPrice;
 
     List<Map<String, dynamic>> filteredVariants =
@@ -60,33 +62,41 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
 
     _selectedVariantIndex = variantNames.indexOf(_item.variant ?? '');
     _selectedPreferenceIndex = _getPreferenceIndex(_selectedPreference);
+    _calculateAddonsTotalPrice(); // Recalculate total price for addons
+  }
+
+  void _calculateAddonsTotalPrice() {
+    _addonsTotalPrice = _selectedAddons.values
+        .where((addon) => addon['selected'] == true)
+        .fold(0, (total, addon) => total + (addon['price'] as int));
   }
 
   void _editItem() {
     List<Map<String, dynamic>> filteredVariants =
         MenuVarian.where((variant) => variant['id_menu'] == _item.id).toList();
-
     final selectedVariant = _selectedVariantIndex >= 0 &&
             _selectedVariantIndex < filteredVariants.length
         ? filteredVariants[_selectedVariantIndex]
         : null;
 
-    // final editedItem = _item.copyWith(
-    //   variant: selectedVariant?['nama_varian'] ?? '',
-    //   variantId: selectedVariant?['id_varian'],
-    //   qty: _quantity,
-    //   addons: _selectedAddons.map((key, value) => MapEntry(key, {'selected': value})),
-    //   notes: _notes,
-    //   preference: {'preference': _selectedPreference},
-    //   variantPrice: _variantPrice,
-    // );
+    _calculateAddonsTotalPrice(); // Recalculate the total price before saving
 
-    // widget.cart.updateItem(widget.index, editedItem);
+    final editedItem = _item.copyWith(
+      variant: selectedVariant?['nama_varian'] ?? '',
+      variantId: selectedVariant?['id_varian'],
+      qty: _quantity,
+      addons: _selectedAddons, // Save addons in the new format
+      notes: _notes,
+      preference: {'preference': _selectedPreference},
+      variantPrice: _variantPrice,
+    );
 
-    // Pastikan bahwa update ke AppState dilakukan
-    // widget.appState.update(() {
-    //   widget.appState.cartItems[widget.index] = editedItem;
-    // });
+    widget.cart.updateItem(widget.index, editedItem);
+
+    // Ensure update in AppState
+    widget.appState.update(() {
+      widget.appState.cartItems[widget.index] = editedItem;
+    });
 
     Navigator.of(context).pop();
   }

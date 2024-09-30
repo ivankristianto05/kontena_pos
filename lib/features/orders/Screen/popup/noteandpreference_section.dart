@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/constants.dart';
+import 'package:kontena_pos/data/addons_preference.dart';
 
 class NotesAndPreferenceSection extends StatefulWidget {
   final String type;
@@ -40,22 +41,9 @@ class _NotesAndPreferenceSectionState extends State<NotesAndPreferenceSection> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> preferences = [];
-    if (widget.type == 'food') {
-      preferences = [
-        'original',
-        'hot',
-        'very hot',
-        'no sauce',
-        'no MSG',
-        'no salt'
-      ];
-    } else if (widget.type == 'beverage') {
-      preferences = ['less sugar', 'less ice'];
-    } else if (widget.type == 'breakfast') {
-      preferences = ['small', 'medium', 'jumbo'];
-    }
-
+    // Gunakan data dari preference_data.dart
+    List<String> preferences = preferencesByType[widget.type] ?? [];
+    
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -82,7 +70,13 @@ class _NotesAndPreferenceSectionState extends State<NotesAndPreferenceSection> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          widget.onPreferenceSelected(index, preference);
+                          if (isSelected) {
+                            // Deselect if the same preference is selected
+                            widget.onPreferenceSelected(-1, '');
+                          } else {
+                            // Select the new preference
+                            widget.onPreferenceSelected(index, preference);
+                          }
                         },
                         child: Container(
                           decoration: BoxDecoration(

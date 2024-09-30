@@ -1,170 +1,209 @@
-// import 'package:flutter/material.dart';
-// import 'package:kontena_pos/models/list_to_confirm.dart';
-// import 'package:kontena_pos/core/functions/cart.dart';
-// import 'package:kontena_pos/app_state.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/models/cartitem.dart';
+import 'package:kontena_pos/models/list_to_confirm.dart'; // Import untuk formatting tanggal
 
-// class OrderManager extends ChangeNotifier {
-//   final AppState appState;
-
-//   OrderManager(this.appState);
-
-//   List<ListToConfirm> _confirmedOrders = [];
-//   List<ListToConfirm> get confirmedOrders => _confirmedOrders;
-
-//   String _namaPemesan = '';
-//   String get namaPemesan => _namaPemesan;
-
-//   String _selectedTable = '';
-//   String get selectedTable => _selectedTable;
-
-//   String _currentOrderId = '';
-//   String get currentOrderId => _currentOrderId;
+class OrderManager extends ChangeNotifier {
+  List<ListToConfirm> _confirmedOrders = [];
+  List<ListToConfirm> get confirmedOrders => _confirmedOrders;
   
-// // Method to get an order by its ID
-//   ListToConfirm getOrderById(String orderId) {
-//     return _confirmedOrders.firstWhere(
-//       (order) => order.idOrder == orderId,
-//       orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
-//     );
-//   }
+  // Dependency injection for AppState
+  final AppState appState;
+  OrderManager(this.appState);
 
-//   bool _isOrderConfirmed = false;
-//   bool get isOrderConfirmed => _isOrderConfirmed;
+  // Set to store fully checked order IDs
+  Set<String> _fullyCheckedOrders = {};
+  final Map<String, Map<String, bool>> _orderItemCheckedStatuses = {};
 
-//   Set<String> fullyCheckedOrders = {};
-//   Map<String, bool> checkedItems = {};
+  bool _isOrderConfirmed = false;
+  bool get isOrderConfirmed => _isOrderConfirmed;
 
-//   void setNamaPemesan(String name) {
-//     _namaPemesan = name.isEmpty ? '' : name;
-//     notifyListeners();
-//   }
+  String _namaPemesan = '';
+  String get namaPemesan => _namaPemesan;
 
-//   void setSelectedTable(String table) {
-//     _selectedTable = table;
-//     notifyListeners();
-//   }
+  void setNamaPemesan(String name) {
+    _namaPemesan = name.isEmpty ? '' : name;
+    notifyListeners();
+  }
 
-//   void resetSelectedTable() {
-//     _selectedTable = '';
-//     notifyListeners();
-//   }
+  String _currentOrderId = '';
+  String get currentOrderId => _currentOrderId;
 
-//   void setCurrentOrderId(String orderId) {
-//     _currentOrderId = orderId;
-//     initializeCheckedItems(orderId);
-//     bool allChecked = areAllItemsChecked(orderId);
-//     updateOrderCheckedStatus(orderId, allChecked);
-//     notifyListeners();
-//   }
+  void setCurrentOrderId(String orderId) {
+    _currentOrderId = orderId;
+    // Check if all items in the new order are fully checked and update the state
+    checkOrderItems(orderId);
+    notifyListeners();
+  }
 
-//   void initializeCheckedItems(String orderId) {
-//     checkedItems.clear();
-//     final order = _confirmedOrders.firstWhere(
-//       (order) => order.idOrder == orderId,
-//       orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
-//     );
-//     for (var item in order.items) {
-//       String uniqueKey = "${orderId}_${item.id}";
-//       checkedItems[uniqueKey] = false;
-//     }
-//   }
-//   // Method to get the table for the current order
-//   String getTableForCurrentOrder() {
-//     return _selectedTable; // Return the current table for the selected order
-//   }
+  String _selectedTable = '';
+  String get selectedTable => _selectedTable;
 
-//   bool areAllItemsChecked(String orderId) {
-//     final order = _confirmedOrders.firstWhere(
-//       (order) => order.idOrder == orderId,
-//       orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []),
-//     );
-//     if (order.items.isEmpty) return false;
+  void setSelectedTable(String table) {
+    _selectedTable = table;
+    notifyListeners();
+  }
+  
+  void resetSelectedTable() {
+    _selectedTable = '';
+    notifyListeners();
+  }
 
-//     for (var item in order.items) {
-//       String uniqueKey = "${orderId}_${item.id}";
-//       if (!checkedItems.containsKey(uniqueKey) || checkedItems[uniqueKey] == false) {
-//         return false;
-//       }
-//     }
-//     return true;
-//   }
+  String getTableForCurrentOrder() {
+    final order = _confirmedOrders.firstWhere(
+      (order) => order.idOrder == _currentOrderId,
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: [], time: DateTime.now()),
+    );
+    return order.table;
+  }
 
-//   void updateCheckedItems(String orderId, String itemId, bool isChecked) {
-//     String uniqueKey = "${orderId}_${itemId}";
-//     checkedItems[uniqueKey] = isChecked;
+  void printConfirmedOrders() {
+    for (var order in _confirmedOrders) {
+      print('Order ID: ${order.idOrder}');
+      print('Order Time: ${formatDateTime(order.time)}'); // Use the new function here
+    }
+  }
 
-//     bool allChecked = areAllItemsChecked(orderId);
+  ListToConfirm _generateOrder(String idOrder, List<CartItem> cartItems) {
+    return ListToConfirm(
+      idOrder: idOrder,
+      namaPemesan: _namaPemesan,
+      table: _selectedTable,
+      items: List.from(cartItems),
+      time: DateTime.now(), // Set current time
+    );
+  }
 
-//     if (allChecked) {
-//       fullyCheckedOrders.add(orderId);
-//     } else {
-//       fullyCheckedOrders.remove(orderId);
-//     }
+  void confirmOrder(String idOrder, List<CartItem> cartItems) {
+    final ListToConfirm order = _generateOrder(idOrder, cartItems);
+    _confirmedOrders.add(order);
+    _isOrderConfirmed = true;
+    appState.resetCart();
+    notifyListeners();
+  }
 
-//     updateOrderCheckedStatus(orderId, allChecked);
-//     notifyListeners();
-//   }
+  void confirmOrderStatus(String orderId) {
+    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    if (index >= 0) {
+      _confirmedOrders[index] = _confirmedOrders[index].copyWith(status: 'Confirmed');
+      notifyListeners();
+    } else {
+      print('Order with orderId $orderId not found.');
+    }
+  }
 
-//   void updateOrderCheckedStatus(String orderId, bool isChecked) {
-//     if (isChecked) {
-//       fullyCheckedOrders.add(orderId);
-//     } else {
-//       fullyCheckedOrders.remove(orderId);
-//     }
-//     notifyListeners();
-//   }
+  Future<void> createOrder({
+    required TextEditingController guestNameController,
+    required VoidCallback resetDropdown,
+    required VoidCallback onSuccess,
+    required List<CartItem> cartItems,
+  }) async {
+    if (cartItems.isEmpty || guestNameController.text.isEmpty) {
+      print('Error: Nama pemesan tidak boleh kosong.');
+      return;
+    }
 
-//   void confirmOrder(String idOrder) {
-//     final ListToConfirm order = _generateOrder(idOrder);
+    final String idOrder = DateTime.now().toIso8601String();
+    final ListToConfirm order = _generateOrder(idOrder, cartItems);
+    addOrder(order);
+    appState.resetCart();
+    resetSelectedTable();
+    guestNameController.clear();
+    setNamaPemesan('');
+    resetDropdown();
+    onSuccess();
+    notifyListeners();
+  }
 
-//     _confirmedOrders.add(order);
-//     appState.addConfirmedOrder(order); // Call method on AppState
-//     _isOrderConfirmed = true;
-//     notifyListeners();
-//   }
+  void addOrder(ListToConfirm order) {
+    _confirmedOrders.add(order);
+    notifyListeners();
+  }
 
-//   void createOrder({
-//     required TextEditingController guestNameController,
-//     required VoidCallback resetDropdown,
-//   }) async {
-//     if (guestNameController.text.isEmpty) {
-//       print('Error: Nama pemesan tidak boleh kosong.');
-//       return;
-//     }
+  Set<String> get fullyCheckedOrders => _fullyCheckedOrders;
 
-//     final String idOrder = DateTime.now().toIso8601String();
-//     final ListToConfirm order = _generateOrder(idOrder);
-//     addOrder(order);
-//     resetSelectedTable();
-//     guestNameController.clear();
-//     setNamaPemesan('');
+  bool isOrderFullyChecked(String orderId) {
+    return _fullyCheckedOrders.contains(orderId);
+  }
 
-//     await Future.delayed(Duration(milliseconds: 100));
+  void checkOrderItems(String orderId) {
+    final order = _confirmedOrders.firstWhere(
+      (order) => order.idOrder == orderId,
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: [], time: DateTime.now()),
+    );
+    final allChecked = order.items.every((item) => order.itemCheckedStatuses[item.id] ?? false);
+    if (allChecked) {
+      addFullyCheckedOrder(orderId);
+    } else {
+      removeFullyCheckedOrder(orderId);
+    }
+    notifyListeners();
+  }
 
-//     resetDropdown();
-//     notifyListeners();
-//   }
+  void setItemCheckedStatus(String orderId, String itemId, bool isChecked) {
+    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    if (index >= 0) {
+      final order = _confirmedOrders[index];
+      final updatedItemCheckedStatuses = Map<String, bool>.from(order.itemCheckedStatuses);
+      updatedItemCheckedStatuses[itemId] = isChecked;
+      _confirmedOrders[index] = order.copyWith(itemCheckedStatuses: updatedItemCheckedStatuses);
+      checkOrderItems(orderId); // Recheck order items after updating
+      notifyListeners();
+    } else {
+      print('Order with orderId $orderId not found.');
+    }
+  }
 
-//   void addOrder(ListToConfirm order) {
-//     _confirmedOrders.add(order);
-//     appState.addConfirmedOrder(order); // Call method on AppState
-//     _isOrderConfirmed = true;
-//     notifyListeners();
-//   }
+  Map<String, bool> getItemCheckedStatuses(String orderId) {
+    return _orderItemCheckedStatuses[orderId] ?? {};
+  }
 
-//   ListToConfirm _generateOrder(String idOrder) {
-//     final List<CartItem> allItems = List.from(appState.cartItems); // Get items from AppState
-//     return ListToConfirm(
-//       idOrder: idOrder,
-//       namaPemesan: _namaPemesan,
-//       table: _selectedTable,
-//       items: allItems,
-//     );
-//   }
+  void addFullyCheckedOrder(String orderId) {
+    _fullyCheckedOrders.add(orderId);
+    notifyListeners();
+  }
 
-//   bool isOrderFullyChecked(String orderId) {
-//     bool result = fullyCheckedOrders.contains(orderId);
-//     print('Order $orderId is fully checked: $result');
-//     return result;
-//   }
-// }
+  void removeFullyCheckedOrder(String orderId) {
+    _fullyCheckedOrders.remove(orderId);
+    notifyListeners();
+  }
+
+  void setItemCheckedStatuses(String orderId, Map<String, bool> statuses) {
+    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    if (index >= 0) {
+      final order = _confirmedOrders[index];
+      _confirmedOrders[index] = order.copyWith(itemCheckedStatuses: statuses);
+      notifyListeners();
+    }
+  }
+
+  // Method to load item checked statuses when the order is set
+  Future<void> loadAndSetItemCheckedStatuses(String orderId) async {
+    final statuses = await appState.loadItemCheckedStatuses(orderId);
+    setItemCheckedStatuses(orderId, statuses);
+  }
+
+  ListToConfirm getConfirmedOrderById(String orderId) {
+    return _confirmedOrders.firstWhere(
+      (order) => order.idOrder == orderId,
+      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: [], time: DateTime.now()),
+    );
+  }
+
+  bool isItemChecked(String orderId, String itemId) {
+    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    if (index >= 0) {
+      final order = _confirmedOrders[index];
+      return order.itemCheckedStatuses[itemId] ?? false; // Default to false if not found
+    }
+    return false;
+  }
+
+  // Function to format DateTime to the desired format
+  String formatDateTime(DateTime dateTime) {
+    final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
+    return formatter.format(dateTime);
+  }
+}
