@@ -43,11 +43,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
               decoration: BoxDecoration(
                 color: theme.colorScheme.onBackground,
               ),
-              child: TopBar(
-                smallButtonWidth: smallButtonWidth,
-                buttonWidth: buttonWidth,
-                // isWideScreen: true,
-              ),
+              child: TopBar(),
             ),
           ],
         ),

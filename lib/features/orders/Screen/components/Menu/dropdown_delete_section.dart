@@ -22,7 +22,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
     double dropdownWidth = (screenWidth - searchbarWidth - 32) / 2;
 
     final appState = Provider.of<AppState>(context, listen: false);
-    final cart = Cart(onCartChanged: () => setState(() {}));
+    final cart = Cart(appState, onCartChanged: () => setState(() {}));
 
     return Container(
       width: screenWidth - searchbarWidth,

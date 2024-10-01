@@ -6,7 +6,7 @@ import 'package:kontena_pos/core/utils/number_ui.dart';
 class BottomNavigationInvoice extends StatelessWidget {
   // final double contentHeight;
 
-  Cart cart = Cart();
+  // Cart cart = Cart();
 
   BottomNavigationInvoice({
     super.key,
@@ -21,19 +21,19 @@ class BottomNavigationInvoice extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
-            height: MediaQuery.sizeOf(context).width * 0.05,
+            height: MediaQuery.sizeOf(context).width * 0.07,
             decoration: BoxDecoration(
               color: theme.colorScheme.secondary,
-              border: Border(
-                right: BorderSide(
-                  color: theme.colorScheme.surface,
-                  width: 2.0,
-                ),
-                // bottom: BorderSide(
-                //   color: theme.colorScheme.surface,
-                //   width: 1.0,
-                // ),
-              ),
+              // border: Border.all(
+              //   // right: BorderSide(
+              //   color: theme.colorScheme.primary,
+              //   width: 2.0,
+              //   // ),
+              //   // bottom: BorderSide(
+              //   //   color: theme.colorScheme.surface,
+              //   //   width: 1.0,
+              //   // ),
+              // ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.max,
@@ -85,7 +85,7 @@ class BottomNavigationInvoice extends StatelessWidget {
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: cart.items.isNotEmpty
+                    color: false
                         ? theme.colorScheme.primary
                         : theme.colorScheme.surface,
                   ),
@@ -103,7 +103,7 @@ class BottomNavigationInvoice extends StatelessWidget {
                           children: [
                             Text(
                               'Bayar',
-                              style: cart.items.isNotEmpty
+                              style: false
                                   ? TextStyle(
                                       color: theme.colorScheme.primaryContainer,
                                       fontSize: 18.0,
@@ -112,8 +112,8 @@ class BottomNavigationInvoice extends StatelessWidget {
                                   : theme.textTheme.labelLarge,
                             ),
                             Text(
-                              '${cart.items.length} item',
-                              style: cart.items.isNotEmpty
+                              '0 item',
+                              style: false
                                   ? TextStyle(
                                       color: theme.colorScheme.primaryContainer,
                                     )
@@ -124,9 +124,9 @@ class BottomNavigationInvoice extends StatelessWidget {
                         Text(
                           numberFormat(
                             'idr',
-                            cart.getTotal(),
+                            0,
                           ),
-                          style: cart.items.isNotEmpty
+                          style: false
                               ? TextStyle(
                                   color: theme.colorScheme.primaryContainer,
                                   fontSize: 18.0,

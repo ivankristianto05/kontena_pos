@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/widgets/searchbar.dart';
+import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Menu/orderbutton_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/appbar_section.dart';
@@ -8,7 +10,6 @@ import 'package:kontena_pos/features/orders/Screen/components/Menu/dropdown_dele
 import 'package:kontena_pos/features/orders/Screen/components/footer_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Menu/guestinputwithbutton_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Menu/itemcart_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/itemdialog_section.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/constants.dart';
@@ -80,39 +81,45 @@ class _OrderScreenState extends State<OrderScreen> {
         double buttonWidth = screenWidth * 0.15;
 
         // Create an instance of Cart and pass AppState to it
-        // Cart cart = Cart(appState);
-        Cart cart = Cart();
+        Cart cart = Cart(appState);
 
         return Scaffold(
-          appBar: BuildAppbar(
-            smallButtonWidth: smallButtonWidth,
-            buttonWidth: buttonWidth,
-          ),
           body: Container(
             color: itembackgroundcolor,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      height: 55,
-                      child: Searchbar(
-                        screenWidth: searchbarWidth,
-                        onSearchChanged: _handleSearchChanged,
-                      ),
-                    ),
-                    GuestInputWithButton(
-                      screenWidth: screenWidth,
-                      guestNameController: _guestNameController,
-                      smallButtonWidth: smallButtonWidth,
-                      onNameSubmitted: (name) {
-                        // Update AppState with the guest name
-                        appState.setNamaPemesan(name);
-                      },
-                    ),
-                  ],
+                TopBar(),
+                Searchbar(
+                  onChanged: (value) {
+                    onSearch(context, value);
+                  },
                 ),
+                // Row(
+                //   children: [
+                //     // Container(
+                //     //   height: 55,
+                //     //   child: Searchbar(
+                //     //     screenWidth: searchbarWidth,
+                //     //     onSearchChanged: _handleSearchChanged,
+                //     //   ),
+                //     // ),
+                //     // GuestInputWithButton(
+                //     //   screenWidth: screenWidth,
+                //     //   guestNameController: _guestNameController,
+                //     //   smallButtonWidth: smallButtonWidth,
+                //     //   onNameSubmitted: (name) {
+                //     //     // Update AppState with the guest name
+                //     //     appState.setNamaPemesan(name);
+                //     //   },
+                //     // ),
+                //     Searchbar(
+                //       onChanged: (value) {
+                //         onSearch(context, value);
+                //       },
+                //     ),
+                //   ],
+                // ),
                 Row(
                   children: [
                     Container(
@@ -208,4 +215,6 @@ class _OrderScreenState extends State<OrderScreen> {
       },
     );
   }
+
+  onSearch(BuildContext context, dynamic value) async {}
 }

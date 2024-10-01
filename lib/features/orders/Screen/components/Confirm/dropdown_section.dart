@@ -34,7 +34,7 @@ class _DropdownState extends State<Dropdown> {
 
     // Access AppState and Cart
     final appState = Provider.of<AppState>(context);
-    final cart = Cart(onCartChanged: () => setState(() {}));
+    final cart = Cart(appState, onCartChanged: () => setState(() {}));
 
     // Define table options
     final List<String> tableOptions = <String>[

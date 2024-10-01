@@ -34,31 +34,6 @@ class AppState extends ChangeNotifier {
   late SharedPreferences prefs;
   late OrderManager orderManager;
 
-  String _typeTransaction = '';
-  String get typeTransaction => _typeTransaction;
-  set typeTransaction(String _value) {
-    _typeTransaction = _value;
-  }
-
-  List<dynamic> _item = [];
-  List<dynamic> get item => _item;
-  set item(List<dynamic> _value) {
-    _item = _value;
-  }
-
-  static List<CartItem> cartItem = [];
-  static void updateCart(List<CartItem> items) {
-    items.forEach((element) {
-      print('check pref, ${element.pref}');
-    });
-    cartItem = items;
-  }
-
-  static void resetCartt() {
-    cartItem = [];
-  }
-
-  // List untuk menyimpan item di cart
   void _ensureInitialized() {
     if (!isInitialized) {
       throw StateError('AppState has not been initialized.');
@@ -87,30 +62,6 @@ class AppState extends ChangeNotifier {
         item.addons.toString() == newItem.addons.toString());
   }
 
-  // Menambahkan atau memperbarui item di cart
-  // void addItemToCart(CartItem newItem) {
-  //   final existingItemIndex = findItemIndex(newItem);
-  //   if (existingItemIndex >= 0) {
-  //     var existingItem = _cartItems[existingItemIndex];
-  //     existingItem.qty += newItem.qty; // Update quantity
-  //     existingItem.variant = newItem.variant;
-  //     existingItem.variantId = newItem.variantId;
-  //     existingItem.notes = newItem.notes;
-  //     existingItem.preference = newItem.preference;
-  //     existingItem.addons = newItem.addons;
-  //     existingItem.variantPrice = newItem.variantPrice;
-  //     existingItem.totalPrice = existingItem.qty *
-  //         (existingItem.variantPrice != 0
-  //             ? existingItem.variantPrice
-  //             : existingItem.price);
-  //     _cartItems[existingItemIndex] = CartItem.from(
-  //         existingItem); // Menggunakan salinan item yang diperbarui
-  //   } else {
-  //     _cartItems
-  //         .add(CartItem.from(newItem)); // Menambahkan item baru dengan salinan
-  //   }
-  //   notifyListeners(); // Notify listeners of changes
-  // }
   // Method untuk menambahkan atau mengupdate item di cart
   void addItemToCart(CartItem newItem) {
     _ensureInitialized();
@@ -147,7 +98,8 @@ class AppState extends ChangeNotifier {
 
   // Fungsi untuk mengupdate total harga dari Cart
   void updateTotalPriceFromCart() {
-    double totalCartPrice = _cartItems.fold(0.0, (sum, item) => sum + item.totalPrice);
+    double totalCartPrice =
+        _cartItems.fold(0.0, (sum, item) => sum + item.totalPrice);
     setTotalPrice(totalCartPrice); // Gunakan setter untuk update total harga
   }
 
@@ -166,70 +118,6 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // List untuk menyimpan order yang dikonfirmasi
-  List<ListToConfirm> _confirmedOrders = [];
-  List<ListToConfirm> get confirmedOrders => _confirmedOrders;
-
-  // Menyimpan status konfirmasi
-  bool _isOrderConfirmed = false;
-  bool get isOrderConfirmed => _isOrderConfirmed;
-
-  // Menyimpan nama pemesan
-  String _namaPemesan = '';
-  String get namaPemesan => _namaPemesan;
-  void setNamaPemesan(String name) {
-    _namaPemesan = name.isEmpty ? '' : name; // Reset nama jika input kosong
-    notifyListeners();
-  }
-
-  String _currentOrderId = ''; // Field to store the selected order ID
-  String get currentOrderId =>
-      _currentOrderId; // Getter for the current order ID
-  void setCurrentOrderId(String orderId) {
-    _currentOrderId = orderId;
-    notifyListeners(); // Notify listeners of changes
-  }
-
-  String _selectedTable = ''; // Field to store the selected table
-  String get selectedTable => _selectedTable;
-  void setSelectedTable(String table) {
-    _selectedTable = table;
-    notifyListeners(); // Notify listeners of changes
-  }
-
-  void resetSelectedTable() {
-    _selectedTable = '';
-    notifyListeners(); // Pemberitahuan kepada UI
-  }
-
-  String getTableForCurrentOrder() {
-    final currentOrderId = _currentOrderId;
-
-    // Temukan order dengan currentOrderId
-    final order = _confirmedOrders.firstWhere(
-        (order) => order.idOrder == currentOrderId,
-        orElse: () =>
-            ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []));
-    return order.table; // Kembalikan nilai tabel dari order
-  }
-
-  void printConfirmedOrders() {
-    for (var order in _confirmedOrders) {
-      print('Order ID: ${order.idOrder}');
-      print('Nama Pemesan: ${order.namaPemesan}');
-      print('Table: ${order.table}');
-    }
-  }
-
-  ListToConfirm _generateOrder(String idOrder) {
-    final List<CartItem> allItems = List.from(_cartItems);
-    return ListToConfirm(
-      idOrder: idOrder,
-      namaPemesan: _namaPemesan,
-      table: _selectedTable,
-      items: allItems,
-    );
-  
   // Proxy method calls to OrderManager
   void setNamaPemesan(String name) {
     _ensureInitialized();
@@ -287,14 +175,6 @@ class AppState extends ChangeNotifier {
   }
 
   void confirmOrderStatus(String orderId) {
-    final index =
-        _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
-    if (index >= 0) {
-      // Assuming you add a status field to ListToConfirm
-      _confirmedOrders[index] =
-          _confirmedOrders[index].copyWith(status: 'Confirmed');
-      notifyListeners(); // Notify listeners that the status has changed
-    }
     _ensureInitialized();
     orderManager.confirmOrderStatus(orderId);
     notifyListeners();
@@ -305,27 +185,6 @@ class AppState extends ChangeNotifier {
     required VoidCallback resetDropdown,
     required VoidCallback onSuccess,
   }) async {
-    if (_cartItems.isEmpty || guestNameController.text.isEmpty) {
-      print('Error: Nama pemesan tidak boleh kosong.');
-      return;
-    }
-
-    final String idOrder = DateTime.now().toIso8601String();
-    final ListToConfirm order = _generateOrder(idOrder);
-    addOrder(order);
-    resetCart();
-    resetSelectedTable();
-    guestNameController.clear();
-    setNamaPemesan('');
-    resetDropdown(); // Panggil resetDropdown setelah menunggu
-
-    // Call the onSuccess callback
-    onSuccess();
-
-    notifyListeners();
-  }
-
-  // Menambahkan order yang dikonfirmasi ke dalam list (tidak perlu jika sudah ada `confirmOrder`)
     _ensureInitialized();
     await orderManager.createOrder(
       guestNameController: guestNameController,
@@ -346,10 +205,6 @@ class AppState extends ChangeNotifier {
     _ensureInitialized();
     return orderManager.fullyCheckedOrders;
   }
-
-  // Variabel untuk menyimpan ID order yang semua itemnya telah ter-check
-  Set<String> _fullyCheckedOrders = {};
-  Set<String> get fullyCheckedOrders => _fullyCheckedOrders;
 
   void addFullyCheckedOrder(String orderId) {
     _ensureInitialized();
@@ -442,4 +297,6 @@ class AppState extends ChangeNotifier {
     final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
     return formatter.format(dateTime);
   }
+
+  String typeTransaction = '';
 }

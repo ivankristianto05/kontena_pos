@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:kontena_pos/Screen/components/Menu/buttonfilter_section.dart';
+// import 'package:kontena_pos/Screen/components/Menu/buttonfilter_section.dart';
+// import 'package:kontena_pos/Screen/components/Menu/guestinputwithbutton_section.dart';
+// import 'package:kontena_pos/Screen/components/Menu/dropdown_delete_section.dart';
+// import 'package:kontena_pos/Screen/components/Menu/itemcart_section.dart';
 // import 'package:kontena_pos/Screen/components/itemcart_section.dart';
-import 'package:kontena_pos/Screen/components/searchbar_section.dart';
-import 'package:kontena_pos/app_state.dart';
+// import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/data/menu.dart';
-import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
-import 'package:kontena_pos/features/cart/persentation/cart_list_item.dart';
+import 'package:kontena_pos/features/invoices/persentation/action_button.dart';
 import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
-import 'package:kontena_pos/widgets/card_item.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
-import 'package:kontena_pos/widgets/empty_cart.dart';
+import 'package:kontena_pos/widgets/filter_bar.dart';
+import 'package:kontena_pos/widgets/searchbar.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:kontena_pos/widgets/type_transaction.dart';
-import 'package:provider/provider.dart';
 // import 'package:kontena_pos/models/cart_item.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:kontena_pos/core/functions/cart.dart';
 
 class InvoiceScreen extends StatefulWidget {
   const InvoiceScreen({Key? key}) : super(key: key);
@@ -30,9 +29,9 @@ class InvoiceScreen extends StatefulWidget {
 class _InvoiceScreenState extends State<InvoiceScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   // late List<ItemCart> cartItem;
-  Cart cart = Cart();
+  // Cart cart = Cart();
   late Map cartRecapData;
-  late List<CartItem> cartData;
+  // late List<CartItem> cartData;
   late List<Map<String, dynamic>> cartDataItem = [
     {
       'id': 'test',
@@ -63,7 +62,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   void initState() {
     super.initState();
     // cartData = cart.getAllItemCart();
-    cartData = cart.getAllItemCart();
+    // cartData = cart.getAllItemCart();
 
     Future.delayed(Duration(milliseconds: 300), () {
       setState(() {
@@ -104,7 +103,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     double smallButtonWidth = screenWidth * 0.05;
     double buttonWidth = screenWidth * 0.15;
     double dataContentWidth = MediaQuery.sizeOf(context).width * 0.25;
-    context.watch<AppState>();
 
     return Scaffold(
       key: scaffoldKey,
@@ -113,24 +111,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         top: false,
         child: Column(
           children: [
-            Container(
-              width: double.infinity,
-              // height: 40.0,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.secondary,
-                border: Border(
-                  bottom: BorderSide(
-                    color: theme.colorScheme.surface,
-                    width: 1.0,
-                  ),
-                ),
-              ),
-              child: TopBar(
-                smallButtonWidth: smallButtonWidth,
-                buttonWidth: buttonWidth,
-                // isWideScreen: true,
-              ),
-            ),
+            TopBar(),
             Expanded(
               child: Stack(
                 children: [
@@ -141,16 +122,28 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       Expanded(
                         child: Stack(
                           children: [
-                            Searchbar(
-                              screenWidth: MediaQuery.sizeOf(context).width,
-                              onSearchChanged: (val) => {filterSearch = val},
+                            // Searchbar(
+                            //   screenWidth: MediaQuery.sizeOf(context).width,
+                            //   onSearchChanged: (val) => {filterSearch = val},
+                            // ),
+                            Column(
+                              children: [
+                                Searchbar(
+                                  onCompleted: () {},
+                                ),
+                                FilterBar(
+                                  onFilterSelected: (String type) {},
+                                ),
+                              ],
                             ),
+                            Container(),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 65.0, 8.0, 8.0),
-                              child: ButtonFilter(
-                                onFilterSelected: (String type) {},
-                              ),
+                              // child: ButtonFilter(
+                              //   onFilterSelected: (String type) {},
+                              // ),
+                              child: Container(),
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
@@ -222,169 +215,119 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       Column(
                         // mainAxisSize: MainAxisSize.max,
                         children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              // Expanded(
-                              //   child:
-                              // ),
-                              Container(
-                                width:
-                                    (MediaQuery.sizeOf(context).width * 0.25) -
-                                        50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primaryContainer,
-                                ),
-                                child: CustomTextFormField(
-                                  controller: enterGuestNameController,
-                                  // focusNode: inputSearchVarian,
-                                  maxLines: 1,
-                                  // contentPadding: EdgeInsets.symmetric(
-                                  //   horizontal: 3.h,
-                                  //   vertical: 9.v,
-                                  // ),
-
-                                  borderDecoration: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(0.h),
-                                    borderSide: BorderSide(
-                                      color: theme.colorScheme.surface,
-                                      width: 0,
-                                    ),
-                                  ),
-                                  hintText: "Input guest name",
-                                  hintStyle: theme.textTheme.labelMedium,
-                                ),
-                              ),
-                              Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: theme.colorScheme.surface,
-                                      width: 1.0,
-                                    ),
-                                    // bottom: BorderSide(
-                                    //   color: theme.colorScheme.surface,
-                                    //   width: 1.0,
-                                    // ),
-                                  ),
-                                  color: theme.colorScheme.primaryContainer,
-                                ),
-                                child: MaterialButton(
-                                  height: 50,
-                                  child: Icon(
-                                    Icons.delete,
-                                    color: theme.colorScheme.onError,
-                                    size: 22,
-                                  ),
-                                  onPressed: () {
-                                    // Define the action for the refresh button
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
                           Container(
-                            width: MediaQuery.sizeOf(context).width * 0.25,
-                            // height: 60.0,
+                            width: dataContentWidth,
+                            height: MediaQuery.sizeOf(context).height * 0.06,
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primaryContainer,
                             ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Expanded(
-                                      child: InkWell(
-                                        splashColor: Colors.transparent,
-                                        focusColor: Colors.transparent,
-                                        hoverColor: Colors.transparent,
-                                        highlightColor: Colors.transparent,
-                                        onTap: () {
-                                          onTapTypeTransaction(context);
-                                        },
-                                        child: Container(
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            color: theme
-                                                .colorScheme.primaryContainer,
-                                            border: Border(
-                                              bottom: BorderSide(
-                                                color:
-                                                    theme.colorScheme.surface,
-                                                width: 0.5,
+                            child: CustomTextFormField(
+                              controller: enterGuestNameController,
+                              // focusNode: inputSearchVarian,
+                              maxLines: 1,
+                              // contentPadding: EdgeInsets.symmetric(
+                              //   horizontal: 3.h,
+                              //   vertical: 9.v,
+                              // ),
+
+                              borderDecoration: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(0.h),
+                                borderSide: BorderSide(
+                                  color: theme.colorScheme.surface,
+                                  width: 0,
+                                ),
+                              ),
+                              hintText: "Input guest name",
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              width: MediaQuery.sizeOf(context).width * 0.25,
+                              height: 400.0,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primaryContainer,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Expanded(
+                                        child: InkWell(
+                                          splashColor: Colors.transparent,
+                                          focusColor: Colors.transparent,
+                                          hoverColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
+                                          onTap: () {
+                                            onTapTypeTransaction(context);
+                                          },
+                                          child: Container(
+                                            height: MediaQuery.sizeOf(context)
+                                                    .height *
+                                                0.06,
+                                            decoration: BoxDecoration(
+                                              color: theme
+                                                  .colorScheme.primaryContainer,
+                                              border: Border(
+                                                bottom: BorderSide(
+                                                  color:
+                                                      theme.colorScheme.surface,
+                                                  width: 0.5,
+                                                ),
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(8.0, 0.0, 8.0, 0.0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    'Pilih Jenis Transaksi',
+                                                    style: theme
+                                                        .textTheme.labelMedium,
+                                                  ),
+                                                  Icon(
+                                                    Icons
+                                                        .keyboard_arrow_down_rounded,
+                                                    color: theme
+                                                        .colorScheme.outline,
+                                                    size: 24.0,
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
-                                          child: Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    8.0, 0.0, 8.0, 0.0),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                (AppState().typeTransaction ==
-                                                        '')
-                                                    ? Text(
-                                                        'Pilih Jenis Transaksi',
-                                                        style: theme.textTheme
-                                                            .labelMedium,
-                                                      )
-                                                    : Text(
-                                                        AppState()
-                                                            .typeTransaction
-                                                            .toUpperCase(),
-                                                        style: TextStyle(
-                                                          color: theme
-                                                              .colorScheme
-                                                              .secondary,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                Icon(
-                                                  Icons
-                                                      .keyboard_arrow_down_rounded,
-                                                  color:
-                                                      theme.colorScheme.outline,
-                                                  size: 24.0,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
                                         ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ],
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           Expanded(
                             child: Container(
                               width: dataContentWidth,
-                              // height: double.infinity,
+                              height: double.infinity,
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.primaryContainer,
                               ),
                               child: Column(
-                                mainAxisSize: MainAxisSize.min,
+                                mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  if (cartData.isNotEmpty) CardListItem(),
-                                  if (cartData.isEmpty) EmptyCart()
+                                  // if (cartData.isNotEmpty) CardListItem(),
+                                  // if (cartData.isEmpty) EmptyCart()
                                 ],
                               ),
                             ),
@@ -398,17 +341,30 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             ),
             Container(
               width: double.infinity,
-              height: MediaQuery.sizeOf(context).height * 0.06,
+              height: MediaQuery.sizeOf(context).height * 0.07,
               decoration: BoxDecoration(
                 color: Colors.transparent,
               ),
               child: BottomNavigationInvoice(),
+              // child: ActionButton(
+              //     // screenWidth: screenWidth,
+              //     // //cart: cart,
+              //     // guestNameController: _guestNameController,
+              //     // resetDropdown: () {
+              //     //   setState(() {
+              //     //     table = null;
+              //     //     pickupType = null;
+              //     //   });
+              //     // },
+              //     ),
             ),
           ],
         ),
       ),
     );
   }
+
+  void onSearch(BuildContext context, dynamic value) async {}
 
   TextEditingController enterGuestNameController = TextEditingController();
   FocusNode inputPhone = FocusNode();
@@ -430,10 +386,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           //   type: item['type'],
           //   onAddToCart: (item) {},
           // ),
-          child: AddToCart(
-            dataMenu: item,
-            isNew: true,
-          ),
+          child: Container(),
+          // child: AddToCart(dataMenu: item),
         );
       },
     ).then((value) => {print('check value, $value')});
@@ -459,6 +413,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           child: TypeTransaction(),
         );
       },
-    ).then((value) => {});
+    ).then((value) => {print('check value, $value')});
   }
 }
