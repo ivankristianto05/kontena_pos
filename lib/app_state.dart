@@ -45,6 +45,7 @@ class AppState extends ChangeNotifier {
   // List to store cart items
   List<CartItem> _cartItems = [];
   List<CartItem> get cartItems => _cartItems;
+  static List<CartItem> cartItem = [];
 
   // Variabel untuk menyimpan total harga
   double _totalPrice = 0.0;
