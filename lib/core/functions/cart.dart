@@ -20,7 +20,7 @@ class Cart extends ChangeNotifier {
   }
   List<CartItem> get items => List.from(_items);
 
- int _calculateAddonsPrice(Map<String, Map<String, dynamic>>? addons) {
+  int _calculateAddonsPrice(Map<String, Map<String, dynamic>>? addons) {
     int total = 0;
     if (addons != null) {
       addons.forEach((addonCategory, addonDetails) {
@@ -33,45 +33,45 @@ class Cart extends ChangeNotifier {
   }
 
   // Pastikan bahwa total price di AppState hanya diperbarui sekali setelah semua perubahan
- void _recalculateTotalPrice() {
+  void _recalculateTotalPrice() {
     double totalPrice = 0.0;
-    
+
     for (var item in _items) {
-      item.addonsPrice = _calculateAddonsPrice(item.addons); 
-      item.calculateTotalPrice(); 
+      item.addonsPrice = _calculateAddonsPrice(item.addons);
+      item.calculateTotalPrice();
       totalPrice += item.totalPrice; // Aggregate total price for each item
     }
     appState.setTotalPrice(totalPrice); // Update AppState with the new total
   }
 
   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
-  final existingItemIndex = _items.indexWhere((item) =>
-      item.id == newItem.id && item.variantId == newItem.variantId);
+    final existingItemIndex = _items.indexWhere(
+        (item) => item.id == newItem.id && item.variantId == newItem.variantId);
 
-  if (existingItemIndex >= 0) {
-    var existingItem = _items[existingItemIndex];
-    if (mode == CartMode.add) {
-      existingItem.qty += newItem.qty; // Update quantity
+    if (existingItemIndex >= 0) {
+      var existingItem = _items[existingItemIndex];
+      if (mode == CartMode.add) {
+        existingItem.qty += newItem.qty; // Update quantity
+      } else {
+        existingItem.qty = newItem.qty;
+      }
+      existingItem = existingItem.copyWith(
+        variant: newItem.variant,
+        variantId: newItem.variantId,
+        notes: newItem.notes,
+        preference: newItem.preference,
+        addons: newItem.addons,
+        variantPrice: newItem.variantPrice,
+        addonsPrice: _calculateAddonsPrice(newItem.addons),
+        qty: existingItem.qty + newItem.qty, // Update quantity
+      );
+      _items[existingItemIndex] = existingItem;
     } else {
-      existingItem.qty = newItem.qty;
+      _items.add(CartItem.from(newItem));
     }
-    existingItem = existingItem.copyWith(
-      variant: newItem.variant,
-      variantId: newItem.variantId,
-      notes: newItem.notes,
-      preference: newItem.preference,
-      addons: newItem.addons,
-      variantPrice: newItem.variantPrice,
-      addonsPrice: _calculateAddonsPrice(newItem.addons),
-      qty: existingItem.qty + newItem.qty, // Update quantity
-    );
-    _items[existingItemIndex] = existingItem;
-  } else {
-    _items.add(CartItem.from(newItem)); 
+    _recalculateTotalPrice();
+    _onCartChanged?.call(); // Notify listener
   }
-  _recalculateTotalPrice(); 
-  _onCartChanged?.call(); // Notify listener
-}
 
   void updateItem(int index, CartItem updatedItem) {
     if (index >= 0 && index < _items.length) {
@@ -85,18 +85,18 @@ class Cart extends ChangeNotifier {
   }
 
   void removeItem(int index) {
-  if (index < 0 || index >= _items.length) {
-    print('Invalid index: $index');
-    return;
+    if (index < 0 || index >= _items.length) {
+      print('Invalid index: $index');
+      return;
+    }
+    _items.removeAt(index);
+    appState.cartItems.removeAt(index);
+    _recalculateTotalPrice();
+    if (_onCartChanged != null) {
+      _onCartChanged!();
+    }
+    appState.notifyListeners();
   }
-  _items.removeAt(index);
-  appState.cartItems.removeAt(index);
-  _recalculateTotalPrice();
-  if (_onCartChanged != null) {
-    _onCartChanged!();
-  }
-  appState.notifyListeners();
-}
 
   void clearAllItems() {
     _items.clear();

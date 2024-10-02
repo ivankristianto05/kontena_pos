@@ -98,7 +98,8 @@ class AppState extends ChangeNotifier {
 
   // Fungsi untuk mengupdate total harga dari Cart
   void updateTotalPriceFromCart() {
-    double totalCartPrice = _cartItems.fold(0.0, (sum, item) => sum + item.totalPrice);
+    double totalCartPrice =
+        _cartItems.fold(0.0, (sum, item) => sum + item.totalPrice);
     setTotalPrice(totalCartPrice); // Gunakan setter untuk update total harga
   }
 
@@ -116,7 +117,7 @@ class AppState extends ChangeNotifier {
     _totalPrice = 0.0;
     notifyListeners();
   }
-  
+
   // Proxy method calls to OrderManager
   void setNamaPemesan(String name) {
     _ensureInitialized();
@@ -297,4 +298,5 @@ class AppState extends ChangeNotifier {
     return formatter.format(dateTime);
   }
 
+  String typeTransaction = '';
 }

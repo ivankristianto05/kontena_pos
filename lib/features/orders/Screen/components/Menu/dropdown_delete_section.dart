@@ -34,11 +34,9 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
           Container(
             width: screenWidth * 0.20,
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                right: BorderSide(color: Colors.grey, width: 1)
-              )
-            ),
+                color: Colors.white,
+                border:
+                    Border(right: BorderSide(color: Colors.grey, width: 1))),
             child: DropdownButtonHideUnderline(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -73,11 +71,9 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
           Container(
             width: screenWidth * 0.10,
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                right: BorderSide(color: Colors.grey, width: 1)
-              )
-            ),
+                color: Colors.white,
+                border:
+                    Border(right: BorderSide(color: Colors.grey, width: 1))),
             child: DropdownButtonHideUnderline(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -86,7 +82,16 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                   hint: Text("Table"),
                   value: table,
                   items: <String>[
-                    '1','2','3','4','5','6','7','8','9','10',
+                    '1',
+                    '2',
+                    '3',
+                    '4',
+                    '5',
+                    '6',
+                    '7',
+                    '8',
+                    '9',
+                    '10',
                   ].map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -110,7 +115,16 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
                   },
                   selectedItemBuilder: (BuildContext context) {
                     return <String>[
-                      '1','2','3','4','5','6','7','8','9','10',
+                      '1',
+                      '2',
+                      '3',
+                      '4',
+                      '5',
+                      '6',
+                      '7',
+                      '8',
+                      '9',
+                      '10',
                     ].map((String value) {
                       return Center(
                         child: Text(
@@ -127,7 +141,7 @@ class _DropdownDeleteSectionState extends State<DropdownDeleteSection> {
             ),
           ),
           Container(
-            width: screenWidth*0.05,
+            width: screenWidth * 0.05,
             height: 50,
             decoration: BoxDecoration(
               color: Colors.white,

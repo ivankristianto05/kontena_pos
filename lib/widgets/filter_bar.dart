@@ -3,19 +3,19 @@ import 'package:kontena_pos/constants.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:kontena_pos/core/app_export.dart';
 
-class ButtonFilter extends StatefulWidget {
+class FilterBar extends StatefulWidget {
   final void Function(String type) onFilterSelected;
 
-  const ButtonFilter({
+  const FilterBar({
     Key? key,
     required this.onFilterSelected,
   }) : super(key: key);
 
   @override
-  _ButtonFilterState createState() => _ButtonFilterState();
+  _FilterBarState createState() => _FilterBarState();
 }
 
-class _ButtonFilterState extends State<ButtonFilter> {
+class _FilterBarState extends State<FilterBar> {
   String _selectedFilter = 'All'; // Default selected filter
 
   void _handleFilterButtonPressed(String type) {
@@ -33,9 +33,7 @@ class _ButtonFilterState extends State<ButtonFilter> {
         4; // 65% of screen width divided among 4 buttons, minus padding
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8.0,
-      ),
+      padding: const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
