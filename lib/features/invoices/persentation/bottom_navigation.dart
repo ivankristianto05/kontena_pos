@@ -40,6 +40,38 @@ class BottomNavigationInvoice extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
+                  'Order to Pay',
+                  style: TextStyle(
+                    color: theme.colorScheme.primaryContainer,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            height: MediaQuery.sizeOf(context).width * 0.07,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondary,
+              // border: Border.all(
+              //   // right: BorderSide(
+              //   color: theme.colorScheme.primary,
+              //   width: 2.0,
+              //   // ),
+              //   // bottom: BorderSide(
+              //   //   color: theme.colorScheme.surface,
+              //   //   width: 1.0,
+              //   // ),
+              // ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
                   'Produk',
                   style: TextStyle(
                     color: theme.colorScheme.primaryContainer,

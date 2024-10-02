@@ -67,7 +67,8 @@ class Cart extends ChangeNotifier {
       );
       _items[existingItemIndex] = existingItem;
     } else {
-      _items.add(CartItem.from(newItem));
+      _items.add(newItem);
+      AppState().addItemToCart(newItem);
     }
     _recalculateTotalPrice();
     _onCartChanged?.call(); // Notify listener
@@ -112,7 +113,7 @@ class Cart extends ChangeNotifier {
   }
 
   List<CartItem> getAllItemCart() {
-    return AppState.cartItem.toList();
+    return AppState().cartItems.toList();
   }
 
   List<Map<String, dynamic>> printItemDetails() {

@@ -11,6 +11,7 @@ import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
+import 'package:kontena_pos/features/cart/persentation/cart_list_item.dart';
 import 'package:kontena_pos/features/invoices/persentation/action_button.dart';
 import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
@@ -67,6 +68,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   void initState() {
     super.initState();
     cartData = cart.getAllItemCart();
+    print('check cart data, $cartData');
     // cartData = cart.getAllItemCart();
 
     Future.delayed(Duration(milliseconds: 300), () {
@@ -98,7 +100,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     //         .toList();
     List<dynamic> filteredItems = item.toList();
     // updateQty(filteredItems);
-    // print('filtered, ${filteredItems}');
+    print('filtered, ${cartData}');
     return filteredItems;
   }
 
@@ -331,7 +333,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  // if (cartData.isNotEmpty) CardListItem(),
+                                  if (cartData.isNotEmpty) CardListItem(),
                                   if (cartData.isEmpty) EmptyCart()
                                 ],
                               ),

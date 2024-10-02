@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Menu/orderbutton_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/appbar_section.dart';
@@ -20,6 +22,7 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _guestNameController = TextEditingController();
   String _selectedFilterType = 'All';
   String _searchQuery = '';
@@ -43,7 +46,8 @@ class _OrderScreenState extends State<OrderScreen> {
     setState(() {});
   }
 
-  void _showItemDetailsDialog(String name, int price, String idMenu, String type) {
+  void _showItemDetailsDialog(
+      String name, int price, String idMenu, String type) {
     showDialog(
       context: context,
       builder: (context) {
@@ -82,15 +86,18 @@ class _OrderScreenState extends State<OrderScreen> {
         Cart cart = Cart(appState);
 
         return Scaffold(
-          appBar: BuildAppbar(
-            smallButtonWidth: smallButtonWidth,
-            buttonWidth: buttonWidth,
-          ),
+          // appBar: BuildAppbar(
+          //   smallButtonWidth: smallButtonWidth,
+          //   buttonWidth: buttonWidth,
+          // ),
+          key: scaffoldKey,
+          backgroundColor: theme.colorScheme.background,
           body: Container(
             color: itembackgroundcolor,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                TopBar(),
                 Row(
                   children: [
                     Container(
@@ -161,7 +168,8 @@ class _OrderScreenState extends State<OrderScreen> {
                           cartItems: appState.cartItems,
                           screenWidth: screenWidth,
                           onEditItem: (editedItem) {
-                            final index = appState.cartItems.indexWhere((item) => item.id == editedItem.id);
+                            final index = appState.cartItems
+                                .indexWhere((item) => item.id == editedItem.id);
                             if (index != -1) {
                               setState(() {
                                 appState.cartItems[index] = editedItem;

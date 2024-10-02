@@ -1167,6 +1167,8 @@ class _AddToCartState extends State<AddToCart> {
       addon: addon,
     );
 
+    print('check new item, $newItem');
+
     setState(() {
       cart.addItem(newItem, mode: CartMode.add);
     });
