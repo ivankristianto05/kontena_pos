@@ -111,6 +111,10 @@ class Cart extends ChangeNotifier {
     return _items.any((item) => item.id == itemId);
   }
 
+  List<CartItem> getAllItemCart() {
+    return AppState.cartItem.toList();
+  }
+
   List<Map<String, dynamic>> printItemDetails() {
     List<Map<String, dynamic>> itemDetails = [];
 

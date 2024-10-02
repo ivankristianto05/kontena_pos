@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:kontena_pos/app_state.dart';
 // import 'package:kontena_pos/Screen/components/Menu/buttonfilter_section.dart';
 // import 'package:kontena_pos/Screen/components/Menu/guestinputwithbutton_section.dart';
 // import 'package:kontena_pos/Screen/components/Menu/dropdown_delete_section.dart';
@@ -7,11 +8,15 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 // import 'package:kontena_pos/Screen/components/itemcart_section.dart';
 // import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/core/app_export.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/data/menu.dart';
+import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
 import 'package:kontena_pos/features/invoices/persentation/action_button.dart';
 import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
+import 'package:kontena_pos/models/cartitem.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
+import 'package:kontena_pos/widgets/empty_cart.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/searchbar.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
@@ -29,9 +34,9 @@ class InvoiceScreen extends StatefulWidget {
 class _InvoiceScreenState extends State<InvoiceScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   // late List<ItemCart> cartItem;
-  // Cart cart = Cart();
+  Cart cart = Cart(AppState());
   late Map cartRecapData;
-  // late List<CartItem> cartData;
+  late List<CartItem> cartData;
   late List<Map<String, dynamic>> cartDataItem = [
     {
       'id': 'test',
@@ -61,7 +66,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   @override
   void initState() {
     super.initState();
-    // cartData = cart.getAllItemCart();
+    cartData = cart.getAllItemCart();
     // cartData = cart.getAllItemCart();
 
     Future.delayed(Duration(milliseconds: 300), () {
@@ -327,7 +332,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   // if (cartData.isNotEmpty) CardListItem(),
-                                  // if (cartData.isEmpty) EmptyCart()
+                                  if (cartData.isEmpty) EmptyCart()
                                 ],
                               ),
                             ),
@@ -386,8 +391,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           //   type: item['type'],
           //   onAddToCart: (item) {},
           // ),
-          child: Container(),
-          // child: AddToCart(dataMenu: item),
+          // child: Container(),
+          child: AddToCart(dataMenu: item),
         );
       },
     ).then((value) => {print('check value, $value')});
