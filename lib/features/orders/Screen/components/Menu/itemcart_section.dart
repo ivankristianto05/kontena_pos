@@ -114,7 +114,6 @@ class ItemCart extends StatelessWidget {
                     ),
                   ),
                 SizedBox(height: 8),
-                // Action Buttons (Edit & Delete)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

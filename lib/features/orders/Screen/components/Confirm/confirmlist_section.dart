@@ -95,7 +95,8 @@ class _ConfirmListState extends State<ConfirmList> {
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold),
                             ),
-                            const SizedBox(width: 8), // Space between qty and name-variant
+                            const SizedBox(
+                                width: 8), // Space between qty and name-variant
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,13 +108,19 @@ class _ConfirmListState extends State<ConfirmList> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   // Display additional information like preferences, addons, and notes
-                                  if (listItem.items[i].preference['preference'] != null &&
-                                      listItem.items[i].preference['preference']!.isNotEmpty)
+                                  if (listItem.items[i]
+                                              .preference['preference'] !=
+                                          null &&
+                                      listItem.items[i]
+                                          .preference['preference']!.isNotEmpty)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4.0),
                                       child: Text(
                                         'Preference: ${listItem.items[i].preference['preference']!}',
-                                        style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            color: textdetailcolor,
+                                            fontWeight: FontWeight.w800),
                                       ),
                                     ),
                                   if (listItem.items[i].addons != null &&
@@ -122,7 +129,10 @@ class _ConfirmListState extends State<ConfirmList> {
                                       padding: const EdgeInsets.only(top: 4.0),
                                       child: Text(
                                         'Addons: ${listItem.items[i].addons!.entries.where((addon) => addon.value['selected'] == true).map((addon) => addon.key).join(', ')}',
-                                        style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            color: textdetailcolor,
+                                            fontWeight: FontWeight.w800),
                                       ),
                                     ),
                                   if (listItem.items[i].notes.isNotEmpty)
@@ -130,7 +140,10 @@ class _ConfirmListState extends State<ConfirmList> {
                                       padding: const EdgeInsets.only(top: 4.0),
                                       child: Text(
                                         'Notes: ${listItem.items[i].notes}',
-                                        style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            color: textdetailcolor,
+                                            fontWeight: FontWeight.w800),
                                       ),
                                     ),
                                 ],
@@ -151,6 +164,38 @@ class _ConfirmListState extends State<ConfirmList> {
                                   _checkAllCheckedStatus();
                                 });
                               },
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: buttonselectedcolor,
+                                padding: EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                              onPressed: () {},
+                              child: Text(
+                                'Edit',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: redcolor,
+                                padding: EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                              onPressed: () {},
+                              child: Text(
+                                'Delete',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 14),
+                              ),
                             ),
                           ],
                         ),

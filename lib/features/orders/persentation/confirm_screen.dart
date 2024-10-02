@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Confirm/CUD_iconbutton_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Confirm/iconbutton_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Confirm/ConfirmCard_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/appbar_section.dart';
 import 'package:provider/provider.dart';
@@ -113,7 +113,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   child: Dropdown(),
                 ),
                 Container(
-                  child: CUDIconButton(),
+                  child: Iconbutton(),
                 ),
               ],
             ),

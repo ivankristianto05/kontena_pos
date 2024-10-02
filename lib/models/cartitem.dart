@@ -27,7 +27,7 @@ class CartItem {
     required this.notes,
     required this.preference,
     this.type,
-  }) : totalPrice = qty * (variantPrice != 0 ? variantPrice : price) + addonsPrice;
+  }) : totalPrice = qty * ( (variantPrice != 0 ? variantPrice : price) + addonsPrice);
 
   // Constructor for creating a copy of an existing CartItem
   CartItem.from(CartItem item)

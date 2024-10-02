@@ -100,11 +100,6 @@ class OrderManager extends ChangeNotifier {
     required VoidCallback onSuccess,
     required List<CartItem> cartItems,
   }) async {
-    if (cartItems.isEmpty || guestNameController.text.isEmpty) {
-      print('Error: Nama pemesan tidak boleh kosong.');
-      return;
-    }
-
     final String idOrder = DateTime.now().toIso8601String();
     final ListToConfirm order = _generateOrder(idOrder, cartItems);
     addOrder(order);
@@ -206,4 +201,12 @@ class OrderManager extends ChangeNotifier {
     final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
     return formatter.format(dateTime);
   }
+// Method to check all items in an order
+  void checkAllItems(String orderId) {
+    var order = getConfirmedOrderById(orderId); // Retrieve the order by ID
+    if (order != null) {
+      order.itemCheckedStatuses.updateAll((key, value) => true); // Set all items to checked
+    }
+  }
+  
 }

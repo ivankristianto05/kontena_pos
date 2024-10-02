@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:kontena_pos/routes/app_routes.dart';
-import 'package:provider/provider.dart';
 
 class ActionButton extends StatelessWidget {
   const ActionButton({
@@ -23,19 +23,12 @@ class ActionButton extends StatelessWidget {
 
     return Consumer<AppState>(
       builder: (context, appState, child) {
-        // Ensure AppState is initialized
-              double totalPrice = appState.totalPrice; // This will trigger a rebuild if totalPrice changes
+        double totalPrice = appState.totalPrice;
 
         if (!appState.isInitialized) {
           return Center(child: CircularProgressIndicator());
         }
-
-        // Get number of selected items from the cart
         int numberOfSelectedItemIds = appState.cartItems.length;
-
-        // Get total price directly from AppState
-
-        // Format total price
         final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
         String formattedTotalPrice = 'Rp ${currencyFormat.format(totalPrice)}';
 
@@ -46,12 +39,26 @@ class ActionButton extends StatelessWidget {
             color: buttoncolor2,
             textColor: Colors.white,
             onPressed: () async {
+              if (guestNameController.text.isEmpty ||
+                  appState.cartItems.isEmpty) {
+                String errorMessage = guestNameController.text.isEmpty
+                    ? 'Nama pemesan tidak boleh kosong!'
+                    : 'Item keranjang tidak boleh kosong!';
+                // Tampilkan pesan error
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(errorMessage),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+                return;
+              }
               try {
                 await appState.createOrder(
                   guestNameController: guestNameController,
                   resetDropdown: resetDropdown,
                   onSuccess: () {
-                    // Navigate back to the OrderScreen immediately after order creation
                     Navigator.pushReplacementNamed(
                       context,
                       AppRoutes.orderScreen,
@@ -59,7 +66,6 @@ class ActionButton extends StatelessWidget {
                   },
                 );
               } catch (e) {
-                // Handle any errors that may occur during order creation
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Error: $e')),
                 );

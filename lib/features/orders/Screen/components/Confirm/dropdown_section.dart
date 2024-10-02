@@ -54,7 +54,7 @@ class _DropdownState extends State<Dropdown> {
     final hasOrderId = appState.currentOrderId.isNotEmpty;
 
     return Container(
-      width: screenWidth * 0.2,
+      width: screenWidth * 0.25,
       height: 50,
       alignment: Alignment.topRight,
       child: Row(
