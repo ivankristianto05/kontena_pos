@@ -45,6 +45,7 @@ class AppState extends ChangeNotifier {
   // List to store cart items
   List<CartItem> _cartItems = [];
   List<CartItem> get cartItems => _cartItems;
+  
   static List<CartItem> cartItem = [];
 
   // Variabel untuk menyimpan total harga
@@ -298,6 +299,11 @@ class AppState extends ChangeNotifier {
     final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
     return formatter.format(dateTime);
   }
+  void checkAllItemsInOrder(String orderId) {
+        _ensureInitialized();
+  orderManager.checkAllItems(orderId);
+  notifyListeners();
+}
 
   String typeTransaction = '';
 }

@@ -39,7 +39,8 @@ class _IconbuttonState extends State<Iconbutton> {
               height: 50,
               padding: EdgeInsets.zero,
               onPressed: () {
-                if (appState.currentOrderId != null && appState.currentOrderId.isNotEmpty) {
+                if (appState.currentOrderId != null &&
+                    appState.currentOrderId.isNotEmpty) {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -75,9 +76,16 @@ class _IconbuttonState extends State<Iconbutton> {
               height: 50,
               padding: EdgeInsets.zero,
               onPressed: () {
-                //fungsi check all
+                final currentOrderId = appState.currentOrderId;
+                if (currentOrderId.isNotEmpty) {
+                  appState.checkAllItemsInOrder(
+                      currentOrderId); // Panggil fungsi check all
+                } else {
+                  print('Tidak ada order yang dipilih.');
+                }
               },
-              child: FaIcon(FontAwesomeIcons.check, color: Colors.cyan, size: 18),
+              child:
+                  FaIcon(FontAwesomeIcons.check, color: Colors.cyan, size: 18),
             ),
           ),
         ],

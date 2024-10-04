@@ -138,12 +138,14 @@ class OrderManager extends ChangeNotifier {
   }
 
   void setItemCheckedStatus(String orderId, String itemId, bool isChecked) {
+    print('Setting item $itemId in order $orderId to $isChecked');
     final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
     if (index >= 0) {
       final order = _confirmedOrders[index];
       final updatedItemCheckedStatuses = Map<String, bool>.from(order.itemCheckedStatuses);
       updatedItemCheckedStatuses[itemId] = isChecked;
       _confirmedOrders[index] = order.copyWith(itemCheckedStatuses: updatedItemCheckedStatuses);
+      appState.saveItemCheckedStatuses(orderId, updatedItemCheckedStatuses);
       checkOrderItems(orderId); // Recheck order items after updating
       notifyListeners();
     } else {
@@ -202,11 +204,20 @@ class OrderManager extends ChangeNotifier {
     return formatter.format(dateTime);
   }
 // Method to check all items in an order
-  void checkAllItems(String orderId) {
-    var order = getConfirmedOrderById(orderId); // Retrieve the order by ID
-    if (order != null) {
-      order.itemCheckedStatuses.updateAll((key, value) => true); // Set all items to checked
+void checkAllItems(String orderId) {
+    final orderIndex = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    if (orderIndex >= 0) {
+        final order = _confirmedOrders[orderIndex];
+
+        // Update semua item menjadi dicentang
+        for (var item in order.items) {
+            setItemCheckedStatus(orderId, item.id, true); // Panggil fungsi setItemCheckedStatus untuk setiap item
+        }
+        addFullyCheckedOrder(orderId);
+        notifyListeners(); // Beritahu UI untuk memperbarui tampilan
+    } else {
+        print('Order dengan ID $orderId tidak ditemukan.');
     }
-  }
-  
+}
+
 }

@@ -196,7 +196,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
                 child: Row(
                   children: const [
                     Text(
-                      'Agil Mahardika',
+                      'Super Admin',
                       style: TextStyle(color: Colors.white),
                     ),
                     SizedBox(width: 8),
