@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:styled_divider/styled_divider.dart';
 
 class ListCart extends StatelessWidget {
@@ -24,6 +25,7 @@ class ListCart extends StatelessWidget {
   final TextStyle labelStyle;
   final VoidCallback? onTap; // Added onTap parameter
   final String catatan;
+  // final String catatan;
 
   ListCart({
     this.mainAxisAlignment = MainAxisAlignment.spaceBetween,
@@ -84,7 +86,7 @@ class ListCart extends StatelessWidget {
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("${qty}X $price"),
+                    Text("${qty}X ${numberFormat('idr', double.parse(price))}"),
                     Text(
                       total,
                       style: theme.textTheme.bodyMedium,
@@ -126,7 +128,7 @@ class ListCart extends StatelessWidget {
                                       child: Row(
                                         children: [
                                           Text(
-                                              '${addonItem['qty']}X ${addonItem['price']}'),
+                                              '${addonItem['qty']}X ${numberFormat('idr', addonItem['price'])}'),
                                         ],
                                       ),
                                     ),

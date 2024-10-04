@@ -3,7 +3,9 @@ import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 
 class TypeTransaction extends StatefulWidget {
-  TypeTransaction({Key? key}) : super(key: key);
+  TypeTransaction({Key? key, this.selected}) : super(key: key);
+
+  String? selected;
 
   @override
   _TypeTransactionState createState() => _TypeTransactionState();
@@ -20,6 +22,9 @@ class _TypeTransactionState extends State<TypeTransaction> {
   @override
   void initState() {
     super.initState();
+    if (widget.selected != null) {
+      typeTransaction = widget.selected!;
+    }
   }
 
   @override

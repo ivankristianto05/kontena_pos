@@ -38,12 +38,11 @@ class _CardListItem extends State<CardListItem> {
     return Column(
       children: [
         SingleChildScrollView(
+          primary: true,
           child: Container(
-            height: MediaQuery.of(context).size.height -
-                AppBar().preferredSize.height -
-                MediaQuery.of(context).padding.top -
-                165,
+            height: 700,
             child: ListView.builder(
+              shrinkWrap: true,
               itemCount: cartData.length,
               itemBuilder: (context, index) {
                 final itemData = cartData[index];
@@ -54,27 +53,29 @@ class _CardListItem extends State<CardListItem> {
                 totalAddon = 0;
                 List<dynamic> addons = [];
 
-                if (itemData.notes != null) {
-                  catatan = itemData.notes.toString();
-                }
+                catatan = itemData.notes.toString();
+                print('addon, ${itemData.addon}');
+                print('pref, ${itemData.pref}');
 
-                if (itemData.addon!.isNotEmpty) {
-                  itemData.addon!.forEach((value) {
-                    addons.add({
-                      'name': value['nama_menu'],
-                      'qty': value['qty'],
-                      'price': numberFormat('idr', value['harga']),
-                    });
-                    // String itemName = value["itemName"] as String;
-                    // String price = value["price"];
+                if (itemData.addon != null) {}
 
-                    // addon2 +=
-                    //     "$itemName - (${numberFormat('idr', double.parse(price))})\n";
-                    totalAddon +=
-                        (double.parse(value['harga'].toString()).toInt() *
-                            double.parse(value['qty'].toString()).toInt());
-                  });
-                }
+                // if (itemData.addon!.isNotEmpty) {
+                //   itemData.addon!.forEach((value) {
+                //     addons.add({
+                //       'name': value['nama_menu'],
+                //       'qty': value['qty'],
+                //       'price': numberFormat('idr', value['harga']),
+                //     });
+                //     // String itemName = value["itemName"] as String;
+                //     // String price = value["price"];
+
+                //     // addon2 +=
+                //     //     "$itemName - (${numberFormat('idr', double.parse(price))})\n";
+                //     totalAddon +=
+                //         (double.parse(value['harga'].toString()).toInt() *
+                //             double.parse(value['qty'].toString()).toInt());
+                //   });
+                // }
 
                 if (itemData.pref != null) {
                   int i = 1;
@@ -92,11 +93,11 @@ class _CardListItem extends State<CardListItem> {
                     title: "${itemData.name} (${itemData.qty})",
                     subtitle: itemData.name,
                     // addon: addon2,
-                    addons: addons,
+                    // addons: addons,
                     qty: itemData.qty.toString(),
                     catatan: preference,
                     titleStyle: CustomTextStyles.labelLargeBlack,
-                    price: numberFormat('idr', itemData.price),
+                    price: itemData.price.toString(),
                     total: numberFormat(
                         'idr', itemData.qty * (itemData.price + totalAddon)),
                     priceStyle: CustomTextStyles.labelLargeBlack,
@@ -106,11 +107,12 @@ class _CardListItem extends State<CardListItem> {
                     note: itemData.notes,
                     lineColor: appTheme.gray200,
                     secondaryStyle: CustomTextStyles.bodySmallGray,
-                    onTap: () => onTapItem(context, index, itemData),
+                    // onTap: () => onTapItem(context, index, itemData),
                   ),
                 );
               },
             ),
+            // ],
           ),
         ),
       ],

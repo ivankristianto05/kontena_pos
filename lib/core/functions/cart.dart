@@ -102,6 +102,7 @@ class Cart extends ChangeNotifier {
   void clearAllItems() {
     _items.clear();
     appState.resetCart(); // Clear items from the AppState as well
+    _recalculateTotalPrice();
     if (_onCartChanged != null) {
       _onCartChanged!();
     }

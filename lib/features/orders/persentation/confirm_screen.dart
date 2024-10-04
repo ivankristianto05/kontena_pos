@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Confirm/iconbutton_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Confirm/ConfirmCard_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/appbar_section.dart';
+import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Confirm/confirmbutton_section.dart';
@@ -67,15 +68,16 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     double buttonWidth = screenWidth * 0.15;
 
     return Scaffold(
-      appBar: BuildAppbar(
-        smallButtonWidth: smallButtonWidth,
-        buttonWidth: buttonWidth,
-      ),
+      // appBar: BuildAppbar(
+      //   smallButtonWidth: smallButtonWidth,
+      //   buttonWidth: buttonWidth,
+      // ),
       body: Container(
         color: itembackgroundcolor,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            TopBar(),
             Row(
               children: [
                 Container(
