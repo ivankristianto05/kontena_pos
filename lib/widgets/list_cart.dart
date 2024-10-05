@@ -25,6 +25,7 @@ class ListCart extends StatelessWidget {
   final TextStyle labelStyle;
   final VoidCallback? onTap; // Added onTap parameter
   final String catatan;
+  final bool isEdit;
   // final String catatan;
 
   ListCart({
@@ -54,6 +55,7 @@ class ListCart extends StatelessWidget {
     ],
     this.onTap,
     this.catatan = "",
+    this.isEdit = true,
   });
 
   @override
@@ -177,14 +179,15 @@ class ListCart extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding:
-                const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 12.0),
-            child: Text(
-              'Edit',
-              style: editLabelStyle,
+          if (isEdit)
+            Padding(
+              padding:
+                  const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 12.0),
+              child: Text(
+                'Edit',
+                style: editLabelStyle,
+              ),
             ),
-          ),
           Container(
             height: 1.0,
             color: lineColor,

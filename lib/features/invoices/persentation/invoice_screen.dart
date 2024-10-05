@@ -11,6 +11,8 @@ import 'package:kontena_pos/constants.dart';
 // import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/core/theme/custom_text_style.dart';
+import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
 import 'package:kontena_pos/features/cart/persentation/cart_list_item.dart';
@@ -19,9 +21,11 @@ import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dar
 import 'package:kontena_pos/features/orders/Screen/components/Confirm/ConfirmCard_section.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
 import 'package:kontena_pos/models/cartitem.dart';
+import 'package:kontena_pos/widgets/custom_dialog.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
 import 'package:kontena_pos/widgets/empty_cart.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
+import 'package:kontena_pos/widgets/list_cart.dart';
 import 'package:kontena_pos/widgets/searchbar.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:kontena_pos/widgets/type_transaction.dart';
@@ -58,6 +62,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   String modeView = 'item';
   List<dynamic> orderList = [];
   String typeTransaction = '';
+  int totalAddon = 0;
+  int totalAddonCheckout = 0;
+  bool isEdit = true;
 
 // // //   //  final String id;
 // // //   // final String name;
@@ -219,6 +226,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                         onTapOpenItem(
                                                           context,
                                                           currentItem,
+                                                          index,
                                                         );
                                                       },
                                                     );
@@ -234,7 +242,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                             if (modeView == 'orderPay')
                               Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
-                                    8.0, 120.0, 8.0, 0.0),
+                                    8.0, 50.0, 8.0, 0.0),
                                 child: SingleChildScrollView(
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -576,7 +584,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                   Text(
                                                     typeTransaction,
                                                     style: theme
-                                                        .textTheme.labelMedium,
+                                                        .textTheme.titleSmall,
                                                   ),
                                                 Icon(
                                                   Icons
@@ -590,7 +598,82 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           ),
                                         ),
                                       ),
-                                    )
+                                    ),
+                                    InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        if (cartData.isNotEmpty) {
+                                          await showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            barrierColor: Color(0x80000000),
+                                            context: context,
+                                            builder: (context) {
+                                              return GestureDetector(
+                                                child: Padding(
+                                                  padding:
+                                                      MediaQuery.viewInsetsOf(
+                                                          context),
+                                                  child: DialogCustomWidget(
+                                                    description:
+                                                        'Are you sure to reset cart?',
+                                                    isConfirm: true,
+                                                    captionConfirm: 'Reset',
+                                                    styleConfirm: TextStyle(
+                                                      color: theme
+                                                          .colorScheme.error,
+                                                    ),
+                                                    onConfirm: () {
+                                                      print('yes confirm');
+                                                      setState(() {
+                                                        AppState().resetCart();
+                                                        cartData = [];
+                                                        modeView = 'item';
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        }
+                                      },
+                                      child: Container(
+                                        height:
+                                            MediaQuery.sizeOf(context).height *
+                                                0.06,
+                                        decoration: BoxDecoration(
+                                          color: theme
+                                              .colorScheme.primaryContainer,
+                                          border: Border(
+                                            left: BorderSide(
+                                              color: theme.colorScheme.surface,
+                                              width: 0.6,
+                                            ),
+                                            bottom: BorderSide(
+                                              color: theme.colorScheme.surface,
+                                              width: 0.6,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  16.0, 0.0, 16.0, 0.0),
+                                          child: Icon(
+                                            Icons.delete_forever_outlined,
+                                            color: cartData.isNotEmpty
+                                                ? theme.colorScheme
+                                                    .onPrimaryContainer
+                                                : theme.colorScheme.outline,
+                                            size: 30.0,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -608,7 +691,98 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  if (cart.items.isNotEmpty) CardListItem(),
+                                  if (cart.items.isNotEmpty)
+                                    SingleChildScrollView(
+                                      primary: true,
+                                      child: Container(
+                                        height: 700,
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: cartData.length,
+                                          itemBuilder: (context, index) {
+                                            final itemData = cartData[index];
+
+                                            String addon2 = '';
+                                            String catatan = '';
+                                            String preference = '';
+                                            totalAddon = 0;
+                                            List<dynamic> addons = [];
+
+                                            catatan = itemData.notes.toString();
+                                            print('addon, ${itemData.addon}');
+                                            print('pref, ${itemData.pref}');
+
+                                            if (itemData.addon != null) {}
+
+                                            // if (itemData.addon!.isNotEmpty) {
+                                            //   itemData.addon!.forEach((value) {
+                                            //     addons.add({
+                                            //       'name': value['nama_menu'],
+                                            //       'qty': value['qty'],
+                                            //       'price': numberFormat('idr', value['harga']),
+                                            //     });
+                                            //     // String itemName = value["itemName"] as String;
+                                            //     // String price = value["price"];
+
+                                            //     // addon2 +=
+                                            //     //     "$itemName - (${numberFormat('idr', double.parse(price))})\n";
+                                            //     totalAddon +=
+                                            //         (double.parse(value['harga'].toString()).toInt() *
+                                            //             double.parse(value['qty'].toString()).toInt());
+                                            //   });
+                                            // }
+
+                                            if (itemData.pref != null) {
+                                              int i = 1;
+                                              itemData.pref?.forEach((element) {
+                                                preference +=
+                                                    "${element['type']}: ${element['name']}";
+                                                if (i < itemData.pref!.length) {
+                                                  preference += ", ";
+                                                }
+                                                i++;
+                                              });
+                                            }
+
+                                            return Container(
+                                              child: ListCart(
+                                                title:
+                                                    "${itemData.name} (${itemData.qty})",
+                                                subtitle: itemData.name,
+                                                // addon: addon2,
+                                                // addons: addons,
+                                                qty: itemData.qty.toString(),
+                                                catatan: preference,
+                                                titleStyle: CustomTextStyles
+                                                    .labelLargeBlack,
+                                                price:
+                                                    itemData.price.toString(),
+                                                total: numberFormat(
+                                                    'idr',
+                                                    itemData.qty *
+                                                        (itemData.price +
+                                                            totalAddon)),
+                                                priceStyle: CustomTextStyles
+                                                    .labelLargeBlack,
+                                                labelStyle: CustomTextStyles
+                                                    .bodySmallBluegray300,
+                                                editLabelStyle: CustomTextStyles
+                                                    .bodySmallOrange600,
+                                                padding: EdgeInsets.all(16),
+                                                note: itemData.notes,
+                                                lineColor: appTheme.gray200,
+                                                secondaryStyle: CustomTextStyles
+                                                    .bodySmallGray,
+                                                isEdit: isEdit,
+                                                onTap: () => onTapOpenItem(
+                                                    context, itemData, index),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        // ],
+                                      ),
+                                    ),
                                   if (cart.items.isEmpty) EmptyCart()
                                 ],
                               ),
@@ -659,7 +833,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   TextEditingController enterGuestNameController = TextEditingController();
   FocusNode inputPhone = FocusNode();
 
-  void onTapOpenItem(BuildContext context, dynamic item) async {
+  void onTapOpenItem(BuildContext context, dynamic item, int? index) async {
+    print('check data item ${item}');
+    print('check data index ${index}');
     await showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: false,
@@ -743,6 +919,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     setState(() {
       enterGuestNameController.text = order.namaPemesan;
       typeTransaction = 'dine-in';
+      cartData = cart.getAllItemCart();
+      isEdit = false;
     });
     // order.forEach((dt) {
     //   print('check, $dt');

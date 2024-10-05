@@ -152,7 +152,7 @@ class TextThemes {
           fontWeight: FontWeight.w700,
         ),
         titleSmall: TextStyle(
-          color: colorScheme.primaryContainer,
+          color: colorScheme.onPrimary,
           fontSize: 14.0,
           fontFamily: 'Lato',
           fontWeight: FontWeight.w700,
