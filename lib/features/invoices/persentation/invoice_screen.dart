@@ -246,136 +246,86 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 child: SingleChildScrollView(
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Wrap(
-                                      spacing: 8.0,
-                                      runSpacing: 8.0,
-                                      children: List.generate(
-                                        orderList.length,
-                                        (index) {
-                                          final currentOrderId =
-                                              AppState().currentOrderId;
-                                          final order = orderList[index];
-                                          // AppState().confirmedOrders[index];
-                                          final isSelected =
-                                              order.idOrder == currentOrderId;
-                                          return AppState()
-                                                  .confirmedOrders
-                                                  .isNotEmpty
-                                              ? GestureDetector(
-                                                  onTap: () {
-                                                    AppState()
+                                    child: Column(
+                                      children: [
+                                        MasonryGridView.count(
+                                          crossAxisCount: 3,
+                                          mainAxisSpacing: 6,
+                                          crossAxisSpacing: 6,
+                                          shrinkWrap: true,
+                                          itemCount: orderList.length,
+                                          itemBuilder: (context, index) {
+                                            final currentOrderId = AppState().currentOrderId;
+                                            final order = orderList[index];
+                                            final isSelected = order.idOrder == currentOrderId;
+                                            return InkWell(
+                                              onTap: () {
+                                                AppState()
                                                         .setCurrentOrderId(order
                                                             .idOrder); // Update the currentOrderId in AppState
                                                     // onOrderSelected(order.idOrder);
                                                     addToCartFromOrder(
                                                         context, order);
-                                                  },
-                                                  child: SizedBox(
-                                                    width: 320.0,
-                                                    child: Card(
-                                                      elevation: 8,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                        side: BorderSide(
-                                                          color: isSelected
-                                                              ? buttonselectedcolor
-                                                              : Colors
-                                                                  .transparent,
-                                                          width: 4,
-                                                        ),
+                                              },
+                                              child: Card(
+                                                elevation: 2,
+                                                // height: double.infinity,
+                                                child: Column(
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsetsDirectional.fromSTEB(
+                                                        16.0,
+                                                        16.0,
+                                                        16.0,
+                                                        10.0,
                                                       ),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                AutoSizeText(
-                                                                  'Table ${order.table}',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                  maxLines: 1,
-                                                                  minFontSize:
-                                                                      10,
-                                                                  maxFontSize:
-                                                                      14,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                AutoSizeText(
-                                                                  AppState()
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                'Table ${order.table.toString()}',
+                                                                style: theme.textTheme.labelMedium,
+                                                              ),
+                                                              Text(
+                                                                typeTransaction.toString(),
+                                                                style: theme.textTheme.labelMedium,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                order.namaPemesan.toString(),
+                                                                style: theme.textTheme.labelMedium,
+                                                              ),
+                                                              
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Text(
+                                                                AppState()
                                                                       .formatDateTime(
                                                                           order
-                                                                              .time), // Use formatted date here
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                            .grey[
-                                                                        700],
-                                                                  ),
-                                                                  maxLines: 1,
-                                                                  minFontSize:
-                                                                      10,
-                                                                  maxFontSize:
-                                                                      12,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            const SizedBox(
-                                                                height: 4),
-                                                            AutoSizeText(
-                                                              order.namaPemesan,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                              .time).toString(),
+                                                                style: theme.textTheme.labelSmall,
                                                               ),
-                                                              maxLines: 1,
-                                                              minFontSize: 12,
-                                                              maxFontSize: 16,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            ),
-                                                            const SizedBox(
-                                                                height: 8),
-                                                            // Remove ConstrainedBox and use Column instead
-                                                            Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                ListView
+                                                            ],
+                                                          ),
+                                                          Column(
+                                                            children: [
+                                                              ListView
                                                                     .separated(
                                                                   separatorBuilder:
                                                                       (context,
                                                                               index) =>
-                                                                          const Divider(
+                                                                          Divider(
                                                                     height: 16,
                                                                     thickness:
-                                                                        1,
-                                                                    color: Colors
-                                                                        .grey,
+                                                                        0.5,
+                                                                    color: theme.colorScheme.surface,
                                                                   ),
                                                                   shrinkWrap:
                                                                       true,
@@ -387,7 +337,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                   itemBuilder:
                                                                       (context,
                                                                           i) {
-                                                                    final cartItem =
+                                                                            final cartItem =
                                                                         order.items[
                                                                             i];
                                                                     return Padding(
@@ -425,7 +375,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                                   maxFontSize: 14,
                                                                                   overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
                                                                                 ),
-                                                                                if ((cartItem.preference != null) && (cartItem.preference.values != null)) ...[
+                                                                                if ((cartItem.preference != null) && (cartItem.preference.values != null))
                                                                                   const SizedBox(height: 4),
                                                                                   AutoSizeText(
                                                                                     "Preference: ${cartItem.preference.values.join(', ')}",
@@ -438,8 +388,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                                     maxFontSize: 12,
                                                                                     overflow: TextOverflow.ellipsis,
                                                                                   ),
-                                                                                ],
-                                                                                if (cartItem.addons != null && cartItem.addons!.isNotEmpty) ...[
+                                                                                if (cartItem.addons != null && cartItem.addons!.isNotEmpty)
                                                                                   const SizedBox(height: 4),
                                                                                   AutoSizeText(
                                                                                     "+ ${cartItem.addons!.keys.join(', ')}",
@@ -452,8 +401,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                                     maxFontSize: 12,
                                                                                     overflow: TextOverflow.ellipsis,
                                                                                   ),
-                                                                                ],
-                                                                                if ((cartItem.notes != null) && (cartItem.notes != '')) ...[
+                                                                                if ((cartItem.notes != null) && (cartItem.notes != ''))
                                                                                   const SizedBox(height: 4),
                                                                                   AutoSizeText(
                                                                                     "Notes: ${cartItem.notes}",
@@ -466,30 +414,272 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                                     maxFontSize: 12,
                                                                                     overflow: TextOverflow.ellipsis,
                                                                                   ),
-                                                                                ],
                                                                               ],
                                                                             ),
                                                                           ),
                                                                         ],
                                                                       ),
                                                                     );
-                                                                  },
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
+                                                                },
+                                                              ),
+                                                            ]
+                                                          )
+                                                        ],
                                                       ),
                                                     ),
-                                                  ),
+                                                  ],
                                                 )
-                                              : const Center(
-                                                  child: AutoSizeText(
-                                                      'No order inputted.'),
-                                                );
-                                        },
-                                      ),
+                                              )
+
+                                            );
+                                          },),
+                                      ]
                                     ),
+
+                                    // child: Wrap(
+                                    //   spacing: 8.0,
+                                    //   runSpacing: 8.0,
+                                    //   children: List.generate(
+                                    //     orderList.length,
+                                    //     (index) {
+                                    //       final currentOrderId =
+                                    //           AppState().currentOrderId;
+                                    //       final order = orderList[index];
+                                    //       // AppState().confirmedOrders[index];
+                                    //       final isSelected =
+                                    //           order.idOrder == currentOrderId;
+                                    //       return AppState()
+                                    //               .confirmedOrders
+                                    //               .isNotEmpty
+                                    //           ? GestureDetector(
+                                    //               onTap: () {
+                                    //                 AppState()
+                                    //                     .setCurrentOrderId(order
+                                    //                         .idOrder); // Update the currentOrderId in AppState
+                                    //                 // onOrderSelected(order.idOrder);
+                                    //                 addToCartFromOrder(
+                                    //                     context, order);
+                                    //               },
+                                    //               child: SizedBox(
+                                    //                 width: 320.0,
+                                    //                 child: Card(
+                                    //                   elevation: 8,
+                                    //                   shape:
+                                    //                       RoundedRectangleBorder(
+                                    //                     borderRadius:
+                                    //                         BorderRadius
+                                    //                             .circular(8),
+                                    //                     side: BorderSide(
+                                    //                       color: isSelected
+                                    //                           ? buttonselectedcolor
+                                    //                           : Colors
+                                    //                               .transparent,
+                                    //                       width: 4,
+                                    //                     ),
+                                    //                   ),
+                                    //                   child: Padding(
+                                    //                     padding:
+                                    //                         const EdgeInsets
+                                    //                             .all(8.0),
+                                    //                     child: Column(
+                                    //                       crossAxisAlignment:
+                                    //                           CrossAxisAlignment
+                                    //                               .start,
+                                    //                       children: [
+                                    //                         Row(
+                                    //                           mainAxisAlignment:
+                                    //                               MainAxisAlignment
+                                    //                                   .spaceBetween,
+                                    //                           children: [
+                                    //                             AutoSizeText(
+                                    //                               'Table ${order.table}',
+                                    //                               style:
+                                    //                                   const TextStyle(
+                                    //                                 fontWeight:
+                                    //                                     FontWeight
+                                    //                                         .bold,
+                                    //                               ),
+                                    //                               maxLines: 1,
+                                    //                               minFontSize:
+                                    //                                   10,
+                                    //                               maxFontSize:
+                                    //                                   14,
+                                    //                               overflow:
+                                    //                                   TextOverflow
+                                    //                                       .ellipsis,
+                                    //                             ),
+                                    //                             AutoSizeText(
+                                    //                               AppState()
+                                    //                                   .formatDateTime(
+                                    //                                       order
+                                    //                                           .time), // Use formatted date here
+                                    //                               style:
+                                    //                                   TextStyle(
+                                    //                                 color: Colors
+                                    //                                         .grey[
+                                    //                                     700],
+                                    //                               ),
+                                    //                               maxLines: 1,
+                                    //                               minFontSize:
+                                    //                                   10,
+                                    //                               maxFontSize:
+                                    //                                   12,
+                                    //                               overflow:
+                                    //                                   TextOverflow
+                                    //                                       .ellipsis,
+                                    //                             ),
+                                    //                           ],
+                                    //                         ),
+                                    //                         const SizedBox(
+                                    //                             height: 4),
+                                    //                         AutoSizeText(
+                                    //                           order.namaPemesan,
+                                    //                           style:
+                                    //                               const TextStyle(
+                                    //                             fontWeight:
+                                    //                                 FontWeight
+                                    //                                     .bold,
+                                    //                           ),
+                                    //                           maxLines: 1,
+                                    //                           minFontSize: 12,
+                                    //                           maxFontSize: 16,
+                                    //                           overflow:
+                                    //                               TextOverflow
+                                    //                                   .ellipsis,
+                                    //                         ),
+                                    //                         const SizedBox(
+                                    //                             height: 8),
+                                    //                         // Remove ConstrainedBox and use Column instead
+                                    //                         Column(
+                                    //                           crossAxisAlignment:
+                                    //                               CrossAxisAlignment
+                                    //                                   .start,
+                                    //                           children: [
+                                    //                             ListView
+                                    //                                 .separated(
+                                    //                               separatorBuilder:
+                                    //                                   (context,
+                                    //                                           index) =>
+                                    //                                       const Divider(
+                                    //                                 height: 16,
+                                    //                                 thickness:
+                                    //                                     1,
+                                    //                                 color: Colors
+                                    //                                     .grey,
+                                    //                               ),
+                                    //                               shrinkWrap:
+                                    //                                   true,
+                                    //                               physics:
+                                    //                                   const NeverScrollableScrollPhysics(),
+                                    //                               itemCount: order
+                                    //                                   .items
+                                    //                                   .length,
+                                    //                               itemBuilder:
+                                    //                                   (context,
+                                    //                                       i) {
+                                    //                                 final cartItem =
+                                    //                                     order.items[
+                                    //                                         i];
+                                    //                                 return Padding(
+                                    //                                   padding: const EdgeInsets
+                                    //                                       .only(
+                                    //                                       bottom:
+                                    //                                           8.0),
+                                    //                                   child:
+                                    //                                       Row(
+                                    //                                     crossAxisAlignment:
+                                    //                                         CrossAxisAlignment.start,
+                                    //                                     children: [
+                                    //                                       Text(
+                                    //                                         "${cartItem.qty}",
+                                    //                                         style:
+                                    //                                             const TextStyle(
+                                    //                                           fontWeight: FontWeight.w600,
+                                    //                                           fontSize: 14,
+                                    //                                         ),
+                                    //                                       ),
+                                    //                                       const SizedBox(
+                                    //                                           width: 8),
+                                    //                                       Expanded(
+                                    //                                         child:
+                                    //                                             Column(
+                                    //                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                    //                                           children: [
+                                    //                                             AutoSizeText(
+                                    //                                               "${cartItem.name} - ${cartItem.variant ?? ''}",
+                                    //                                               style: const TextStyle(
+                                    //                                                 fontWeight: FontWeight.w600,
+                                    //                                               ),
+                                    //                                               maxLines: 2, // Allows up to 2 lines
+                                    //                                               minFontSize: 10,
+                                    //                                               maxFontSize: 14,
+                                    //                                               overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
+                                    //                                             ),
+                                    //                                             if ((cartItem.preference != null) && (cartItem.preference.values != null)) ...[
+                                    //                                               const SizedBox(height: 4),
+                                    //                                               AutoSizeText(
+                                    //                                                 "Preference: ${cartItem.preference.values.join(', ')}",
+                                    //                                                 style: const TextStyle(
+                                    //                                                   color: Colors.grey,
+                                    //                                                   fontSize: 12,
+                                    //                                                 ),
+                                    //                                                 maxLines: 1,
+                                    //                                                 minFontSize: 10,
+                                    //                                                 maxFontSize: 12,
+                                    //                                                 overflow: TextOverflow.ellipsis,
+                                    //                                               ),
+                                    //                                             ],
+                                    //                                             if (cartItem.addons != null && cartItem.addons!.isNotEmpty) ...[
+                                    //                                               const SizedBox(height: 4),
+                                    //                                               AutoSizeText(
+                                    //                                                 "+ ${cartItem.addons!.keys.join(', ')}",
+                                    //                                                 style: const TextStyle(
+                                    //                                                   color: Colors.grey,
+                                    //                                                   fontSize: 12,
+                                    //                                                 ),
+                                    //                                                 maxLines: 1,
+                                    //                                                 minFontSize: 10,
+                                    //                                                 maxFontSize: 12,
+                                    //                                                 overflow: TextOverflow.ellipsis,
+                                    //                                               ),
+                                    //                                             ],
+                                    //                                             if ((cartItem.notes != null) && (cartItem.notes != '')) ...[
+                                    //                                               const SizedBox(height: 4),
+                                    //                                               AutoSizeText(
+                                    //                                                 "Notes: ${cartItem.notes}",
+                                    //                                                 style: const TextStyle(
+                                    //                                                   color: Colors.grey,
+                                    //                                                   fontSize: 12,
+                                    //                                                 ),
+                                    //                                                 maxLines: 2,
+                                    //                                                 minFontSize: 10,
+                                    //                                                 maxFontSize: 12,
+                                    //                                                 overflow: TextOverflow.ellipsis,
+                                    //                                               ),
+                                    //                                             ],
+                                    //                                           ],
+                                    //                                         ),
+                                    //                                       ),
+                                    //                                     ],
+                                    //                                   ),
+                                    //                                 );
+                                    //                               },
+                                    //                             ),
+                                    //                           ],
+                                    //                         ),
+                                    //                       ],
+                                    //                     ),
+                                    //                   ),
+                                    //                 ),
+                                    //               ),
+                                    //             )
+                                    //           : const Center(
+                                    //               child: AutoSizeText(
+                                    //                   'No order inputted.'),
+                                    //             );
+                                    //     },
+                                    //   ),
+                                    // ),
                                   ),
                                 ),
                               ),
