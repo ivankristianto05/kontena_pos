@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/core/utils/alert.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/constants.dart';
@@ -65,6 +66,9 @@ class ActionButton extends StatelessWidget {
                     );
                   },
                 );
+                if (context.mounted) {
+                  alertSuccess(context, 'Order berhasil ditambahkan');
+                }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Error: $e')),

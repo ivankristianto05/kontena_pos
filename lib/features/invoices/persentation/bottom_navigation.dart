@@ -8,14 +8,17 @@ class BottomNavigationInvoice extends StatelessWidget {
   // final double contentHeight;
   VoidCallback? onTapOrderToPay;
   VoidCallback? onTapItem;
+  VoidCallback? onTapPay;
 
   Cart cart = Cart(AppState());
 
-  BottomNavigationInvoice(
-      {super.key,
-      // required this.contentHeight,
-      this.onTapOrderToPay,
-      this.onTapItem});
+  BottomNavigationInvoice({
+    super.key,
+    // required this.contentHeight,
+    this.onTapOrderToPay,
+    this.onTapItem,
+    this.onTapPay,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -125,58 +128,63 @@ class BottomNavigationInvoice extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: cart.items.isNotEmpty
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.surface,
-                  ),
-                  child: Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Bayar',
-                              style: cart.items.isNotEmpty
-                                  ? TextStyle(
-                                      color: theme.colorScheme.primaryContainer,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.w600,
-                                    )
-                                  : theme.textTheme.labelLarge,
-                            ),
-                            Text(
-                              '${cart.items.length} item',
-                              style: cart.items.isNotEmpty
-                                  ? TextStyle(
-                                      color: theme.colorScheme.primaryContainer,
-                                    )
-                                  : theme.textTheme.labelSmall,
-                            ),
-                          ],
-                        ),
-                        Text(
-                          numberFormat(
-                            'idr',
-                            AppState().totalPrice,
+                child: InkWell(
+                  onTap: onTapPay,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: cart.items.isNotEmpty
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.surface,
+                    ),
+                    child: Padding(
+                      padding:
+                          EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Bayar',
+                                style: cart.items.isNotEmpty
+                                    ? TextStyle(
+                                        color:
+                                            theme.colorScheme.primaryContainer,
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.w600,
+                                      )
+                                    : theme.textTheme.labelLarge,
+                              ),
+                              Text(
+                                '${cart.items.length} item',
+                                style: cart.items.isNotEmpty
+                                    ? TextStyle(
+                                        color:
+                                            theme.colorScheme.primaryContainer,
+                                      )
+                                    : theme.textTheme.labelSmall,
+                              ),
+                            ],
                           ),
-                          style: cart.items.isNotEmpty
-                              ? TextStyle(
-                                  color: theme.colorScheme.primaryContainer,
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w600,
-                                )
-                              : theme.textTheme.labelLarge,
-                        ),
-                      ],
+                          Text(
+                            numberFormat(
+                              'idr',
+                              AppState().totalPrice,
+                            ),
+                            style: cart.items.isNotEmpty
+                                ? TextStyle(
+                                    color: theme.colorScheme.primaryContainer,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w600,
+                                  )
+                                : theme.textTheme.labelLarge,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

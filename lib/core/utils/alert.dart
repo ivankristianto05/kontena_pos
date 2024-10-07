@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/core/theme/theme_helper.dart';
 
 void alertError(BuildContext context, String message) {
   ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -8,9 +9,11 @@ void alertError(BuildContext context, String message) {
     SnackBar(
       content: Text(
         message,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: theme.colorScheme.primaryContainer),
       ),
-      backgroundColor: Colors.redAccent, // You can customize the color here
+      duration: const Duration(seconds: 5),
+      backgroundColor:
+          theme.colorScheme.onError, // You can customize the color here
     ),
   );
 }
@@ -22,10 +25,11 @@ void alertSuccess(BuildContext context, String message) {
     SnackBar(
       content: Text(
         message,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: theme.colorScheme.primaryContainer),
       ),
+      duration: const Duration(seconds: 5),
       backgroundColor:
-          const Color(0xFF4A9D4D), // You can customize the color here
+          theme.colorScheme.primary, // You can customize the color here
     ),
   );
 }

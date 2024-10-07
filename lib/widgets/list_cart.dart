@@ -188,11 +188,10 @@ class ListCart extends StatelessWidget {
                 style: editLabelStyle,
               ),
             ),
-          Container(
+          Divider(
             height: 1.0,
-            color: lineColor,
-            margin: const EdgeInsets.symmetric(
-                horizontal: 16.0), // Adjust margin as needed
+            thickness: 1.0,
+            color: theme.colorScheme.surface,
           ),
         ],
       ),

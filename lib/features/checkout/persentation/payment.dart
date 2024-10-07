@@ -54,8 +54,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Pembayaran',
-                      style: theme.textTheme.labelMedium,
+                      'Payment',
+                      style: TextStyle(
+                          color: theme.colorScheme.primaryContainer,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold),
                     ),
                     if (!paymentStatus)
                       InkWell(
@@ -79,6 +82,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ],
                 ),
               ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [],
             ),
           ],
         ),
