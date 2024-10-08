@@ -9,6 +9,7 @@ class BottomNavigationInvoice extends StatelessWidget {
   VoidCallback? onTapOrderToPay;
   VoidCallback? onTapItem;
   VoidCallback? onTapPay;
+  String? isSelected;
 
   Cart cart = Cart(AppState());
 
@@ -18,6 +19,7 @@ class BottomNavigationInvoice extends StatelessWidget {
     this.onTapOrderToPay,
     this.onTapItem,
     this.onTapPay,
+    this.isSelected,
   });
 
   @override
@@ -51,7 +53,9 @@ class BottomNavigationInvoice extends StatelessWidget {
                   Text(
                     'Order to Pay',
                     style: TextStyle(
-                      color: theme.colorScheme.primaryContainer,
+                      color: isSelected == 'orderPay'
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.primaryContainer,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -86,7 +90,9 @@ class BottomNavigationInvoice extends StatelessWidget {
                   Text(
                     'Produk',
                     style: TextStyle(
-                      color: theme.colorScheme.primaryContainer,
+                      color: isSelected == 'item'
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.primaryContainer,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),

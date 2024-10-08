@@ -128,7 +128,6 @@ class Cart extends ChangeNotifier {
         'indexaddons': item.addons,
       });
     }
-    print(itemDetails);
     return itemDetails;
   }
 }

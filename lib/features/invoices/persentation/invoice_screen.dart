@@ -132,7 +132,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         top: false,
         child: Column(
           children: [
-            TopBar(),
+            TopBar(
+              isSelected: 'invoice',
+            ),
             Expanded(
               child: Stack(
                 children: [
@@ -348,7 +350,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                             thickness: 0.5,
                                                             color: theme
                                                                 .colorScheme
-                                                                .surface,
+                                                                .outline,
                                                           ),
                                                           Padding(
                                                             padding:
@@ -372,7 +374,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                         0.5,
                                                                     color: theme
                                                                         .colorScheme
-                                                                        .surface,
+                                                                        .outline,
                                                                   ),
                                                                   shrinkWrap:
                                                                       true,
@@ -496,7 +498,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               borderDecoration: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(0.h),
                                 borderSide: BorderSide(
-                                  color: theme.colorScheme.surface,
+                                  color: theme.colorScheme.outline,
                                   width: 0,
                                 ),
                               ),
@@ -536,7 +538,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                             border: Border(
                                               bottom: BorderSide(
                                                 color:
-                                                    theme.colorScheme.surface,
+                                                    theme.colorScheme.outline,
                                                 width: 0.5,
                                               ),
                                             ),
@@ -568,8 +570,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                 Icon(
                                                   Icons
                                                       .keyboard_arrow_down_rounded,
-                                                  color:
-                                                      theme.colorScheme.outline,
+                                                  color: theme
+                                                      .colorScheme.secondary,
                                                   size: 24.0,
                                                 ),
                                               ],
@@ -629,11 +631,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                               .colorScheme.primaryContainer,
                                           border: Border(
                                             left: BorderSide(
-                                              color: theme.colorScheme.surface,
+                                              color: theme.colorScheme.outline,
                                               width: 0.6,
                                             ),
                                             bottom: BorderSide(
-                                              color: theme.colorScheme.surface,
+                                              color: theme.colorScheme.outline,
                                               width: 0.6,
                                             ),
                                           ),
@@ -645,8 +647,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           child: Icon(
                                             Icons.delete_forever_outlined,
                                             color: cartData.isNotEmpty
-                                                ? theme.colorScheme
-                                                    .onPrimaryContainer
+                                                ? theme.colorScheme.onError
                                                 : theme.colorScheme.outline,
                                             size: 30.0,
                                           ),
@@ -688,8 +689,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                             List<dynamic> addons = [];
 
                                             catatan = itemData.notes.toString();
-                                            print('addon, ${itemData.addon}');
-                                            print('pref, ${itemData.pref}');
 
                                             if (itemData.addon != null) {}
 
@@ -745,8 +744,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                     .labelLargeBlack,
                                                 labelStyle: CustomTextStyles
                                                     .bodySmallBluegray300,
-                                                editLabelStyle: CustomTextStyles
-                                                    .bodySmallOrange600,
+                                                editLabelStyle: TextStyle(
+                                                  color:
+                                                      theme.colorScheme.primary,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                                 padding: EdgeInsets.all(16),
                                                 note: itemData.notes,
                                                 lineColor: appTheme.gray200,
@@ -781,6 +783,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 color: Colors.transparent,
               ),
               child: BottomNavigationInvoice(
+                isSelected: modeView,
                 onTapOrderToPay: () {
                   setState(() {
                     modeView = 'orderPay';

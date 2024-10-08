@@ -75,7 +75,7 @@ class ListCart extends StatelessWidget {
                 StyledDivider(
                   height: 15.0,
                   thickness: 2.0,
-                  color: theme.colorScheme.surface,
+                  color: theme.colorScheme.outline,
                   lineStyle: DividerLineStyle.dotted,
                 ),
                 Text(
@@ -189,9 +189,9 @@ class ListCart extends StatelessWidget {
               ),
             ),
           Divider(
-            height: 1.0,
-            thickness: 1.0,
-            color: theme.colorScheme.surface,
+            height: 5.0,
+            thickness: 0.5,
+            color: theme.colorScheme.outline,
           ),
         ],
       ),

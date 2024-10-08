@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:kontena_pos/core/app_export.dart';
+import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 
 class FilterBar extends StatefulWidget {
   final void Function(String type) onFilterSelected;
@@ -51,23 +52,18 @@ class _FilterBarState extends State<FilterBar> {
 
   Widget _buildFilterButton(String type, double width) {
     bool isSelected = _selectedFilter == type;
-    return Container(
+    return SizedBox(
       height: 50,
       width: width,
-      child: MaterialButton(
+      child: CustomElevatedButton(
+        text: type,
+        buttonTextStyle: isSelected
+            ? TextStyle(color: theme.colorScheme.primaryContainer)
+            : TextStyle(color: theme.colorScheme.secondary),
+        buttonStyle: isSelected
+            ? CustomButtonStyles.primary
+            : CustomButtonStyles.outlineSecondary,
         onPressed: () => _handleFilterButtonPressed(type),
-        color: isSelected
-            ? theme.colorScheme.primary
-            : buttoncolor, // Change color based on selection
-        textColor: Colors.white,
-        height: 50,
-        child: AutoSizeText(
-          type,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-          maxLines: 1,
-          minFontSize: 10,
-          overflow: TextOverflow.ellipsis,
-        ),
       ),
     );
   }

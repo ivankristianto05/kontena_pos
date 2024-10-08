@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Menu/orderbutton_section.dart';
@@ -97,7 +98,9 @@ class _OrderScreenState extends State<OrderScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TopBar(),
+                TopBar(
+                  isSelected: 'order',
+                ),
                 Row(
                   children: [
                     Container(
@@ -124,7 +127,10 @@ class _OrderScreenState extends State<OrderScreen> {
                       width: searchbarWidth,
                       child: Row(
                         children: [
-                          ButtonFilter(onFilterSelected: _handleFilterSelected),
+                          FilterBar(
+                            onFilterSelected: _handleFilterSelected,
+                          ),
+                          // ButtonFilter(onFilterSelected: _handleFilterSelected),
                         ],
                       ),
                     ),
