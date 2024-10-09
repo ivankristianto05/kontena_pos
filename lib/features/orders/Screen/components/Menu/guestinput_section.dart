@@ -78,53 +78,53 @@ class _GuestInputWithButtonState extends State<GuestInputWithButton> {
               ),
             ),
           ),
-          Container(
-            width: widget.smallButtonWidth,
-            height: 55,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                right: BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-              ),
-            ),
-            child: MaterialButton(
-              height: 55,
-              padding: EdgeInsets.zero,
-              onPressed: () {
-                widget.onNameSubmitted(widget.guestNameController
-                    .text); // Call the callback with the input text
-              },
-              child: Center(
-                child: FaIcon(
-                  FontAwesomeIcons.magnifyingGlass,
-                  size: 16,
-                ),
-              ),
-            ),
-          ),
-          Container(
-            width: widget.smallButtonWidth,
-            height: 55,
-            decoration: BoxDecoration(
-              color: Colors.white,
-            ),
-            child: MaterialButton(
-              height: 55,
-              padding: EdgeInsets.zero,
-              onPressed: () {
-                // Handle the action for the person button
-              },
-              child: Center(
-                child: FaIcon(
-                  FontAwesomeIcons.userPlus,
-                  size: 16,
-                ),
-              ),
-            ),
-          ),
+          // Container(
+          //   width: widget.smallButtonWidth,
+          //   height: 55,
+          //   decoration: BoxDecoration(
+          //     color: Colors.white,
+          //     border: Border(
+          //       right: BorderSide(
+          //         color: Colors.grey,
+          //         width: 1.0,
+          //       ),
+          //     ),
+          //   ),
+          //   child: MaterialButton(
+          //     height: 55,
+          //     padding: EdgeInsets.zero,
+          //     onPressed: () {
+          //       widget.onNameSubmitted(widget.guestNameController
+          //           .text); // Call the callback with the input text
+          //     },
+          //     child: Center(
+          //       child: FaIcon(
+          //         FontAwesomeIcons.magnifyingGlass,
+          //         size: 16,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          // Container(
+          //   width: widget.smallButtonWidth,
+          //   height: 55,
+          //   decoration: BoxDecoration(
+          //     color: Colors.white,
+          //   ),
+          //   child: MaterialButton(
+          //     height: 55,
+          //     padding: EdgeInsets.zero,
+          //     onPressed: () {
+          //       // Handle the action for the person button
+          //     },
+          //     child: Center(
+          //       child: FaIcon(
+          //         FontAwesomeIcons.userPlus,
+          //         size: 16,
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

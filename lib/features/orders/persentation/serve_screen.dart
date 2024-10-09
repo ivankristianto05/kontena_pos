@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Confirm/iconbutton_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Confirm/ConfirmCard_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Serve/iconbutton_section.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
@@ -12,12 +11,12 @@ import 'package:kontena_pos/features/orders/Screen/components/footer_section.dar
 import 'package:kontena_pos/features/orders/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/constants.dart';
 
-class ConfirmScreen extends StatefulWidget {
+class ServeScreen extends StatefulWidget {
   @override
-  _ConfirmScreenState createState() => _ConfirmScreenState();
+  _ServeScreenState createState() => _ServeScreenState();
 }
 
-class _ConfirmScreenState extends State<ConfirmScreen> {
+class _ServeScreenState extends State<ServeScreen> {
   final TextEditingController _guestNameController = TextEditingController();
   String _selectedFilterType = 'All';
   String _searchQuery = '';
@@ -114,7 +113,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   child: Dropdown(),
                 ),
                 Container(
-                  child: Iconbutton(),
+                  child: ServeIconButton(),
                 ),
               ],
             ),
@@ -124,13 +123,13 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   Container(
                     width: screenWidth * 0.65,
                     alignment: Alignment.topLeft,
-                    child: ConfirmCard(
-                      screenWidth: screenWidth,
-                      onOrderSelected: (orderId) {
-                        appState.setCurrentOrderId(orderId);
-                        appState.printConfirmedOrders();
-                      },
-                    ),
+                    // child: ConfirmCard(
+                    //   screenWidth: screenWidth,
+                    //   onOrderSelected: (orderId) {
+                    //     appState.setCurrentOrderId(orderId);
+                    //     appState.printConfirmedOrders();
+                    //   },
+                    // ),
                   ),
                   Container(
                     width: screenWidth * 0.35,
@@ -162,12 +161,9 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   ),
                   CustomButton(
                     screenWidth: MediaQuery.of(context).size.width,
-                    buttonText: 'Confirm', // Text for the confirm page
+                    buttonText: 'Serve', // Text for the confirm page
                     onPressed: () {
-                      if (appState.currentOrderId.isNotEmpty) {
-                        appState.confirmOrderStatus(appState.currentOrderId);
-                        print("Order ${appState.currentOrderId} confirmed");
-                      }
+                      print("order served");
                     },
                   ),
                 ],

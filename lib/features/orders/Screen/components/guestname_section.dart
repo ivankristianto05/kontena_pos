@@ -76,6 +76,7 @@ class _GuestNameTextFieldButtonState extends State<GuestNameTextFieldButton> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
+                      hintText: 'Guest Name',
                       border: InputBorder.none,
                       contentPadding:
                           EdgeInsets.symmetric(vertical: 18, horizontal: 8),
@@ -85,52 +86,52 @@ class _GuestNameTextFieldButtonState extends State<GuestNameTextFieldButton> {
               ),
             ),
           ),
-          Container(
-            width: widget.smallButtonWidth,
-            height: 55,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                right: BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-              ),
-            ),
-            child: MaterialButton(
-              height: 55,
-              padding: EdgeInsets.zero,
-              onPressed: () {
-                // Handle search action here
-              },
-              child: Center(
-                child: FaIcon(
-                  FontAwesomeIcons.magnifyingGlass,
-                  size: 16,
-                ),
-              ),
-            ),
-          ),
-          Container(
-            width: widget.smallButtonWidth,
-            height: 55,
-            decoration: BoxDecoration(
-              color: Colors.white,
-            ),
-            child: MaterialButton(
-              height: 55,
-              padding: EdgeInsets.zero,
-              onPressed: () {
-                // Handle action for person button
-              },
-              child: Center(
-                child: FaIcon(
-                  FontAwesomeIcons.userPlus,
-                  size: 16,
-                ),
-              ),
-            ),
-          ),
+          // Container(
+          //   width: widget.smallButtonWidth,
+          //   height: 55,
+          //   decoration: BoxDecoration(
+          //     color: Colors.white,
+          //     border: Border(
+          //       right: BorderSide(
+          //         color: Colors.grey,
+          //         width: 1.0,
+          //       ),
+          //     ),
+          //   ),
+          //   child: MaterialButton(
+          //     height: 55,
+          //     padding: EdgeInsets.zero,
+          //     onPressed: () {
+          //       // Handle search action here
+          //     },
+          //     child: Center(
+          //       child: FaIcon(
+          //         FontAwesomeIcons.magnifyingGlass,
+          //         size: 16,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          // Container(
+          //   width: widget.smallButtonWidth,
+          //   height: 55,
+          //   decoration: BoxDecoration(
+          //     color: Colors.white,
+          //   ),
+          //   child: MaterialButton(
+          //     height: 55,
+          //     padding: EdgeInsets.zero,
+          //     onPressed: () {
+          //       // Handle action for person button
+          //     },
+          //     child: Center(
+          //       child: FaIcon(
+          //         FontAwesomeIcons.userPlus,
+          //         size: 16,
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
