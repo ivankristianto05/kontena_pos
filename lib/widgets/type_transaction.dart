@@ -434,7 +434,9 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                                 'SHOPEE',
                                                 style: (typeTransaction ==
                                                         "shopee")
-                                                    ? theme.textTheme.titleSmall
+                                                    ? TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer)
                                                     : theme
                                                         .textTheme.labelMedium,
                                               ),
@@ -442,9 +444,11 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                                 'Pesanan ShopeeFood',
                                                 style: (typeTransaction ==
                                                         "shopee")
-                                                    ? theme.textTheme.titleSmall
+                                                    ? TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer)
                                                     : theme
-                                                        .textTheme.labelSmall,
+                                                        .textTheme.labelMedium,
                                               ),
                                             ],
                                           ),
@@ -508,7 +512,9 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                 child: Text(
                                   'Terapkan',
                                   textAlign: TextAlign.center,
-                                  style: theme.textTheme.titleSmall,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.primaryContainer,
+                                  ),
                                 ),
                               ),
                             ),

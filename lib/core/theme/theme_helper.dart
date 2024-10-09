@@ -164,22 +164,23 @@ class TextThemes {
 class ColorSchemes {
   static const primaryColorScheme = ColorScheme.light(
     // Primary colors
-    primary: Color(0xFF079dd4),
+    primary: Color(0xFF1976D2),
     secondary: Color(0xFF393E46),
     primaryContainer: Color(0XFFFFFFFF),
     secondaryContainer: Color(0XFFE6F5FB),
 
     background: Color(0xFFEEEEEE),
 
-    surface: Color(0xFFE3E6EA),
+    surface: Color(0XFFF5F5F5),
+    // #234, 239, 240, 255
 
     // Error colors
     onError: Color(0XFFF81E01),
 
     // On colors(text colors)
     onPrimary: Color(0XFF222831),
-    onPrimaryContainer: Color(0XFFF81E01),
-    outline: Color(0XFF9E9E9E),
+    onPrimaryContainer: Color(0XFF9E9E9E),
+    outline: Color(0xFFE0E0E0),
   );
 }
 
@@ -210,6 +211,7 @@ class PrimaryColors {
   Color get gray300 => const Color(0XFFE0E0E0);
   Color get gray30001 => const Color(0XFFE0D2EC);
   Color get gray30002 => const Color(0XFFDBEBE5);
+  Color get gray350 => const Color(0XFFD6D6D6);
   Color get gray500 => const Color(0XFF9E9E9E);
   Color get gray600 => const Color(0XFF6D6D74);
 

@@ -30,8 +30,47 @@ class CustomButtonStyles {
           borderRadius: BorderRadius.circular(5.0),
         ),
       );
+  static ButtonStyle get secondaryContainer => ElevatedButton.styleFrom(
+        backgroundColor: theme.colorScheme.secondaryContainer,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+      );
 
   // Outline button style
+  static ButtonStyle get outlinePrimary => OutlinedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primaryContainer,
+        side: BorderSide(
+          color: theme.colorScheme.primary,
+          width: 2,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+      );
+
+  static ButtonStyle get outlineSecondary => OutlinedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primaryContainer,
+        side: BorderSide(
+          color: theme.colorScheme.secondary,
+          width: 2,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+      );
+
+  static ButtonStyle get primary => OutlinedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primary,
+        side: BorderSide(
+          color: theme.colorScheme.primary,
+          width: 2,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+      );
+
   static ButtonStyle get outlineOrangeTL5 => OutlinedButton.styleFrom(
         backgroundColor: Colors.transparent,
         side: BorderSide(
@@ -42,6 +81,7 @@ class CustomButtonStyles {
           borderRadius: BorderRadius.circular(5.0),
         ),
       );
+
   // text button style
   static ButtonStyle get none => ButtonStyle(
         backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/features/authentication/persentation/select_organisation.dart';
-import 'package:kontena_pos/features/checkout/persentation/payment.dart';
+import 'package:kontena_pos/features/checkout/persentation/payment_screen.dart';
 import 'package:kontena_pos/features/invoices/persentation/history_invoice_screen.dart';
 import 'package:kontena_pos/features/invoices/persentation/invoice_screen.dart';
 import 'package:kontena_pos/features/orders/persentation/order_screen.dart';

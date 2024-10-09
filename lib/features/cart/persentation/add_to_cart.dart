@@ -787,6 +787,10 @@ class _AddToCartState extends State<AddToCart> {
                       ),
                       child: CustomElevatedButton(
                         text: "Add Item To Cart",
+                        buttonTextStyle: TextStyle(
+                          color: theme.colorScheme.primaryContainer,
+                        ),
+                        buttonStyle: CustomButtonStyles.primary,
                         onPressed: () {
                           addToCart(
                             context,

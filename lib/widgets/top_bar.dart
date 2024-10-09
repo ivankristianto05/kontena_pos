@@ -5,10 +5,9 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
   // final double smallButtonWidth;
   // final double buttonWidth;
   // final bool isWideScreen;
+  final String? isSelected;
 
-  TopBar({
-    super.key,
-  });
+  TopBar({super.key, this.isSelected});
   // double smallButtonWidth = 40.0;
   // double buttonWidth = 40.0;
   double menuWidth = 240.0;
@@ -20,10 +19,10 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
       width: double.infinity,
       // height: 40.0,
       decoration: BoxDecoration(
-        color: theme.colorScheme.secondary,
+        color: theme.colorScheme.background,
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.surface,
+            color: theme.colorScheme.outline,
             width: 1.0,
           ),
         ),
@@ -38,7 +37,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
-                      color: theme.colorScheme.surface,
+                      color: theme.colorScheme.outline,
                       width: 1.0,
                     ),
                     // bottom: BorderSide(
@@ -46,13 +45,13 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                     //   width: 1.0,
                     // ),
                   ),
-                  color: theme.colorScheme.secondary,
+                  // color: theme.colorScheme.secondary,
                 ),
                 child: MaterialButton(
                   height: 48.0,
                   child: Icon(
                     Icons.refresh,
-                    color: theme.colorScheme.primaryContainer,
+                    color: theme.colorScheme.secondary,
                   ),
                   onPressed: () {
                     // Define the action for the refresh button
@@ -64,7 +63,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
-                      color: theme.colorScheme.surface,
+                      color: theme.colorScheme.outline,
                       width: 1.0,
                     ),
                     // bottom: BorderSide(
@@ -82,7 +81,9 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Text(
                     'Order',
                     style: TextStyle(
-                      color: theme.colorScheme.primaryContainer,
+                      color: isSelected == 'order'
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.secondary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -95,7 +96,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
-                      color: theme.colorScheme.surface,
+                      color: theme.colorScheme.outline,
                       width: 1.0,
                     ),
                     // bottom: BorderSide(
@@ -113,7 +114,9 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Text(
                     'Invoice',
                     style: TextStyle(
-                      color: theme.colorScheme.primaryContainer,
+                      color: isSelected == 'invoice'
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.secondary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -125,7 +128,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
-                      color: theme.colorScheme.surface,
+                      color: theme.colorScheme.outline,
                       width: 1.0,
                     ),
                     // bottom: BorderSide(
@@ -143,7 +146,9 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Text(
                     'History',
                     style: TextStyle(
-                      color: theme.colorScheme.primaryContainer,
+                      color: isSelected == 'history'
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.secondary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -163,7 +168,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
-                      color: theme.colorScheme.surface,
+                      color: theme.colorScheme.outline,
                       width: 1.0,
                     ),
                     // bottom: BorderSide(
@@ -179,7 +184,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                     child: Text(
                       'Shokudo Restaurant',
                       style: TextStyle(
-                        color: theme.colorScheme.primaryContainer,
+                        color: theme.colorScheme.secondary,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -193,7 +198,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
-                      color: theme.colorScheme.surface,
+                      color: theme.colorScheme.outline,
                       width: 1.0,
                     ),
                     // bottom: BorderSide(
@@ -208,7 +213,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   },
                   child: Icon(
                     Icons.settings,
-                    color: theme.colorScheme.primaryContainer,
+                    color: theme.colorScheme.secondary,
                   ),
                 ),
               ),
@@ -218,7 +223,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
-                      color: theme.colorScheme.surface,
+                      color: theme.colorScheme.outline,
                       width: 1.0,
                     ),
                     // bottom: BorderSide(
@@ -232,13 +237,13 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     Icon(
                       Icons.person,
-                      color: theme.colorScheme.primaryContainer,
+                      color: theme.colorScheme.secondary,
                     ),
                     const SizedBox(width: 8), // Space between text and icon
                     Text(
                       'Administrator',
                       style: TextStyle(
-                        color: theme.colorScheme.primaryContainer,
+                        color: theme.colorScheme.secondary,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -252,7 +257,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
-                      color: theme.colorScheme.surface,
+                      color: theme.colorScheme.outline,
                       width: 1.0,
                     ),
                     // bottom: BorderSide(
@@ -267,7 +272,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   },
                   child: Icon(
                     Icons.logout,
-                    color: theme.colorScheme.primaryContainer,
+                    color: theme.colorScheme.secondary,
                   ),
                 ),
               ),
