@@ -77,9 +77,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     Text(
                       'Payment',
                       style: TextStyle(
-                          color: theme.colorScheme.secondary,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold),
+                        color: theme.colorScheme.secondary,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     if (!paymentStatus)
                       InkWell(

@@ -5,6 +5,7 @@ import 'package:kontena_pos/features/invoices/persentation/history_invoice_scree
 import 'package:kontena_pos/features/invoices/persentation/invoice_screen.dart';
 import 'package:kontena_pos/features/orders/persentation/order_screen.dart';
 import 'package:kontena_pos/features/authentication/persentation/login_screen.dart';
+import 'package:kontena_pos/features/setting/persentation/setting_screen.dart';
 
 import '../features/orders/persentation/confirm_screen.dart';
 
@@ -17,6 +18,7 @@ class AppRoutes {
   static const String paymentScreen = '/payment';
   static const String confirmScreen =
       '/confirm'; // ganti ConfirmScreen dengan confirmScreen untuk naming convention yang konsisten
+  static const String settingScreen = '/setting';
 
   static Map<String, WidgetBuilder> routes = {
     loginScreen: (context) => const LoginScreen(),
@@ -27,5 +29,6 @@ class AppRoutes {
     confirmScreen: (context) =>
         ConfirmScreen(), // pastikan ConfirmScreen adalah class
     paymentScreen: (context) => const PaymentScreen(),
+    settingScreen: (context) => const SettingScreen(),
   };
 }
