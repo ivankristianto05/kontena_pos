@@ -3,14 +3,23 @@ import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 
-class Dropdown extends StatefulWidget {
-  const Dropdown({super.key});
+class DropdownWidget extends StatefulWidget {
+  final double dropdownwidth;
+  final double pickupDropdownWidth;
+  final double tableDropdownWidth;
+
+  const DropdownWidget({
+    Key? key,
+    required this.dropdownwidth, // Parameter untuk lebar dropdown
+    required this.pickupDropdownWidth, // Parameter untuk lebar pickup dropdown
+    required this.tableDropdownWidth,  // Parameter untuk lebar table dropdown
+  }) : super(key: key);
 
   @override
-  _DropdownState createState() => _DropdownState();
+  _DropdownWidgetState createState() => _DropdownWidgetState();
 }
 
-class _DropdownState extends State<Dropdown> {
+class _DropdownWidgetState extends State<DropdownWidget> {
   String? pickupType;
   String? table;
 
@@ -30,7 +39,6 @@ class _DropdownState extends State<Dropdown> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double searchbarWidth = screenWidth * 0.65;
 
     // Access AppState and Cart
     final appState = Provider.of<AppState>(context);
@@ -38,30 +46,22 @@ class _DropdownState extends State<Dropdown> {
 
     // Define table options
     final List<String> tableOptions = <String>[
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '10',
+      '1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
     ];
 
     // Check if order ID is selected
     final hasOrderId = appState.currentOrderId.isNotEmpty;
 
     return Container(
-      width: screenWidth * 0.25,
+      width: widget.dropdownwidth, // Gunakan parameter lebar yang diterima
       height: 50,
       alignment: Alignment.topRight,
       child: Row(
         children: [
+          // Dropdown untuk Pickup Type
           Expanded(
             child: Container(
-              width: screenWidth * 0.10,
+              width: widget.pickupDropdownWidth, // Gunakan parameter lebar yang diterima
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -77,19 +77,15 @@ class _DropdownState extends State<Dropdown> {
                   padding: const EdgeInsets.all(8.0),
                   child: DropdownButton<String>(
                     isExpanded: true,
-                    hint: Text("Select an Option"),
+                    hint: const Text("Select an Option"),
                     value: pickupType,
-                    items: <String>[
-                      'Dine in',
-                      'Take away',
-                      'Gojek',
-                    ].map((String value) {
+                    items: <String>['Dine in', 'Take away', 'Gojek'].map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Center(
                           child: Text(
                             value,
-                            style: TextStyle(fontWeight: FontWeight.normal),
+                            style: const TextStyle(fontWeight: FontWeight.normal),
                           ),
                         ),
                       );
@@ -104,8 +100,9 @@ class _DropdownState extends State<Dropdown> {
               ),
             ),
           ),
+          // Dropdown untuk Table
           Container(
-            width: screenWidth * 0.15,
+            width: widget.tableDropdownWidth, // Gunakan parameter lebar yang diterima
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border(
@@ -121,7 +118,7 @@ class _DropdownState extends State<Dropdown> {
                 padding: const EdgeInsets.all(8.0),
                 child: DropdownButton<String>(
                   isExpanded: true,
-                  hint: Text("Table"),
+                  hint: const Text("Table"),
                   value: table, // Use the value stored in the state
                   items: hasOrderId
                       ? tableOptions.map((String value) {
@@ -130,7 +127,7 @@ class _DropdownState extends State<Dropdown> {
                             child: Center(
                               child: Text(
                                 'Table $value',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),
@@ -143,8 +140,7 @@ class _DropdownState extends State<Dropdown> {
                       table = newValue;
                     });
                     if (newValue != null) {
-                      appState.setSelectedTable(
-                          newValue); // Save selected table to AppState
+                      appState.setSelectedTable(newValue); // Save selected table to AppState
                     }
                   },
                   selectedItemBuilder: (BuildContext context) {
@@ -153,7 +149,7 @@ class _DropdownState extends State<Dropdown> {
                             return Center(
                               child: Text(
                                 'Table $value',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),

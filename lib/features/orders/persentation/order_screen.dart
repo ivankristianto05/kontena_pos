@@ -120,10 +120,6 @@ class _OrderScreenState extends State<OrderScreen> {
                       child: Row(
                         children: [
                           FilterBar(onFilterSelected: _handleFilterSelected),
-                          FilterBar(
-                            onFilterSelected: _handleFilterSelected,
-                          ),
-                          // ButtonFilter(onFilterSelected: _handleFilterSelected),
                         ],
                       ),
                     ),

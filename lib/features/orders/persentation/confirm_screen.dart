@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Confirm/iconbutton_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Confirm/ConfirmCard_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/ordercard_section.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/features/orders/Screen/components/custombutton_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Confirm/confirmlist_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Confirm/dropdown_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/dropdown_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/guestname_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/footer_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/searchbar_section.dart';
@@ -111,7 +111,13 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                       ),
                     ),
                   ),
-                  child: Dropdown(),
+                  child: DropdownWidget(
+                    dropdownwidth: screenWidth * 0.25,
+                    pickupDropdownWidth:
+                        screenWidth * 0.10, // Lebar dropdown untuk pickup
+                    tableDropdownWidth:
+                        screenWidth * 0.10, // Lebar dropdown untuk table
+                  ),
                 ),
                 Container(
                   child: Iconbutton(),
@@ -124,12 +130,14 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   Container(
                     width: screenWidth * 0.65,
                     alignment: Alignment.topLeft,
-                    child: ConfirmCard(
+                    child: OrderCard(
                       screenWidth: screenWidth,
                       onOrderSelected: (orderId) {
                         appState.setCurrentOrderId(orderId);
                         appState.printConfirmedOrders();
                       },
+                      orderan: appState.confirmedOrders,
+                        currentOrderId: appState.currentOrderId, // Pass selected order ID
                     ),
                   ),
                   Container(
