@@ -37,6 +37,8 @@ class Footer extends StatelessWidget {
             text: 'Served',
             onPressed: () {
               // Handle Served button press
+              Navigator.pushNamed(context, AppRoutes.servescreen);
+
             },
           ),
         ),

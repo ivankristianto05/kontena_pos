@@ -135,8 +135,8 @@ class _ConfirmInputState extends State<ConfirmInput> {
                   ),
                   MaterialButton(
                     onPressed: () {
-                      // Save action here
-                      Navigator.of(context).pop(); // Close dialog after save
+                      
+                      Navigator.of(context).pop();
                     },
                     height: screenHeight * 0.08,
                     color: Colors.blue,

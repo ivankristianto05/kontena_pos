@@ -34,7 +34,7 @@ class _FilterBarState extends State<FilterBar> {
         4; // 65% of screen width divided among 4 buttons, minus padding
 
     return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
+      padding: const EdgeInsetsDirectional.symmetric(horizontal: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [

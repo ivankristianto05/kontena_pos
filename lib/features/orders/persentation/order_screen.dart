@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/features/orders/Screen/popup/itemdialog_section.dart';
+import 'package:kontena_pos/widgets/dropdown_delete.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Menu/orderbutton_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/appbar_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Menu/buttonfilter_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Menu/cardmenu_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Menu/dropdown_delete_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/footer_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Menu/guestinputwithbutton_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Menu/guestinput_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Menu/itemcart_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/searchbar_section.dart';
-import 'package:kontena_pos/features/orders/Screen/popup/itemdialog_section.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
@@ -83,14 +81,9 @@ class _OrderScreenState extends State<OrderScreen> {
         double smallButtonWidth = screenWidth * 0.05;
         double buttonWidth = screenWidth * 0.15;
 
-        // Create an instance of Cart and pass AppState to it
         Cart cart = Cart(appState);
 
         return Scaffold(
-          // appBar: BuildAppbar(
-          //   smallButtonWidth: smallButtonWidth,
-          //   buttonWidth: buttonWidth,
-          // ),
           key: scaffoldKey,
           backgroundColor: theme.colorScheme.background,
           body: Container(
@@ -115,7 +108,6 @@ class _OrderScreenState extends State<OrderScreen> {
                       guestNameController: _guestNameController,
                       smallButtonWidth: smallButtonWidth,
                       onNameSubmitted: (name) {
-                        // Update AppState with the guest name
                         appState.setNamaPemesan(name);
                       },
                     ),
@@ -127,6 +119,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       width: searchbarWidth,
                       child: Row(
                         children: [
+                          FilterBar(onFilterSelected: _handleFilterSelected),
                           FilterBar(
                             onFilterSelected: _handleFilterSelected,
                           ),
@@ -138,17 +131,11 @@ class _OrderScreenState extends State<OrderScreen> {
                       width: screenWidth - searchbarWidth,
                       decoration: BoxDecoration(
                         border: Border(
-                          bottom: BorderSide(
-                            color: Colors.grey,
-                            width: 1,
-                          ),
-                          top: BorderSide(
-                            color: Colors.grey,
-                            width: 1,
-                          ),
+                          bottom: BorderSide(color: Colors.grey, width: 1),
+                          top: BorderSide(color: Colors.grey, width: 1),
                         ),
                       ),
-                      child: DropdownDeleteSection(),
+                      child: DropdownDelete(),
                     ),
                   ],
                 ),
@@ -167,9 +154,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       ),
                       Container(
                         width: screenWidth * 0.35,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                        ),
+                        decoration: BoxDecoration(color: Colors.white),
                         child: ItemCart(
                           cartItems: appState.cartItems,
                           screenWidth: screenWidth,
@@ -200,7 +185,6 @@ class _OrderScreenState extends State<OrderScreen> {
                       ),
                       ActionButton(
                         screenWidth: screenWidth,
-                        //cart: cart,
                         guestNameController: _guestNameController,
                         resetDropdown: () {
                           setState(() {

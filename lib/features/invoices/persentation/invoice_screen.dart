@@ -18,7 +18,6 @@ import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
 import 'package:kontena_pos/features/cart/persentation/cart_list_item.dart';
 import 'package:kontena_pos/features/invoices/persentation/action_button.dart';
 import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Confirm/ConfirmCard_section.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
 import 'package:kontena_pos/models/cartitem.dart';
 import 'package:kontena_pos/widgets/custom_dialog.dart';

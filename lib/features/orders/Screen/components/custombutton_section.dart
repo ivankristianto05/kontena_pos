@@ -3,19 +3,23 @@ import 'package:provider/provider.dart'; // For accessing AppState
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/app_state.dart'; // Import the AppState
 
-class ConfirmButton extends StatefulWidget {
+class CustomButton extends StatefulWidget {
   final double screenWidth;
+  final String buttonText; // New parameter for button text
+  final VoidCallback? onPressed; // New parameter for button action
 
-  ConfirmButton({
+  CustomButton({
     super.key,
     required this.screenWidth,
+    required this.buttonText, // Require the buttonText
+    required this.onPressed, // Require the onPressed function
   });
 
   @override
-  _ConfirmButtonState createState() => _ConfirmButtonState();
+  _CustomButtonState createState() => _CustomButtonState();
 }
 
-class _ConfirmButtonState extends State<ConfirmButton> {
+class _CustomButtonState extends State<CustomButton> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -31,17 +35,10 @@ class _ConfirmButtonState extends State<ConfirmButton> {
       child: MaterialButton(
         color: buttonColor,
         textColor: Colors.white,
-        onPressed: isEnabled
-            ? () {
-                if (orderId.isNotEmpty) {
-                  appState.confirmOrderStatus(orderId);
-                  print("Order $orderId confirmed");
-                }
-              }
-            : null,
+        onPressed: isEnabled ? widget.onPressed : null, // Use the passed function
         child: Center(
           child: Text(
-            'Confirm',
+            widget.buttonText, // Use the passed text
             style: TextStyle(fontSize: 18),
           ),
         ),
