@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/data/setting_menu.dart';
+import 'package:kontena_pos/features/setting/persentation/setting_application.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({
@@ -17,6 +19,8 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   String? _barcode;
+  late bool visible;
+  String isSelected = 'application';
 
   @override
   void initState() {
@@ -92,20 +96,171 @@ class _SettingScreenState extends State<SettingScreen> {
               ),
             ),
           ),
+          Divider(
+            height: 1.0,
+            thickness: 1,
+            color: theme.colorScheme.outline,
+          ),
           Expanded(
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
-                BarcodeKeyboardListener(
-                  bufferDuration: Duration(milliseconds: 200),
-                  onBarcodeScanned: (barcode) {
-                    // if (!visible) return;
-                    // print(barcode);
-                    // setState(() {
-                    //   _barcode = barcode;
-                    // });
-                  },
-                  child: Container(),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Builder(
+                          builder: (context) {
+                            final menuList = menuSetting;
+                            return ListView.builder(
+                              padding: EdgeInsets.zero,
+                              primary: false,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              itemCount: menuList.length,
+                              itemBuilder: (context, index) {
+                                final menuListItem = menuList[index];
+                                return Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 0.0, 0.0),
+                                  child: Container(
+                                    width: 100.0,
+                                    height: 72.0,
+                                    decoration: BoxDecoration(
+                                      color: (isSelected ==
+                                              menuListItem['name'])
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.primaryContainer,
+                                      borderRadius: BorderRadius.circular(0.0),
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: theme.colorScheme.outline,
+                                          width: 1.0,
+                                        ),
+                                      ),
+                                    ),
+                                    child: InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        setState(() {
+                                          print(
+                                              'clicked, ${menuListItem['label']}');
+                                        });
+                                        onTapMenu(context, menuListItem);
+                                      },
+                                      child: ListTile(
+                                        title: Text(
+                                          menuListItem['label'],
+                                          style: TextStyle(
+                                            color: (isSelected ==
+                                                    menuListItem['name'])
+                                                ? theme.colorScheme
+                                                    .primaryContainer
+                                                : theme.colorScheme.secondary,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          menuListItem['group'],
+                                          style: TextStyle(
+                                            color: (isSelected ==
+                                                    menuListItem['name'])
+                                                ? theme.colorScheme
+                                                    .primaryContainer
+                                                : theme.colorScheme
+                                                    .onPrimaryContainer,
+                                          ),
+                                        ),
+                                        trailing: Icon(
+                                          Icons.arrow_forward_ios,
+                                          color: (isSelected ==
+                                                  menuListItem['name'])
+                                              ? theme
+                                                  .colorScheme.primaryContainer
+                                              : theme.colorScheme.secondary,
+                                          size: 20.0,
+                                        ),
+                                        tileColor: Color(0xFFF5F5F5),
+                                        dense: false,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(),
+                        ),
+                        Divider(
+                          height: 5.0,
+                          thickness: 0.5,
+                          indent: 0.0,
+                          endIndent: 0.0,
+                          color: theme.colorScheme.outline,
+                        ),
+                        Container(
+                          height: 50.0,
+                          transformAlignment: Alignment.bottomCenter,
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  0.0, 0.0, 0.0, 0.0),
+                              child: Text(
+                                'TPOS - 1.0.0',
+                                style: TextStyle(
+                                  color: theme.colorScheme.secondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.background,
+                    ),
+                    child: Padding(
+                      padding:
+                          EdgeInsetsDirectional.fromSTEB(6.0, 6.0, 6.0, 6.0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: 980.0,
+                              decoration: BoxDecoration(
+                                  // color: theme.colorScheme.outline,
+                                  ),
+                              child: (isSelected == 'application')
+                                  ? SettingApplication()
+                                  : Container(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -120,5 +275,11 @@ class _SettingScreenState extends State<SettingScreen> {
       AppRoutes.invoiceScreen,
       (route) => false,
     );
+  }
+
+  onTapMenu(BuildContext context, dynamic param) {
+    setState(() {
+      isSelected = param['name'];
+    });
   }
 }
