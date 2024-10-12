@@ -5,8 +5,8 @@ import 'package:kontena_pos/features/invoices/persentation/history_invoice_scree
 import 'package:kontena_pos/features/invoices/persentation/invoice_screen.dart';
 import 'package:kontena_pos/features/orders/persentation/order_screen.dart';
 import 'package:kontena_pos/features/authentication/persentation/login_screen.dart';
+import 'package:kontena_pos/features/setting/persentation/setting_screen.dart';
 import 'package:kontena_pos/features/orders/persentation/serve_screen.dart';
-
 import '../features/orders/persentation/confirm_screen.dart';
 
 class AppRoutes {
@@ -16,6 +16,7 @@ class AppRoutes {
   static const String invoiceScreen = '/invoice';
   static const String historyInvoiceScreen = '/history';
   static const String paymentScreen = '/payment';
+  static const String settingScreen = '/setting';
   static const String confirmScreen = '/confirm';
   static const String servescreen = '/serve';
 
@@ -27,6 +28,7 @@ class AppRoutes {
     historyInvoiceScreen: (context) => const HistoryInvoiceScreen(),
     confirmScreen: (context) => ConfirmScreen(),
     paymentScreen: (context) => const PaymentScreen(),
-    servescreen  : (context) => ServeScreen(),
+    settingScreen: (context) => const SettingScreen(),
+    servescreen: (context) => ServeScreen(),
   };
 }

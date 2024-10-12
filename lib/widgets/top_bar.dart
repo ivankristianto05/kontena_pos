@@ -210,6 +210,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 child: MaterialButton(
                   onPressed: () {
                     // Define the action for the MaterialButton
+                    onTapSetting(context);
                   },
                   child: Icon(
                     Icons.settings,
@@ -303,6 +304,13 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
   onTapOrder(BuildContext context) {
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.orderScreen,
+      (route) => false,
+    );
+  }
+
+  onTapSetting(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.settingScreen,
       (route) => false,
     );
   }
