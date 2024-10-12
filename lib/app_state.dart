@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kontena_pos/core/functions/order.dart';
+import 'package:kontena_pos/core/functions/serve.dart';
+import 'package:kontena_pos/models/list_to_serve.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models/cartitem.dart';
 import 'core/functions/cart.dart';
@@ -23,6 +25,7 @@ class AppState extends ChangeNotifier {
   Future initializeState() async {
     prefs = await SharedPreferences.getInstance();
     orderManager = OrderManager(this);
+    serveManager = ServeManager(this, orderManager);
     notifyListeners();
   }
 
@@ -33,6 +36,7 @@ class AppState extends ChangeNotifier {
 
   late SharedPreferences prefs;
   late OrderManager orderManager;
+  late ServeManager serveManager;
 
   void _ensureInitialized() {
     if (!isInitialized) {
@@ -109,7 +113,7 @@ class AppState extends ChangeNotifier {
   void setTotalPrice(double newTotalPrice) {
     _totalPrice = newTotalPrice;
     notifyListeners();
-    print('AppState - Total Harga Diperbarui: Rp $_totalPrice');
+   // print('AppState - Total Harga Diperbarui: Rp $_totalPrice');
   }
 
   // Fungsi untuk mereset cart dan total harga
@@ -170,6 +174,11 @@ class AppState extends ChangeNotifier {
     orderManager.printConfirmedOrders();
   }
 
+  void printConfirmedOrderIdsWithItems(){
+    _ensureInitialized();
+    orderManager.printConfirmedOrderIdsWithItems();
+  }
+
   void confirmOrder(String idOrder) {
     _ensureInitialized();
     orderManager.confirmOrder(idOrder, _cartItems);
@@ -179,6 +188,7 @@ class AppState extends ChangeNotifier {
   void confirmOrderStatus(String orderId) {
     _ensureInitialized();
     orderManager.confirmOrderStatus(orderId);
+    serveManager.addServedOrder(orderId);
     notifyListeners();
   }
 
@@ -235,6 +245,11 @@ class AppState extends ChangeNotifier {
   List<ListToConfirm> get confirmedOrders {
     _ensureInitialized();
     return orderManager.confirmedOrders;
+  }
+
+  List <ListToServe> get servedOrders{
+    _ensureInitialized();
+    return serveManager.serveOrders;
   }
 
   void checkOrderItems(String orderId) {
@@ -304,6 +319,5 @@ class AppState extends ChangeNotifier {
   orderManager.checkAllItems(orderId);
   notifyListeners();
 }
-
   String typeTransaction = '';
 }

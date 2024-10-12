@@ -134,7 +134,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                       screenWidth: screenWidth,
                       onOrderSelected: (orderId) {
                         appState.setCurrentOrderId(orderId);
-                        appState.printConfirmedOrders();
+                        //appState.printConfirmedOrders();
                       },
                       orderan: appState.confirmedOrders,
                         currentOrderId: appState.currentOrderId, // Pass selected order ID
@@ -176,6 +176,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                         appState.confirmOrderStatus(appState.currentOrderId);
                         print("Order ${appState.currentOrderId} confirmed");
                       }
+              
                     },
                   ),
                 ],

@@ -8,7 +8,10 @@ import 'package:kontena_pos/models/list_to_confirm.dart'; // Import untuk format
 class OrderManager extends ChangeNotifier {
   List<ListToConfirm> _confirmedOrders = [];
   List<ListToConfirm> get confirmedOrders => _confirmedOrders;
-  
+
+  Set<String> _confirmedOrderIds = {};
+  Set<String> get confirmedOrderIds => _confirmedOrderIds;
+
   // Dependency injection for AppState
   final AppState appState;
   OrderManager(this.appState);
@@ -17,8 +20,8 @@ class OrderManager extends ChangeNotifier {
   Set<String> _fullyCheckedOrders = {};
   final Map<String, Map<String, bool>> _orderItemCheckedStatuses = {};
 
-  bool _isOrderConfirmed = false;
-  bool get isOrderConfirmed => _isOrderConfirmed;
+  bool _globalOrderConfirmed = false;
+  bool get globalOrderConfirmed => _globalOrderConfirmed;
 
   String _namaPemesan = '';
   String get namaPemesan => _namaPemesan;
@@ -45,7 +48,7 @@ class OrderManager extends ChangeNotifier {
     _selectedTable = table;
     notifyListeners();
   }
-  
+
   void resetSelectedTable() {
     _selectedTable = '';
     notifyListeners();
@@ -54,7 +57,12 @@ class OrderManager extends ChangeNotifier {
   String getTableForCurrentOrder() {
     final order = _confirmedOrders.firstWhere(
       (order) => order.idOrder == _currentOrderId,
-      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: [], time: DateTime.now()),
+      orElse: () => ListToConfirm(
+          idOrder: '',
+          namaPemesan: '',
+          table: '',
+          items: [],
+          time: DateTime.now()),
     );
     return order.table;
   }
@@ -62,7 +70,6 @@ class OrderManager extends ChangeNotifier {
   void printConfirmedOrders() {
     for (var order in _confirmedOrders) {
       print('Order ID: ${order.idOrder}');
-      print('Order Time: ${formatDateTime(order.time)}'); // Use the new function here
     }
   }
 
@@ -79,21 +86,46 @@ class OrderManager extends ChangeNotifier {
   void confirmOrder(String idOrder, List<CartItem> cartItems) {
     final ListToConfirm order = _generateOrder(idOrder, cartItems);
     _confirmedOrders.add(order);
-    _isOrderConfirmed = true;
+    _globalOrderConfirmed = true;
     appState.resetCart();
     notifyListeners();
   }
 
   void confirmOrderStatus(String orderId) {
-    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    final index =
+        _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
     if (index >= 0) {
-      _confirmedOrders[index] = _confirmedOrders[index].copyWith(status: 'Confirmed');
+      _confirmedOrders[index] =
+          _confirmedOrders[index].copyWith(status: 'Confirmed');
+      _confirmedOrderIds.add(orderId); // Simpan ID order yang dikonfirmasi
+      _globalOrderConfirmed = true; // Status global juga diubah
+      printConfirmedOrderIdsWithItems();
       notifyListeners();
     } else {
       print('Order with orderId $orderId not found.');
     }
   }
+   bool isOrderConfirmed(String orderId) {
+    return _confirmedOrderIds.contains(orderId); // Cek di dalam Set
+  }
+  void printConfirmedOrderIdsWithItems() {
+  for (var orderId in _confirmedOrderIds) {
+    // Cari order berdasarkan orderId di _confirmedOrders
+    final order = _confirmedOrders.firstWhere(
+      (order) => order.idOrder == orderId,
+    );
 
+    if (order != null) {
+      print('Order ID: ${order.idOrder}');
+      print('Items:');
+      for (var item in order.items) {
+        print('- Item ID: ${item.id}, Name: ${item.name}, Quantity: ${item.qty}');
+      }
+    } else {
+      print('Order with ID $orderId not found.');
+    }
+  }
+}
   Future<void> createOrder({
     required TextEditingController guestNameController,
     required VoidCallback resetDropdown,
@@ -126,9 +158,15 @@ class OrderManager extends ChangeNotifier {
   void checkOrderItems(String orderId) {
     final order = _confirmedOrders.firstWhere(
       (order) => order.idOrder == orderId,
-      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: [], time: DateTime.now()),
+      orElse: () => ListToConfirm(
+          idOrder: '',
+          namaPemesan: '',
+          table: '',
+          items: [],
+          time: DateTime.now()),
     );
-    final allChecked = order.items.every((item) => order.itemCheckedStatuses[item.id] ?? false);
+    final allChecked = order.items
+        .every((item) => order.itemCheckedStatuses[item.id] ?? false);
     if (allChecked) {
       addFullyCheckedOrder(orderId);
     } else {
@@ -138,13 +176,16 @@ class OrderManager extends ChangeNotifier {
   }
 
   void setItemCheckedStatus(String orderId, String itemId, bool isChecked) {
-    print('Setting item $itemId in order $orderId to $isChecked');
-    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    //print('Setting item $itemId in order $orderId to $isChecked');
+    final index =
+        _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
     if (index >= 0) {
       final order = _confirmedOrders[index];
-      final updatedItemCheckedStatuses = Map<String, bool>.from(order.itemCheckedStatuses);
+      final updatedItemCheckedStatuses =
+          Map<String, bool>.from(order.itemCheckedStatuses);
       updatedItemCheckedStatuses[itemId] = isChecked;
-      _confirmedOrders[index] = order.copyWith(itemCheckedStatuses: updatedItemCheckedStatuses);
+      _confirmedOrders[index] =
+          order.copyWith(itemCheckedStatuses: updatedItemCheckedStatuses);
       appState.saveItemCheckedStatuses(orderId, updatedItemCheckedStatuses);
       checkOrderItems(orderId); // Recheck order items after updating
       notifyListeners();
@@ -168,7 +209,8 @@ class OrderManager extends ChangeNotifier {
   }
 
   void setItemCheckedStatuses(String orderId, Map<String, bool> statuses) {
-    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    final index =
+        _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
     if (index >= 0) {
       final order = _confirmedOrders[index];
       _confirmedOrders[index] = order.copyWith(itemCheckedStatuses: statuses);
@@ -185,15 +227,22 @@ class OrderManager extends ChangeNotifier {
   ListToConfirm getConfirmedOrderById(String orderId) {
     return _confirmedOrders.firstWhere(
       (order) => order.idOrder == orderId,
-      orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: [], time: DateTime.now()),
+      orElse: () => ListToConfirm(
+          idOrder: '',
+          namaPemesan: '',
+          table: '',
+          items: [],
+          time: DateTime.now()),
     );
   }
 
   bool isItemChecked(String orderId, String itemId) {
-    final index = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+    final index =
+        _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
     if (index >= 0) {
       final order = _confirmedOrders[index];
-      return order.itemCheckedStatuses[itemId] ?? false; // Default to false if not found
+      return order.itemCheckedStatuses[itemId] ??
+          false; // Default to false if not found
     }
     return false;
   }
@@ -203,21 +252,29 @@ class OrderManager extends ChangeNotifier {
     final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
     return formatter.format(dateTime);
   }
+
 // Method to check all items in an order
-void checkAllItems(String orderId) {
-    final orderIndex = _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
+  void checkAllItems(String orderId) {
+    final orderIndex =
+        _confirmedOrders.indexWhere((order) => order.idOrder == orderId);
     if (orderIndex >= 0) {
-        final order = _confirmedOrders[orderIndex];
+      final order = _confirmedOrders[orderIndex];
 
-        // Update semua item menjadi dicentang
-        for (var item in order.items) {
-            setItemCheckedStatus(orderId, item.id, true); // Panggil fungsi setItemCheckedStatus untuk setiap item
-        }
-        addFullyCheckedOrder(orderId);
-        notifyListeners(); // Beritahu UI untuk memperbarui tampilan
+      // Update semua item menjadi dicentang
+      for (var item in order.items) {
+        setItemCheckedStatus(orderId, item.id,
+            true); // Panggil fungsi setItemCheckedStatus untuk setiap item
+      }
+      addFullyCheckedOrder(orderId);
+      notifyListeners(); // Beritahu UI untuk memperbarui tampilan
     } else {
-        print('Order dengan ID $orderId tidak ditemukan.');
+      print('Order dengan ID $orderId tidak ditemukan.');
     }
-}
+  }
 
+  // Fungsi untuk menambahkan order yang sudah dikonfirmasi
+  void addConfirmedOrder(String orderId) {
+    _confirmedOrderIds.add(orderId);
+    notifyListeners();
+  }
 }

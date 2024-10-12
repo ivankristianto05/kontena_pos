@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/models/list_to_confirm.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +16,8 @@ class GuestNameTextFieldButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _GuestNameTextFieldButtonState createState() => _GuestNameTextFieldButtonState();
+  _GuestNameTextFieldButtonState createState() =>
+      _GuestNameTextFieldButtonState();
 }
 
 class _GuestNameTextFieldButtonState extends State<GuestNameTextFieldButton> {
@@ -42,9 +42,11 @@ class _GuestNameTextFieldButtonState extends State<GuestNameTextFieldButton> {
     final currentOrderId = appState.currentOrderId;
 
     // Find the order with the currentOrderId
-    final order = appState.confirmedOrders
-        .firstWhere((order) => order.idOrder == currentOrderId, orElse: () => ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []));
-    
+    final order = appState.confirmedOrders.firstWhere(
+        (order) => order.idOrder == currentOrderId,
+        orElse: () =>
+            ListToConfirm(idOrder: '', namaPemesan: '', table: '', items: []));
+
     // Update the TextEditingController with the guest name from the order
     widget.guestNameController.text = order.namaPemesan;
   }
@@ -73,10 +75,17 @@ class _GuestNameTextFieldButtonState extends State<GuestNameTextFieldButton> {
                   // TextField untuk nama pemesan
                   TextField(
                     controller: widget.guestNameController,
+                    enabled: false,
+                    style: TextStyle(
+                      color: Colors.black, // Mengatur teks agar tetap jelas
+                    ),
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
                       hintText: 'Guest Name',
+                      hintStyle: TextStyle(
+                        color: Colors.grey, // Warna teks hint
+                      ),
                       border: InputBorder.none,
                       contentPadding:
                           EdgeInsets.symmetric(vertical: 18, horizontal: 8),
@@ -86,52 +95,6 @@ class _GuestNameTextFieldButtonState extends State<GuestNameTextFieldButton> {
               ),
             ),
           ),
-          // Container(
-          //   width: widget.smallButtonWidth,
-          //   height: 55,
-          //   decoration: BoxDecoration(
-          //     color: Colors.white,
-          //     border: Border(
-          //       right: BorderSide(
-          //         color: Colors.grey,
-          //         width: 1.0,
-          //       ),
-          //     ),
-          //   ),
-          //   child: MaterialButton(
-          //     height: 55,
-          //     padding: EdgeInsets.zero,
-          //     onPressed: () {
-          //       // Handle search action here
-          //     },
-          //     child: Center(
-          //       child: FaIcon(
-          //         FontAwesomeIcons.magnifyingGlass,
-          //         size: 16,
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          // Container(
-          //   width: widget.smallButtonWidth,
-          //   height: 55,
-          //   decoration: BoxDecoration(
-          //     color: Colors.white,
-          //   ),
-          //   child: MaterialButton(
-          //     height: 55,
-          //     padding: EdgeInsets.zero,
-          //     onPressed: () {
-          //       // Handle action for person button
-          //     },
-          //     child: Center(
-          //       child: FaIcon(
-          //         FontAwesomeIcons.userPlus,
-          //         size: 16,
-          //       ),
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );
