@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/features/orders/Screen/components/Serve/iconbutton_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Serve/servelist_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/ordercard_section.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
@@ -134,9 +135,9 @@ class _ServeScreenState extends State<ServeScreen> {
                       screenWidth: screenWidth,
                       onOrderSelected: (orderId) {
                         appState.setCurrentOrderId(orderId);
-                        appState.printConfirmedOrders();
+                        //appState.printConfirmedOrders();
                       },
-                      orderan: [],
+                      orderan: appState.servedOrders,
                       currentOrderId: appState.currentOrderId,
                     ),
                   ),
@@ -145,7 +146,7 @@ class _ServeScreenState extends State<ServeScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                     ),
-                    child: ConfirmList(
+                    child: ServeList(
                       listToConfirm: appState.confirmedOrders,
                       screenWidth: screenWidth,
                       appState: appState,
