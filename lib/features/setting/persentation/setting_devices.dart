@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 
-class SettingApplication extends StatefulWidget {
-  SettingApplication({Key? key}) : super(key: key);
+class SettingDevices extends StatefulWidget {
+  SettingDevices({Key? key}) : super(key: key);
 
   @override
-  _SettingApplicationState createState() => _SettingApplicationState();
+  _SettingDevicesState createState() => _SettingDevicesState();
 }
 
-class _SettingApplicationState extends State<SettingApplication> {
+class _SettingDevicesState extends State<SettingDevices> {
   bool canVoid = true;
+  String selectedTipePrinter = 'USB';
+  List<String> options = ['USB', 'Bluetooth'];
+
   @override
   void setState(VoidCallback callback) {
     super.setState(callback);
@@ -92,7 +95,7 @@ class _SettingApplicationState extends State<SettingApplication> {
                                                   .fromSTEB(
                                                       0.0, 0.0, 0.0, 12.0),
                                               child: Text(
-                                                'Pengaturan Aplikasi',
+                                                'Pengaturan Devices',
                                                 style: TextStyle(
                                                   color: theme
                                                       .colorScheme.secondary,
@@ -121,72 +124,58 @@ class _SettingApplicationState extends State<SettingApplication> {
                                                               .start,
                                                       children: [
                                                         Text(
-                                                          'Nama POS',
+                                                          'Tipe Koneksi Printer',
                                                           style: TextStyle(
                                                             color: theme
                                                                 .colorScheme
                                                                 .secondary,
                                                           ),
                                                         ),
-                                                        Text(
-                                                          'Nama POS yang terdaftar oleh sistem',
-                                                          style: TextStyle(
-                                                            color: theme
-                                                                .colorScheme
-                                                                .onPrimaryContainer,
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                      0.0,
-                                                                      6.0,
-                                                                      0.0,
-                                                                      0.0),
-                                                          child: Container(
-                                                            width:
-                                                                double.infinity,
-                                                            height: 45.0,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: theme
-                                                                  .colorScheme
-                                                                  .primaryContainer,
-                                                              border:
-                                                                  Border.all(
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .outline,
-                                                                width: 2.0,
-                                                              ),
-                                                            ),
-                                                            alignment:
-                                                                AlignmentDirectional(
-                                                                    -1.00,
-                                                                    0.00),
-                                                            child: Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          12.0,
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0),
-                                                              child: Text(
-                                                                (false)
-                                                                    ? 'Outlet 1'
-                                                                    : 'Outlet',
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: theme
-                                                                      .colorScheme
-                                                                      .secondary,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
+                                                        // Padding(
+                                                        //   padding:
+                                                        //       EdgeInsetsDirectional
+                                                        //           .fromSTEB(
+                                                        //               0.0,
+                                                        //               6.0,
+                                                        //               0.0,
+                                                        //               0.0),
+                                                        //   child: Container(
+                                                        //     width:
+                                                        //         double.infinity,
+                                                        //     height: 45.0,
+                                                        //     decoration:
+                                                        //         BoxDecoration(
+                                                        //       color: theme
+                                                        //           .colorScheme
+                                                        //           .primaryContainer,
+                                                        //       border:
+                                                        //           Border.all(
+                                                        //         color: theme
+                                                        //             .colorScheme
+                                                        //             .outline,
+                                                        //         width: 2.0,
+                                                        //       ),
+                                                        //     ),
+                                                        //     alignment:
+                                                        //         AlignmentDirectional(
+                                                        //             -1.00,
+                                                        //             0.00),
+                                                        //     child: Padding(
+                                                        //         padding:
+                                                        //             EdgeInsetsDirectional
+                                                        //                 .fromSTEB(
+                                                        //                     12.0,
+                                                        //                     0.0,
+                                                        //                     0.0,
+                                                        //                     0.0),
+                                                        //         child:
+                                                        //             DropdownButton(
+                                                        //           items: options.asMap().entries.map((e) {
+
+                                                        //           })),
+                                                        //         )),
+                                                        //   ),
+                                                        // ),
                                                         Padding(
                                                           padding:
                                                               EdgeInsetsDirectional

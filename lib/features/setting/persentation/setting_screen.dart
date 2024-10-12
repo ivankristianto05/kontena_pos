@@ -3,6 +3,7 @@ import 'package:flutter_barcode_listener/flutter_barcode_listener.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/data/setting_menu.dart';
 import 'package:kontena_pos/features/setting/persentation/setting_application.dart';
+import 'package:kontena_pos/features/setting/persentation/setting_devices.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({
@@ -175,7 +176,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                             color: (isSelected ==
                                                     menuListItem['name'])
                                                 ? theme.colorScheme
-                                                    .primaryContainer
+                                                    .onPrimaryContainer
                                                 : theme.colorScheme
                                                     .onPrimaryContainer,
                                           ),
@@ -254,7 +255,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                   ),
                               child: (isSelected == 'application')
                                   ? SettingApplication()
-                                  : Container(),
+                                  : SettingDevices(),
                             ),
                           ],
                         ),
