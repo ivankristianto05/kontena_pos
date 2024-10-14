@@ -49,7 +49,7 @@ class AppState extends ChangeNotifier {
   // List to store cart items
   List<CartItem> _cartItems = [];
   List<CartItem> get cartItems => _cartItems;
-  
+
   static List<CartItem> cartItem = [];
 
   // Variabel untuk menyimpan total harga
@@ -113,7 +113,7 @@ class AppState extends ChangeNotifier {
   void setTotalPrice(double newTotalPrice) {
     _totalPrice = newTotalPrice;
     notifyListeners();
-   // print('AppState - Total Harga Diperbarui: Rp $_totalPrice');
+    // print('AppState - Total Harga Diperbarui: Rp $_totalPrice');
   }
 
   // Fungsi untuk mereset cart dan total harga
@@ -174,7 +174,7 @@ class AppState extends ChangeNotifier {
     orderManager.printConfirmedOrders();
   }
 
-  void printConfirmedOrderIdsWithItems(){
+  void printConfirmedOrderIdsWithItems() {
     _ensureInitialized();
     orderManager.printConfirmedOrderIdsWithItems();
   }
@@ -247,7 +247,7 @@ class AppState extends ChangeNotifier {
     return orderManager.confirmedOrders;
   }
 
-  List <ListToServe> get servedOrders{
+  List<ListToServe> get servedOrders {
     _ensureInitialized();
     return serveManager.serveOrders;
   }
@@ -314,10 +314,14 @@ class AppState extends ChangeNotifier {
     final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
     return formatter.format(dateTime);
   }
+
   void checkAllItemsInOrder(String orderId) {
-        _ensureInitialized();
-  orderManager.checkAllItems(orderId);
-  notifyListeners();
-}
+    _ensureInitialized();
+    orderManager.checkAllItems(orderId);
+    notifyListeners();
+  }
+
   String typeTransaction = '';
+  List<dynamic> listPrinter = [];
+  dynamic configPrinter;
 }

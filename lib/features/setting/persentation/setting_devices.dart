@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
+import 'package:kontena_pos/core/api/get_printer.dart' as callGetPrinter;
 
 class SettingDevices extends StatefulWidget {
   SettingDevices({Key? key}) : super(key: key);
@@ -13,15 +15,31 @@ class _SettingDevicesState extends State<SettingDevices> {
   bool canVoid = true;
   String selectedTipePrinter = 'USB';
   List<String> options = ['USB', 'Bluetooth'];
+  List<dynamic> listPrinter = [];
+  String selectedPrinter = '';
+  // ApiCallResponse? testPrintResult;
 
   @override
   void setState(VoidCallback callback) {
     super.setState(callback);
+    // if (AppState().configPrinter != '') {
+    //   setState(() {
+    //     selectedPrinter = AppState().configPrinter;
+    //   });
+    // }
   }
 
   @override
   void initState() {
     super.initState();
+    onGetPrinter(context);
+
+    if (AppState().configPrinter != null) {
+      setState(() {
+        selectedPrinter = AppState().configPrinter['selectedPrinter'];
+        selectedTipePrinter = AppState().configPrinter['tipeConnection'];
+      });
+    }
   }
 
   @override
@@ -131,51 +149,6 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                 .secondary,
                                                           ),
                                                         ),
-                                                        // Padding(
-                                                        //   padding:
-                                                        //       EdgeInsetsDirectional
-                                                        //           .fromSTEB(
-                                                        //               0.0,
-                                                        //               6.0,
-                                                        //               0.0,
-                                                        //               0.0),
-                                                        //   child: Container(
-                                                        //     width:
-                                                        //         double.infinity,
-                                                        //     height: 45.0,
-                                                        //     decoration:
-                                                        //         BoxDecoration(
-                                                        //       color: theme
-                                                        //           .colorScheme
-                                                        //           .primaryContainer,
-                                                        //       border:
-                                                        //           Border.all(
-                                                        //         color: theme
-                                                        //             .colorScheme
-                                                        //             .outline,
-                                                        //         width: 2.0,
-                                                        //       ),
-                                                        //     ),
-                                                        //     alignment:
-                                                        //         AlignmentDirectional(
-                                                        //             -1.00,
-                                                        //             0.00),
-                                                        //     child: Padding(
-                                                        //         padding:
-                                                        //             EdgeInsetsDirectional
-                                                        //                 .fromSTEB(
-                                                        //                     12.0,
-                                                        //                     0.0,
-                                                        //                     0.0,
-                                                        //                     0.0),
-                                                        //         child:
-                                                        //             DropdownButton(
-                                                        //           items: options.asMap().entries.map((e) {
-
-                                                        //           })),
-                                                        //         )),
-                                                        //   ),
-                                                        // ),
                                                         Padding(
                                                           padding:
                                                               EdgeInsetsDirectional
@@ -184,17 +157,91 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                       6.0,
                                                                       0.0,
                                                                       0.0),
-                                                          child: Text(
-                                                            (false)
-                                                                ? 'Data setting tersimpan'
-                                                                : 'Data Setting belum tersimpan',
-                                                            style: TextStyle(
+                                                          child: Container(
+                                                            width:
+                                                                double.infinity,
+                                                            height: 45.0,
+                                                            decoration:
+                                                                BoxDecoration(
                                                               color: theme
                                                                   .colorScheme
-                                                                  .secondary,
+                                                                  .primaryContainer,
+                                                              border:
+                                                                  Border.all(
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .outline,
+                                                                width: 2.0,
+                                                              ),
+                                                            ),
+                                                            child:
+                                                                DropdownButtonHideUnderline(
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child:
+                                                                    DropdownButton<
+                                                                        String>(
+                                                                  isExpanded:
+                                                                      true,
+                                                                  hint: Text(
+                                                                      "Select an Option"),
+                                                                  value:
+                                                                      selectedTipePrinter,
+                                                                  items:
+                                                                      <String>[
+                                                                    'USB',
+                                                                    'Bluetooth',
+                                                                  ].map((String
+                                                                          value) {
+                                                                    return DropdownMenuItem<
+                                                                        String>(
+                                                                      value:
+                                                                          value,
+                                                                      child:
+                                                                          Text(
+                                                                        value,
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.normal),
+                                                                      ),
+                                                                    );
+                                                                  }).toList(),
+                                                                  onChanged:
+                                                                      (String?
+                                                                          newValue) {
+                                                                    setState(
+                                                                        () {
+                                                                      selectedTipePrinter =
+                                                                          newValue!;
+                                                                    });
+                                                                  },
+                                                                ),
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
+                                                        // Padding(
+                                                        //   padding:
+                                                        //       EdgeInsetsDirectional
+                                                        //           .fromSTEB(
+                                                        //               0.0,
+                                                        //               6.0,
+                                                        //               0.0,
+                                                        //               0.0),
+                                                        //   child: Text(
+                                                        //     (false)
+                                                        //         ? 'Data setting tersimpan'
+                                                        //         : 'Data Setting belum tersimpan',
+                                                        //     style: TextStyle(
+                                                        //       color: theme
+                                                        //           .colorScheme
+                                                        //           .secondary,
+                                                        //     ),
+                                                        //   ),
+                                                        // ),
                                                       ],
                                                     ),
                                                   ),
@@ -217,71 +264,122 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                               .start,
                                                       children: [
                                                         Text(
-                                                          'Void',
+                                                          'Daftar Printer',
                                                           style: TextStyle(
                                                             color: theme
                                                                 .colorScheme
                                                                 .secondary,
                                                           ),
                                                         ),
-                                                        Text(
-                                                          'Atur transaksi bisa void jika ada customer',
-                                                          style: TextStyle(
-                                                            color: theme
-                                                                .colorScheme
-                                                                .onPrimaryContainer,
-                                                          ),
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Column(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
-                                                              children: [
-                                                                Switch.adaptive(
-                                                                  value:
-                                                                      canVoid,
-                                                                  onChanged:
-                                                                      (newValue) async {
-                                                                    setState(() =>
-                                                                        canVoid =
-                                                                            newValue);
-                                                                  },
-                                                                  activeColor: theme
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                      0.0,
+                                                                      6.0,
+                                                                      0.0,
+                                                                      0.0),
+                                                          child: Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Container(
+                                                                width: 280.0,
+                                                                height: 45.0,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: theme
                                                                       .colorScheme
-                                                                      .primary,
-                                                                  activeTrackColor: theme
-                                                                      .colorScheme
-                                                                      .primary,
-                                                                  inactiveTrackColor: theme
-                                                                      .colorScheme
-                                                                      .onPrimaryContainer,
-                                                                  inactiveThumbColor: theme
-                                                                      .colorScheme
-                                                                      .onPrimaryContainer,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Column(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
-                                                              children: [
-                                                                Text(
-                                                                  (false)
-                                                                      ? 'Bisa Void'
-                                                                      : 'Tidak Bisa Void',
-                                                                  style:
-                                                                      TextStyle(
+                                                                      .primaryContainer,
+                                                                  border: Border
+                                                                      .all(
                                                                     color: theme
                                                                         .colorScheme
-                                                                        .secondary,
+                                                                        .outline,
+                                                                    width: 2.0,
                                                                   ),
                                                                 ),
-                                                              ],
-                                                            ),
-                                                          ],
+                                                                child:
+                                                                    DropdownButtonHideUnderline(
+                                                                  child:
+                                                                      Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .all(
+                                                                            8.0),
+                                                                    child: DropdownButton<
+                                                                        String>(
+                                                                      isExpanded:
+                                                                          true,
+                                                                      hint: Text(
+                                                                          "Select an Option"),
+                                                                      value: listPrinter.isNotEmpty &&
+                                                                              listPrinter.any((printer) => printer['name'] == selectedPrinter)
+                                                                          ? selectedPrinter
+                                                                          : null,
+                                                                      items: listPrinter.map<
+                                                                          DropdownMenuItem<
+                                                                              String>>((dynamic
+                                                                          dt) {
+                                                                        return DropdownMenuItem<
+                                                                            String>(
+                                                                          value:
+                                                                              dt['name'],
+                                                                          child:
+                                                                              Text(
+                                                                            dt['name'],
+                                                                            style:
+                                                                                TextStyle(fontWeight: FontWeight.normal),
+                                                                          ),
+                                                                        );
+                                                                      }).toList(),
+                                                                      onChanged:
+                                                                          (String?
+                                                                              newValue) {
+                                                                        setState(
+                                                                            () {
+                                                                          selectedPrinter =
+                                                                              newValue!;
+                                                                        });
+                                                                      },
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            5.0,
+                                                                            0.0,
+                                                                            0.0,
+                                                                            0.0),
+                                                                child:
+                                                                    CustomElevatedButton(
+                                                                  text:
+                                                                      "Get Printer",
+                                                                  width: 120.0,
+                                                                  height: 42.0,
+                                                                  buttonTextStyle: TextStyle(
+                                                                      color: theme
+                                                                          .colorScheme
+                                                                          .primaryContainer),
+                                                                  buttonStyle:
+                                                                      CustomButtonStyles
+                                                                          .primaryButton,
+                                                                  onPressed:
+                                                                      () async {
+                                                                    await onGetPrinter(
+                                                                        context);
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -313,7 +411,10 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                           buttonStyle:
                                                               CustomButtonStyles
                                                                   .primaryButton,
-                                                          onPressed: () {},
+                                                          onPressed: () {
+                                                            onTapSaveConfigPrinter(
+                                                                context);
+                                                          },
                                                         ),
                                                       ],
                                                     ),
@@ -341,5 +442,32 @@ class _SettingDevicesState extends State<SettingDevices> {
         ],
       ),
     );
+  }
+
+  onGetPrinter(BuildContext context) async {
+    String url = 'getPrinter';
+    String ipAddress = '192.168.18.20';
+    final callGetPrinter.getPrinter dataPrinter =
+        callGetPrinter.getPrinter(url: url, ipAddress: ipAddress);
+
+    final resultPrinter =
+        await callGetPrinter.requestGetPrinter(requestQuery: dataPrinter);
+
+    if (resultPrinter.containsKey('printer')) {
+      setState(() {
+        AppState().listPrinter = resultPrinter['printer'];
+        listPrinter = resultPrinter['printer'];
+      });
+    }
+  }
+
+  onTapSaveConfigPrinter(BuildContext context) async {
+    setState(() {
+      AppState().configPrinter = {
+        'selectedPrinter': selectedPrinter,
+        'tipeConnection': selectedTipePrinter,
+      };
+    });
+    print('check data, ${AppState().configPrinter}');
   }
 }
