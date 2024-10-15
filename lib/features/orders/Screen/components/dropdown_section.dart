@@ -50,7 +50,7 @@ class _DropdownWidgetState extends State<DropdownWidget> {
     ];
 
     // Check if order ID is selected
-    final hasOrderId = appState.currentOrderId.isNotEmpty;
+    final hasOrderId = appState.currentConfirmOrderId.isNotEmpty;
 
     return Container(
       width: widget.dropdownwidth, // Gunakan parameter lebar yang diterima

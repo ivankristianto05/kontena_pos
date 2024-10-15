@@ -31,12 +31,11 @@ class OrderManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  String _currentOrderId = '';
-  String get currentOrderId => _currentOrderId;
+  String _currentConfirmOrderId = '';
+  String get currentConfirmOrderId => _currentConfirmOrderId;
 
-  void setCurrentOrderId(String orderId) {
-    _currentOrderId = orderId;
-    // Check if all items in the new order are fully checked and update the state
+  void setCurrentConfirmOrderId(String orderId) {
+    _currentConfirmOrderId = orderId;
     checkOrderItems(orderId);
     notifyListeners();
   }
@@ -56,7 +55,7 @@ class OrderManager extends ChangeNotifier {
 
   String getTableForCurrentOrder() {
     final order = _confirmedOrders.firstWhere(
-      (order) => order.idOrder == _currentOrderId,
+      (order) => order.idOrder == _currentConfirmOrderId,
       orElse: () => ListToConfirm(
           idOrder: '',
           namaPemesan: '',

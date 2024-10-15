@@ -6,7 +6,7 @@ import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/features/orders/Screen/components/custombutton_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Confirm/confirmlist_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Confirm/orderlist_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/dropdown_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/guestname_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/footer_section.dart';
@@ -134,11 +134,11 @@ class _ServeScreenState extends State<ServeScreen> {
                     child: OrderCard(
                       screenWidth: screenWidth,
                       onOrderSelected: (orderId) {
-                        appState.setCurrentOrderId(orderId);
+                        appState.setCurrentServeOrderId(orderId);
                         //appState.printConfirmedOrders();
                       },
                       orderan: appState.servedOrders,
-                      currentOrderId: appState.currentOrderId,
+                      currentOrderId: appState.currentServeOrderId,
                     ),
                   ),
                   Container(
@@ -146,8 +146,8 @@ class _ServeScreenState extends State<ServeScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                     ),
-                    child: ServeList(
-                      listToConfirm: appState.confirmedOrders,
+                    child: OrderList(
+                      listorder: appState.servedOrders,
                       screenWidth: screenWidth,
                       appState: appState,
                       onAllChecked: (bool isChecked) {
@@ -155,6 +155,7 @@ class _ServeScreenState extends State<ServeScreen> {
                           allItemsChecked = isChecked;
                         });
                       },
+                      currentOrderId: appState.currentServeOrderId,
                     ),
                   ),
                 ],

@@ -257,13 +257,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           itemCount: orderList.length,
                                           itemBuilder: (context, index) {
                                             final currentOrderId =
-                                                AppState().currentOrderId;
+                                                AppState().currentConfirmOrderId;
                                             final order = orderList[index];
                                             final isSelected =
                                                 order.idOrder == currentOrderId;
                                             return InkWell(
                                               onTap: () {
-                                                AppState().setCurrentOrderId(order
+                                                AppState().setCurrentConfirmOrderId(order
                                                     .idOrder); // Update the currentOrderId in AppState
                                                 // onOrderSelected(order.idOrder);
                                                 addToCartFromOrder(

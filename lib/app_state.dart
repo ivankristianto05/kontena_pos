@@ -136,17 +136,28 @@ class AppState extends ChangeNotifier {
     return orderManager.namaPemesan;
   }
 
-  String get currentOrderId {
+  String get currentConfirmOrderId {
     _ensureInitialized();
-    return orderManager.currentOrderId;
+    return orderManager.currentConfirmOrderId;
   }
 
-  void setCurrentOrderId(String orderId) {
+  String get currentServeOrderId {
     _ensureInitialized();
-    orderManager.setCurrentOrderId(orderId);
+    return serveManager.currentServeOrderId;
+  }
+
+
+  void setCurrentConfirmOrderId(String orderId) {
+    _ensureInitialized();
+    orderManager.setCurrentConfirmOrderId(orderId);
     notifyListeners();
   }
-
+  void setCurrentServeOrderId(String orderId) {
+    _ensureInitialized();
+    serveManager.setCurrentServeOrderId(orderId);
+    notifyListeners();
+  }
+  
   void setSelectedTable(String table) {
     _ensureInitialized();
     orderManager.setSelectedTable(table);

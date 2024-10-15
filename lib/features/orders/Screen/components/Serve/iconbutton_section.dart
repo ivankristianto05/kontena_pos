@@ -38,10 +38,10 @@ class _ServeIconButtonState extends State<ServeIconButton> {
               height: 50,
               padding: EdgeInsets.zero,
               onPressed: () {
-                final currentOrderId = appState.currentOrderId;
-                if (currentOrderId.isNotEmpty) {
+                final currentConfirmOrderId= appState.currentConfirmOrderId;
+                if (currentConfirmOrderId.isNotEmpty) {
                   appState.checkAllItemsInOrder(
-                      currentOrderId); // Panggil fungsi check all
+                      currentConfirmOrderId); // Panggil fungsi check all
                 } else {
                   print('Tidak ada order yang dipilih.');
                 }
