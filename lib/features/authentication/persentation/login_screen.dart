@@ -1,4 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/core/api/frappe_thunder_authenticator/auth.dart'
+    as frappeLogin;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
+    as frappeFetchDataItem;
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
@@ -18,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final unfocusNode = FocusNode();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
+  bool isLoading = false;
 
   String? Function(BuildContext, String?)? userFieldControllerValidator;
 
@@ -100,6 +108,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                Image.asset(
+                                  'images/app_launcher_icon.png',
+                                  height: 90.v,
+                                  width: 70.v,
+                                ),
                                 CustomImageView(
                                   imagePath: ImageConstant.imgAppLauncherIcon,
                                   // imagePath: 'images/img_app_launcher_icon.png',
@@ -199,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController enterPhoneController = TextEditingController();
   FocusNode inputPhone = FocusNode();
   Widget _buildPhoneNumberSection(BuildContext context) {
-    enterPhoneController.text = 'test';
+    enterPhoneController.text = 'hello@thunderlab.id';
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       // const Padding(
       //   padding: EdgeInsets.only(left: 1),
@@ -235,9 +248,9 @@ class _LoginScreenState extends State<LoginScreen> {
   // widget password
   TextEditingController enterPasswordController = TextEditingController();
   FocusNode inputPassword = FocusNode();
-  late bool _obscurePassword = false;
+  late bool _obscurePassword = true;
   Widget _buildPasswordSection(BuildContext context) {
-    enterPasswordController.text = 'test';
+    enterPasswordController.text = 'adminkontena';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -295,10 +308,43 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void onTapMasuk(BuildContext context) async {
     if (enterPhoneController.text != '' && enterPasswordController.text != '') {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.selectOrganisationScreen,
-        (route) => false,
+      setState(() {
+        isLoading = true;
+      });
+
+      final frappeLogin.loginRequest request = frappeLogin.loginRequest(
+        username: enterPhoneController.text,
+        password: enterPasswordController.text,
       );
+
+      try {
+        Map<String, dynamic> result = await frappeLogin.login(request);
+        // print('test result, $result');
+        // print('header, ${AppState().setCookie}');
+      } catch (error) {
+        if (error.toString() == 'Exception: Authentication Error!') {
+          enterPasswordController.text = '';
+          enterPhoneController.text = '';
+          if (context.mounted) {
+            alert.alertError(context, 'Sepertinya akun atau passwordmu salah');
+          }
+        } else {
+          if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
+        }
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (context.mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.selectOrganisationScreen,
+          (route) => false,
+        );
+      }
     } else {
       alert.alertError(context, 'Data Belum Lengkap!');
     }

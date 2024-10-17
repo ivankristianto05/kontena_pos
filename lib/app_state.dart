@@ -321,7 +321,9 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  List<dynamic> listItems = [];
   String typeTransaction = '';
   List<dynamic> listPrinter = [];
   dynamic configPrinter;
+  String setCookie = '';
 }

@@ -1,14 +1,14 @@
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/app_state.dart';
+
+import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
+    as frappeFetchDataItem;
+
 import 'package:kontena_pos/constants.dart';
-// import 'package:kontena_pos/Screen/components/Menu/buttonfilter_section.dart';
-// import 'package:kontena_pos/Screen/components/Menu/guestinputwithbutton_section.dart';
-// import 'package:kontena_pos/Screen/components/Menu/dropdown_delete_section.dart';
-// import 'package:kontena_pos/Screen/components/Menu/itemcart_section.dart';
-// import 'package:kontena_pos/Screen/components/itemcart_section.dart';
-// import 'package:kontena_pos/Screen/components/searchbar_section.dart';
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/core/theme/custom_text_style.dart';
@@ -79,6 +79,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   @override
   void initState() {
     super.initState();
+    onCallItem();
     cartData = cart.getAllItemCart();
     print('check cart data, $cartData');
     // cartData = cart.getAllItemCart();
@@ -133,6 +134,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           children: [
             TopBar(
               isSelected: 'invoice',
+              onTapRefresh: () {
+                onCallItem();
+              },
             ),
             Expanded(
               child: Stack(
@@ -209,12 +213,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                         itemDisplay[index];
                                                     return ProductGrid(
                                                       name: currentItem[
-                                                          'nama_menu'],
-                                                      category:
-                                                          currentItem['type'],
-                                                      price:
-                                                          currentItem['harga']
-                                                              .toString(),
+                                                          'item_name'],
+                                                      category: currentItem[
+                                                          'item_group'],
+                                                      price: numberFormat(
+                                                          'idr',
+                                                          currentItem[
+                                                              'standard_rate']),
                                                       image: CustomImageView(
                                                         imagePath: ImageConstant
                                                             .imgAdl1,
@@ -815,6 +820,48 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         ),
       ),
     );
+  }
+
+  void onCallItem() async {
+    isLoading = true;
+
+    final frappeFetchDataItem.ItemRequest requestItem =
+        frappeFetchDataItem.ItemRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+    );
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final itemRequset = await frappeFetchDataItem
+          .requestItem(requestQuery: requestItem)
+          .timeout(
+            Duration(seconds: 30),
+          );
+
+      print("titiew: $itemRequset");
+      setState(() {
+        AppState().listItems = itemRequset;
+        itemDisplay = itemRequset;
+      });
+      // AppState().userDetail = profileResult;
+    } catch (error) {
+      isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        // Handle other errors
+        // if (error.toString().contains('403')) {
+        //   _bottomScreenError(context);
+        // }
+
+        // _bottomScreenError(context);
+        print(error);
+      }
+      return;
+    }
   }
 
   void onSearch(BuildContext context, dynamic value) async {}
