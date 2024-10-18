@@ -51,9 +51,14 @@ class _SearchbarState extends State<Searchbar> {
       child: TextField(
         decoration: InputDecoration(
           hintText: 'Search Menu',
+          hintStyle: TextStyle(
+            color: theme.colorScheme.onPrimaryContainer,
+            fontSize: 14.0,
+          ),
           // filled: true,
           // fillColor: Colors.white,
           border: InputBorder.none,
+          contentPadding: EdgeInsets.all(12.0),
           // isDense: true,
           suffixIcon: enterSearch.text.isNotEmpty
               ? InkWell(

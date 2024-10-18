@@ -11,7 +11,7 @@ class CartItem {
   int variantPrice;
   int totalPrice;
   int addonsPrice; // Field to store the total price of addons
-  
+
   Map<String, Map<String, dynamic>>? addons;
   String notes;
   Map<String, String> preference;
@@ -33,7 +33,8 @@ class CartItem {
     this.pref,
     this.addon,
     this.type,
-  }) : totalPrice = qty * ( (variantPrice != 0 ? variantPrice : price) + addonsPrice);
+  }) : totalPrice =
+            qty * ((variantPrice != 0 ? variantPrice : price) + addonsPrice);
 
   // Constructor for creating a copy of an existing CartItem
   CartItem.from(CartItem item)
@@ -41,6 +42,7 @@ class CartItem {
         name = item.name,
         variant = item.variant,
         variantId = item.variantId,
+        itemName = item.itemName,
         qty = item.qty,
         price = item.price,
         variantPrice = item.variantPrice,
@@ -61,11 +63,13 @@ class CartItem {
     Map<String, Map<String, dynamic>>? addons,
     String? notes,
     Map<String, String>? preference,
+    String? itemName,
   }) {
     // Recalculate total price if qty, variantPrice, or addonsPrice is modified
     return CartItem(
       id: id,
       name: name,
+      itemName: itemName,
       variant: variant ?? this.variant,
       variantId: variantId ?? this.variantId,
       qty: qty ?? this.qty,
@@ -89,6 +93,7 @@ class CartItem {
     return {
       'id': id,
       'name': name,
+      'itemName': itemName,
       'variant': variant,
       'variantId': variantId,
       'qty': qty,

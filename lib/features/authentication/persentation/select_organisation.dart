@@ -115,7 +115,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                               4), // if you need this
                                                       side: BorderSide(
                                                         color: theme.colorScheme
-                                                            .surface,
+                                                            .outline,
                                                         width: 1,
                                                       ),
                                                     ),
@@ -144,7 +144,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                         child: Column(
                                                           children: [
                                                             Image.asset(
-                                                              'images/$img.png',
+                                                              'assets/images/$img.png',
                                                               fit: BoxFit.cover,
                                                             ),
                                                             const SizedBox(
@@ -152,9 +152,11 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                             AutoSizeText(
                                                               currentItem[
                                                                   'name'],
-                                                              style: theme
-                                                                  .textTheme
-                                                                  .labelMedium,
+                                                              style: TextStyle(
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .secondary,
+                                                              ),
                                                               maxLines: 1,
                                                               overflow:
                                                                   TextOverflow

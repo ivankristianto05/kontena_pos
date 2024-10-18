@@ -109,17 +109,17 @@ class _LoginScreenState extends State<LoginScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Image.asset(
-                                  'images/app_launcher_icon.png',
-                                  height: 90.v,
-                                  width: 70.v,
+                                  'assets/images/app_launcher_icon.png',
+                                  height: 165.v,
+                                  width: 165.v,
                                 ),
-                                CustomImageView(
-                                  imagePath: ImageConstant.imgAppLauncherIcon,
-                                  // imagePath: 'images/img_app_launcher_icon.png',
-                                  height: 156,
-                                  width: 168,
-                                  alignment: Alignment.centerRight,
-                                ),
+                                // CustomImageView(
+                                //   imagePath: ImageConstant.imgAppLauncherIcon,
+                                //   // imagePath: 'images/img_app_launcher_icon.png',
+                                //   height: 156,
+                                //   width: 168,
+                                //   alignment: Alignment.centerRight,
+                                // ),
                                 Column(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.start,
