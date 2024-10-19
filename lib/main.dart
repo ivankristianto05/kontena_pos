@@ -24,7 +24,7 @@ void main() async {
     await windowManager.ensureInitialized();
     windowManager.waitUntilReadyToShow().then((_) async {
       // Hide window title bar
-      await windowManager.setFullScreen(true);
+      await windowManager.setFullScreen(false);
       await windowManager.setAlwaysOnTop(false);
       await windowManager.setSkipTaskbar(false);
     });

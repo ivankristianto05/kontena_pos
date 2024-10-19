@@ -3,17 +3,22 @@ import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:intl/intl.dart';
 import 'package:kontena_pos/app_state.dart';
 
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
     as frappeFetchDataItem;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item_group.dart'
     as frappeFetchDataItemGroup;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/item_price.dart'
+    as frappeFetchDataItemPrice;
 
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/core/functions/reformat_item_with_price.dart';
 import 'package:kontena_pos/core/theme/custom_text_style.dart';
+import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
@@ -34,7 +39,7 @@ import 'package:kontena_pos/widgets/type_transaction.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class InvoiceScreen extends StatefulWidget {
-  const InvoiceScreen({Key? key}) : super(key: key);
+  const InvoiceScreen({super.key});
 
   @override
   _InvoiceScreenState createState() => _InvoiceScreenState();
@@ -81,6 +86,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   @override
   void initState() {
     super.initState();
+    onCallItemGroup();
+    onCallItemPrice();
     onCallItem();
     cartData = cart.getAllItemCart();
     print('check cart data, $cartData');
@@ -138,6 +145,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
               isSelected: 'invoice',
               onTapRefresh: () {
                 onCallItemGroup();
+                onCallItemPrice();
                 onCallItem();
               },
             ),
@@ -160,7 +168,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                             ),
                             if (modeView == 'item')
                               Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                padding: EdgeInsetsDirectional.fromSTEB(
                                     8.0, 60.0, 8.0, 8.0),
                                 child: FilterBar(
                                   onFilterSelected: (String type) {},
@@ -168,11 +176,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               ),
                             if (modeView == 'item')
                               Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                padding: EdgeInsetsDirectional.fromSTEB(
                                     8.0, 120.0, 8.0, 0.0),
                                 child: Align(
-                                  alignment:
-                                      const AlignmentDirectional(0.00, 0.00),
+                                  alignment: AlignmentDirectional(0.00, 0.00),
                                   child: SingleChildScrollView(
                                     child: (isLoading == false &&
                                             itemDisplay.isEmpty)
@@ -843,12 +850,45 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             Duration(seconds: 30),
           );
 
-      print("item group: $itemGroupRequset");
       setState(() {
-        AppState().listItemGroup = itemGroupRequset;
+        AppState().dataItemGroup = itemGroupRequset;
         // itemDisplay = itemGroupRequset;
-        print('check ${AppState().listItemGroup}');
         isLoading = false;
+      });
+    } catch (error) {
+      isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        print(error);
+      }
+      return;
+    }
+  }
+
+  void onCallItemPrice() async {
+    String? today = dateTimeFormat('date', null);
+    final frappeFetchDataItemPrice.ItemPriceRequest requestItemPrice =
+        frappeFetchDataItemPrice.ItemPriceRequest(
+      cookie: AppState().setCookie,
+      filters: '[["selling","=",1],["valid_from","<=","$today"]]',
+      limit: 5000,
+    );
+    print('check today, $today');
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final itemPriceRequest = await frappeFetchDataItemPrice
+          .requestItemPrice(requestQuery: requestItemPrice)
+          .timeout(
+            Duration(seconds: 30),
+          );
+
+      // print("item price request: $itemPriceRequest");
+      setState(() {
+        AppState().dataItemPrice = itemPriceRequest;
+        // itemDisplay = reformatItem(itemPriceRequest);
       });
     } catch (error) {
       isLoading = false;
@@ -869,7 +909,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         frappeFetchDataItem.ItemRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: '[]',
+      filters: '[["disabled","=",0],["is_sales_item","=",1]]',
+      limit: 1500,
     );
 
     try {
@@ -882,8 +923,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
       // print("titiew: $itemRequset");
       setState(() {
-        AppState().listItems = reformatItem(item);
-        itemDisplay = reformatItem(itemRequest);
+        AppState().dataItem = ReformatItemWithPrice(
+          itemRequest,
+          AppState().dataItemPrice,
+        );
+        itemDisplay = AppState().dataItem;
+        print('chekc item display, ${itemDisplay}');
       });
       // AppState().userDetail = profileResult;
     } catch (error) {
@@ -953,10 +998,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           'totalPrice': item.totalPrice,
           'addonsPrice': item.addonsPrice,
         };
-        print('check item_name, ${editItem}');
-        print('check itemName, ${editItem['qty'].runtimeType}}');
-        print('check itemName, ${editItem['variantPrice'].runtimeType}}');
-        print('check itemName, ${editItem['totalPrice'].runtimeType}}');
+
         return Padding(
           padding: MediaQuery.viewInsetsOf(context),
           // child: ItemDetailsDialog(

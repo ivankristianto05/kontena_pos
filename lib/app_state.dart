@@ -321,8 +321,13 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<dynamic> listItems = [];
-  List<dynamic> listItemGroup = [];
+  List<dynamic> dataCompany = [];
+  List<dynamic> dataPOSProfile = [];
+  List<dynamic> dataItem = [];
+  List<dynamic> dataItemGroup = [];
+  List<dynamic> dataItemPrice = [];
+  dynamic configCompany;
+  dynamic configPOSProfile;
   String typeTransaction = '';
   List<dynamic> listPrinter = [];
   dynamic configPrinter;

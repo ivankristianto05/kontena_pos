@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 
 class TopBar extends StatelessWidget implements PreferredSizeWidget {
@@ -186,7 +187,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      'Shokudo Restaurant',
+                      AppState().configPOSProfile['name'],
                       style: TextStyle(
                         color: theme.colorScheme.secondary,
                         fontSize: 16,

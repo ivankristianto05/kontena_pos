@@ -1,6 +1,13 @@
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/core/api/frappe_thunder_pos/company.dart'
+    as frappeFetchDataCompany;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_profile.dart'
+    as frappeFetchDataPOSProfile;
 import 'package:kontena_pos/data/organisation.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
@@ -24,17 +31,27 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
   final formKey = GlobalKey<FormState>();
 
   String? Function(BuildContext, String?)? userFieldControllerValidator;
+  late List<dynamic> companyDisplay;
+  late List<dynamic> posProfileDisplay;
+  bool isCompany = true;
 
   @override
   void initState() {
     super.initState();
+    // setState(() {
+    isCompany = true;
+    callCompany();
+    callPOSProfile();
+    companyDisplay = AppState().dataCompany;
+    posProfileDisplay = AppState().dataPOSProfile;
+    // });
   }
 
   @override
   void dispose() {
     // _model.dispose();
-
     super.dispose();
+    isCompany = true;
   }
 
   @override
@@ -77,106 +94,251 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Select Organisation',
-                                      style: theme.textTheme.titleLarge,
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              8.0, 120.0, 8.0, 0.0),
-                                      child: Align(
-                                        child: SizedBox(
-                                          width:
-                                              MediaQuery.sizeOf(context).width,
-                                          child: Column(
-                                            children: [
-                                              MasonryGridView.count(
-                                                crossAxisCount: 4,
-                                                mainAxisSpacing: 6,
-                                                crossAxisSpacing: 6,
-                                                shrinkWrap: true,
-                                                itemCount: organisation.length,
-                                                itemBuilder: (context, index) {
-                                                  final currentItem =
-                                                      organisation[index];
-                                                  final String img =
-                                                      currentItem['img'];
-                                                  return Card(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              4), // if you need this
-                                                      side: BorderSide(
-                                                        color: theme.colorScheme
-                                                            .outline,
-                                                        width: 1,
-                                                      ),
-                                                    ),
-                                                    elevation: 0,
-                                                    child: InkWell(
-                                                      splashColor:
-                                                          Colors.transparent,
-                                                      focusColor:
-                                                          Colors.transparent,
-                                                      hoverColor:
-                                                          Colors.transparent,
-                                                      highlightColor:
-                                                          Colors.transparent,
-                                                      onTap: () {
-                                                        onTap(context);
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                          24.0,
-                                                          24.0,
-                                                          24.0,
-                                                          24.0,
+                                if (isCompany)
+                                  Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Select Organisation',
+                                        style: theme.textTheme.titleLarge,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(8.0, 120.0, 8.0, 0.0),
+                                        child: Align(
+                                          child: SizedBox(
+                                            width: MediaQuery.sizeOf(context)
+                                                .width,
+                                            child: Column(
+                                              children: [
+                                                MasonryGridView.count(
+                                                  crossAxisCount: 4,
+                                                  mainAxisSpacing: 6,
+                                                  crossAxisSpacing: 6,
+                                                  shrinkWrap: true,
+                                                  itemCount:
+                                                      companyDisplay.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final currentItem =
+                                                        companyDisplay[index];
+                                                    String filename =
+                                                        currentItem['name']
+                                                            .toString()
+                                                            .toLowerCase()
+                                                            .replaceAll(
+                                                                ' ', '_');
+                                                    // final String img =
+                                                    //     currentItem['img'];
+                                                    return Card(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                4), // if you need this
+                                                        side: BorderSide(
+                                                          color: theme
+                                                              .colorScheme
+                                                              .outline,
+                                                          width: 1,
                                                         ),
-                                                        child: Column(
-                                                          children: [
-                                                            Image.asset(
-                                                              'assets/images/$img.png',
-                                                              fit: BoxFit.cover,
-                                                            ),
-                                                            const SizedBox(
-                                                                height: 12.0),
-                                                            AutoSizeText(
-                                                              currentItem[
-                                                                  'name'],
-                                                              style: TextStyle(
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .secondary,
+                                                      ),
+                                                      elevation: 0,
+                                                      child: InkWell(
+                                                        splashColor:
+                                                            Colors.transparent,
+                                                        focusColor:
+                                                            Colors.transparent,
+                                                        hoverColor:
+                                                            Colors.transparent,
+                                                        highlightColor:
+                                                            Colors.transparent,
+                                                        onTap: () {
+                                                          onTapCompany(context,
+                                                              currentItem);
+                                                        },
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                            24.0,
+                                                            24.0,
+                                                            24.0,
+                                                            24.0,
+                                                          ),
+                                                          child: Column(
+                                                            children: [
+                                                              Image.asset(
+                                                                'assets/images/$filename.png',
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                errorBuilder: (BuildContext
+                                                                        context,
+                                                                    Object
+                                                                        exception,
+                                                                    StackTrace?
+                                                                        stackTrace) {
+                                                                  // Tampilkan gambar default jika file tidak ada
+                                                                  return Image
+                                                                      .asset(
+                                                                    'assets/images/image_not_found.png',
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  );
+                                                                },
                                                               ),
-                                                              maxLines: 1,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              minFontSize: 10,
-                                                            ),
-                                                          ],
+                                                              const SizedBox(
+                                                                  height: 12.0),
+                                                              AutoSizeText(
+                                                                currentItem[
+                                                                    'name'],
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: theme
+                                                                      .colorScheme
+                                                                      .secondary,
+                                                                ),
+                                                                maxLines: 1,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                minFontSize: 10,
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ],
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
+                                if (!isCompany)
+                                  Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Select POS',
+                                        style: theme.textTheme.titleLarge,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(8.0, 120.0, 8.0, 0.0),
+                                        child: Align(
+                                          child: SizedBox(
+                                            width: MediaQuery.sizeOf(context)
+                                                .width,
+                                            child: Column(
+                                              children: [
+                                                MasonryGridView.count(
+                                                  crossAxisCount: 4,
+                                                  mainAxisSpacing: 6,
+                                                  crossAxisSpacing: 6,
+                                                  shrinkWrap: true,
+                                                  itemCount:
+                                                      posProfileDisplay.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final currentItem =
+                                                        posProfileDisplay[
+                                                            index];
+                                                    String filename =
+                                                        currentItem['name']
+                                                            .toString()
+                                                            .toLowerCase()
+                                                            .replaceAll(
+                                                                ' ', '_');
+                                                    // final String img =
+                                                    //     currentItem['img'];
+                                                    return Card(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                4), // if you need this
+                                                        side: BorderSide(
+                                                          color: theme
+                                                              .colorScheme
+                                                              .outline,
+                                                          width: 1,
+                                                        ),
+                                                      ),
+                                                      elevation: 0,
+                                                      child: InkWell(
+                                                        splashColor:
+                                                            Colors.transparent,
+                                                        focusColor:
+                                                            Colors.transparent,
+                                                        hoverColor:
+                                                            Colors.transparent,
+                                                        highlightColor:
+                                                            Colors.transparent,
+                                                        onTap: () {
+                                                          onTapPOSProfile(
+                                                              context,
+                                                              currentItem);
+                                                        },
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                            24.0,
+                                                            24.0,
+                                                            24.0,
+                                                            24.0,
+                                                          ),
+                                                          child: Column(
+                                                            children: [
+                                                              Icon(
+                                                                Icons
+                                                                    .store_outlined,
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .secondary,
+                                                                size: 68.0,
+                                                              ),
+                                                              const SizedBox(
+                                                                  height: 12.0),
+                                                              AutoSizeText(
+                                                                currentItem[
+                                                                    'name'],
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: theme
+                                                                      .colorScheme
+                                                                      .secondary,
+                                                                ),
+                                                                maxLines: 1,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                minFontSize: 10,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                               ],
                             ),
                           ),
@@ -193,7 +355,44 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
     );
   }
 
-  void onTap(BuildContext context) async {
+  List<dynamic> reformatPOSProfile(
+    List<dynamic> posProfile,
+    dynamic configCompany,
+  ) {
+    return posProfile
+        .where((posp) => posp['company'] == configCompany['name'])
+        .toList();
+  }
+
+  void onTapCompany(BuildContext context, dynamic? itemSelected) async {
+    setState(() {
+      isCompany = false;
+      AppState().configCompany = itemSelected;
+      posProfileDisplay = reformatPOSProfile(
+        AppState().dataPOSProfile,
+        itemSelected,
+      );
+    });
+    // Navigator.of(context).pushNamedAndRemoveUntil(
+    //   AppRoutes.invoiceScreen,
+    //   (route) => false,
+    // );
+    // if (enterPhoneController.text != '' && enterPasswordController.text != '') {
+    // } else {
+    //   alert.alertError(context, 'Data Belum Lengkap!');
+    // }
+  }
+
+  void onTapPOSProfile(BuildContext context, dynamic? itemSelected) async {
+    setState(() {
+      // isCompany = false;
+      // AppState().configCompany = itemSelected;
+      AppState().configPOSProfile = itemSelected;
+      // posProfileDisplay = reformatPOSProfile(
+      //   AppState().dataPOSProfile,
+      //   itemSelected,
+      // );
+    });
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.invoiceScreen,
       (route) => false,
@@ -202,5 +401,75 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
     // } else {
     //   alert.alertError(context, 'Data Belum Lengkap!');
     // }
+  }
+
+  void callCompany() async {
+    final frappeFetchDataCompany.CompanyRequest requestCompany =
+        frappeFetchDataCompany.CompanyRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+      limit: 1500,
+    );
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final callRequest = await frappeFetchDataCompany
+          .requestCompany(requestQuery: requestCompany)
+          .timeout(
+            Duration(seconds: 30),
+          );
+
+      print("titiew: $callRequest");
+      setState(() {
+        AppState().dataCompany = callRequest;
+        companyDisplay = callRequest;
+      });
+      // AppState().userDetail = profileResult;
+    } catch (error) {
+      // isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        print(error);
+      }
+      return;
+    }
+  }
+
+  void callPOSProfile() async {
+    final frappeFetchDataPOSProfile.POSProfileRequest requestCompany =
+        frappeFetchDataPOSProfile.POSProfileRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+      limit: 1500,
+    );
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final callRequest = await frappeFetchDataPOSProfile
+          .requestPOSProfile(requestQuery: requestCompany)
+          .timeout(
+            Duration(seconds: 30),
+          );
+
+      print("titiew: $callRequest");
+      setState(() {
+        AppState().dataPOSProfile = callRequest;
+        posProfileDisplay = callRequest;
+      });
+      // AppState().userDetail = profileResult;
+    } catch (error) {
+      // isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        print(error);
+      }
+      return;
+    }
   }
 }

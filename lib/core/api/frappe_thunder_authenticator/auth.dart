@@ -44,7 +44,7 @@ Future<Map<String, dynamic>> login(loginRequest requestBody) async {
       if (responseBody['message'] == 'Logged In') {
         String? setCookie = response.headers['set-cookie'];
         AppState().setCookie = setCookie ?? '';
-        return responseBody['message'];
+        return responseBody;
       } else {
         throw Exception(responseBody['message']['message']);
       }

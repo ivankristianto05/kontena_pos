@@ -22,9 +22,9 @@ class _FilterBarState extends State<FilterBar> {
 
   @override
   void initState() {
-    print('filter display, ${AppState().listItemGroup}');
+    super.initState();
     setState(() {
-      filterDisplay = AppState().listItemGroup;
+      filterDisplay = AppState().dataItemGroup;
     });
   }
 
@@ -63,7 +63,6 @@ class _FilterBarState extends State<FilterBar> {
                     filterDisplay.length,
                     (index) {
                       final filterItem = filterDisplay[index];
-                      print('check filter item, $filterItem');
                       return Row(
                         children: [
                           _buildFilterButton(filterItem['name'], buttonWidth),

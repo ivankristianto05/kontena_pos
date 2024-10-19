@@ -1,21 +1,23 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class salesItemPriceRequest {
+class ItemPriceRequest {
   final String cookie;
   final String? fields;
   final String? filters;
   final int? limit;
   final String? orfilters;
 
-  salesItemPriceRequest(
-      {required this.cookie,
-      this.fields,
-      this.limit,
-      this.filters,
-      this.orfilters});
+  ItemPriceRequest({
+    required this.cookie,
+    this.fields =
+        '["name","item_code", "item_name","price_list_rate","uom","valid_from"]',
+    this.limit,
+    this.filters,
+    this.orfilters,
+  });
 
-  Map<String, dynamic> formatRequestSalesItemPrice() {
+  Map<String, dynamic> formatRequestItemPrice() {
     Map<String, dynamic> requestMap = {};
 
     if (fields != null && fields!.isNotEmpty) {
@@ -37,7 +39,7 @@ class salesItemPriceRequest {
     return requestMap;
   }
 
-  Map<String, String> formatHeaderSalesItemPrice() {
+  Map<String, String> formatHeaderItemPrice() {
     return {
       'Cookie': cookie,
     };
@@ -48,12 +50,12 @@ String queryParams(Map<String, dynamic> map) =>
     map.entries.map((e) => '${e.key}=${e.value}').join('&');
 
 Future<List<dynamic>> requestItemPrice(
-    {required salesItemPriceRequest requestQuery}) async {
+    {required ItemPriceRequest requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/resource/Item Price?${queryParams(requestQuery.formatRequestSalesItemPrice())}';
+      'https://erp2.hotelkontena.com/api/resource/Item Price?${queryParams(requestQuery.formatRequestItemPrice())}';
 
   final response = await http.get(Uri.parse(url),
-      headers: requestQuery.formatHeaderSalesItemPrice());
+      headers: requestQuery.formatHeaderItemPrice());
 
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);

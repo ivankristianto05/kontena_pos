@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_authenticator/auth.dart'
     as frappeLogin;
-import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
-    as frappeFetchDataItem;
+
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
@@ -113,13 +112,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   height: 165.v,
                                   width: 165.v,
                                 ),
-                                // CustomImageView(
-                                //   imagePath: ImageConstant.imgAppLauncherIcon,
-                                //   // imagePath: 'images/img_app_launcher_icon.png',
-                                //   height: 156,
-                                //   width: 168,
-                                //   alignment: Alignment.centerRight,
-                                // ),
                                 Column(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -214,16 +206,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildPhoneNumberSection(BuildContext context) {
     enterPhoneController.text = 'hello@thunderlab.id';
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      // const Padding(
-      //   padding: EdgeInsets.only(left: 1),
-      //   child: Text(
-      //     "No Hp / Email",
-      //     style: TextStyle(
-      //       fontSize: 16,
-      //     ),
-      //   ),
-      // ),
-      // const SizedBox(height: 6),
       CustomTextFormField(
         controller: enterPhoneController,
         focusNode: inputPhone,
@@ -254,16 +236,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // const Padding(
-        //   padding: EdgeInsets.only(left: 1),
-        //   child: Text(
-        //     "Password",
-        //     style: TextStyle(
-        //       fontSize: 16,
-        //     ),
-        //   ),
-        // ),
-        // const SizedBox(height: 6),
         CustomTextFormField(
           controller: enterPasswordController,
           focusNode: inputPassword,
@@ -319,7 +291,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       try {
         Map<String, dynamic> result = await frappeLogin.login(request);
-        // print('test result, $result');
+
+        print('test result, $result');
+
         // print('header, ${AppState().setCookie}');
       } catch (error) {
         if (error.toString() == 'Exception: Authentication Error!') {
