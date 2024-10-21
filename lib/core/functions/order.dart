@@ -27,8 +27,10 @@ class OrderManager extends ChangeNotifier {
   String get namaPemesan => _namaPemesan;
 
   void setNamaPemesan(String name) {
-    _namaPemesan = name.isEmpty ? '' : name;
-    notifyListeners();
+    if(_namaPemesan != name) {
+      _namaPemesan = name;
+      notifyListeners();
+    }
   }
 
   String _currentConfirmOrderId = '';

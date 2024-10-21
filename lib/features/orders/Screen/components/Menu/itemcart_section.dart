@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/itemeditdialog_section.dart';
 import 'package:kontena_pos/constants.dart';
-import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:intl/intl.dart';
