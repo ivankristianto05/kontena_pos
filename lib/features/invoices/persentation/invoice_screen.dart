@@ -12,6 +12,12 @@ import 'package:kontena_pos/core/api/frappe_thunder_pos/item_group.dart'
     as frappeFetchDataItemGroup;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item_price.dart'
     as frappeFetchDataItemPrice;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_cart.dart'
+    as frappeFetchDataCart;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_cart.dart'
+    as frappeFetchDataGetCart;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_order.dart'
+    as frappeFetchDataOrder;
 
 import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/app_export.dart';
@@ -71,6 +77,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   int totalAddon = 0;
   int totalAddonCheckout = 0;
   bool isEdit = true;
+  dynamic cartSelected;
 
 // // //   //  final String id;
 // // //   // final String name;
@@ -1077,9 +1084,50 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   void onTapPay(BuildContext context) async {
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.paymentScreen,
-      (route) => false,
+    // Navigator.of(context).pushNamedAndRemoveUntil(
+    //   AppRoutes.paymentScreen,
+    //   (route) => false,
+    // );
+
+    final frappeFetchDataCart.CreatePosCartRequest request =
+        frappeFetchDataCart.CreatePosCartRequest(
+      cookie: AppState().setCookie,
+      customer: '0',
+      customerName: 'Guest',
+      company: AppState().configCompany['name'],
+      outlet: AppState().configPOSProfile['name'],
+      postingDate: dateTimeFormat('date', null).toString(),
+      priceList: AppState().configPOSProfile['selling_price_list'],
+      table: '1',
+      id: cartSelected != null ? cartSelected['name'] : null,
+    );
+    print('cart selected, $cartSelected');
+
+    // request.getParamID()
+
+    frappeFetchDataCart.request(requestQuery: request).then((value) {
+      if (cartSelected == null) {
+        cartSelected = value['data'];
+      } else {}
+      print('check value, $cartSelected');
+    });
+  }
+
+  callPosOrder(dynamic item) async {
+    final frappeFetchDataOrder.CreatePosOrderRequest request =
+        frappeFetchDataOrder.CreatePosOrderRequest(
+      cookie: AppState().setCookie,
+      customer: '0',
+      customerName: 'Guest',
+      company: AppState().configCompany['name'],
+      postingDate: dateTimeFormat('date', null).toString(),
+      outlet: AppState().configPOSProfile['name'],
+      priceList: AppState().configPOSProfile['selling_price_list'],
+      cartNo: cartSelected.name,
+      item: item.name,
+      itemName: item.item_name,
+      itemGroup: item.item_group,
+      qty: item.qty,
     );
   }
 }
