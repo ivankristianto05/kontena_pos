@@ -51,6 +51,7 @@ dependencies:
   styled_divider: ^1.0.5
   badges: ^3.1.2
   flutter_barcode_listener: ^0.1.4
+  http: ^1.2.0
 
 dev_dependencies:
   flutter_test:

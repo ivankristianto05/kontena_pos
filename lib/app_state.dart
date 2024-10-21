@@ -53,7 +53,7 @@ class AppState extends ChangeNotifier {
    double _totalPrice = 0.0;
 
   double get totalPrice => _totalPrice;
-  
+
   void resetCart() {
     _cartItems = [];
     _totalPrice = 0.0;
@@ -119,7 +119,7 @@ class AppState extends ChangeNotifier {
     orderManager.printConfirmedOrders();
   }
 
-  void printConfirmedOrderIdsWithItems(){
+  void printConfirmedOrderIdsWithItems() {
     _ensureInitialized();
     orderManager.printConfirmedOrderIdsWithItems();
   }
@@ -192,7 +192,7 @@ class AppState extends ChangeNotifier {
     return orderManager.confirmedOrders;
   }
 
-  List <ListToServe> get servedOrders{
+  List<ListToServe> get servedOrders {
     _ensureInitialized();
     return serveManager.serveOrders;
   }
@@ -259,10 +259,14 @@ class AppState extends ChangeNotifier {
     final DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
     return formatter.format(dateTime);
   }
+
   void checkAllItemsInOrder(String orderId) {
-        _ensureInitialized();
-  orderManager.checkAllItems(orderId);
-  notifyListeners();
-}
+    _ensureInitialized();
+    orderManager.checkAllItems(orderId);
+    notifyListeners();
+  }
+
   String typeTransaction = '';
+  List<dynamic> listPrinter = [];
+  dynamic configPrinter;
 }

@@ -168,6 +168,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     CustomElevatedButton(
                                       text: "Masuk",
+                                      buttonTextStyle: TextStyle(
+                                          color: theme
+                                              .colorScheme.primaryContainer),
+                                      buttonStyle:
+                                          CustomButtonStyles.primaryButton,
                                       onPressed: () {
                                         onTapMasuk(context);
                                       },

@@ -96,6 +96,8 @@ class _SettingApplicationState extends State<SettingApplication> {
                                                 style: TextStyle(
                                                   color: theme
                                                       .colorScheme.secondary,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16.0,
                                                 ),
                                               ),
                                             ),
