@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:intl/intl.dart';
 import 'package:kontena_pos/app_state.dart';
 
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
@@ -18,8 +17,9 @@ import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_cart.dart'
     as frappeFetchDataGetCart;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_order.dart'
     as frappeFetchDataOrder;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_order.dart'
+    as frappeFetchDataGetOrder;
 
-import 'package:kontena_pos/constants.dart';
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/core/functions/reformat_item_with_price.dart';
@@ -28,13 +28,10 @@ import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
-import 'package:kontena_pos/features/cart/persentation/cart_list_item.dart';
-import 'package:kontena_pos/features/invoices/persentation/action_button.dart';
 import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
 import 'package:kontena_pos/models/cartitem.dart';
 import 'package:kontena_pos/widgets/custom_dialog.dart';
-import 'package:kontena_pos/widgets/custom_text_form_field.dart';
 import 'package:kontena_pos/widgets/empty_cart.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/list_cart.dart';
@@ -68,11 +65,16 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   bool isSearchActive = false;
   bool isLoading = true;
   String selectedGroup = '';
+
   List<dynamic> item = [];
   List<dynamic> itemDisplay = [];
+  List<dynamic> orderDisplay = [];
+
+  List<dynamic> tempPosCart = [];
+  List<dynamic> tempPosOrder = [];
+
   String searchItemQuery = '';
   String modeView = 'item';
-  List<dynamic> orderList = [];
   String typeTransaction = '';
   int totalAddon = 0;
   int totalAddonCheckout = 0;
@@ -96,8 +98,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     onCallItemGroup();
     onCallItemPrice();
     onCallItem();
+
+    onCallDataPosCart();
+    onCallDataPosOrder();
+    reformatOrderCart();
+
     cartData = cart.getAllItemCart();
-    print('check cart data, $cartData');
     // cartData = cart.getAllItemCart();
 
     Future.delayed(Duration(milliseconds: 300), () {
@@ -108,7 +114,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
         // print(itemDisplay);
         itemDisplay = getItem();
-        orderList = AppState().confirmedOrders;
+        // orderList = AppState().confirmedOrders;
       });
     });
   }
@@ -154,6 +160,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 onCallItemGroup();
                 onCallItemPrice();
                 onCallItem();
+                onCallDataPosCart();
+                onCallDataPosOrder();
+
+                reformatOrderCart();
               },
             ),
             Expanded(
@@ -262,17 +272,23 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           mainAxisSpacing: 6,
                                           crossAxisSpacing: 6,
                                           shrinkWrap: true,
-                                          itemCount: orderList.length,
+                                          itemCount: orderDisplay.length,
                                           itemBuilder: (context, index) {
-                                            final currentOrderId =
-                                                AppState().currentOrderId;
-                                            final order = orderList[index];
-                                            final isSelected =
-                                                order.idOrder == currentOrderId;
+                                            // print(
+                                            //     'check order, ${orderDisplay[index]}');
+                                            // final currentOrderId =
+                                            //     AppState().currentOrderId;
+                                            final order = orderDisplay[index];
+                                            dynamic orderItemList =
+                                                order['items'];
+                                            print(
+                                                'check order item, $orderItemList');
+                                            // final isSelected =
+                                            //     order.idOrder == currentOrderId;
                                             return InkWell(
                                               onTap: () {
-                                                AppState().setCurrentOrderId(order
-                                                    .idOrder); // Update the currentOrderId in AppState
+                                                // AppState().setCurrentOrderId(order
+                                                //     .idOrder); // Update the currentOrderId in AppState
                                                 // onOrderSelected(order.idOrder);
                                                 addToCartFromOrder(
                                                     context, order);
@@ -301,15 +317,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                     .spaceBetween,
                                                             children: [
                                                               Text(
-                                                                'Table ${order.table.toString()}',
+                                                                order['name'],
                                                                 style: theme
                                                                     .textTheme
                                                                     .titleMedium,
                                                               ),
                                                               Text(
-                                                                typeTransaction
-                                                                    .toString()
-                                                                    .toUpperCase(),
+                                                                'Table ${order['table']}',
                                                                 style: theme
                                                                     .textTheme
                                                                     .bodyMedium,
@@ -319,8 +333,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                           Row(
                                                             children: [
                                                               Text(
-                                                                order
-                                                                    .namaPemesan
+                                                                order['customer_name']
                                                                     .toString(),
                                                                 style: theme
                                                                     .textTheme
@@ -340,11 +353,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                             child: Row(
                                                               children: [
                                                                 Text(
-                                                                  AppState()
-                                                                      .formatDateTime(
-                                                                          order
-                                                                              .time)
-                                                                      .toString(),
+                                                                  dateTimeFormat(
+                                                                    'dateui',
+                                                                    order[
+                                                                        'date'],
+                                                                  ).toString(),
                                                                   style: theme
                                                                       .textTheme
                                                                       .labelSmall,
@@ -387,15 +400,18 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                       true,
                                                                   physics:
                                                                       const NeverScrollableScrollPhysics(),
-                                                                  itemCount: order
-                                                                      .items
-                                                                      .length,
+                                                                  itemCount:
+                                                                      orderItemList
+                                                                          .length,
                                                                   itemBuilder:
                                                                       (context,
-                                                                          i) {
-                                                                    final cartItem =
-                                                                        order.items[
-                                                                            i];
+                                                                          idx) {
+                                                                    dynamic
+                                                                        orderItem =
+                                                                        orderItemList[
+                                                                            idx];
+                                                                    print(
+                                                                        'check item qty, ${orderItem['quantity']}');
                                                                     return Padding(
                                                                       padding: const EdgeInsets
                                                                           .only(
@@ -407,7 +423,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                           Text(
-                                                                            "${cartItem.qty}",
+                                                                            "${orderItem['quantity']}",
                                                                             style:
                                                                                 const TextStyle(
                                                                               fontWeight: FontWeight.w600,
@@ -422,34 +438,34 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                                               children: [
                                                                                 AutoSizeText(
-                                                                                  "${cartItem.name} - ${cartItem.variant ?? ''}",
+                                                                                  "${orderItem['item_name']} - ${orderItem['variant'] ?? ''}",
                                                                                   style: theme.textTheme.titleMedium,
                                                                                   maxLines: 2, // Allows up to 2 lines
                                                                                   minFontSize: 10,
                                                                                   maxFontSize: 14,
                                                                                   overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
                                                                                 ),
-                                                                                if ((cartItem.preference != null) && (cartItem.preference.values != null)) const SizedBox(height: 4),
+                                                                                // if ((orderItem['preference'] != null) && (orderItem['preference'] != null)) const SizedBox(height: 4),
+                                                                                // AutoSizeText(
+                                                                                //   "Preference: ${orderItem['preference']}",
+                                                                                //   style: theme.textTheme.labelSmall,
+                                                                                //   maxLines: 1,
+                                                                                //   minFontSize: 10,
+                                                                                //   maxFontSize: 12,
+                                                                                //   overflow: TextOverflow.ellipsis,
+                                                                                // ),
+                                                                                // if (orderItem['addons'] != null && orderItem['addons']!.isNotEmpty) const SizedBox(height: 4),
+                                                                                // AutoSizeText(
+                                                                                //   "+ ${orderItem['addons']!.keys.join(', ')}",
+                                                                                //   style: theme.textTheme.labelSmall,
+                                                                                //   maxLines: 1,
+                                                                                //   minFontSize: 10,
+                                                                                //   maxFontSize: 12,
+                                                                                //   overflow: TextOverflow.ellipsis,
+                                                                                // ),
+                                                                                if ((orderItem['note'] != null) && (orderItem['note'] != '')) const SizedBox(height: 4),
                                                                                 AutoSizeText(
-                                                                                  "Preference: ${cartItem.preference.values.join(', ')}",
-                                                                                  style: theme.textTheme.labelSmall,
-                                                                                  maxLines: 1,
-                                                                                  minFontSize: 10,
-                                                                                  maxFontSize: 12,
-                                                                                  overflow: TextOverflow.ellipsis,
-                                                                                ),
-                                                                                if (cartItem.addons != null && cartItem.addons!.isNotEmpty) const SizedBox(height: 4),
-                                                                                AutoSizeText(
-                                                                                  "+ ${cartItem.addons!.keys.join(', ')}",
-                                                                                  style: theme.textTheme.labelSmall,
-                                                                                  maxLines: 1,
-                                                                                  minFontSize: 10,
-                                                                                  maxFontSize: 12,
-                                                                                  overflow: TextOverflow.ellipsis,
-                                                                                ),
-                                                                                if ((cartItem.notes != null) && (cartItem.notes != '')) const SizedBox(height: 4),
-                                                                                AutoSizeText(
-                                                                                  "Notes: ${cartItem.notes}",
+                                                                                  "Notes: ${orderItem['note']}",
                                                                                   style: theme.textTheme.labelSmall,
                                                                                   maxLines: 2,
                                                                                   minFontSize: 10,
@@ -637,6 +653,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                         AppState().resetCart();
                                                         cartData = [];
                                                         modeView = 'item';
+                                                        cartSelected = null;
                                                       });
                                                     },
                                                   ),
@@ -841,7 +858,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   void onCallItemGroup() async {
-    isLoading = true;
+    // isLoading = true;
 
     final frappeFetchDataItemGroup.ItemGroupRequest requestItemGroup =
         frappeFetchDataItemGroup.ItemGroupRequest(
@@ -882,7 +899,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       filters: '[["selling","=",1],["valid_from","<=","$today"]]',
       limit: 5000,
     );
-    print('check today, $today');
 
     try {
       // Add a timeout of 30 seconds to the profile request
@@ -935,7 +951,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           AppState().dataItemPrice,
         );
         itemDisplay = AppState().dataItem;
-        print('chekc item display, ${itemDisplay}');
       });
       // AppState().userDetail = profileResult;
     } catch (error) {
@@ -1101,19 +1116,40 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       table: '1',
       id: cartSelected != null ? cartSelected['name'] : null,
     );
-    print('cart selected, $cartSelected');
+    // print('cart selected, $cartSelected');
 
     // request.getParamID()
 
-    frappeFetchDataCart.request(requestQuery: request).then((value) {
-      if (cartSelected == null) {
-        cartSelected = value['data'];
-      } else {}
-      print('check value, $cartSelected');
-    });
+    try {
+      final callReqPosCart =
+          await frappeFetchDataCart.request(requestQuery: request);
+
+      if (callReqPosCart.isNotEmpty) {
+        cartSelected = callReqPosCart;
+      }
+    } catch (error) {
+      if (context.mounted) {
+        print('error pos cart, $error');
+        // alert.alertError(context, error.toString());
+      }
+    }
+
+    if (cartSelected != null) {
+      for (CartItem itm in cartData) {
+        print('cart data, ${itm.qty}');
+        dynamic itemReq = {
+          'item': itm.name,
+          'item_name': itm.itemName,
+          'item_group': itm.itemGroup,
+          'qty': itm.qty,
+          'notes': itm.notes
+        };
+        onCallPosOrder(itemReq);
+      }
+    }
   }
 
-  callPosOrder(dynamic item) async {
+  onCallPosOrder(dynamic paramItem) async {
     final frappeFetchDataOrder.CreatePosOrderRequest request =
         frappeFetchDataOrder.CreatePosOrderRequest(
       cookie: AppState().setCookie,
@@ -1123,11 +1159,89 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       postingDate: dateTimeFormat('date', null).toString(),
       outlet: AppState().configPOSProfile['name'],
       priceList: AppState().configPOSProfile['selling_price_list'],
-      cartNo: cartSelected.name,
-      item: item.name,
-      itemName: item.item_name,
-      itemGroup: item.item_group,
-      qty: item.qty,
+      cartNo: cartSelected['name'],
+      item: paramItem['item'],
+      itemName: paramItem['item_name'],
+      itemGroup: paramItem['item_group'],
+      note: paramItem['notes'],
+      qty: paramItem['qty'],
     );
+
+    try {
+      final reqPosOrder =
+          await frappeFetchDataOrder.request(requestQuery: request);
+    } catch (error) {
+      print('error pos order, $error');
+    }
+  }
+
+  onCallDataPosCart() async {
+    final frappeFetchDataGetCart.PosCartRequest request =
+        frappeFetchDataGetCart.PosCartRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+      limit: 1500,
+    );
+
+    try {
+      final callRequest =
+          await frappeFetchDataGetCart.requestPosCart(requestQuery: request);
+
+      if (callRequest.isNotEmpty) {
+        setState(() {
+          tempPosCart = callRequest;
+        });
+      }
+    } catch (error) {
+      print('error call data pos cart, $error');
+    }
+  }
+
+  onCallDataPosOrder() async {
+    final frappeFetchDataGetOrder.PosOrderRequest request =
+        frappeFetchDataGetOrder.PosOrderRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+      limit: 2000,
+    );
+
+    try {
+      final callRequest =
+          await frappeFetchDataGetOrder.requestPosOrder(requestQuery: request);
+
+      if (callRequest.isNotEmpty) {
+        setState(() {
+          tempPosOrder = callRequest;
+        });
+      }
+    } catch (error) {
+      print('error call data pos order, $error');
+    }
+  }
+
+  reformatOrderCart() async {
+    List<dynamic> cartNew = [];
+
+    // print('temp cart, ${tempPosCart[0]}');
+    // print('temp order, ${tempPosOrder[0]}');
+
+    if (tempPosCart.isNotEmpty) {
+      for (dynamic cartTemp in tempPosCart) {
+        dynamic tmp = cartTemp;
+        // print('test, ${tmp['name']}');
+        tmp['items'] = tempPosOrder
+            .where((ord) => ord['pos_cart'] == tmp['name'])
+            .toList();
+        cartNew.add(tmp);
+      }
+    }
+
+    // print('check cart new, $cartNew');
+    print('check cart new, ${cartNew.length}');
+    setState(() {
+      orderDisplay = cartNew;
+    });
   }
 }

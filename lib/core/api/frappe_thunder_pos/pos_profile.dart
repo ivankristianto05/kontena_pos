@@ -7,6 +7,7 @@ class POSProfileRequest {
   final String? limitStart;
   final int? limit;
   final String? filters;
+  final String? id;
   // late http.Client client;
 
   POSProfileRequest({
@@ -15,11 +16,12 @@ class POSProfileRequest {
     this.limit,
     this.limitStart,
     this.filters,
+    this.id,
   }) {
     // client = http.Client();
   }
 
-  Map<String, dynamic> formatRequestPOSProfile() {
+  Map<String, dynamic> formatRequest() {
     Map<String, dynamic> requestMap = {};
 
     if (fields != null && fields!.isNotEmpty) {
@@ -41,10 +43,14 @@ class POSProfileRequest {
     return requestMap;
   }
 
-  Map<String, String> formatHeaderPOSProfile() {
+  Map<String, String> formatHeader() {
     return {
       'Cookie': cookie,
     };
+  }
+
+  String? paramID() {
+    return id;
   }
 }
 
@@ -52,14 +58,34 @@ String queryParams(Map<String, dynamic> map) =>
     map.entries.map((e) => '${e.key}=${e.value}').join('&');
 
 // print('check url, $cookie');
-Future<List<dynamic>> requestPOSProfile(
-    {required POSProfileRequest requestQuery}) async {
+Future<List<dynamic>> request({required POSProfileRequest requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/resource/POS Profile?${queryParams(requestQuery.formatRequestPOSProfile())}';
+      'https://erp2.hotelkontena.com/api/resource/POS Profile?${queryParams(requestQuery.formatRequest())}';
 
   final response = await http.get(
     Uri.parse(url),
-    headers: requestQuery.formatHeaderPOSProfile(),
+    headers: requestQuery.formatHeader(),
+  );
+
+  if (response.statusCode == 200) {
+    final responseBody = json.decode(response.body);
+    if (responseBody.containsKey('data')) {
+      return responseBody['data'];
+    } else {
+      throw Exception(responseBody);
+    }
+  } else {
+    throw Exception('System unknown error code ${response.statusCode}');
+  }
+}
+
+Future<Map<String, dynamic>> requestDetail(
+    {required POSProfileRequest requestQuery}) async {
+  String url =
+      'https://erp2.hotelkontena.com/api/resource/POS Profile/${requestQuery.paramID()}?${queryParams(requestQuery.formatRequest())}';
+  final response = await http.get(
+    Uri.parse(url),
+    headers: requestQuery.formatHeader(),
   );
 
   if (response.statusCode == 200) {

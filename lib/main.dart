@@ -18,6 +18,9 @@ void main() async {
   await appState
       .initializeState(); // Ensure this completes before running the app
 
+  print(
+      'test, ${((kIsWeb != true) || (Platform.isAndroid != true) || (Platform.isIOS != true))}');
+
   if ((kIsWeb != true) ||
       (Platform.isAndroid != true) ||
       (Platform.isIOS != true)) {

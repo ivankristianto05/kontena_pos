@@ -1,6 +1,7 @@
 class CartItem {
   final String id;
   final String name;
+  String? itemGroup;
   String? itemName;
   String? variant;
   String? variantId;
@@ -20,6 +21,7 @@ class CartItem {
   CartItem({
     required this.id,
     required this.name,
+    this.itemGroup,
     this.itemName,
     this.variant,
     this.variantId,
@@ -43,6 +45,7 @@ class CartItem {
         variant = item.variant,
         variantId = item.variantId,
         itemName = item.itemName,
+        itemGroup = item.itemGroup,
         qty = item.qty,
         price = item.price,
         variantPrice = item.variantPrice,
@@ -64,12 +67,14 @@ class CartItem {
     String? notes,
     Map<String, String>? preference,
     String? itemName,
+    String? itemGroup,
   }) {
     // Recalculate total price if qty, variantPrice, or addonsPrice is modified
     return CartItem(
       id: id,
       name: name,
       itemName: itemName,
+      itemGroup: itemGroup,
       variant: variant ?? this.variant,
       variantId: variantId ?? this.variantId,
       qty: qty ?? this.qty,
@@ -94,6 +99,7 @@ class CartItem {
       'id': id,
       'name': name,
       'itemName': itemName,
+      'itemGroup': itemGroup,
       'variant': variant,
       'variantId': variantId,
       'qty': qty,

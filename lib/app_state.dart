@@ -84,6 +84,7 @@ class AppState extends ChangeNotifier {
       existingItem.preference = newItem.preference;
       existingItem.addons = newItem.addons;
       existingItem.variantPrice = newItem.variantPrice;
+      existingItem.itemGroup = newItem.itemGroup;
 
       existingItem.totalPrice = existingItem.qty *
           (existingItem.variantPrice != 0
@@ -326,8 +327,11 @@ class AppState extends ChangeNotifier {
   List<dynamic> dataItem = [];
   List<dynamic> dataItemGroup = [];
   List<dynamic> dataItemPrice = [];
+
   dynamic configCompany;
   dynamic configPOSProfile;
+  dynamic configUser;
+
   String typeTransaction = '';
   List<dynamic> listPrinter = [];
   dynamic configPrinter;

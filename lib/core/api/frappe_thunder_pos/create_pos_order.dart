@@ -38,6 +38,7 @@ class CreatePosOrderRequest {
 
   Map<String, dynamic> toJson() {
     final data = {
+      "docstatus": 1,
       "customer": customer,
       "customer_name": customerName,
       "company": company,
@@ -48,7 +49,7 @@ class CreatePosOrderRequest {
       "item_name": itemName,
       "item_group": itemGroup,
       "note": note,
-      "qty": qty,
+      "quantity": qty,
     };
 
     data.removeWhere((key, value) => value == null);
@@ -56,7 +57,7 @@ class CreatePosOrderRequest {
   }
 }
 
-Future<Map<String, dynamic>> requestCalculateVoucher(
+Future<Map<String, dynamic>> request(
     {required CreatePosOrderRequest requestQuery}) async {
   String url = 'https://erp2.hotelkontena.com/api/resource/POS Order';
 
@@ -69,8 +70,8 @@ Future<Map<String, dynamic>> requestCalculateVoucher(
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
 
-    if (responseBody.containsKey('message')) {
-      return responseBody;
+    if (responseBody.containsKey('data')) {
+      return responseBody['data'];
     } else {
       throw Exception(responseBody);
     }

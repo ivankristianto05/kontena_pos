@@ -5,6 +5,9 @@ import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_authenticator/auth.dart'
     as frappeLogin;
 
+import 'package:kontena_pos/core/api/frappe_thunder_authenticator/user_detail.dart'
+    as frappeUserDetail;
+
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
@@ -83,6 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
                         width: MediaQuery.sizeOf(context).width * 0.2,
@@ -97,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
                             30.0,
-                            30.0,
+                            80.0,
                             30.0,
                             80.0,
                           ),
@@ -171,17 +175,65 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
                                     ),
-                                    CustomElevatedButton(
-                                      text: "Masuk",
-                                      buttonTextStyle: TextStyle(
-                                          color: theme
-                                              .colorScheme.primaryContainer),
-                                      buttonStyle:
-                                          CustomButtonStyles.primaryButton,
-                                      onPressed: () {
-                                        onTapMasuk(context);
-                                      },
-                                    ),
+                                    if (isLoading)
+                                      Container(
+                                        width: double.infinity,
+                                        height: 48.0,
+                                        decoration: BoxDecoration(
+                                          color: theme.colorScheme.primary,
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  8.0, 0.0, 8.0, 0.0),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Center(
+                                                child: Container(
+                                                  width: 23,
+                                                  height: 23,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation<
+                                                            Color>(
+                                                      Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(
+                                                        10.0, 0.0, 8.0, 0.0),
+                                                child: Text(
+                                                  'Loading...',
+                                                  style: TextStyle(
+                                                      color: theme.colorScheme
+                                                          .primaryContainer),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    if (isLoading == false)
+                                      CustomElevatedButton(
+                                        text: "Masuk",
+                                        buttonTextStyle: TextStyle(
+                                            color: theme
+                                                .colorScheme.primaryContainer),
+                                        buttonStyle:
+                                            CustomButtonStyles.primaryButton,
+                                        onPressed: () {
+                                          onTapMasuk(context);
+                                        },
+                                      ),
                                   ],
                                 ),
                               ],
@@ -204,14 +256,14 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController enterPhoneController = TextEditingController();
   FocusNode inputPhone = FocusNode();
   Widget _buildPhoneNumberSection(BuildContext context) {
-    enterPhoneController.text = 'hello@thunderlab.id';
+    // enterPhoneController.text = 'hello@thunderlab.id';
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       CustomTextFormField(
         controller: enterPhoneController,
         focusNode: inputPhone,
         contentPadding: EdgeInsets.symmetric(
-          horizontal: 3.h,
-          vertical: 9.v,
+          horizontal: 4.h,
+          vertical: 15.v,
         ),
         hintText: "Masukin no hp / email mu",
         validator: (value) {
@@ -232,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
   FocusNode inputPassword = FocusNode();
   late bool _obscurePassword = true;
   Widget _buildPasswordSection(BuildContext context) {
-    enterPasswordController.text = 'adminkontena';
+    // enterPasswordController.text = 'devkontena';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -293,6 +345,27 @@ class _LoginScreenState extends State<LoginScreen> {
         Map<String, dynamic> result = await frappeLogin.login(request);
 
         print('test result, $result');
+
+        if ((result.containsKey('message')) &&
+            (result['message'] == 'Logged In')) {
+          final frappeUserDetail.UserDetailRequest requestUser =
+              frappeUserDetail.UserDetailRequest(
+            cookie: AppState().setCookie,
+            id: enterPhoneController.text,
+          );
+
+          final callRequestUser =
+              await frappeUserDetail.request(requestQuery: requestUser).timeout(
+                    Duration(seconds: 30),
+                  );
+
+          print('check data req user, ${callRequestUser}');
+          if (callRequestUser.isNotEmpty) {
+            setState(() {
+              AppState().configUser = callRequestUser;
+            });
+          }
+        }
 
         // print('header, ${AppState().setCookie}');
       } catch (error) {

@@ -1166,18 +1166,18 @@ class _AddToCartState extends State<AddToCart> {
     }
 
     CartItem newItem = CartItem(
-      id: id,
-      name: item['name'],
-      itemName: item['item_name'],
-      notes: note,
-      preference: {},
-      pref: selectedPref,
-      price: varian != null
-          ? varian['standard_rate'].toInt()
-          : item['standard_rate'].toInt(),
-      qty: qty,
-      addon: addon,
-    );
+        id: id,
+        name: item['name'],
+        itemName: item['item_name'],
+        notes: note,
+        preference: {},
+        pref: selectedPref,
+        price: varian != null
+            ? varian['standard_rate'].toInt()
+            : item['standard_rate'].toInt(),
+        qty: qty,
+        addon: addon,
+        itemGroup: item['item_group']);
 
     setState(() {
       cart.addItem(newItem, mode: CartMode.add);

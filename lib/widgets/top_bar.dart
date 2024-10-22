@@ -247,7 +247,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                     const SizedBox(width: 8), // Space between text and icon
                     Text(
-                      'Administrator',
+                      AppState().configUser['name'],
                       style: TextStyle(
                         color: theme.colorScheme.secondary,
                         fontSize: 16,

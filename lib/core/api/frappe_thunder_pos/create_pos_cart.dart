@@ -29,12 +29,12 @@ class CreatePosCartRequest {
   }
 
   String? getParamID() {
-    print('check id, $id');
     return id;
   }
 
   Map<String, dynamic> toJson() {
     final data = {
+      "docstatus": 1,
       "customer": customer,
       "customer_name": customerName,
       "company": company,
@@ -52,7 +52,7 @@ class CreatePosCartRequest {
 Future<Map<String, dynamic>> request(
     {required CreatePosCartRequest requestQuery}) async {
   String url;
-  print('check get param ${requestQuery.getParamID()}');
+
   if (requestQuery.getParamID() != null) {
     url =
         'https://erp2.hotelkontena.com/api/resource/POS Cart/${requestQuery.getParamID()}';
@@ -70,9 +70,9 @@ Future<Map<String, dynamic>> request(
 
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
-    print('check data, $responseBody');
+
     if (responseBody.containsKey('data')) {
-      return responseBody;
+      return responseBody['data'];
     } else {
       throw Exception(responseBody);
     }

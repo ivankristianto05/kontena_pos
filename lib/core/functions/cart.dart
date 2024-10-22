@@ -59,6 +59,7 @@ class Cart extends ChangeNotifier {
         variant: newItem.variant,
         variantId: newItem.variantId,
         itemName: newItem.itemName,
+        itemGroup: newItem.itemGroup,
         notes: newItem.notes,
         preference: newItem.preference,
         addons: newItem.addons,

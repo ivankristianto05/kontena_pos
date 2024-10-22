@@ -1,17 +1,18 @@
 import 'dart:convert';
-import 'dart:ui';
 import 'package:http/http.dart' as http;
 
-class PosCartRequest {
+class UserDetailRequest {
   final String cookie;
+  final String id;
   final String? fields;
   final String? limitStart;
   final int? limit;
   final String? filters;
   // late http.Client client;
 
-  PosCartRequest({
+  UserDetailRequest({
     required this.cookie,
+    required this.id,
     this.fields,
     this.limit,
     this.limitStart,
@@ -20,7 +21,7 @@ class PosCartRequest {
     // client = http.Client();
   }
 
-  Map<String, dynamic> formatRequestPosCart() {
+  Map<String, dynamic> formatRequest() {
     Map<String, dynamic> requestMap = {};
 
     if (fields != null && fields!.isNotEmpty) {
@@ -42,10 +43,14 @@ class PosCartRequest {
     return requestMap;
   }
 
-  Map<String, String> formatHeaderPosCart() {
+  Map<String, String> formatHeader() {
     return {
       'Cookie': cookie,
     };
+  }
+
+  String paramID() {
+    return id;
   }
 }
 
@@ -53,14 +58,14 @@ String queryParams(Map<String, dynamic> map) =>
     map.entries.map((e) => '${e.key}=${e.value}').join('&');
 
 // print('check url, $cookie');
-Future<List<dynamic>> requestPosCart(
-    {required PosCartRequest requestQuery}) async {
+Future<Map<String, dynamic>> request(
+    {required UserDetailRequest requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/resource/POS Cart?${queryParams(requestQuery.formatRequestPosCart())}';
+      'https://erp2.hotelkontena.com/api/resource/User/${requestQuery.paramID()}?${queryParams(requestQuery.formatRequest())}';
 
   final response = await http.get(
     Uri.parse(url),
-    headers: requestQuery.formatHeaderPosCart(),
+    headers: requestQuery.formatHeader(),
   );
 
   if (response.statusCode == 200) {
