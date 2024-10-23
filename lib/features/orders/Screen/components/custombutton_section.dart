@@ -23,7 +23,7 @@ class _CustomButtonState extends State<CustomButton> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
-    final orderId = appState.currentOrderId;
+    final orderId = appState.currentConfirmOrderId;
 
     // Enable button only if the current order ID is fully checked
     bool isEnabled = appState.isOrderFullyChecked(orderId);

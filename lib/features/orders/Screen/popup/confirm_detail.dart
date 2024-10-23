@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/addons_section.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/noteandpreference_section.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/sumary_section.dart';
@@ -63,8 +64,8 @@ class _ConfirmInputDetailState extends State<ConfirmInputDetail> {
       type: widget.type,
     );
 
-    final appState = Provider.of<AppState>(context, listen: false);
-    appState.addItemToCart(cartItem);
+    final cart = Provider.of<Cart>(context, listen: false);
+    cart.addItem(cartItem);
 
     Navigator.of(context).pop();
   }

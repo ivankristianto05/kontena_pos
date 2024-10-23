@@ -5,7 +5,7 @@ import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/features/orders/Screen/components/custombutton_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Confirm/confirmlist_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Confirm/orderlist_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/dropdown_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/guestname_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/footer_section.dart';
@@ -133,11 +133,11 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                     child: OrderCard(
                       screenWidth: screenWidth,
                       onOrderSelected: (orderId) {
-                        appState.setCurrentOrderId(orderId);
+                        appState.setCurrentConfirmOrderId(orderId);
                         //appState.printConfirmedOrders();
                       },
                       orderan: appState.confirmedOrders,
-                        currentOrderId: appState.currentOrderId, // Pass selected order ID
+                      currentOrderId: appState.currentConfirmOrderId, // Pass selected order ID
                     ),
                   ),
                   Container(
@@ -145,8 +145,8 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                     ),
-                    child: ConfirmList(
-                      listToConfirm: appState.confirmedOrders,
+                    child: OrderList(
+                      listorder: appState.confirmedOrders,
                       screenWidth: screenWidth,
                       appState: appState,
                       onAllChecked: (bool isChecked) {
@@ -154,6 +154,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                           allItemsChecked = isChecked;
                         });
                       },
+                      currentOrderId: appState.currentConfirmOrderId,
                     ),
                   ),
                 ],
@@ -172,9 +173,9 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                     screenWidth: MediaQuery.of(context).size.width,
                     buttonText: 'Confirm', // Text for the confirm page
                     onPressed: () {
-                      if (appState.currentOrderId.isNotEmpty) {
-                        appState.confirmOrderStatus(appState.currentOrderId);
-                        print("Order ${appState.currentOrderId} confirmed");
+                      if (appState.currentConfirmOrderId.isNotEmpty) {
+                        appState.confirmOrderStatus(appState.currentConfirmOrderId);
+                        print("Order ${appState.currentConfirmOrderId} confirmed");
                       }
               
                     },

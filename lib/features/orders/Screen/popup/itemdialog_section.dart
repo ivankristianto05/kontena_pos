@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/addons_section.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/noteandpreference_section.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/sumary_section.dart';
@@ -7,8 +8,7 @@ import 'package:kontena_pos/features/orders/Screen/popup/variant_section.dart';
 import 'package:kontena_pos/data/menuvarian.dart';
 import 'package:kontena_pos/models/cartitem.dart';
 import 'package:provider/provider.dart';
-import 'package:kontena_pos/app_state.dart';
-
+ 
 class ItemDetailsDialog extends StatefulWidget {
   final String name;
   final int price;
@@ -35,8 +35,9 @@ class _ItemDetailsDialogState extends State<ItemDetailsDialog> {
   String? _selectedVariant;
   int _quantity = 1;
   int _variantPrice = 0;
-  int _addonsTotalPrice = 0; // Add this variable to store the total addons price
-void _calculateAddonsTotalPrice() {
+  int _addonsTotalPrice = 0; // Variable untuk menyimpan harga total addons
+
+  void _calculateAddonsTotalPrice() {
     _addonsTotalPrice = _selectedAddons.values
         .where((addon) => addon['selected'] == true)
         .fold(0, (total, addon) => total + (addon['price'] as int));
@@ -44,38 +45,41 @@ void _calculateAddonsTotalPrice() {
 
   final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
 
-  void _addItemToCart() {  
-  // Ensure MenuVarian is correctly filtered based on idMenu
-  final List<Map<String, dynamic>> filteredVariants = MenuVarian
-    .where((variant) => variant['id_menu'] == widget.idMenu)
-    .toList();  
-  final selectedVariant = _selectedVariantIndex >= 0 && _selectedVariantIndex < filteredVariants.length
-      ? filteredVariants[_selectedVariantIndex]
-      : null;
-      _calculateAddonsTotalPrice(); // Update total addons price
+  void _addItemToCart() {
+    // Filter MenuVarian berdasarkan idMenu
+    final List<Map<String, dynamic>> filteredVariants = MenuVarian
+        .where((variant) => variant['id_menu'] == widget.idMenu)
+        .toList();
 
-  final cartItem = CartItem(
-    id: widget.idMenu,
-    name: widget.name,
-    variant: selectedVariant != null ? selectedVariant['nama_varian'] : null,
-    variantId: selectedVariant != null ? selectedVariant['id_varian'] : null,
-    qty: _quantity,
-    price: widget.price,
-    variantPrice: _variantPrice,
-    addonsPrice: _addonsTotalPrice, // Include total addons price
-    addons: _selectedAddons,
-    notes: _notes,
-    preference: {
-      'preference': _selectedPreference,
-    },
-    type: widget.type,
-  );
+    final selectedVariant = _selectedVariantIndex >= 0 && _selectedVariantIndex < filteredVariants.length
+        ? filteredVariants[_selectedVariantIndex]
+        : null;
+    _calculateAddonsTotalPrice(); // Update harga total addons
 
-  final appState = Provider.of<AppState>(context, listen: false);
-  appState.addItemToCart(cartItem);
+    final cartItem = CartItem(
+      id: widget.idMenu,
+      name: widget.name,
+      variant: selectedVariant != null ? selectedVariant['nama_varian'] : null,
+      variantId: selectedVariant != null ? selectedVariant['id_varian'] : null,
+      qty: _quantity,
+      price: widget.price,
+      variantPrice: _variantPrice,
+      addonsPrice: _addonsTotalPrice, // Masukkan harga total addons
+      addons: _selectedAddons,
+      notes: _notes,
+      preference: {
+        'preference': _selectedPreference,
+      },
+      type: widget.type,
+    );
 
-  Navigator.of(context).pop();
-}
+    // Ganti AppState dengan Cart
+    final cart = Provider.of<Cart>(context, listen: false);
+    cart.addItem(cartItem);
+
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -161,9 +165,7 @@ void _calculateAddonsTotalPrice() {
                     flex: 2,
                     child: SummarySection(
                       name: widget.name,
-                      price: _variantPrice != 0
-                          ? _variantPrice
-                          : widget.price,
+                      price: _variantPrice != 0 ? _variantPrice : widget.price,
                       type: widget.type,
                       selectedVariant: _selectedVariant,
                       selectedPreferenceIndex: _selectedPreferenceIndex,

@@ -5,7 +5,6 @@ import 'package:kontena_pos/core/functions/serve.dart';
 import 'package:kontena_pos/models/list_to_serve.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models/cartitem.dart';
-import 'core/functions/cart.dart';
 import 'models/list_to_confirm.dart';
 import 'dart:convert';
 
@@ -51,75 +50,11 @@ class AppState extends ChangeNotifier {
   List<CartItem> get cartItems => _cartItems;
 
   static List<CartItem> cartItem = [];
-
-  // Variabel untuk menyimpan total harga
   double _totalPrice = 0.0;
 
-  // Getter untuk mengambil nilai total harga
   double get totalPrice => _totalPrice;
 
-  // Method untuk menemukan indeks item di cart
-  int findItemIndex(CartItem newItem) {
-    _ensureInitialized();
-    return _cartItems.indexWhere((item) =>
-        item.id == newItem.id &&
-        item.variant == newItem.variant &&
-        item.preference.toString() == newItem.preference.toString() &&
-        item.addons.toString() == newItem.addons.toString());
-  }
-
-  // Method untuk menambahkan atau mengupdate item di cart
-  void addItemToCart(CartItem newItem) {
-    _ensureInitialized();
-
-    final existingItemIndex = findItemIndex(newItem);
-
-    if (existingItemIndex >= 0) {
-      // Jika item sudah ada, update kuantitas dan total harganya
-      var existingItem = _cartItems[existingItemIndex];
-      existingItem.qty += newItem.qty;
-      existingItem.variant = newItem.variant;
-      existingItem.variantId = newItem.variantId;
-      existingItem.notes = newItem.notes;
-      existingItem.preference = newItem.preference;
-      existingItem.addons = newItem.addons;
-      existingItem.variantPrice = newItem.variantPrice;
-      existingItem.itemGroup = newItem.itemGroup;
-
-      existingItem.totalPrice = existingItem.qty *
-          (existingItem.variantPrice != 0
-              ? existingItem.variantPrice
-              : existingItem.price);
-
-      // Update daftar item di cart
-      _cartItems[existingItemIndex] = CartItem.from(existingItem);
-      updateTotalPriceFromCart();
-    } else {
-      // Jika item baru, tambahkan ke cart
-      _cartItems.add(CartItem.from(newItem));
-      updateTotalPriceFromCart();
-    }
-    // Set total harga dari Cart setelah menambah item baru
-    updateTotalPriceFromCart();
-  }
-
-  // Fungsi untuk mengupdate total harga dari Cart
-  void updateTotalPriceFromCart() {
-    double totalCartPrice =
-        _cartItems.fold(0.0, (sum, item) => sum + item.totalPrice);
-    setTotalPrice(totalCartPrice); // Gunakan setter untuk update total harga
-  }
-
-  // Setter untuk mengupdate total harga dari Cart
-  void setTotalPrice(double newTotalPrice) {
-    _totalPrice = newTotalPrice;
-    notifyListeners();
-    // print('AppState - Total Harga Diperbarui: Rp $_totalPrice');
-  }
-
-  // Fungsi untuk mereset cart dan total harga
   void resetCart() {
-    _ensureInitialized();
     _cartItems = [];
     _totalPrice = 0.0;
     notifyListeners();
@@ -129,7 +64,6 @@ class AppState extends ChangeNotifier {
   void setNamaPemesan(String name) {
     _ensureInitialized();
     orderManager.setNamaPemesan(name);
-    notifyListeners();
   }
 
   String get namaPemesan {
@@ -137,14 +71,25 @@ class AppState extends ChangeNotifier {
     return orderManager.namaPemesan;
   }
 
-  String get currentOrderId {
+  String get currentConfirmOrderId {
     _ensureInitialized();
-    return orderManager.currentOrderId;
+    return orderManager.currentConfirmOrderId;
   }
 
-  void setCurrentOrderId(String orderId) {
+  String get currentServeOrderId {
     _ensureInitialized();
-    orderManager.setCurrentOrderId(orderId);
+    return serveManager.currentServeOrderId;
+  }
+
+  void setCurrentConfirmOrderId(String orderId) {
+    _ensureInitialized();
+    orderManager.setCurrentConfirmOrderId(orderId);
+    notifyListeners();
+  }
+
+  void setCurrentServeOrderId(String orderId) {
+    _ensureInitialized();
+    serveManager.setCurrentServeOrderId(orderId);
     notifyListeners();
   }
 

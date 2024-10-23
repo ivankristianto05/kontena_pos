@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/constants.dart';
+import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/core/utils/alert.dart';
 import 'package:provider/provider.dart';
-import 'package:kontena_pos/app_state.dart';
-import 'package:kontena_pos/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:kontena_pos/routes/app_routes.dart';
 
@@ -22,14 +22,10 @@ class ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     var buttoncolor2 = buttoncolor;
 
-    return Consumer<AppState>(
-      builder: (context, appState, child) {
-        double totalPrice = appState.totalPrice;
-
-        if (!appState.isInitialized) {
-          return Center(child: CircularProgressIndicator());
-        }
-        int numberOfSelectedItemIds = appState.cartItems.length;
+    return Consumer<Cart>(
+      builder: (context, cart, child) {
+        double totalPrice = cart.totalPrice;
+        int numberOfSelectedItemIds = cart.items.length;
         final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
         String formattedTotalPrice = 'Rp ${currencyFormat.format(totalPrice)}';
 
@@ -40,12 +36,10 @@ class ActionButton extends StatelessWidget {
             color: buttoncolor2,
             textColor: Colors.white,
             onPressed: () async {
-              if (guestNameController.text.isEmpty ||
-                  appState.cartItems.isEmpty) {
+              if (guestNameController.text.isEmpty || cart.items.isEmpty) {
                 String errorMessage = guestNameController.text.isEmpty
                     ? 'Nama pemesan tidak boleh kosong!'
                     : 'Item keranjang tidak boleh kosong!';
-                // Tampilkan pesan error
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(errorMessage),
@@ -56,7 +50,7 @@ class ActionButton extends StatelessWidget {
                 return;
               }
               try {
-                await appState.createOrder(
+                await cart.createOrder(
                   guestNameController: guestNameController,
                   resetDropdown: resetDropdown,
                   onSuccess: () {

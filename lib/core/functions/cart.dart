@@ -13,12 +13,18 @@ class Cart extends ChangeNotifier {
   final AppState appState; // Dependency injection for AppState
   VoidCallback? _onCartChanged;
 
-  Cart(this.appState, {VoidCallback? onCartChanged})
-      : _onCartChanged = onCartChanged {
-    // Set the initial cart items from AppState
+  Cart(this.appState, {VoidCallback? onCartChanged}) {
     _items = List.from(appState.cartItems);
+    _totalPrice = appState.totalPrice; // Sync total price
   }
+
   List<CartItem> get items => List.from(_items);
+
+  // Variabel untuk menyimpan total harga
+  double _totalPrice = 0.0;
+
+  // Getter untuk mengambil nilai total harga
+  double get totalPrice => _totalPrice;
 
   int _calculateAddonsPrice(Map<String, Map<String, dynamic>>? addons) {
     int total = 0;
@@ -32,48 +38,54 @@ class Cart extends ChangeNotifier {
     return total;
   }
 
-  // Pastikan bahwa total price di AppState hanya diperbarui sekali setelah semua perubahan
+  // Fungsi untuk menghitung total harga dari item di cart
   void _recalculateTotalPrice() {
-    double totalPrice = 0.0;
+    _totalPrice = _items.fold(0.0, (sum, item) => sum + item.totalPrice);
+    notifyListeners(); // Notify that total price has changed
+  }
 
-    for (var item in _items) {
-      item.addonsPrice = _calculateAddonsPrice(item.addons);
-      item.calculateTotalPrice();
-      totalPrice += item.totalPrice; // Aggregate total price for each item
-    }
-    appState.setTotalPrice(totalPrice); // Update AppState with the new total
+  int findItemIndex(CartItem newItem) {
+    return items.indexWhere((item) =>
+        item.id == newItem.id &&
+        item.variant == newItem.variant &&
+        item.preference.toString() == newItem.preference.toString() &&
+        item.addons.toString() == newItem.addons.toString());
   }
 
   void addItem(CartItem newItem, {CartMode mode = CartMode.add}) {
-    final existingItemIndex = _items.indexWhere(
-        (item) => item.id == newItem.id && item.variantId == newItem.variantId);
+    final existingItemIndex = findItemIndex(newItem);
 
     if (existingItemIndex >= 0) {
+      // Jika item sudah ada di cart
       var existingItem = _items[existingItemIndex];
+
       if (mode == CartMode.add) {
-        existingItem.qty += newItem.qty; // Update quantity
-      } else {
+        // Jika mode adalah 'add', tambahkan kuantitas
+        existingItem.qty += newItem.qty;
+      } else if (mode == CartMode.update) {
+        // Jika mode adalah 'update', set kuantitas baru
         existingItem.qty = newItem.qty;
       }
+
+      // Update detail lainnya
       existingItem = existingItem.copyWith(
         variant: newItem.variant,
         variantId: newItem.variantId,
-        itemName: newItem.itemName,
-        itemGroup: newItem.itemGroup,
         notes: newItem.notes,
         preference: newItem.preference,
         addons: newItem.addons,
         variantPrice: newItem.variantPrice,
         addonsPrice: _calculateAddonsPrice(newItem.addons),
-        qty: existingItem.qty + newItem.qty, // Update quantity
       );
-      _items[existingItemIndex] = existingItem;
+
+      _items[existingItemIndex] = existingItem; // Perbarui item di cart
     } else {
-      _items.add(newItem);
-      AppState().addItemToCart(newItem);
+      // Jika item baru, tambahkan ke cart
+      _items.add(CartItem.from(newItem));
     }
-    _recalculateTotalPrice();
-    _onCartChanged?.call(); // Notify listener
+
+    _recalculateTotalPrice(); // Hitung ulang total harga
+    _onCartChanged?.call(); // Beritahu listener
   }
 
   void updateItem(int index, CartItem updatedItem) {
@@ -93,43 +105,57 @@ class Cart extends ChangeNotifier {
       return;
     }
     _items.removeAt(index);
-    appState.cartItems.removeAt(index);
     _recalculateTotalPrice();
-    if (_onCartChanged != null) {
-      _onCartChanged!();
-    }
-    appState.notifyListeners();
+    _onCartChanged?.call();
   }
 
   void clearAllItems() {
     _items.clear();
-    appState.resetCart(); // Clear items from the AppState as well
     _recalculateTotalPrice();
-    if (_onCartChanged != null) {
-      _onCartChanged!();
-    }
-    appState.notifyListeners(); // Notify listeners of AppState
-  }
-
-  bool isItemInCart(String itemId) {
-    return _items.any((item) => item.id == itemId);
+    _onCartChanged?.call();
+    notifyListeners(); // Notify listeners of AppState
   }
 
   List<CartItem> getAllItemCart() {
     return AppState().cartItems.toList();
   }
 
-  List<Map<String, dynamic>> printItemDetails() {
-    List<Map<String, dynamic>> itemDetails = [];
+  bool isItemInCart(String itemId) {
+    return _items.any((item) => item.id == itemId);
+  }
 
-    for (var item in _items) {
-      itemDetails.add({
-        'idmenu': item.id,
-        'idvarian': item.variant,
-        'indexpreference': item.preference,
-        'indexaddons': item.addons,
-      });
+  Future<void> createOrder({
+    required TextEditingController guestNameController,
+    required VoidCallback resetDropdown,
+    required VoidCallback onSuccess,
+  }) async {
+    // Periksa apakah nama pemesan ada dan cart tidak kosong
+    if (guestNameController.text.isEmpty) {
+      throw 'Nama pemesan tidak boleh kosong!';
     }
-    return itemDetails;
+    if (_items.isEmpty) {
+      throw 'Keranjang tidak boleh kosong!';
+    }
+
+    try {
+      // Panggil metode createOrder di OrderManager, mirip dengan AppState sebelumnya
+      await appState.orderManager.createOrder(
+        guestNameController: guestNameController,
+        resetDropdown: resetDropdown,
+        onSuccess: onSuccess,
+        cartItems: _items, // Menggunakan item dari Cart
+      );
+
+      // Setelah order berhasil, bersihkan keranjang dan reset form
+      clearAllItems();
+      guestNameController.clear();
+      resetDropdown();
+
+      // Callback untuk tindakan sukses
+      onSuccess();
+      notifyListeners(); // Beritahu listener bahwa ada perubahan pada Cart
+    } catch (e) {
+      throw 'Error saat membuat order: $e';
+    }
   }
 }

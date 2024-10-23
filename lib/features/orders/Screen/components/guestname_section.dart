@@ -39,7 +39,7 @@ class _GuestNameTextFieldButtonState extends State<GuestNameTextFieldButton> {
 
   void _updateGuestName() {
     final appState = context.read<AppState>();
-    final currentOrderId = appState.currentOrderId;
+    final currentOrderId = appState.currentConfirmOrderId;
 
     // Find the order with the currentOrderId
     final order = appState.confirmedOrders.firstWhere(
