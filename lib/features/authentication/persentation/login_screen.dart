@@ -344,8 +344,6 @@ class _LoginScreenState extends State<LoginScreen> {
       try {
         Map<String, dynamic> result = await frappeLogin.login(request);
 
-        print('test result, $result');
-
         if ((result.containsKey('message')) &&
             (result['message'] == 'Logged In')) {
           final frappeUserDetail.UserDetailRequest requestUser =
@@ -364,6 +362,16 @@ class _LoginScreenState extends State<LoginScreen> {
             setState(() {
               AppState().configUser = callRequestUser;
             });
+          }
+          setState(() {
+            isLoading = false;
+          });
+
+          if (context.mounted) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              AppRoutes.selectOrganisationScreen,
+              (route) => false,
+            );
           }
         }
 
@@ -385,13 +393,6 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         isLoading = false;
       });
-
-      if (context.mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRoutes.selectOrganisationScreen,
-          (route) => false,
-        );
-      }
     } else {
       alert.alertError(context, 'Data Belum Lengkap!');
     }

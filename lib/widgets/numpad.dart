@@ -25,7 +25,7 @@ class _NumPadWidgetState extends State<NumPad> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.width * 0.5,
+      height: MediaQuery.of(context).size.width * 0.4,
       decoration: BoxDecoration(
         color: theme.colorScheme.primaryContainer,
       ),

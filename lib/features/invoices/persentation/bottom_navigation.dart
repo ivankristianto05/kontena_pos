@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/core/functions/invoice.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 
@@ -11,7 +12,7 @@ class BottomNavigationInvoice extends StatelessWidget {
   VoidCallback? onTapPay;
   String? isSelected;
 
-  Cart cart = Cart(AppState());
+  InvoiceCart cart = InvoiceCart();
 
   BottomNavigationInvoice({
     super.key,
@@ -24,6 +25,8 @@ class BottomNavigationInvoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    dynamic temp = cart.recapCart();
+    double totalPrice = temp['totalPrice'] * 1.0;
     return Row(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,7 +182,7 @@ class BottomNavigationInvoice extends StatelessWidget {
                           Text(
                             numberFormat(
                               'idr',
-                              AppState().totalPrice,
+                              totalPrice,
                             ),
                             style: cart.items.isNotEmpty
                                 ? TextStyle(

@@ -71,6 +71,17 @@ class CustomButtonStyles {
         ),
       );
 
+  static ButtonStyle get onPrimaryContainer => OutlinedButton.styleFrom(
+        backgroundColor: theme.colorScheme.onPrimaryContainer,
+        side: BorderSide(
+          color: theme.colorScheme.onPrimaryContainer,
+          width: 2,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+      );
+
   static ButtonStyle get outlineOrangeTL5 => OutlinedButton.styleFrom(
         backgroundColor: Colors.transparent,
         side: BorderSide(

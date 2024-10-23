@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/core/functions/invoice.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/data/menu.dart';
@@ -34,7 +35,7 @@ class _AddToCartState extends State<AddToCart> {
   List<dynamic> selectedAddon = [];
   int qty = 0;
   late List<TextEditingController> qtyAddonController;
-  Cart cart = Cart(AppState());
+  InvoiceCart cart = InvoiceCart();
 
   @override
   void setState(VoidCallback callback) {
@@ -1165,29 +1166,27 @@ class _AddToCartState extends State<AddToCart> {
       id += "-n${notes.hashCode}";
     }
 
-    CartItem newItem = CartItem(
+    InvoiceCartItem newItem = InvoiceCartItem(
         id: id,
         name: item['name'],
         itemName: item['item_name'],
         notes: note,
         preference: {},
-        pref: selectedPref,
         price: varian != null
             ? varian['standard_rate'].toInt()
             : item['standard_rate'].toInt(),
         qty: qty,
-        addon: addon,
+        uom: item['stock_uom'],
+        description: item['item_name'],
+        // addon: addon,
         itemGroup: item['item_group']);
 
     setState(() {
-      cart.addItem(newItem, mode: CartMode.add);
+      cart.addItem(newItem, mode: InvoiceCartMode.add);
     });
 
     Navigator.pop(context);
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.invoiceScreen,
-      (route) => false,
-    );
+    // Navigator.of(context).pushNamed(AppRoutes.invoiceScreen);
   }
 
   setReinitData() {

@@ -491,37 +491,36 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
   void onTapPOSProfile(BuildContext context, dynamic itemSelected) async {
     final frappeFetchDataPOSProfile.POSProfileRequest reqPosProfileDetail =
         frappeFetchDataPOSProfile.POSProfileRequest(
-      cookie: AppState().setCookie,
-      id: itemSelected['name'],
-      fields: '["*"]',
-    );
+            cookie: AppState().setCookie, id: itemSelected['name']);
     try {
       final reqPosProfile = await frappeFetchDataPOSProfile.requestDetail(
           requestQuery: reqPosProfileDetail);
 
       if (reqPosProfile.isNotEmpty) {
         setState(() {
-          AppState().configPOSProfile = itemSelected;
+          AppState().configPOSProfile = reqPosProfile;
         });
       }
 
       print('check detail, $reqPosProfile');
+
+      if (context.mounted) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.invoiceScreen,
+          (route) => false,
+        );
+      }
     } catch (error) {
       // isLoading = false;
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
       } else {
-        print(error);
+        if (context.mounted) {
+          alert.alertError(context, error.toString());
+        }
       }
       return;
-    }
-
-    if (context.mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.invoiceScreen,
-        (route) => false,
-      );
     }
   }
 

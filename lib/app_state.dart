@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kontena_pos/core/functions/invoice.dart';
 import 'package:kontena_pos/core/functions/order.dart';
 import 'package:kontena_pos/core/functions/serve.dart';
 import 'package:kontena_pos/models/list_to_serve.dart';
@@ -50,6 +51,7 @@ class AppState extends ChangeNotifier {
   List<CartItem> get cartItems => _cartItems;
 
   static List<CartItem> cartItem = [];
+
   double _totalPrice = 0.0;
 
   double get totalPrice => _totalPrice;
@@ -281,4 +283,14 @@ class AppState extends ChangeNotifier {
   List<dynamic> listPrinter = [];
   dynamic configPrinter;
   String setCookie = '';
+
+  static List<InvoiceCartItem> invoiceCartItems =
+      []; // New static list to store cart items
+  static void updateInvoiceCart(List<InvoiceCartItem> items) {
+    invoiceCartItems = items;
+  }
+
+  static void resetInvoiceCart() {
+    invoiceCartItems = [];
+  }
 }
