@@ -491,10 +491,10 @@ class _TypeTransactionState extends State<TypeTransaction> {
                               // });
                               // Navigator.pop(context);
                               Navigator.of(context).pop();
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                AppRoutes.invoiceScreen,
-                                (route) => false,
-                              );
+                              // Navigator.of(context).pushNamedAndRemoveUntil(
+                              //   AppRoutes.invoiceScreen,
+                              //   (route) => false,
+                              // );
                               // context.pushNamed('');
                               setState(() {});
                             },

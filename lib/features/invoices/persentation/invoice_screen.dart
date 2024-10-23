@@ -38,6 +38,7 @@ import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:kontena_pos/widgets/type_transaction.dart';
 // import 'package:kontena_pos/models/cart_item.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:kontena_pos/core/utils/alert.dart' as alert;
 
 class InvoiceScreen extends StatefulWidget {
   InvoiceScreen({Key? key}) : super(key: key);
@@ -72,7 +73,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   String searchItemQuery = '';
   String modeView = 'item';
-  String typeTransaction = '';
+  String typeTransaction = 'dine-in';
   int totalAddon = 0;
   int totalAddonCheckout = 0;
   bool isEdit = true;
@@ -105,7 +106,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     onCallDataPosOrder();
     reformatOrderCart();
 
-    cartData = cart.getAllItemCart();
+    setState((){
+      cartData = cart.getAllItemCart();
+      AppState().typeTransaction = 'dine-in';
+      typeTransaction = 'dine-in';
+    });
     // cartData = cart.getAllItemCart();
 
     // Future.delayed(Duration(milliseconds: 300), () {
@@ -227,8 +232,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                       (context, index) {
                                                     final currentItem =
                                                         itemDisplay[index];
-                                                    print(
-                                                        'chekc stock uom, ${currentItem['stock_uom']}');
+                                                    
                                                     return ProductGrid(
                                                       name: currentItem[
                                                               'item_name'] ??
@@ -886,8 +890,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
+        if (context.mounted) {
+            alert.alertError(context, 'Gagal mengambil data item group dari server');
+          }
       } else {
-        print(error);
+        if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
       }
       return;
     }
@@ -920,8 +929,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
+        if (context.mounted) {
+            alert.alertError(context, 'Gagal mengambil data item price dari server');
+          }
       } else {
-        print(error);
+        if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
       }
       return;
     }
@@ -960,8 +974,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
+        if (context.mounted) {
+            alert.alertError(context, 'Gagal mengambil data item dari server');
+          }
       } else {
-        print(error);
+        if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
       }
       return;
     }
@@ -1055,7 +1074,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           selected: typeTransaction,
         );
       },
-    ).then((value) => {});
+    ).then((value) => {
+      setState((){
+        typeTransaction = AppState().typeTransaction;
+      }),
+      print('check type transaction, $typeTransaction')
+    });
   }
 
   void addToCartFromOrder(BuildContext context, dynamic order) async {
@@ -1127,7 +1151,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     } catch (error) {
       if (context.mounted) {
         print('error pos cart, $error');
-        // alert.alertError(context, error.toString());
+        alert.alertError(context, error.toString());
       }
     }
 
@@ -1169,6 +1193,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           await frappeFetchDataOrder.request(requestQuery: request);
     } catch (error) {
       print('error pos order, $error');
+      if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
     }
   }
 
@@ -1192,6 +1219,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       }
     } catch (error) {
       print('error call data pos cart, $error');
+      if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
     }
   }
 
@@ -1215,6 +1245,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       }
     } catch (error) {
       print('error call data pos order, $error');
+      if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
     }
   }
 
