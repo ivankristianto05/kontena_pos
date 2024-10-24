@@ -21,16 +21,14 @@ import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_order.dart'
     as frappeFetchDataGetOrder;
 
 import 'package:kontena_pos/core/app_export.dart';
-import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/core/functions/invoice.dart';
 import 'package:kontena_pos/core/functions/reformat_item_with_price.dart';
 import 'package:kontena_pos/core/theme/custom_text_style.dart';
 import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
-import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
 import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
-import 'package:kontena_pos/models/cartitem.dart';
 import 'package:kontena_pos/widgets/custom_dialog.dart';
 import 'package:kontena_pos/widgets/empty_cart.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
@@ -40,9 +38,10 @@ import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:kontena_pos/widgets/type_transaction.dart';
 // import 'package:kontena_pos/models/cart_item.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:kontena_pos/core/utils/alert.dart' as alert;
 
 class InvoiceScreen extends StatefulWidget {
-  const InvoiceScreen({super.key});
+  InvoiceScreen({Key? key}) : super(key: key);
 
   @override
   _InvoiceScreenState createState() => _InvoiceScreenState();
@@ -50,10 +49,9 @@ class InvoiceScreen extends StatefulWidget {
 
 class _InvoiceScreenState extends State<InvoiceScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  // late List<ItemCart> cartItem;
-  Cart cart = Cart(AppState());
+  InvoiceCart cart = InvoiceCart();
   late Map cartRecapData;
-  late List<CartItem> cartData;
+  late List<InvoiceCartItem> cartData;
   late List<Map<String, dynamic>> cartDataItem = [
     {
       'id': 'test',
@@ -75,7 +73,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   String searchItemQuery = '';
   String modeView = 'item';
-  String typeTransaction = '';
+  String typeTransaction = 'dine-in';
   int totalAddon = 0;
   int totalAddonCheckout = 0;
   bool isEdit = true;
@@ -91,6 +89,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 // // //   // final String notes;
 // // //   // final Map<String, String> preference;
 // // //   // String? type;
+  @override
+  void setState(VoidCallback callback) {
+    super.setState(callback);
+    cartData = cart.getAllItemCart();
+  }
 
   @override
   void initState() {
@@ -103,20 +106,24 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     onCallDataPosOrder();
     reformatOrderCart();
 
-    cartData = cart.getAllItemCart();
+    setState((){
+      cartData = cart.getAllItemCart();
+      AppState().typeTransaction = 'dine-in';
+      typeTransaction = 'dine-in';
+    });
     // cartData = cart.getAllItemCart();
 
-    Future.delayed(Duration(milliseconds: 300), () {
-      setState(() {
-        // item = AppState().item;
-        item = ListMenu;
-        isLoading = false;
+    // Future.delayed(Duration(milliseconds: 300), () {
+    //   setState(() {
+    //     // item = AppState().item;
+    //     item = ListMenu;
+    //     isLoading = false;
 
-        // print(itemDisplay);
-        itemDisplay = getItem();
-        // orderList = AppState().confirmedOrders;
-      });
-    });
+    //     // print(itemDisplay);
+    //     itemDisplay = getItem();
+    //     // orderList = AppState().confirmedOrders;
+    //   });
+    // });
   }
 
   @override
@@ -207,7 +214,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                 0.7,
                                             child: Skeletonizer(
                                               enabled: isLoading,
-                                              child: const ProductGrid(),
+                                              child: Container(),
                                             ),
                                           )
                                         : SizedBox(
@@ -225,11 +232,14 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                       (context, index) {
                                                     final currentItem =
                                                         itemDisplay[index];
+                                                    
                                                     return ProductGrid(
                                                       name: currentItem[
-                                                          'item_name'],
+                                                              'item_name'] ??
+                                                          '',
                                                       category: currentItem[
-                                                          'item_group'],
+                                                              'item_group'] ??
+                                                          '',
                                                       price: numberFormat(
                                                           'idr',
                                                           currentItem[
@@ -281,8 +291,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                             final order = orderDisplay[index];
                                             dynamic orderItemList =
                                                 order['items'];
-                                            print(
-                                                'check order item, $orderItemList');
                                             // final isSelected =
                                             //     order.idOrder == currentOrderId;
                                             return InkWell(
@@ -648,9 +656,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                           .colorScheme.error,
                                                     ),
                                                     onConfirm: () {
-                                                      print('yes confirm');
                                                       setState(() {
-                                                        AppState().resetCart();
+                                                        AppState
+                                                            .resetInvoiceCart();
                                                         cartData = [];
                                                         modeView = 'item';
                                                         cartSelected = null;
@@ -710,18 +718,16 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  if (cart.items.isNotEmpty)
+                                  if (cartData.isNotEmpty)
                                     SingleChildScrollView(
                                       primary: true,
-                                      child: Container(
+                                      child: SizedBox(
                                         height: 700,
                                         child: ListView.builder(
                                           shrinkWrap: true,
                                           itemCount: cartData.length,
                                           itemBuilder: (context, index) {
                                             final itemData = cartData[index];
-                                            print(
-                                                'check item data, ${itemData.itemName}');
 
                                             String addon2 = '';
                                             String catatan = '';
@@ -751,16 +757,16 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                             //   });
                                             // }
 
-                                            if (itemData.pref != null) {
+                                            if (itemData.preference != null) {
                                               int i = 1;
-                                              itemData.pref?.forEach((element) {
-                                                preference +=
-                                                    "${element['type']}: ${element['name']}";
-                                                if (i < itemData.pref!.length) {
-                                                  preference += ", ";
-                                                }
-                                                i++;
-                                              });
+                                              // itemData.preference.forEach((element) {
+                                              //   preference +=
+                                              //       "${element['type']}: ${element['name']}";
+                                              //   if (i < itemData.pref!.length) {
+                                              //     preference += ", ";
+                                              //   }
+                                              //   i++;
+                                              // });
                                             }
 
                                             return ListCart(
@@ -790,7 +796,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                 fontWeight: FontWeight.bold,
                                               ),
                                               padding: EdgeInsets.all(16),
-                                              note: itemData.notes,
+                                              note: itemData.notes ?? '',
                                               lineColor: appTheme.gray200,
                                               secondaryStyle: CustomTextStyles
                                                   .bodySmallGray,
@@ -884,8 +890,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
+        if (context.mounted) {
+            alert.alertError(context, 'Gagal mengambil data item group dari server');
+          }
       } else {
-        print(error);
+        if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
       }
       return;
     }
@@ -918,8 +929,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
+        if (context.mounted) {
+            alert.alertError(context, 'Gagal mengambil data item price dari server');
+          }
       } else {
-        print(error);
+        if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
       }
       return;
     }
@@ -958,8 +974,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
+        if (context.mounted) {
+            alert.alertError(context, 'Gagal mengambil data item dari server');
+          }
       } else {
-        print(error);
+        if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
       }
       return;
     }
@@ -998,6 +1019,14 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         );
       },
     ).then((value) => {});
+    setState(() {
+      // Map<String, dynamic> recap = cart.recapCart();
+      // AppState().totalPrice = double.parse(recap['totalPrice']);
+      // print('test, ${(cart.recapCart()).totalPrice}');
+
+      cartData = cart.getAllItemCart();
+      print('check cart data, ${cartData}');
+    });
   }
 
   void onTapEditItem(BuildContext context, dynamic item, int index) async {
@@ -1023,14 +1052,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
         return Padding(
           padding: MediaQuery.viewInsetsOf(context),
-          // child: ItemDetailsDialog(
-          //   name: item['nama_menu'],
-          //   price: int.parse(item['harga'].toString()),
-          //   idMenu: item['id_menu'],
-          //   type: item['type'],
-          //   onAddToCart: (item) {},
-          // ),
-          // child: Container(),
           child: AddToCart(
             dataMenu: editItem,
             idxMenu: index,
@@ -1049,34 +1070,32 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       barrierColor: const Color(0x00000000),
       context: context,
       builder: (context) {
-        return Container(
-          // padding: MediaQuery.viewInsetsOf(context),
-          // child: ItemDetailsDialog(
-          //   name: item['nama_menu'],
-          //   price: int.parse(item['harga'].toString()),
-          //   idMenu: item['id_menu'],
-          //   type: item['type'],
-          //   onAddToCart: (item) {},
-          // ),
-          child: TypeTransaction(
-            selected: typeTransaction,
-          ),
+        return TypeTransaction(
+          selected: typeTransaction,
         );
       },
-    ).then((value) => {print('check value, $value')});
+    ).then((value) => {
+      setState((){
+        typeTransaction = AppState().typeTransaction;
+      }),
+      print('check type transaction, $typeTransaction')
+    });
   }
 
   void addToCartFromOrder(BuildContext context, dynamic order) async {
     setState(() {
-      cart.clearAllItems();
-      // AppState().resetCart();
+      cart.clearCart();
     });
     const Duration(seconds: 1);
 
     for (int a = 0; a < order.items.length; a++) {
-      CartItem newItem = CartItem(
+      InvoiceCartItem newItem = InvoiceCartItem(
         id: order.items[a].id,
         name: order.items[a].name,
+        itemName: order.items[a].item_name,
+        itemGroup: order.items[a].item_group,
+        uom: order.items[a].uom,
+        description: order.items[a].description,
         qty: order.items[a].qty,
         price: order.items[a].price,
         notes: order.items[a].notes,
@@ -1084,7 +1103,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       );
 
       setState(() {
-        cart.addItem(newItem, mode: CartMode.add);
+        cart.addItem(newItem, mode: InvoiceCartMode.add);
       });
     }
     setState(() {
@@ -1099,11 +1118,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   void onTapPay(BuildContext context) async {
-    // Navigator.of(context).pushNamedAndRemoveUntil(
-    //   AppRoutes.paymentScreen,
-    //   (route) => false,
-    // );
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.paymentScreen,
+      (route) => false,
+    );
+  }
 
+  onCallPosCart() async {
     final frappeFetchDataCart.CreatePosCartRequest request =
         frappeFetchDataCart.CreatePosCartRequest(
       cookie: AppState().setCookie,
@@ -1130,12 +1151,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     } catch (error) {
       if (context.mounted) {
         print('error pos cart, $error');
-        // alert.alertError(context, error.toString());
+        alert.alertError(context, error.toString());
       }
     }
 
     if (cartSelected != null) {
-      for (CartItem itm in cartData) {
+      for (InvoiceCartItem itm in cartData) {
         print('cart data, ${itm.qty}');
         dynamic itemReq = {
           'item': itm.name,
@@ -1172,6 +1193,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           await frappeFetchDataOrder.request(requestQuery: request);
     } catch (error) {
       print('error pos order, $error');
+      if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
     }
   }
 
@@ -1195,6 +1219,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       }
     } catch (error) {
       print('error call data pos cart, $error');
+      if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
     }
   }
 
@@ -1218,6 +1245,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       }
     } catch (error) {
       print('error call data pos order, $error');
+      if (context.mounted) {
+            alert.alertError(context, error.toString());
+          }
     }
   }
 

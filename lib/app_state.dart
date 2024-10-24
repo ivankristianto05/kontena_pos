@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kontena_pos/core/functions/invoice.dart';
 import 'package:kontena_pos/core/functions/order.dart';
 import 'package:kontena_pos/core/functions/serve.dart';
 import 'package:kontena_pos/models/list_to_serve.dart';
@@ -60,6 +61,7 @@ class AppState extends ChangeNotifier {
     _totalPrice = 0.0;
     notifyListeners();
   }
+
   // Proxy method calls to OrderManager
   void setNamaPemesan(String name) {
     _ensureInitialized();
@@ -81,18 +83,18 @@ class AppState extends ChangeNotifier {
     return serveManager.currentServeOrderId;
   }
 
-
   void setCurrentConfirmOrderId(String orderId) {
     _ensureInitialized();
     orderManager.setCurrentConfirmOrderId(orderId);
     notifyListeners();
   }
+
   void setCurrentServeOrderId(String orderId) {
     _ensureInitialized();
     serveManager.setCurrentServeOrderId(orderId);
     notifyListeners();
   }
-  
+
   void setSelectedTable(String table) {
     _ensureInitialized();
     orderManager.setSelectedTable(table);
@@ -281,4 +283,14 @@ class AppState extends ChangeNotifier {
   List<dynamic> listPrinter = [];
   dynamic configPrinter;
   String setCookie = '';
+
+  static List<InvoiceCartItem> invoiceCartItems =
+      []; // New static list to store cart items
+  static void updateInvoiceCart(List<InvoiceCartItem> items) {
+    invoiceCartItems = items;
+  }
+
+  static void resetInvoiceCart() {
+    invoiceCartItems = [];
+  }
 }

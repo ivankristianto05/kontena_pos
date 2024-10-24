@@ -446,7 +446,7 @@ class _SettingDevicesState extends State<SettingDevices> {
 
   onGetPrinter(BuildContext context) async {
     String url = 'getPrinter';
-    String ipAddress = '192.168.18.20';
+    String ipAddress = '127.0.0.1';
     final callGetPrinter.getPrinter dataPrinter =
         callGetPrinter.getPrinter(url: url, ipAddress: ipAddress);
 

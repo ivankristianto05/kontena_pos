@@ -13,7 +13,7 @@ class AppRoutes {
   static const String loginScreen = '/login';
   static const String selectOrganisationScreen = '/select-organisation';
   static const String orderScreen = '/order';
-  static const String invoiceScreen = '/invoice';
+  static String invoiceScreen = '/invoice';
   static const String historyInvoiceScreen = '/history';
   static const String paymentScreen = '/payment';
   static const String settingScreen = '/setting';
@@ -24,7 +24,7 @@ class AppRoutes {
     loginScreen: (context) => const LoginScreen(),
     selectOrganisationScreen: (context) => const SelectOrganisationScreen(),
     orderScreen: (context) => OrderScreen(),
-    invoiceScreen: (context) => const InvoiceScreen(),
+    invoiceScreen: (context) => InvoiceScreen(),
     historyInvoiceScreen: (context) => const HistoryInvoiceScreen(),
     confirmScreen: (context) => ConfirmScreen(),
     paymentScreen: (context) => const PaymentScreen(),

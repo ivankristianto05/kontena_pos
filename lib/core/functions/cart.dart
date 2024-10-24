@@ -150,6 +150,10 @@ List<CartItem> getAllItemCart() {
       clearAllItems();
       guestNameController.clear();
       resetDropdown();
+      // Setelah order berhasil, bersihkan keranjang dan reset form
+      clearAllItems();
+      guestNameController.clear();
+      resetDropdown();
 
       // Callback sukses
       onSuccess();

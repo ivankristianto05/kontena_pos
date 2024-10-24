@@ -1,16 +1,29 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
-import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/core/functions/invoice.dart';
 import 'package:kontena_pos/core/functions/payment_prediction.dart';
+import 'package:kontena_pos/core/functions/print.dart';
 import 'package:kontena_pos/core/theme/custom_text_style.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/core/utils/alert.dart';
+import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/data/mode_payment.dart';
-import 'package:kontena_pos/models/cartitem.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/widgets/custom_outlined_button.dart';
+import 'package:kontena_pos/widgets/list_cart.dart';
 import 'package:kontena_pos/widgets/numpad.dart';
-import 'package:kontena_pos/widgets/top_bar.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:kontena_pos/core/utils/alert.dart' as alert;
+
+import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_invoice.dart'
+    as frappeFetchDataInvoice;
+
+import 'package:kontena_pos/core/api/send_printer.dart'
+    as sendToPrinter;
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({Key? key}) : super(key: key);
@@ -35,15 +48,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
   bool loading = false;
   late List<dynamic> cardListMethod;
   late List<dynamic> digitalListMethod;
-  Cart cart = Cart(AppState());
-  late List<CartItem> cartData;
+  InvoiceCart cart = InvoiceCart();
+  late List<InvoiceCartItem> cartData;
+  dynamic invoice;
 
   @override
   void initState() {
     super.initState();
 
     setState(() {
-      bill = AppState().totalPrice;
+      dynamic recapCart = cart.recapCart();
+      bill = recapCart['totalPrice'] * 1.0;
       cardListMethod = card;
       digitalListMethod = digital;
       cartData = cart.getAllItemCart();
@@ -147,7 +162,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                             Text(
                                               numberFormat(
                                                 'idr',
-                                                AppState().totalPrice,
+                                                bill,
                                               ),
                                               style: TextStyle(
                                                 color:
@@ -231,11 +246,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                               highlightColor:
                                                   Colors.transparent,
                                               onTap: () async {
-                                                // setState(() {
+                                                setState(() {
                                                 //   _model.payment = _model.bill;
                                                 //   _model.subMethod = 'CASH';
                                                 //   _model.ref = null;
-                                                // });
+                                                  // paymentMethod = 'Cash';
+                                                  payment = bill;
+                                                });
                                               },
                                               child: Container(
                                                 width: double.infinity,
@@ -346,7 +363,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                             highlightColor:
                                                                 Colors
                                                                     .transparent,
-                                                            onTap: () async {},
+                                                            onTap: () async {
+                                                              setState((){
+                                                                payment = paymentRecommendationItem;
+                                                              });
+                                                            },
                                                             child: Row(
                                                               mainAxisSize:
                                                                   MainAxisSize
@@ -785,10 +806,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             NumPad(
                               onResult: (value) {
-                                print('value, $value');
                                 setState(() {
                                   payment = double.parse(value);
                                 });
@@ -796,18 +817,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
-                                  16.0, 24, 16.0, 0.0),
+                                  16.0, 24, 16.0, 24.0),
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
+                                  if (paymentStatus == false)
                                   CustomOutlinedButton(
                                     height: 48.0,
                                     text: "Pay",
+                                    isDisabled: payment < bill ? true : false,
                                     buttonTextStyle: TextStyle(
                                         color:
                                             theme.colorScheme.primaryContainer),
-                                    buttonStyle: CustomButtonStyles.primary,
-                                    onPressed: () {},
+                                    buttonStyle: payment < bill
+                                        ? CustomButtonStyles.onPrimaryContainer
+                                        : CustomButtonStyles.primary,
+                                    onPressed: () {
+                                      onTapPay(context);
+                                    },
                                   ),
                                 ],
                               ),
@@ -913,7 +940,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                         CrossAxisAlignment
                                                             .center,
                                                     children: [
-                                                      if (!paymentStatus)
+                                                      if (paymentStatus == false)
                                                         Text(
                                                           'Belum dibayar',
                                                           textAlign:
@@ -1075,98 +1102,49 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                     (context, itemCartIndex) {
                                                   final itemCartItem =
                                                       itemCart[itemCartIndex];
-                                                  return Padding(
-                                                    padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(0.0, 15.0,
-                                                                0.0, 0.0),
-                                                    child: InkWell(
-                                                      splashColor:
-                                                          Colors.transparent,
-                                                      focusColor:
-                                                          Colors.transparent,
-                                                      hoverColor:
-                                                          Colors.transparent,
-                                                      highlightColor:
-                                                          Colors.transparent,
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0,
-                                                                            4.0),
-                                                                child: Text(
-                                                                  '${itemCartItem.name} (${itemCartItem.qty})',
-                                                                  style: CustomTextStyles
-                                                                      .labelLargeBlack,
-                                                                ),
-                                                              ),
-                                                              Divider(
-                                                                height: 2.0,
-                                                                thickness: 0.5,
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .surface,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        0.0,
-                                                                        4.0,
-                                                                        0.0,
-                                                                        0.0),
-                                                            child: Text(
-                                                              itemCartItem.name,
-                                                              style: theme
-                                                                  .textTheme
-                                                                  .bodyMedium,
-                                                            ),
-                                                          ),
-                                                          Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                '${itemCartItem.qty} X ${numberFormat('idr', itemCartItem.price)}',
-                                                                style: theme
-                                                                    .textTheme
-                                                                    .bodyMedium,
-                                                              ),
-                                                              Text(
-                                                                '${numberFormat('idr', itemCartItem.qty * (itemCartItem.price + totalAddon))}',
-                                                                style: theme
-                                                                    .textTheme
-                                                                    .bodyMedium,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
+                                                  return ListCart(
+                                                    title:
+                                                        "${itemCartItem.itemName} (${itemCartItem.qty})",
+                                                    subtitle:
+                                                        itemCartItem.itemName ??
+                                                            '-',
+                                                    // addon: addon2,
+                                                    // addons: addons,
+                                                    qty: itemCartItem.qty
+                                                        .toString(),
+                                                    // catatan: itemCartItem.preference,
+                                                    titleStyle: CustomTextStyles
+                                                        .labelLargeBlack,
+                                                    price: itemCartItem.price
+                                                        .toString(),
+                                                    total: numberFormat(
+                                                        'idr',
+                                                        itemCartItem.qty *
+                                                            (itemCartItem
+                                                                    .price +
+                                                                totalAddon)),
+                                                    priceStyle: CustomTextStyles
+                                                        .labelLargeBlack,
+                                                    labelStyle: CustomTextStyles
+                                                        .bodySmallBluegray300,
+                                                    editLabelStyle: TextStyle(
+                                                      color: theme
+                                                          .colorScheme.primary,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
+                                                    padding: EdgeInsets.all(16),
+                                                    note: itemCartItem.notes ??
+                                                        '',
+                                                    lineColor: appTheme.gray200,
+                                                    secondaryStyle:
+                                                        CustomTextStyles
+                                                            .bodySmallGray,
+                                                    isEdit: false,
+                                                    // onTap: () => onTapEditItem(
+                                                    //     context,
+                                                    //     itemData,
+                                                    //     index),
                                                   );
                                                 },
                                               );
@@ -1179,70 +1157,75 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ],
                               ),
                             ),
-                            Column(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Divider(
-                                  height: 5.0,
-                                  thickness: 0.5,
-                                  color: theme.colorScheme.outline,
-                                ),
-                                Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 8.0, 0.0, 0.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      CustomOutlinedButton(
-                                        height: 48.0,
-                                        text: "Reprint Invoice",
-                                        buttonTextStyle: TextStyle(
-                                            color: theme.colorScheme.primary),
-                                        buttonStyle:
-                                            CustomButtonStyles.outlinePrimary,
-                                        onPressed: () {},
-                                      ),
-                                    ],
+                            if (paymentStatus)
+                              Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Divider(
+                                    height: 5.0,
+                                    thickness: 0.5,
+                                    color: theme.colorScheme.outline,
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 8.0, 0.0, 0.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      CustomOutlinedButton(
-                                        height: 48.0,
-                                        text: "Reprint Checker",
-                                        buttonTextStyle: TextStyle(
-                                            color: theme.colorScheme.primary),
-                                        buttonStyle:
-                                            CustomButtonStyles.outlinePrimary,
-                                        onPressed: () {},
-                                      ),
-                                    ],
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 8.0, 0.0, 0.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        CustomOutlinedButton(
+                                          height: 48.0,
+                                          text: "Reprint Invoice",
+                                          buttonTextStyle: TextStyle(
+                                              color: theme.colorScheme.primary),
+                                          buttonStyle:
+                                              CustomButtonStyles.outlinePrimary,
+                                          onPressed: () {
+                                            onPrintInvoice();
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 24.0, 0.0, 0.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      CustomElevatedButton(
-                                        text: "Done",
-                                        buttonTextStyle: TextStyle(
-                                            color: theme
-                                                .colorScheme.primaryContainer),
-                                        buttonStyle:
-                                            CustomButtonStyles.primaryButton,
-                                        onPressed: () {},
-                                      ),
-                                    ],
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 8.0, 0.0, 0.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        CustomOutlinedButton(
+                                          height: 48.0,
+                                          text: "Reprint Checker",
+                                          buttonTextStyle: TextStyle(
+                                              color: theme.colorScheme.primary),
+                                          buttonStyle:
+                                              CustomButtonStyles.outlinePrimary,
+                                          onPressed: () {},
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            )
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 24.0, 0.0, 0.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        CustomElevatedButton(
+                                          text: "Done",
+                                          buttonTextStyle: TextStyle(
+                                              color: theme.colorScheme
+                                                  .primaryContainer),
+                                          buttonStyle:
+                                              CustomButtonStyles.primaryButton,
+                                          onPressed: () {
+                                            onTapDone(context);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
                           ],
                         ),
                       ),
@@ -1262,5 +1245,122 @@ class _PaymentScreenState extends State<PaymentScreen> {
       AppRoutes.invoiceScreen,
       (route) => false,
     );
+  }
+
+  onTapPay(BuildContext context) async {
+    onCallPosInvoice();
+  }
+
+  onTapDone(BuildContext context) async {
+    setState((){
+      AppState.resetInvoiceCart();
+      AppState().typeTransaction = 'dine-in';
+    });
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.invoiceScreen,
+      (route) => false,
+    );
+  }
+
+  onCallPosInvoice() async {
+    List<dynamic> tempItem = [];
+    List<dynamic> tempPayment = [];
+
+    for (var element in cartData) {
+      tempItem.add({
+        'item_code': element.name,
+        'item_name': element.itemName,
+        'description': element.description,
+        'uom': element.uom,
+        'conversion_factor': 1,
+        'qty': element.qty,
+        'rate': element.price,
+        'amount': element.totalPrice,
+        'base_rate': element.price,
+        'base_amount': element.totalPrice,
+        'income_account': AppState().configCompany['default_income_account'],
+        'cost_center': AppState().configCompany['cost_center'],
+      });
+    }
+
+    print('check config payment, ${AppState().configCompany}');
+
+    // for (var methodPay in AppState().configCompany['payments']) {
+    //   print('check, $methodPay');
+    // }
+    tempPayment.add({
+      'mode_of_payment': 'Cash',
+      'amount': payment,
+      'account': '110-10-002 - Petty Cash G.Cashier (Rp) - KTN001'
+    });
+
+    final frappeFetchDataInvoice.CreatePosInvoiceRequest request =
+        frappeFetchDataInvoice.CreatePosInvoiceRequest(
+      cookie: AppState().setCookie,
+      customer: '0',
+      customerName: 'Guest',
+      company: AppState().configCompany['name'],
+      postingDate: dateTimeFormat('date', null).toString(),
+      postingTime: timeFormat('time_full', 'now'),
+      outlet: AppState().configPOSProfile['name'],
+      currency: AppState().configPOSProfile['currency'],
+      conversionRate: 1,
+      sellingPriceList: AppState().configPOSProfile['selling_price_list'],
+      priceListCurrency: AppState().configPOSProfile['currency'],
+      plcConversionRate: 1,
+      debitTo: AppState().configCompany['default_receivable_account'],
+      costCenter: AppState().configCompany['cost_center'],
+      items: tempItem,
+      baseNetTotal: bill,
+      baseGrandTotal: bill,
+      grandTotal: bill,
+      payments: tempPayment,
+      basePaidAmount: payment,
+      paidAmount: payment,
+    );
+
+    try {
+      final callRespon =
+          await frappeFetchDataInvoice.request(requestQuery: request);
+      print('call respon, ${callRespon}');
+      if (callRespon.containsKey('name')) {
+        setState((){
+          paymentStatus = true;
+          invoice = callRespon;
+        });
+      }
+    } catch (error) {
+      print('error pos invoice, ${error}');
+      alertError(context, error.toString());
+    }
+  }
+
+  onPrintInvoice() async {
+    dynamic docPrint = await printPageInv(
+      'reprint',
+      invoice,
+      AppState().configPrinter,
+      AppState().configCompany,
+      AppState().configPOSProfile,
+      AppState().configUser
+    );
+
+    // print('print invoce, $docPrint');
+
+    final sendToPrinter.ToPrint request = sendToPrinter.ToPrint(doc: docPrint, ipAddress: '127.0.0.1');
+    try {
+      final callRespon =
+          await sendToPrinter.request(requestQuery: request);
+      print('call respon, ${callRespon}');
+      if (callRespon != null) {
+        // setState((){
+        //   paymentStatus = true;
+        //   invoice = callRespon;
+        // });
+      }
+    } catch (error) {
+      print('error pos invoice, ${error}');
+      alertError(context, error.toString());
+    }
   }
 }

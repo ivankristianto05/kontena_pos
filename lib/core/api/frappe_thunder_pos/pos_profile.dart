@@ -49,8 +49,11 @@ class POSProfileRequest {
     };
   }
 
-  String? paramID() {
-    return id;
+  Map<String, String> paramDetail() {
+    return {
+      'doctype': 'POS Profile',
+      'name': id ?? '',
+    };
   }
 }
 
@@ -82,7 +85,8 @@ Future<List<dynamic>> request({required POSProfileRequest requestQuery}) async {
 Future<Map<String, dynamic>> requestDetail(
     {required POSProfileRequest requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/resource/POS Profile/${requestQuery.paramID()}?${queryParams(requestQuery.formatRequest())}';
+      'https://erp2.hotelkontena.com/api/method/frappe.desk.form.load.getdoc?${queryParams(requestQuery.paramDetail())}';
+  print('url, $url');
   final response = await http.get(
     Uri.parse(url),
     headers: requestQuery.formatHeader(),
@@ -90,8 +94,8 @@ Future<Map<String, dynamic>> requestDetail(
 
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
-    if (responseBody.containsKey('data')) {
-      return responseBody['data'];
+    if (responseBody.containsKey('docs')) {
+      return responseBody['docs'][0];
     } else {
       throw Exception(responseBody);
     }
