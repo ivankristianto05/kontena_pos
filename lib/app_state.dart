@@ -267,7 +267,18 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  List<dynamic> dataCompany = [];
+  List<dynamic> dataPOSProfile = [];
+  List<dynamic> dataItem = [];
+  List<dynamic> dataItemGroup = [];
+  List<dynamic> dataItemPrice = [];
+
+  dynamic configCompany;
+  dynamic configPOSProfile;
+  dynamic configUser;
+
   String typeTransaction = '';
   List<dynamic> listPrinter = [];
   dynamic configPrinter;
+  String setCookie = '';
 }

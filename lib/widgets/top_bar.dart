@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 
 class TopBar extends StatelessWidget implements PreferredSizeWidget {
   // final double smallButtonWidth;
   // final double buttonWidth;
   // final bool isWideScreen;
-  final String? isSelected;
 
-  TopBar({super.key, this.isSelected});
+  final String? isSelected;
+  final VoidCallback? onTapRefresh;
+
+  TopBar({
+    super.key,
+    this.isSelected,
+    this.onTapRefresh,
+  });
   // double smallButtonWidth = 40.0;
   // double buttonWidth = 40.0;
   double menuWidth = 240.0;
@@ -53,9 +60,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                     Icons.refresh,
                     color: theme.colorScheme.secondary,
                   ),
-                  onPressed: () {
-                    // Define the action for the refresh button
-                  },
+                  onPressed: onTapRefresh,
                 ),
               ),
               Container(
@@ -182,7 +187,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      'Shokudo Restaurant',
+                      AppState().configPOSProfile['name'],
                       style: TextStyle(
                         color: theme.colorScheme.secondary,
                         fontSize: 16,
@@ -242,7 +247,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                     const SizedBox(width: 8), // Space between text and icon
                     Text(
-                      'Administrator',
+                      AppState().configUser['name'],
                       style: TextStyle(
                         color: theme.colorScheme.secondary,
                         fontSize: 16,
@@ -270,6 +275,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 child: MaterialButton(
                   onPressed: () {
                     // Define the action for the MaterialButton
+                    onLogOut(context);
                   },
                   child: Icon(
                     Icons.logout,
@@ -311,6 +317,14 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
   onTapSetting(BuildContext context) {
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.settingScreen,
+      (route) => false,
+    );
+  }
+
+  onLogOut(BuildContext context) async {
+    // await myMe.removeStoredUser();
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.loginScreen,
       (route) => false,
     );
   }

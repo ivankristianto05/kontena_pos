@@ -1,27 +1,37 @@
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/app_state.dart';
-import 'package:kontena_pos/constants.dart';
-// import 'package:kontena_pos/Screen/components/Menu/buttonfilter_section.dart';
-// import 'package:kontena_pos/Screen/components/Menu/guestinputwithbutton_section.dart';
-// import 'package:kontena_pos/Screen/components/Menu/dropdown_delete_section.dart';
-// import 'package:kontena_pos/Screen/components/Menu/itemcart_section.dart';
-// import 'package:kontena_pos/Screen/components/itemcart_section.dart';
-// import 'package:kontena_pos/Screen/components/searchbar_section.dart';
+
+import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
+    as frappeFetchDataItem;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/item_group.dart'
+    as frappeFetchDataItemGroup;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/item_price.dart'
+    as frappeFetchDataItemPrice;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_cart.dart'
+    as frappeFetchDataCart;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_cart.dart'
+    as frappeFetchDataGetCart;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_order.dart'
+    as frappeFetchDataOrder;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_order.dart'
+    as frappeFetchDataGetOrder;
+
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/core/functions/reformat_item_with_price.dart';
 import 'package:kontena_pos/core/theme/custom_text_style.dart';
+import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
-import 'package:kontena_pos/features/cart/persentation/cart_list_item.dart';
-import 'package:kontena_pos/features/invoices/persentation/action_button.dart';
 import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
 import 'package:kontena_pos/models/cartitem.dart';
 import 'package:kontena_pos/widgets/custom_dialog.dart';
-import 'package:kontena_pos/widgets/custom_text_form_field.dart';
 import 'package:kontena_pos/widgets/empty_cart.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/list_cart.dart';
@@ -32,7 +42,7 @@ import 'package:kontena_pos/widgets/type_transaction.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class InvoiceScreen extends StatefulWidget {
-  const InvoiceScreen({Key? key}) : super(key: key);
+  const InvoiceScreen({super.key});
 
   @override
   _InvoiceScreenState createState() => _InvoiceScreenState();
@@ -55,15 +65,21 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   bool isSearchActive = false;
   bool isLoading = true;
   String selectedGroup = '';
+
   List<dynamic> item = [];
   List<dynamic> itemDisplay = [];
+  List<dynamic> orderDisplay = [];
+
+  List<dynamic> tempPosCart = [];
+  List<dynamic> tempPosOrder = [];
+
   String searchItemQuery = '';
   String modeView = 'item';
-  List<dynamic> orderList = [];
   String typeTransaction = '';
   int totalAddon = 0;
   int totalAddonCheckout = 0;
   bool isEdit = true;
+  dynamic cartSelected;
 
 // // //   //  final String id;
 // // //   // final String name;
@@ -79,8 +95,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   @override
   void initState() {
     super.initState();
+    onCallItemGroup();
+    onCallItemPrice();
+    onCallItem();
+
+    onCallDataPosCart();
+    onCallDataPosOrder();
+    reformatOrderCart();
+
     cartData = cart.getAllItemCart();
-    print('check cart data, $cartData');
     // cartData = cart.getAllItemCart();
 
     Future.delayed(Duration(milliseconds: 300), () {
@@ -91,7 +114,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
         // print(itemDisplay);
         itemDisplay = getItem();
-        orderList = AppState().confirmedOrders;
+        // orderList = AppState().confirmedOrders;
       });
     });
   }
@@ -113,7 +136,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     //         .toList();
     List<dynamic> filteredItems = item.toList();
     // updateQty(filteredItems);
-    print('filtered, ${cartData}');
+    // print('filtered, ${cartData}');
     return filteredItems;
   }
 
@@ -133,6 +156,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           children: [
             TopBar(
               isSelected: 'invoice',
+              onTapRefresh: () {
+                onCallItemGroup();
+                onCallItemPrice();
+                onCallItem();
+                onCallDataPosCart();
+                onCallDataPosOrder();
+
+                reformatOrderCart();
+              },
             ),
             Expanded(
               child: Stack(
@@ -144,10 +176,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       Expanded(
                         child: Stack(
                           children: [
-                            // Searchbar(
-                            //   screenWidth: MediaQuery.sizeOf(context).width,
-                            //   onSearchChanged: (val) => {filterSearch = val},
-                            // ),
                             Column(
                               children: [
                                 Searchbar(
@@ -155,34 +183,24 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 ),
                               ],
                             ),
-                            Container(),
-                            // Padding(
-                            //   padding: const EdgeInsetsDirectional.fromSTEB(
-                            //       8.0, 65.0, 8.0, 8.0),
-                            //   // child: ButtonFilter(
-                            //   //   onFilterSelected: (String type) {},
-                            //   // ),
-                            //   child: Container(),
-                            // ),
                             if (modeView == 'item')
                               Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    8.0, 50.0, 8.0, 8.0),
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    8.0, 60.0, 8.0, 8.0),
                                 child: FilterBar(
                                   onFilterSelected: (String type) {},
                                 ),
                               ),
                             if (modeView == 'item')
                               Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                padding: EdgeInsetsDirectional.fromSTEB(
                                     8.0, 120.0, 8.0, 0.0),
                                 child: Align(
-                                  alignment:
-                                      const AlignmentDirectional(0.00, 0.00),
+                                  alignment: AlignmentDirectional(0.00, 0.00),
                                   child: SingleChildScrollView(
                                     child: (isLoading == false &&
                                             itemDisplay.isEmpty)
-                                        ? Container(
+                                        ? SizedBox(
                                             width: MediaQuery.of(context)
                                                     .size
                                                     .width *
@@ -209,12 +227,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                         itemDisplay[index];
                                                     return ProductGrid(
                                                       name: currentItem[
-                                                          'nama_menu'],
-                                                      category:
-                                                          currentItem['type'],
-                                                      price:
-                                                          currentItem['harga']
-                                                              .toString(),
+                                                          'item_name'],
+                                                      category: currentItem[
+                                                          'item_group'],
+                                                      price: numberFormat(
+                                                          'idr',
+                                                          currentItem[
+                                                              'standard_rate']),
                                                       image: CustomImageView(
                                                         imagePath: ImageConstant
                                                             .imgAdl1,
@@ -227,7 +246,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                         onTapOpenItem(
                                                           context,
                                                           currentItem,
-                                                          index,
                                                         );
                                                       },
                                                     );
@@ -254,17 +272,23 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           mainAxisSpacing: 6,
                                           crossAxisSpacing: 6,
                                           shrinkWrap: true,
-                                          itemCount: orderList.length,
+                                          itemCount: orderDisplay.length,
                                           itemBuilder: (context, index) {
-                                            final currentOrderId =
-                                                AppState().currentConfirmOrderId;
-                                            final order = orderList[index];
-                                            final isSelected =
-                                                order.idOrder == currentOrderId;
+                                            // print(
+                                            //     'check order, ${orderDisplay[index]}');
+                                            // final currentOrderId =
+                                            //     AppState().currentOrderId;
+                                            final order = orderDisplay[index];
+                                            dynamic orderItemList =
+                                                order['items'];
+                                            print(
+                                                'check order item, $orderItemList');
+                                            // final isSelected =
+                                            //     order.idOrder == currentOrderId;
                                             return InkWell(
                                               onTap: () {
-                                                AppState().setCurrentConfirmOrderId(order
-                                                    .idOrder); // Update the currentOrderId in AppState
+                                                // AppState().setCurrentOrderId(order
+                                                //     .idOrder); // Update the currentOrderId in AppState
                                                 // onOrderSelected(order.idOrder);
                                                 addToCartFromOrder(
                                                     context, order);
@@ -293,15 +317,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                     .spaceBetween,
                                                             children: [
                                                               Text(
-                                                                'Table ${order.table.toString()}',
+                                                                order['name'],
                                                                 style: theme
                                                                     .textTheme
                                                                     .titleMedium,
                                                               ),
                                                               Text(
-                                                                typeTransaction
-                                                                    .toString()
-                                                                    .toUpperCase(),
+                                                                'Table ${order['table']}',
                                                                 style: theme
                                                                     .textTheme
                                                                     .bodyMedium,
@@ -311,8 +333,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                           Row(
                                                             children: [
                                                               Text(
-                                                                order
-                                                                    .namaPemesan
+                                                                order['customer_name']
                                                                     .toString(),
                                                                 style: theme
                                                                     .textTheme
@@ -332,11 +353,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                             child: Row(
                                                               children: [
                                                                 Text(
-                                                                  AppState()
-                                                                      .formatDateTime(
-                                                                          order
-                                                                              .time)
-                                                                      .toString(),
+                                                                  dateTimeFormat(
+                                                                    'dateui',
+                                                                    order[
+                                                                        'date'],
+                                                                  ).toString(),
                                                                   style: theme
                                                                       .textTheme
                                                                       .labelSmall,
@@ -379,15 +400,18 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                       true,
                                                                   physics:
                                                                       const NeverScrollableScrollPhysics(),
-                                                                  itemCount: order
-                                                                      .items
-                                                                      .length,
+                                                                  itemCount:
+                                                                      orderItemList
+                                                                          .length,
                                                                   itemBuilder:
                                                                       (context,
-                                                                          i) {
-                                                                    final cartItem =
-                                                                        order.items[
-                                                                            i];
+                                                                          idx) {
+                                                                    dynamic
+                                                                        orderItem =
+                                                                        orderItemList[
+                                                                            idx];
+                                                                    print(
+                                                                        'check item qty, ${orderItem['quantity']}');
                                                                     return Padding(
                                                                       padding: const EdgeInsets
                                                                           .only(
@@ -399,7 +423,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                             CrossAxisAlignment.start,
                                                                         children: [
                                                                           Text(
-                                                                            "${cartItem.qty}",
+                                                                            "${orderItem['quantity']}",
                                                                             style:
                                                                                 const TextStyle(
                                                                               fontWeight: FontWeight.w600,
@@ -414,34 +438,34 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                                               children: [
                                                                                 AutoSizeText(
-                                                                                  "${cartItem.name} - ${cartItem.variant ?? ''}",
+                                                                                  "${orderItem['item_name']} - ${orderItem['variant'] ?? ''}",
                                                                                   style: theme.textTheme.titleMedium,
                                                                                   maxLines: 2, // Allows up to 2 lines
                                                                                   minFontSize: 10,
                                                                                   maxFontSize: 14,
                                                                                   overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
                                                                                 ),
-                                                                                if ((cartItem.preference != null) && (cartItem.preference.values != null)) const SizedBox(height: 4),
+                                                                                // if ((orderItem['preference'] != null) && (orderItem['preference'] != null)) const SizedBox(height: 4),
+                                                                                // AutoSizeText(
+                                                                                //   "Preference: ${orderItem['preference']}",
+                                                                                //   style: theme.textTheme.labelSmall,
+                                                                                //   maxLines: 1,
+                                                                                //   minFontSize: 10,
+                                                                                //   maxFontSize: 12,
+                                                                                //   overflow: TextOverflow.ellipsis,
+                                                                                // ),
+                                                                                // if (orderItem['addons'] != null && orderItem['addons']!.isNotEmpty) const SizedBox(height: 4),
+                                                                                // AutoSizeText(
+                                                                                //   "+ ${orderItem['addons']!.keys.join(', ')}",
+                                                                                //   style: theme.textTheme.labelSmall,
+                                                                                //   maxLines: 1,
+                                                                                //   minFontSize: 10,
+                                                                                //   maxFontSize: 12,
+                                                                                //   overflow: TextOverflow.ellipsis,
+                                                                                // ),
+                                                                                if ((orderItem['note'] != null) && (orderItem['note'] != '')) const SizedBox(height: 4),
                                                                                 AutoSizeText(
-                                                                                  "Preference: ${cartItem.preference.values.join(', ')}",
-                                                                                  style: theme.textTheme.labelSmall,
-                                                                                  maxLines: 1,
-                                                                                  minFontSize: 10,
-                                                                                  maxFontSize: 12,
-                                                                                  overflow: TextOverflow.ellipsis,
-                                                                                ),
-                                                                                if (cartItem.addons != null && cartItem.addons!.isNotEmpty) const SizedBox(height: 4),
-                                                                                AutoSizeText(
-                                                                                  "+ ${cartItem.addons!.keys.join(', ')}",
-                                                                                  style: theme.textTheme.labelSmall,
-                                                                                  maxLines: 1,
-                                                                                  minFontSize: 10,
-                                                                                  maxFontSize: 12,
-                                                                                  overflow: TextOverflow.ellipsis,
-                                                                                ),
-                                                                                if ((cartItem.notes != null) && (cartItem.notes != '')) const SizedBox(height: 4),
-                                                                                AutoSizeText(
-                                                                                  "Notes: ${cartItem.notes}",
+                                                                                  "Notes: ${orderItem['note']}",
                                                                                   style: theme.textTheme.labelSmall,
                                                                                   maxLines: 2,
                                                                                   minFontSize: 10,
@@ -481,32 +505,51 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                         children: [
                           Container(
                             width: dataContentWidth,
-                            height: MediaQuery.sizeOf(context).height * 0.06,
+                            height: 48.0,
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primaryContainer,
-                            ),
-                            child: CustomTextFormField(
-                              controller: enterGuestNameController,
-                              // focusNode: inputSearchVarian,
-                              maxLines: 1,
-                              // contentPadding: EdgeInsets.symmetric(
-                              //   horizontal: 3.h,
-                              //   vertical: 9.v,
-                              // ),
-
-                              borderDecoration: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(0.h),
-                                borderSide: BorderSide(
+                              border: Border(
+                                left: BorderSide(
                                   color: theme.colorScheme.outline,
-                                  width: 0,
                                 ),
                               ),
-                              hintText: "Input guest name",
                             ),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Enter Customer Name',
+                                hintStyle: TextStyle(
+                                  color: theme.colorScheme.onPrimaryContainer,
+                                  fontSize: 14.0,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.all(12.0),
+                                suffixIcon: enterGuestNameController
+                                        .text.isNotEmpty
+                                    ? InkWell(
+                                        onTap: () async {
+                                          enterGuestNameController.clear();
+                                          setState(() {
+                                            enterGuestNameController.text = '';
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.clear,
+                                          color: theme.colorScheme.outline,
+                                          size: 24.0,
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                            ),
+                          ),
+                          Divider(
+                            height: 1.0,
+                            thickness: 0.5,
+                            color: theme.colorScheme.outline,
                           ),
                           Container(
                             width: MediaQuery.sizeOf(context).width * 0.25,
-                            height: 60.0,
+                            height: 65.0,
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primaryContainer,
                             ),
@@ -528,9 +571,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           onTapTypeTransaction(context);
                                         },
                                         child: Container(
-                                          height: MediaQuery.sizeOf(context)
-                                                  .height *
-                                              0.06,
+                                          height: 48.0,
                                           decoration: BoxDecoration(
                                             color: theme
                                                 .colorScheme.primaryContainer,
@@ -612,6 +653,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                         AppState().resetCart();
                                                         cartData = [];
                                                         modeView = 'item';
+                                                        cartSelected = null;
                                                       });
                                                     },
                                                   ),
@@ -622,9 +664,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                         }
                                       },
                                       child: Container(
-                                        height:
-                                            MediaQuery.sizeOf(context).height *
-                                                0.06,
+                                        height: 48.0,
                                         decoration: BoxDecoration(
                                           color: theme
                                               .colorScheme.primaryContainer,
@@ -680,6 +720,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           itemCount: cartData.length,
                                           itemBuilder: (context, index) {
                                             final itemData = cartData[index];
+                                            print(
+                                                'check item data, ${itemData.itemName}');
 
                                             String addon2 = '';
                                             String catatan = '';
@@ -721,42 +763,40 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                               });
                                             }
 
-                                            return Container(
-                                              child: ListCart(
-                                                title:
-                                                    "${itemData.name} (${itemData.qty})",
-                                                subtitle: itemData.name,
-                                                // addon: addon2,
-                                                // addons: addons,
-                                                qty: itemData.qty.toString(),
-                                                catatan: preference,
-                                                titleStyle: CustomTextStyles
-                                                    .labelLargeBlack,
-                                                price:
-                                                    itemData.price.toString(),
-                                                total: numberFormat(
-                                                    'idr',
-                                                    itemData.qty *
-                                                        (itemData.price +
-                                                            totalAddon)),
-                                                priceStyle: CustomTextStyles
-                                                    .labelLargeBlack,
-                                                labelStyle: CustomTextStyles
-                                                    .bodySmallBluegray300,
-                                                editLabelStyle: TextStyle(
-                                                  color:
-                                                      theme.colorScheme.primary,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                                padding: EdgeInsets.all(16),
-                                                note: itemData.notes,
-                                                lineColor: appTheme.gray200,
-                                                secondaryStyle: CustomTextStyles
-                                                    .bodySmallGray,
-                                                isEdit: isEdit,
-                                                onTap: () => onTapOpenItem(
-                                                    context, itemData, index),
+                                            return ListCart(
+                                              title:
+                                                  "${itemData.itemName} (${itemData.qty})",
+                                              subtitle:
+                                                  itemData.itemName ?? '-',
+                                              // addon: addon2,
+                                              // addons: addons,
+                                              qty: itemData.qty.toString(),
+                                              catatan: preference,
+                                              titleStyle: CustomTextStyles
+                                                  .labelLargeBlack,
+                                              price: itemData.price.toString(),
+                                              total: numberFormat(
+                                                  'idr',
+                                                  itemData.qty *
+                                                      (itemData.price +
+                                                          totalAddon)),
+                                              priceStyle: CustomTextStyles
+                                                  .labelLargeBlack,
+                                              labelStyle: CustomTextStyles
+                                                  .bodySmallBluegray300,
+                                              editLabelStyle: TextStyle(
+                                                color:
+                                                    theme.colorScheme.primary,
+                                                fontWeight: FontWeight.bold,
                                               ),
+                                              padding: EdgeInsets.all(16),
+                                              note: itemData.notes,
+                                              lineColor: appTheme.gray200,
+                                              secondaryStyle: CustomTextStyles
+                                                  .bodySmallGray,
+                                              isEdit: isEdit,
+                                              onTap: () => onTapEditItem(
+                                                  context, itemData, index),
                                             );
                                           },
                                         ),
@@ -817,14 +857,124 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
+  void onCallItemGroup() async {
+    // isLoading = true;
+
+    final frappeFetchDataItemGroup.ItemGroupRequest requestItemGroup =
+        frappeFetchDataItemGroup.ItemGroupRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+    );
+
+    try {
+      final itemGroupRequset = await frappeFetchDataItemGroup
+          .requestItemGroup(requestQuery: requestItemGroup)
+          .timeout(
+            Duration(seconds: 30),
+          );
+
+      setState(() {
+        AppState().dataItemGroup = itemGroupRequset;
+        // itemDisplay = itemGroupRequset;
+        isLoading = false;
+      });
+    } catch (error) {
+      isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        print(error);
+      }
+      return;
+    }
+  }
+
+  void onCallItemPrice() async {
+    String? today = dateTimeFormat('date', null);
+    final frappeFetchDataItemPrice.ItemPriceRequest requestItemPrice =
+        frappeFetchDataItemPrice.ItemPriceRequest(
+      cookie: AppState().setCookie,
+      filters: '[["selling","=",1],["valid_from","<=","$today"]]',
+      limit: 5000,
+    );
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final itemPriceRequest = await frappeFetchDataItemPrice
+          .requestItemPrice(requestQuery: requestItemPrice)
+          .timeout(
+            Duration(seconds: 30),
+          );
+
+      // print("item price request: $itemPriceRequest");
+      setState(() {
+        AppState().dataItemPrice = itemPriceRequest;
+        // itemDisplay = reformatItem(itemPriceRequest);
+      });
+    } catch (error) {
+      isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        print(error);
+      }
+      return;
+    }
+  }
+
+  void onCallItem() async {
+    isLoading = true;
+
+    final frappeFetchDataItem.ItemRequest requestItem =
+        frappeFetchDataItem.ItemRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[["disabled","=",0],["is_sales_item","=",1]]',
+      limit: 1500,
+    );
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final itemRequest = await frappeFetchDataItem
+          .requestItem(requestQuery: requestItem)
+          .timeout(
+            Duration(seconds: 30),
+          );
+
+      // print("titiew: $itemRequset");
+      setState(() {
+        AppState().dataItem = ReformatItemWithPrice(
+          itemRequest,
+          AppState().dataItemPrice,
+        );
+        itemDisplay = AppState().dataItem;
+      });
+      // AppState().userDetail = profileResult;
+    } catch (error) {
+      isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        print(error);
+      }
+      return;
+    }
+  }
+
+  List<dynamic> reformatItem(List<dynamic> item) {
+    return item.where((itm) => itm['item_group'] != 'Addon').toList();
+  }
+
   void onSearch(BuildContext context, dynamic value) async {}
 
   TextEditingController enterGuestNameController = TextEditingController();
   FocusNode inputPhone = FocusNode();
 
-  void onTapOpenItem(BuildContext context, dynamic item, int? index) async {
-    print('check data item ${item}');
-    print('check data index ${index}');
+  void onTapOpenItem(BuildContext context, dynamic item) async {
     await showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: false,
@@ -842,22 +992,65 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           //   onAddToCart: (item) {},
           // ),
           // child: Container(),
-          child: AddToCart(dataMenu: item),
+          child: AddToCart(
+            dataMenu: item,
+          ),
         );
       },
-    ).then((value) => {print('check value, $value')});
+    ).then((value) => {});
   }
 
-  void onTapTypeTransaction(BuildContext context) async {
-    showModalBottomSheet(
+  void onTapEditItem(BuildContext context, dynamic item, int index) async {
+    await showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: false,
       backgroundColor: const Color(0x8A000000),
       barrierColor: const Color(0x00000000),
       context: context,
       builder: (context) {
+        dynamic editItem = {
+          'id': item.id,
+          'item_name': item.itemName,
+          'notes': item.notes,
+          'name': item.name,
+          'variant': item.variant,
+          'variantId': item.variantId,
+          'qty': item.qty,
+          'variantPrice': item.variantPrice,
+          'totalPrice': item.totalPrice,
+          'addonsPrice': item.addonsPrice,
+        };
+
         return Padding(
           padding: MediaQuery.viewInsetsOf(context),
+          // child: ItemDetailsDialog(
+          //   name: item['nama_menu'],
+          //   price: int.parse(item['harga'].toString()),
+          //   idMenu: item['id_menu'],
+          //   type: item['type'],
+          //   onAddToCart: (item) {},
+          // ),
+          // child: Container(),
+          child: AddToCart(
+            dataMenu: editItem,
+            idxMenu: index,
+          ),
+        );
+      },
+    ).then((value) => {});
+  }
+
+  void onTapTypeTransaction(BuildContext context) async {
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: const Color(0x8A000000),
+      barrierColor: const Color(0x00000000),
+      context: context,
+      builder: (context) {
+        return Container(
+          // padding: MediaQuery.viewInsetsOf(context),
           // child: ItemDetailsDialog(
           //   name: item['nama_menu'],
           //   price: int.parse(item['harga'].toString()),
@@ -874,17 +1067,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   void addToCartFromOrder(BuildContext context, dynamic order) async {
-    print('order, ${order.idOrder}');
-    print('nama pesanan, ${order.namaPemesan}');
-    print('nama pesanan, ${order.items}');
-    print('nama pesanan, ${order.items.length}');
-    print('nama pesanan, ${order.items[0].name}');
-    print('nama pesanan, ${order.items[0].qty}');
-    print('nama pesanan, ${order.items[0].price}');
-    print('nama pesanan, ${order.items[0].notes}');
-    print('nama pesanan, ${order.items[0].preference}');
-    // print('nama pesanan, ${order.items.toMap()}');
-    print('nama pesanan, ${cart.getAllItemCart()}');
     setState(() {
       cart.clearAllItems();
       // AppState().resetCart();
@@ -917,9 +1099,149 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   void onTapPay(BuildContext context) async {
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.paymentScreen,
-      (route) => false,
+    // Navigator.of(context).pushNamedAndRemoveUntil(
+    //   AppRoutes.paymentScreen,
+    //   (route) => false,
+    // );
+
+    final frappeFetchDataCart.CreatePosCartRequest request =
+        frappeFetchDataCart.CreatePosCartRequest(
+      cookie: AppState().setCookie,
+      customer: '0',
+      customerName: 'Guest',
+      company: AppState().configCompany['name'],
+      outlet: AppState().configPOSProfile['name'],
+      postingDate: dateTimeFormat('date', null).toString(),
+      priceList: AppState().configPOSProfile['selling_price_list'],
+      table: '1',
+      id: cartSelected != null ? cartSelected['name'] : null,
     );
+    // print('cart selected, $cartSelected');
+
+    // request.getParamID()
+
+    try {
+      final callReqPosCart =
+          await frappeFetchDataCart.request(requestQuery: request);
+
+      if (callReqPosCart.isNotEmpty) {
+        cartSelected = callReqPosCart;
+      }
+    } catch (error) {
+      if (context.mounted) {
+        print('error pos cart, $error');
+        // alert.alertError(context, error.toString());
+      }
+    }
+
+    if (cartSelected != null) {
+      for (CartItem itm in cartData) {
+        print('cart data, ${itm.qty}');
+        dynamic itemReq = {
+          'item': itm.name,
+          'item_name': itm.itemName,
+          'item_group': itm.itemGroup,
+          'qty': itm.qty,
+          'notes': itm.notes
+        };
+        onCallPosOrder(itemReq);
+      }
+    }
+  }
+
+  onCallPosOrder(dynamic paramItem) async {
+    final frappeFetchDataOrder.CreatePosOrderRequest request =
+        frappeFetchDataOrder.CreatePosOrderRequest(
+      cookie: AppState().setCookie,
+      customer: '0',
+      customerName: 'Guest',
+      company: AppState().configCompany['name'],
+      postingDate: dateTimeFormat('date', null).toString(),
+      outlet: AppState().configPOSProfile['name'],
+      priceList: AppState().configPOSProfile['selling_price_list'],
+      cartNo: cartSelected['name'],
+      item: paramItem['item'],
+      itemName: paramItem['item_name'],
+      itemGroup: paramItem['item_group'],
+      note: paramItem['notes'],
+      qty: paramItem['qty'],
+    );
+
+    try {
+      final reqPosOrder =
+          await frappeFetchDataOrder.request(requestQuery: request);
+    } catch (error) {
+      print('error pos order, $error');
+    }
+  }
+
+  onCallDataPosCart() async {
+    final frappeFetchDataGetCart.PosCartRequest request =
+        frappeFetchDataGetCart.PosCartRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+      limit: 1500,
+    );
+
+    try {
+      final callRequest =
+          await frappeFetchDataGetCart.requestPosCart(requestQuery: request);
+
+      if (callRequest.isNotEmpty) {
+        setState(() {
+          tempPosCart = callRequest;
+        });
+      }
+    } catch (error) {
+      print('error call data pos cart, $error');
+    }
+  }
+
+  onCallDataPosOrder() async {
+    final frappeFetchDataGetOrder.PosOrderRequest request =
+        frappeFetchDataGetOrder.PosOrderRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+      limit: 2000,
+    );
+
+    try {
+      final callRequest =
+          await frappeFetchDataGetOrder.requestPosOrder(requestQuery: request);
+
+      if (callRequest.isNotEmpty) {
+        setState(() {
+          tempPosOrder = callRequest;
+        });
+      }
+    } catch (error) {
+      print('error call data pos order, $error');
+    }
+  }
+
+  reformatOrderCart() async {
+    List<dynamic> cartNew = [];
+
+    // print('temp cart, ${tempPosCart[0]}');
+    // print('temp order, ${tempPosOrder[0]}');
+
+    if (tempPosCart.isNotEmpty) {
+      for (dynamic cartTemp in tempPosCart) {
+        dynamic tmp = cartTemp;
+        // print('test, ${tmp['name']}');
+        tmp['items'] = tempPosOrder
+            .where((ord) => ord['pos_cart'] == tmp['name'])
+            .toList();
+        cartNew.add(tmp);
+      }
+    }
+
+    // print('check cart new, $cartNew');
+    print('check cart new, ${cartNew.length}');
+    setState(() {
+      orderDisplay = cartNew;
+    });
   }
 }

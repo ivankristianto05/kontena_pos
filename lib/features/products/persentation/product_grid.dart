@@ -37,7 +37,12 @@ class ProductGrid extends StatelessWidget {
               child: Container(
                 color: Colors.grey[300],
                 child: Center(
-                  child: image ?? SizedBox(height: 72.v, width: 48.h),
+                  child: Image.asset(
+                    'assets/images/stock-card-image.jpg',
+                    height: 200.v,
+                    width: 280.v,
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
             ),
@@ -58,13 +63,16 @@ class ProductGrid extends StatelessWidget {
                       0.0,
                       4.0,
                     ),
-                    child: Text(
-                      category.toString(),
+                    child: AutoSizeText(
+                      category,
                       style: theme.textTheme.labelMedium,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      minFontSize: 9,
                     ),
                   ),
                   AutoSizeText(
-                    name.toString(),
+                    name,
                     style: theme.textTheme.titleMedium,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -74,7 +82,7 @@ class ProductGrid extends StatelessWidget {
                   Align(
                     alignment: Alignment.bottomRight,
                     child: Text(
-                      numberFormat('idr', int.parse(price)),
+                      price,
                       style: theme.textTheme.titleMedium,
                     ),
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/constants.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:kontena_pos/core/app_export.dart';
@@ -6,8 +7,7 @@ import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 
 class FilterBar extends StatefulWidget {
   final void Function(String type) onFilterSelected;
-
-  const FilterBar({
+  FilterBar({
     Key? key,
     required this.onFilterSelected,
   }) : super(key: key);
@@ -18,6 +18,20 @@ class FilterBar extends StatefulWidget {
 
 class _FilterBarState extends State<FilterBar> {
   String _selectedFilter = 'All'; // Default selected filter
+  List<dynamic> filterDisplay = [];
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      filterDisplay = AppState().dataItemGroup;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   void _handleFilterButtonPressed(String type) {
     setState(() {
@@ -35,17 +49,38 @@ class _FilterBarState extends State<FilterBar> {
 
     return Padding(
       padding: const EdgeInsetsDirectional.symmetric(horizontal: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _buildFilterButton('All', buttonWidth),
-          SizedBox(width: 8),
-          _buildFilterButton('food', buttonWidth),
-          SizedBox(width: 8),
-          _buildFilterButton('beverage', buttonWidth),
-          SizedBox(width: 8),
-          _buildFilterButton('breakfast', buttonWidth),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            _buildFilterButton('All', buttonWidth),
+            const SizedBox(width: 8),
+            Builder(
+              builder: (context) {
+                return Row(
+                  children: List.generate(
+                    filterDisplay.length,
+                    (index) {
+                      final filterItem = filterDisplay[index];
+                      return Row(
+                        children: [
+                          _buildFilterButton(filterItem['name'], buttonWidth),
+                          const SizedBox(width: 8),
+                        ],
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+            // _buildFilterButton('food', buttonWidth),
+            // SizedBox(width: 8),
+            // _buildFilterButton('beverage', buttonWidth),
+            // SizedBox(width: 8),
+            // _buildFilterButton('breakfast', buttonWidth),
+          ],
+        ),
       ),
     );
   }
@@ -56,7 +91,7 @@ class _FilterBarState extends State<FilterBar> {
       height: 50,
       width: width,
       child: CustomElevatedButton(
-        text: type,
+        text: type ?? '',
         buttonTextStyle: isSelected
             ? TextStyle(color: theme.colorScheme.primaryContainer)
             : TextStyle(color: theme.colorScheme.secondary),

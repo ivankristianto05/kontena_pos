@@ -1,9 +1,12 @@
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/core/functions/order.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/routes/app_routes.dart';
 import 'package:kontena_pos/app_state.dart';
+import 'package:window_manager/window_manager.dart';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -13,7 +16,23 @@ void main() async {
 
   // Initialize AppState and ensure it's fully initialized
   final appState = AppState();
-  await appState.initializeState(); // Ensure this completes before running the app
+  await appState
+      .initializeState(); // Ensure this completes before running the app
+
+  print(
+      'test, ${((kIsWeb != true) || (Platform.isAndroid != true) || (Platform.isIOS != true))}');
+
+  if ((kIsWeb != true) ||
+      (Platform.isAndroid != true) ||
+      (Platform.isIOS != true)) {
+    await windowManager.ensureInitialized();
+    windowManager.waitUntilReadyToShow().then((_) async {
+      // Hide window title bar
+      await windowManager.setFullScreen(false);
+      await windowManager.setAlwaysOnTop(false);
+      await windowManager.setSkipTaskbar(false);
+    });
+  }
 
   runApp(
     MultiProvider(

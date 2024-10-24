@@ -18,7 +18,7 @@ class ListCart extends StatelessWidget {
   final TextStyle editLabelStyle;
   final String price;
   final String total;
-  final List<dynamic> addons;
+  final List<dynamic>? addons;
   final TextStyle priceStyle;
   final EdgeInsets padding;
   final Color lineColor;
@@ -50,9 +50,7 @@ class ListCart extends StatelessWidget {
     this.padding = const EdgeInsets.all(8.0),
     this.lineColor = Colors.black, // Default line color is black
     this.labelStyle = const TextStyle(fontSize: 14, color: Colors.black),
-    this.addons = const [
-      {'name': 'Extra 1 Shoot', 'qty': 1, 'price': 5000}
-    ],
+    this.addons,
     this.onTap,
     this.catatan = "",
     this.isEdit = true,
@@ -95,7 +93,7 @@ class ListCart extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (addons.isNotEmpty)
+                if (addons != null)
                   Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 8.0, 0.0),
                     child: Column(
@@ -107,12 +105,12 @@ class ListCart extends StatelessWidget {
                           style: theme.textTheme.labelSmall,
                         ),
                         Builder(builder: (context) {
-                          final addonList = addons;
+                          final addonList = addons?.toList();
                           return ListView.builder(
                             shrinkWrap: true,
-                            itemCount: addonList.length,
+                            itemCount: addonList?.length,
                             itemBuilder: (context, index) {
-                              final addonItem = addonList[index];
+                              final addonItem = addonList?[index];
                               return Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     0.0, 0.0, 0.0, 4.0),

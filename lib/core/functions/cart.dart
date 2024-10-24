@@ -65,6 +65,8 @@ class Cart extends ChangeNotifier {
       existingItem = existingItem.copyWith(
         variant: newItem.variant,
         variantId: newItem.variantId,
+        itemName: newItem.itemName,
+        itemGroup: newItem.itemGroup,
         notes: newItem.notes,
         preference: newItem.preference,
         addons: newItem.addons,
