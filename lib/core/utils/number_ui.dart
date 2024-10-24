@@ -26,6 +26,19 @@ String numberFormat(
               .format(param);
       break;
 
+    case 'number_fixed':
+      int numberFixed = param.floor();
+      result = NumberFormat.currency(locale: 'id', symbol: '', decimalDigits: 0)
+          .format(numberFixed);
+      break;
+
+    case 'idr_fixed':
+      int numberFixed = param.floor();
+      result =
+          NumberFormat.currency(locale: 'id', symbol: 'IDR ', decimalDigits: 0)
+              .format(numberFixed);
+      break;
+
     case 'number_simple':
       result = simpleFormat(param);
       break;

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/functions/invoice.dart';
 import 'package:kontena_pos/core/functions/payment_prediction.dart';
-import 'package:kontena_pos/core/functions/print.dart';
+import 'package:kontena_pos/core/utils/print.dart';
 import 'package:kontena_pos/core/theme/custom_text_style.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/alert.dart';
@@ -22,8 +22,7 @@ import 'package:kontena_pos/core/utils/alert.dart' as alert;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_invoice.dart'
     as frappeFetchDataInvoice;
 
-import 'package:kontena_pos/core/api/send_printer.dart'
-    as sendToPrinter;
+import 'package:kontena_pos/core/api/send_printer.dart' as sendToPrinter;
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({Key? key}) : super(key: key);
@@ -247,9 +246,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                   Colors.transparent,
                                               onTap: () async {
                                                 setState(() {
-                                                //   _model.payment = _model.bill;
-                                                //   _model.subMethod = 'CASH';
-                                                //   _model.ref = null;
+                                                  //   _model.payment = _model.bill;
+                                                  //   _model.subMethod = 'CASH';
+                                                  //   _model.ref = null;
                                                   // paymentMethod = 'Cash';
                                                   payment = bill;
                                                 });
@@ -364,8 +363,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                                 Colors
                                                                     .transparent,
                                                             onTap: () async {
-                                                              setState((){
-                                                                payment = paymentRecommendationItem;
+                                                              setState(() {
+                                                                payment =
+                                                                    paymentRecommendationItem;
                                                               });
                                                             },
                                                             child: Row(
@@ -822,20 +822,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
                                   if (paymentStatus == false)
-                                  CustomOutlinedButton(
-                                    height: 48.0,
-                                    text: "Pay",
-                                    isDisabled: payment < bill ? true : false,
-                                    buttonTextStyle: TextStyle(
-                                        color:
-                                            theme.colorScheme.primaryContainer),
-                                    buttonStyle: payment < bill
-                                        ? CustomButtonStyles.onPrimaryContainer
-                                        : CustomButtonStyles.primary,
-                                    onPressed: () {
-                                      onTapPay(context);
-                                    },
-                                  ),
+                                    CustomOutlinedButton(
+                                      height: 48.0,
+                                      text: "Pay",
+                                      isDisabled: payment < bill ? true : false,
+                                      buttonTextStyle: TextStyle(
+                                          color: theme
+                                              .colorScheme.primaryContainer),
+                                      buttonStyle: payment < bill
+                                          ? CustomButtonStyles
+                                              .onPrimaryContainer
+                                          : CustomButtonStyles.primary,
+                                      onPressed: () {
+                                        onTapPay(context);
+                                      },
+                                    ),
                                 ],
                               ),
                             ),
@@ -940,7 +941,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                         CrossAxisAlignment
                                                             .center,
                                                     children: [
-                                                      if (paymentStatus == false)
+                                                      if (paymentStatus ==
+                                                          false)
                                                         Text(
                                                           'Belum dibayar',
                                                           textAlign:
@@ -1180,7 +1182,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                           buttonStyle:
                                               CustomButtonStyles.outlinePrimary,
                                           onPressed: () {
-                                            onPrintInvoice();
+                                            onPrintInvoice(true);
                                           },
                                         ),
                                       ],
@@ -1199,7 +1201,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                               color: theme.colorScheme.primary),
                                           buttonStyle:
                                               CustomButtonStyles.outlinePrimary,
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            onPrintChecker();
+                                          },
                                         ),
                                       ],
                                     ),
@@ -1252,7 +1256,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   onTapDone(BuildContext context) async {
-    setState((){
+    setState(() {
       AppState.resetInvoiceCart();
       AppState().typeTransaction = 'dine-in';
     });
@@ -1322,35 +1326,66 @@ class _PaymentScreenState extends State<PaymentScreen> {
     try {
       final callRespon =
           await frappeFetchDataInvoice.request(requestQuery: request);
-      print('call respon, ${callRespon}');
+      // print('call respon, ${callRespon}');
       if (callRespon.containsKey('name')) {
-        setState((){
+        setState(() {
           paymentStatus = true;
           invoice = callRespon;
         });
+
+        onPrintInvoice(false);
+        onPrintChecker();
       }
     } catch (error) {
       print('error pos invoice, ${error}');
-      alertError(context, error.toString());
+      if (context.mounted) {
+        alert.alertError(context, error.toString());
+      }
     }
   }
 
-  onPrintInvoice() async {
-    dynamic docPrint = await printPageInv(
-      'reprint',
+  onPrintInvoice(bool reprint) async {
+    dynamic docPrint = await printInvoice(
+        reprint ? 'reprint' : null,
+        invoice,
+        AppState().configPrinter,
+        AppState().configCompany,
+        AppState().configPOSProfile,
+        AppState().configUser);
+
+    // print('print invoce, $docPrint');
+
+    final sendToPrinter.ToPrint request =
+        sendToPrinter.ToPrint(doc: docPrint, ipAddress: '127.0.0.1');
+    try {
+      final callRespon = await sendToPrinter.request(requestQuery: request);
+      // print('call respon, ${callRespon}');
+      if (callRespon != null) {
+        // setState((){
+        //   paymentStatus = true;
+        //   invoice = callRespon;
+        // });
+      }
+    } catch (error) {
+      // print('error pos invoice, ${error}');
+      if (context.mounted) {
+        alert.alertError(context, error.toString());
+      }
+    }
+  }
+
+  onPrintChecker() async {
+    dynamic docPrint = await printChecker(
       invoice,
       AppState().configPrinter,
-      AppState().configCompany,
-      AppState().configPOSProfile,
-      AppState().configUser
     );
 
     // print('print invoce, $docPrint');
 
-    final sendToPrinter.ToPrint request = sendToPrinter.ToPrint(doc: docPrint, ipAddress: '127.0.0.1');
+    final sendToPrinter.ToPrint request =
+        sendToPrinter.ToPrint(doc: docPrint, ipAddress: '127.0.0.1');
     try {
-      final callRespon =
-          await sendToPrinter.request(requestQuery: request);
+      final callRespon = await sendToPrinter.request(requestQuery: request);
       print('call respon, ${callRespon}');
       if (callRespon != null) {
         // setState((){
@@ -1360,7 +1395,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
       }
     } catch (error) {
       print('error pos invoice, ${error}');
-      alertError(context, error.toString());
+      if (context.mounted) {
+        alert.alertError(context, error.toString());
+      }
     }
   }
 }

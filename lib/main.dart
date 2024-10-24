@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/config_app.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/core/functions/order.dart';
 import 'package:provider/provider.dart';
@@ -16,11 +17,9 @@ void main() async {
 
   // Initialize AppState and ensure it's fully initialized
   final appState = AppState();
-  await appState
-      .initializeState(); // Ensure this completes before running the app
-
-  print(
-      'test, ${((kIsWeb != true) || (Platform.isAndroid != true) || (Platform.isIOS != true))}');
+  await appState.initializeState();
+  final configuration =
+      ConfigApp(); // Ensure this completes before running the app
 
   if ((kIsWeb != true) ||
       (Platform.isAndroid != true) ||
@@ -42,28 +41,49 @@ void main() async {
           create: (context) => appState.orderManager,
           update: (context, appState, orderManager) => appState.orderManager,
         ),
-        
         ChangeNotifierProxyProvider<AppState, Cart>(
           create: (context) => Cart(appState),
-          update: (context, appState, cart) => Cart(appState), // Re-create Cart if AppState changes
+          update: (context, appState, cart) =>
+              Cart(appState), // Re-create Cart if AppState changes
         ),
       ],
-      child: MyApp(),
+      child: MyApp(
+        configuration: configuration,
+      ),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key, required this.configuration});
+
+  final ConfigApp configuration;
+
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   late Future<String> _initialRouteFuture;
+  dynamic _configuration;
 
   @override
   void initState() {
     super.initState();
+    widget.configuration.readConfig().then((value) => {
+          setState(() {
+            _configuration = value;
+
+            if ((_configuration.isEmpty)) {
+            } else {
+              try {
+                widget.configuration.setToState(_configuration);
+              } catch (e) {
+                print('gagal $e');
+              }
+            }
+          })
+        });
     _initialRouteFuture = _checkStoredUser();
   }
 

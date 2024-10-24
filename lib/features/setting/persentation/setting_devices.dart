@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
+import 'package:kontena_pos/config_app.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/core/api/get_printer.dart' as callGetPrinter;
@@ -64,7 +65,7 @@ class _SettingDevicesState extends State<SettingDevices> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
+                SizedBox(
                   width: double.infinity,
                   height: MediaQuery.sizeOf(context).height * 1.0,
                   // decoration: BoxDecoration(
@@ -468,6 +469,10 @@ class _SettingDevicesState extends State<SettingDevices> {
         'tipeConnection': selectedTipePrinter,
       };
     });
+    dynamic configPrinter = ConfigApp().generateConfig(
+      AppState().configPrinter,
+    );
+    ConfigApp().writeConfig(configPrinter);
     print('check data, ${AppState().configPrinter}');
   }
 }
