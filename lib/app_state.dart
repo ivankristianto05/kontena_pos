@@ -52,7 +52,7 @@ class AppState extends ChangeNotifier {
 
   static List<CartItem> cartItem = [];
 
-  double _totalPrice = 0.0;
+   double _totalPrice = 0.0;
 
   double get totalPrice => _totalPrice;
 

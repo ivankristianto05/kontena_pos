@@ -1,5 +1,24 @@
+import 'dart:async';
+
+import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
+    as frappeFetchDataItem;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/item_group.dart'
+    as frappeFetchDataItemGroup;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/item_price.dart'
+    as frappeFetchDataItemPrice;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_cart.dart'
+    as frappeFetchDataCart;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_cart.dart'
+    as frappeFetchDataGetCart;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_order.dart'
+    as frappeFetchDataOrder;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_order.dart'
+    as frappeFetchDataGetOrder;
+
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/core/functions/reformat_item_with_price.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/itemdialog_section.dart';
 import 'package:kontena_pos/widgets/dropdown_delete.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
@@ -27,6 +46,10 @@ class _OrderScreenState extends State<OrderScreen> {
   String _searchQuery = '';
   String? table;
   String? pickupType;
+  bool isLoading = true;
+  List<dynamic> itemDisplay = [];
+  List<dynamic> tempPosCart = [];
+  List<dynamic> tempPosOrder = [];
 
   @override
   void initState() {
@@ -198,5 +221,158 @@ class _OrderScreenState extends State<OrderScreen> {
         );
       },
     );
+  }
+  void onCallItemGroup() async {
+    // isLoading = true;
+
+    final frappeFetchDataItemGroup.ItemGroupRequest requestItemGroup =
+        frappeFetchDataItemGroup.ItemGroupRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+    );
+
+    try {
+      final itemGroupRequset = await frappeFetchDataItemGroup
+          .requestItemGroup(requestQuery: requestItemGroup)
+          .timeout(
+            Duration(seconds: 30),
+          );
+
+      setState(() {
+        AppState().dataItemGroup = itemGroupRequset;
+        // itemDisplay = itemGroupRequset;
+        isLoading = false;
+      });
+    } catch (error) {
+      isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        print(error);
+      }
+      return;
+    }
+  }
+
+  void onCallItemPrice() async {
+    String? today = dateTimeFormat('date', null);
+    final frappeFetchDataItemPrice.ItemPriceRequest requestItemPrice =
+        frappeFetchDataItemPrice.ItemPriceRequest(
+      cookie: AppState().setCookie,
+      filters: '[["selling","=",1],["valid_from","<=","$today"]]',
+      limit: 5000,
+    );
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final itemPriceRequest = await frappeFetchDataItemPrice
+          .requestItemPrice(requestQuery: requestItemPrice)
+          .timeout(
+            Duration(seconds: 30),
+          );
+
+      // print("item price request: $itemPriceRequest");
+      setState(() {
+        AppState().dataItemPrice = itemPriceRequest;
+        // itemDisplay = reformatItem(itemPriceRequest);
+      });
+    } catch (error) {
+      isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        print(error);
+      }
+      return;
+    }
+  }
+
+   void onCallItem() async {
+    isLoading = true;
+
+    final frappeFetchDataItem.ItemRequest requestItem =
+        frappeFetchDataItem.ItemRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[["disabled","=",0],["is_sales_item","=",1]]',
+      limit: 1500,
+    );
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final itemRequest = await frappeFetchDataItem
+          .requestItem(requestQuery: requestItem)
+          .timeout(
+            Duration(seconds: 30),
+          );
+
+      // print("titiew: $itemRequset");
+      setState(() {
+        AppState().dataItem = ReformatItemWithPrice(
+          itemRequest,
+          AppState().dataItemPrice,
+        );
+        itemDisplay = AppState().dataItem;
+      });
+      // AppState().userDetail = profileResult;
+    } catch (error) {
+      isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        print(error);
+      }
+      return;
+    }
+  }
+
+  onCallDataPosCart() async {
+    final frappeFetchDataGetCart.PosCartRequest request =
+        frappeFetchDataGetCart.PosCartRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+      limit: 1500,
+    );
+
+    try {
+      final callRequest =
+          await frappeFetchDataGetCart.requestPosCart(requestQuery: request);
+
+      if (callRequest.isNotEmpty) {
+        setState(() {
+          tempPosCart = callRequest;
+        });
+      }
+    } catch (error) {
+      print('error call data pos cart, $error');
+    }
+  }
+
+  onCallDataPosOrder() async {
+    final frappeFetchDataGetOrder.PosOrderRequest request =
+        frappeFetchDataGetOrder.PosOrderRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+      limit: 2000,
+    );
+
+    try {
+      final callRequest =
+          await frappeFetchDataGetOrder.requestPosOrder(requestQuery: request);
+
+      if (callRequest.isNotEmpty) {
+        setState(() {
+          tempPosOrder = callRequest;
+        });
+      }
+    } catch (error) {
+      print('error call data pos order, $error');
+    }
   }
 }

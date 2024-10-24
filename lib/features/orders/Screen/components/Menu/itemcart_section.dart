@@ -6,6 +6,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:intl/intl.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/models/cartitem.dart';
+import 'package:provider/provider.dart';
 
 class ItemCart extends StatelessWidget {
   final List<CartItem> cartItems;
@@ -22,10 +23,12 @@ class ItemCart extends StatelessWidget {
     required this.cart,
   });
 
-  final NumberFormat currencyFormat = NumberFormat('#,###', 'id_ID');
+  final NumberFormat currencyFormat = NumberFormat('###');
 
   @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<Cart>(context);
+  final cartItems = cart.items; // Mendapatkan item cart dari Cart
     return Container(
       width: screenWidth * 0.3,
       child: ListView.separated(
