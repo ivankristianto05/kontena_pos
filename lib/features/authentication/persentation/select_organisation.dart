@@ -187,7 +187,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                 padding:
                                                     const EdgeInsetsDirectional
                                                         .fromSTEB(
-                                                        8.0, 120.0, 8.0, 0.0),
+                                                        8.0, 40.0, 8.0, 0.0),
                                                 child: Align(
                                                   child: SizedBox(
                                                     width: MediaQuery.sizeOf(
@@ -324,7 +324,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                 padding:
                                                     const EdgeInsetsDirectional
                                                         .fromSTEB(
-                                                        8.0, 120.0, 8.0, 0.0),
+                                                        8.0, 40.0, 8.0, 0.0),
                                                 child: Align(
                                                   child: SizedBox(
                                                     width: MediaQuery.sizeOf(

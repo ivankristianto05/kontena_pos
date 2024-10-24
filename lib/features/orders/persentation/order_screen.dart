@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
     as frappeFetchDataItem;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item_group.dart'
@@ -19,7 +20,11 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/functions/reformat_item_with_price.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/datetime_ui.dart';
+import 'package:kontena_pos/core/utils/number_ui.dart';
+import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
 import 'package:kontena_pos/features/orders/Screen/popup/itemdialog_section.dart';
+import 'package:kontena_pos/features/products/persentation/product_grid.dart';
+import 'package:kontena_pos/models/cartitem.dart';
 import 'package:kontena_pos/widgets/dropdown_delete.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
@@ -50,6 +55,9 @@ class _OrderScreenState extends State<OrderScreen> {
   List<dynamic> itemDisplay = [];
   List<dynamic> tempPosCart = [];
   List<dynamic> tempPosOrder = [];
+  Cart cart = Cart(AppState());
+  late List<CartItem> cartData;
+  // List<dynamic> or
 
   @override
   void initState() {
@@ -116,6 +124,9 @@ class _OrderScreenState extends State<OrderScreen> {
               children: [
                 TopBar(
                   isSelected: 'order',
+                  onTapRefresh: () {
+                    onTapRefresh();
+                  },
                 ),
                 Row(
                   children: [
@@ -163,12 +174,51 @@ class _OrderScreenState extends State<OrderScreen> {
                     children: [
                       Expanded(
                         flex: 2,
-                        child: CardMenu(
-                          onMenuTap: (name, price, idMenu, type) {
-                            _showItemDetailsDialog(name, price, idMenu, type);
-                          },
-                          filterType: _selectedFilterType,
-                          searchQuery: _searchQuery,
+                        child: SizedBox(
+                          width: MediaQuery.sizeOf(context)
+                                                .width,
+                          child: GridView.builder(
+                            padding: const EdgeInsets.all(8.0),
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 5,
+                              crossAxisSpacing: 6.0,
+                              mainAxisSpacing: 6.0,
+                            ),
+                            itemCount: itemDisplay.length,
+                            itemBuilder: (context, index) {
+                              final currentItem = itemDisplay[index];
+                              // final harga = int.tryParse(menu['harga'].toString()) ?? 0; // Convert price to integer
+
+                                  // _showItemDetailsDialog(menu['item_name'], menu['standard_rate'], menu['item_code'], menu['item_group'],);
+                              return ProductGrid(
+                                                      name: currentItem[
+                                                              'item_name'] ??
+                                                          '',
+                                                      category: currentItem[
+                                                              'item_group'] ??
+                                                          '',
+                                                      price: numberFormat(
+                                                          'idr',
+                                                          currentItem[
+                                                              'standard_rate']),
+                                                      image: CustomImageView(
+                                                        imagePath: ImageConstant
+                                                            .imgAdl1,
+                                                        height: 90.v,
+                                                        width: 70.h,
+                                                        margin: EdgeInsets.only(
+                                                            bottom: 1.v),
+                                                      ),
+                                                      onTap: () {
+                                                        onTapOpenItem(
+                                                          context,
+                                                          currentItem,
+                                                        );
+                                                        // _showItemDetailsDialog(currentItem['item_name'], int.parse(numberFormat('number_fixed', currentItem['standard_rate'])), currentItem['item_code'], currentItem['item_group'],);
+                                                      },
+                                                    );
+                            },
+                          ),
                         ),
                       ),
                       Container(
@@ -222,6 +272,17 @@ class _OrderScreenState extends State<OrderScreen> {
       },
     );
   }
+  onTapRefresh() {
+    
+                onCallItemGroup();
+                onCallItemPrice();
+                onCallItem();
+                onCallDataPosCart();
+                onCallDataPosOrder();
+
+                reformatOrderCart();
+  }
+
   void onCallItemGroup() async {
     // isLoading = true;
 
@@ -374,5 +435,63 @@ class _OrderScreenState extends State<OrderScreen> {
     } catch (error) {
       print('error call data pos order, $error');
     }
+  }
+
+  reformatOrderCart() async {
+    List<dynamic> cartNew = [];
+
+    // print('temp cart, ${tempPosCart[0]}');
+    // print('temp order, ${tempPosOrder[0]}');
+
+    if (tempPosCart.isNotEmpty) {
+      for (dynamic cartTemp in tempPosCart) {
+        dynamic tmp = cartTemp;
+        // print('test, ${tmp['name']}');
+        tmp['items'] = tempPosOrder
+            .where((ord) => ord['pos_cart'] == tmp['name'])
+            .toList();
+        cartNew.add(tmp);
+      }
+    }
+
+    // print('check cart new, $cartNew');
+    print('check cart new, ${cartNew.length}');
+    setState(() {
+      // orderDisplay = cartNew;
+    });
+  }
+
+  void onTapOpenItem(BuildContext context, dynamic item) async {
+    await showModalBottomSheet(
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: const Color(0x8A000000),
+      barrierColor: const Color(0x00000000),
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: MediaQuery.viewInsetsOf(context),
+          // child: ItemDetailsDialog(
+          //   name: item['nama_menu'],
+          //   price: int.parse(item['harga'].toString()),
+          //   idMenu: item['id_menu'],
+          //   type: item['type'],
+          //   onAddToCart: (item) {},
+          // ),
+          // child: Container(),
+          child: AddToCart(
+            dataMenu: item,
+          ),
+        );
+      },
+    ).then((value) => {});
+    setState(() {
+      // Map<String, dynamic> recap = cart.recapCart();
+      // AppState().totalPrice = double.parse(recap['totalPrice']);
+      // print('test, ${(cart.recapCart()).totalPrice}');
+
+      cartData = cart.getAllItemCart();
+      print('check cart data, ${cartData}');
+    });
   }
 }

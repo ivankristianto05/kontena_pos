@@ -15,10 +15,12 @@ class AddToCart extends StatefulWidget {
     Key? key,
     this.dataMenu,
     this.idxMenu,
+    this.order = false,
   }) : super(key: key);
 
   final dynamic dataMenu;
   final int? idxMenu;
+  bool order;
 
   @override
   _AddToCartState createState() => _AddToCartState();
@@ -35,7 +37,8 @@ class _AddToCartState extends State<AddToCart> {
   List<dynamic> selectedAddon = [];
   int qty = 0;
   late List<TextEditingController> qtyAddonController;
-  InvoiceCart cart = InvoiceCart();
+  InvoiceCart invoiceCart = InvoiceCart();
+  Cart orderCart = Cart(AppState());
 
   @override
   void setState(VoidCallback callback) {
@@ -1166,24 +1169,46 @@ class _AddToCartState extends State<AddToCart> {
       id += "-n${notes.hashCode}";
     }
 
-    InvoiceCartItem newItem = InvoiceCartItem(
+    // invoice
+    if (widget.order == false) {
+      InvoiceCartItem newItem = InvoiceCartItem(
+          id: id,
+          name: item['name'],
+          itemName: item['item_name'],
+          notes: note,
+          preference: {},
+          price: varian != null
+              ? varian['standard_rate'].toInt()
+              : item['standard_rate'].toInt(),
+          qty: qty,
+          uom: item['stock_uom'],
+          description: item['item_name'],
+          // addon: addon,
+          itemGroup: item['item_group']);
+
+      setState(() {
+        invoiceCart.addItem(newItem, mode: InvoiceCartMode.add);
+      });
+    } else {
+      CartItem newItem = CartItem(
         id: id,
         name: item['name'],
-        itemName: item['item_name'],
+        variant: null,
+        variantId: null,
+        qty: qty,
+        price: item['standart_rate'],
+        variantPrice: item['standard_rate'],
+        addonsPrice: item['standard_rate'], // Masukkan harga total addons
+        addons: null,
         notes: note,
         preference: {},
-        price: varian != null
-            ? varian['standard_rate'].toInt()
-            : item['standard_rate'].toInt(),
-        qty: qty,
-        uom: item['stock_uom'],
-        description: item['item_name'],
-        // addon: addon,
-        itemGroup: item['item_group']);
+        type: item['item_group'],
+      );
 
-    setState(() {
-      cart.addItem(newItem, mode: InvoiceCartMode.add);
-    });
+      // final cart = Provider.of<Cart>(context, listen: false);
+      orderCart.addItem(newItem);
+    }
+
 
     Navigator.pop(context);
     // Navigator.of(context).pushNamed(AppRoutes.invoiceScreen);

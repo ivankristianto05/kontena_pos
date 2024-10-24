@@ -64,9 +64,10 @@ class ActionButton extends StatelessWidget {
                   alertSuccess(context, 'Order berhasil ditambahkan');
                 }
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: $e')),
-                );
+                alertError(context, e.toString());
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   SnackBar(content: Text('Error: $e')),
+                // );
               }
             },
             child: Row(
