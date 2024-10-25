@@ -52,13 +52,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   InvoiceCart cart = InvoiceCart();
   late Map cartRecapData;
   late List<InvoiceCartItem> cartData;
-  late List<Map<String, dynamic>> cartDataItem = [
-    {
-      'id': 'test',
-      'name': 'Item 1',
-      'qty': 3,
-    }
-  ];
+  // late List<Map<String, dynamic>> cartDataItem = [
+  //   {
+  //     'id': 'test',
+  //     'name': 'Item 1',
+  //     'qty': 3,
+  //   }
+  // ];
   String filterSearch = '';
   bool isSearchActive = false;
   bool isLoading = true;
@@ -106,7 +106,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     onCallDataPosOrder();
     reformatOrderCart();
 
-    setState((){
+    setState(() {
       cartData = cart.getAllItemCart();
       AppState().typeTransaction = 'dine-in';
       typeTransaction = 'dine-in';
@@ -232,7 +232,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                       (context, index) {
                                                     final currentItem =
                                                         itemDisplay[index];
-                                                    
+
                                                     return ProductGrid(
                                                       name: currentItem[
                                                               'item_name'] ??
@@ -883,7 +883,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       setState(() {
         AppState().dataItemGroup = itemGroupRequset;
         // itemDisplay = itemGroupRequset;
-        isLoading = false;
+        // isLoading = false;
       });
     } catch (error) {
       isLoading = false;
@@ -891,12 +891,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         // Handle timeout error
         // _bottomScreenTimeout(context);
         if (context.mounted) {
-            alert.alertError(context, 'Gagal mengambil data item group dari server');
-          }
+          alert.alertError(
+              context, 'Gagal mengambil data item group dari server');
+        }
       } else {
         if (context.mounted) {
-            alert.alertError(context, error.toString());
-          }
+          alert.alertError(context, error.toString());
+        }
       }
       return;
     }
@@ -930,12 +931,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         // Handle timeout error
         // _bottomScreenTimeout(context);
         if (context.mounted) {
-            alert.alertError(context, 'Gagal mengambil data item price dari server');
-          }
+          alert.alertError(
+              context, 'Gagal mengambil data item price dari server');
+        }
       } else {
         if (context.mounted) {
-            alert.alertError(context, error.toString());
-          }
+          alert.alertError(context, error.toString());
+        }
       }
       return;
     }
@@ -967,6 +969,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           AppState().dataItemPrice,
         );
         itemDisplay = AppState().dataItem;
+        isLoading = false;
       });
       // AppState().userDetail = profileResult;
     } catch (error) {
@@ -975,12 +978,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         // Handle timeout error
         // _bottomScreenTimeout(context);
         if (context.mounted) {
-            alert.alertError(context, 'Gagal mengambil data item dari server');
-          }
+          alert.alertError(context, 'Gagal mengambil data item dari server');
+        }
       } else {
         if (context.mounted) {
-            alert.alertError(context, error.toString());
-          }
+          alert.alertError(context, error.toString());
+        }
       }
       return;
     }
@@ -1075,11 +1078,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         );
       },
     ).then((value) => {
-      setState((){
-        typeTransaction = AppState().typeTransaction;
-      }),
-      print('check type transaction, $typeTransaction')
-    });
+          setState(() {
+            typeTransaction = AppState().typeTransaction;
+          }),
+          print('check type transaction, $typeTransaction')
+        });
   }
 
   void addToCartFromOrder(BuildContext context, dynamic order) async {
@@ -1194,8 +1197,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     } catch (error) {
       print('error pos order, $error');
       if (context.mounted) {
-            alert.alertError(context, error.toString());
-          }
+        alert.alertError(context, error.toString());
+      }
     }
   }
 
@@ -1220,8 +1223,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     } catch (error) {
       print('error call data pos cart, $error');
       if (context.mounted) {
-            alert.alertError(context, error.toString());
-          }
+        alert.alertError(context, error.toString());
+      }
     }
   }
 
@@ -1246,8 +1249,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     } catch (error) {
       print('error call data pos order, $error');
       if (context.mounted) {
-            alert.alertError(context, error.toString());
-          }
+        alert.alertError(context, error.toString());
+      }
     }
   }
 

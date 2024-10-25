@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/functions/invoice.dart';
+import 'package:kontena_pos/core/functions/order_new.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/data/menu.dart';
-import 'package:kontena_pos/data/menuvarian.dart';
-import 'package:kontena_pos/models/cartitem.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
-import 'package:kontena_pos/core/functions/cart.dart';
+// import 'package:kontena_pos/core/functions/cart.dart';
 
 class AddToCart extends StatefulWidget {
   AddToCart({
@@ -38,7 +36,7 @@ class _AddToCartState extends State<AddToCart> {
   int qty = 0;
   late List<TextEditingController> qtyAddonController;
   InvoiceCart invoiceCart = InvoiceCart();
-  Cart orderCart = Cart(AppState());
+  OrderCart orderCart = OrderCart();
 
   @override
   void setState(VoidCallback callback) {
@@ -1171,44 +1169,51 @@ class _AddToCartState extends State<AddToCart> {
 
     // invoice
     if (widget.order == false) {
+      print('ivnoce');
       InvoiceCartItem newItem = InvoiceCartItem(
-          id: id,
-          name: item['name'],
-          itemName: item['item_name'],
-          notes: note,
-          preference: {},
-          price: varian != null
-              ? varian['standard_rate'].toInt()
-              : item['standard_rate'].toInt(),
-          qty: qty,
-          uom: item['stock_uom'],
-          description: item['item_name'],
-          // addon: addon,
-          itemGroup: item['item_group']);
+        id: id,
+        name: item['name'],
+        itemName: item['item_name'],
+        notes: note,
+        preference: {},
+        price: varian != null
+            ? varian['standard_rate'].toInt()
+            : item['standard_rate'].toInt(),
+        qty: qty,
+        uom: item['stock_uom'],
+        description: item['item_name'],
+        // addon: addon,
+        itemGroup: item['item_group'],
+      );
 
       setState(() {
         invoiceCart.addItem(newItem, mode: InvoiceCartMode.add);
       });
     } else {
-      CartItem newItem = CartItem(
+      print('order');
+      OrderCartItem newItem = OrderCartItem(
         id: id,
         name: item['name'],
-        variant: null,
-        variantId: null,
+        itemName: item['item_name'],
+        // variant: null,
+        // variantId: null,
+        uom: item['stock_uom'],
+        description: item['item_name'],
         qty: qty,
-        price: item['standart_rate'],
-        variantPrice: item['standard_rate'],
-        addonsPrice: item['standard_rate'], // Masukkan harga total addons
-        addons: null,
+        price: item['standard_rate'].floor(),
+        // variantPrice: item['standard_rate'].floor(),
+        // addonsPrice:
+        // item['standard_rate'].floor(), // Masukkan harga total addons
+        // addons: null,
         notes: note,
         preference: {},
-        type: item['item_group'],
+        itemGroup: item['item_group'],
+        // type: item['item_group'],
       );
 
       // final cart = Provider.of<Cart>(context, listen: false);
-      orderCart.addItem(newItem);
+      orderCart.addItem(newItem, mode: OrderCartMode.add);
     }
-
 
     Navigator.pop(context);
     // Navigator.of(context).pushNamed(AppRoutes.invoiceScreen);

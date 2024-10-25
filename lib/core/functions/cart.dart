@@ -7,6 +7,7 @@ enum CartMode {
   update, // Update the quantity if the item already exists
   add, // Add a new item if it doesn't exist
 }
+
 class Cart extends ChangeNotifier {
   final AppState appState; // Dependency injection for AppState
   VoidCallback? _onCartChanged;
@@ -35,7 +36,8 @@ class Cart extends ChangeNotifier {
 
   // Fungsi untuk menghitung ulang total harga
   void _recalculateTotalPrice() {
-    _totalPrice = appState.cartItems.fold(0.0, (sum, item) => sum + item.totalPrice);
+    _totalPrice =
+        appState.cartItems.fold(0.0, (sum, item) => sum + item.totalPrice);
     notifyListeners(); // Notify that total price has changed
   }
 
@@ -74,19 +76,21 @@ class Cart extends ChangeNotifier {
         addonsPrice: _calculateAddonsPrice(newItem.addons),
       );
 
-      appState.cartItems[existingItemIndex] = existingItem; // Update item di AppState
+      appState.cartItems[existingItemIndex] =
+          existingItem; // Update item di AppState
     } else {
       // Tambahkan item baru
       appState.cartItems.add(CartItem.from(newItem));
     }
     print('Daftar item di keranjang:');
     for (var item in appState.cartItems) {
-    print('Nama: ${item.name}, Qty: ${item.qty}');
-  }
+      print('Nama: ${item.name}, Qty: ${item.qty}');
+    }
     _recalculateTotalPrice(); // Hitung ulang total harga
     _onCartChanged?.call(); // Beritahu listener
     notifyListeners(); // Beritahu listener bahwa ada perubahan pada Cart
   }
+
   void updateItem(int index, CartItem updatedItem) {
     if (index >= 0 && index < appState.cartItems.length) {
       appState.cartItems[index] = CartItem.from(updatedItem);
@@ -97,6 +101,7 @@ class Cart extends ChangeNotifier {
       print('Item to update not found in the cart');
     }
   }
+
   // Menghapus item dari cart
   void removeItem(int index) {
     if (index < 0 || index >= appState.cartItems.length) {
@@ -115,9 +120,11 @@ class Cart extends ChangeNotifier {
     _onCartChanged?.call();
     notifyListeners(); // Notify listeners
   }
-List<CartItem> getAllItemCart() {
+
+  List<CartItem> getAllItemCart() {
     return AppState().cartItems.toList();
   }
+
   // Mengecek apakah item ada di cart
   bool isItemInCart(String itemId) {
     return appState.cartItems.any((item) => item.id == itemId);

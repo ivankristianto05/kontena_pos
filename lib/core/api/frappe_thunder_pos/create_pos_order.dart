@@ -38,7 +38,7 @@ class CreatePosOrderRequest {
 
   Map<String, dynamic> toJson() {
     final data = {
-      "docstatus": 1,
+      "docstatus": 0,
       "customer": customer,
       "customer_name": customerName,
       "company": company,

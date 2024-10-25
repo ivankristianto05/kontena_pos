@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/functions/order.dart';
-import 'package:kontena_pos/models/cartitem.dart';
 import 'package:kontena_pos/models/list_to_serve.dart';
 
 class ServeManager extends ChangeNotifier {
@@ -16,9 +15,10 @@ class ServeManager extends ChangeNotifier {
     _currentServeOrderId = orderId;
     notifyListeners();
   }
+
   final AppState appState;
   final OrderManager orderManager;
-  
+
   ServeManager(this.appState, this.orderManager);
 
   // Method untuk menambahkan confirmed order ke served list
@@ -38,7 +38,7 @@ class ServeManager extends ChangeNotifier {
 
       // Tambahkan ke daftar servedOrders
       _serveOrders.add(servedOrder);
-      //_currentServeOrderId = confirmedOrder.idOrder; 
+      //_currentServeOrderId = confirmedOrder.idOrder;
       notifyListeners(); // Beritahu UI bahwa data berubah
     } else {
       print('Order dengan ID $orderId tidak ditemukan.');
@@ -90,7 +90,8 @@ class ServeManager extends ChangeNotifier {
 
     // Reset currentOrderId setelah pesanan dihapus
     if (_serveOrders.isNotEmpty) {
-      _currentServeOrderId = _serveOrders.last.idOrder; // Pilih pesanan terakhir
+      _currentServeOrderId =
+          _serveOrders.last.idOrder; // Pilih pesanan terakhir
     } else {
       _currentServeOrderId = ''; // Tidak ada pesanan yang tersisa
     }

@@ -176,8 +176,9 @@ class ColorSchemes {
 
     // Error colors
     onError: Color(0XFFF81E01),
+    onSecondary: Color(0XFF36C450),
 
-    // On colors(text colors)
+    // On colors(text colors)#36c450
     onPrimary: Color(0XFF222831),
     onPrimaryContainer: Color(0XFF9E9E9E),
     outline: Color(0xFFE0E0E0),
