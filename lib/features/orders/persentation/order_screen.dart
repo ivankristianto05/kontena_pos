@@ -63,6 +63,7 @@ class _OrderScreenState extends State<OrderScreen> {
   void initState() {
     super.initState();
     _guestNameController.addListener(_updateState);
+    onCallItem();
   }
 
   @override
@@ -182,7 +183,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 5,
                               crossAxisSpacing: 6.0,
-                              mainAxisSpacing: 6.0,
+                              mainAxisSpacing: 4,
                             ),
                             itemCount: itemDisplay.length,
                             itemBuilder: (context, index) {
