@@ -6,19 +6,19 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/app_state.dart';
 
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
-    as frappeFetchDataItem;
+    as FrappeFetchDataItem;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item_group.dart'
-    as frappeFetchDataItemGroup;
+    as FrappeFetchDataItemGroup;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item_price.dart'
-    as frappeFetchDataItemPrice;
+    as FrappeFetchDataItemPrice;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_cart.dart'
-    as frappeFetchDataCart;
+    as FrappeFetchCreateCart;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_cart.dart'
-    as frappeFetchDataGetCart;
+    as FrappeFetchDataGetCart;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_order.dart'
-    as frappeFetchDataOrder;
+    as FrappeFetchCreateOrder;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_order.dart'
-    as frappeFetchDataGetOrder;
+    as FrappeFetchDataGetOrder;
 
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/core/functions/invoice.dart';
@@ -483,6 +483,22 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                               ],
                                                                             ),
                                                                           ),
+                                                                          Text(
+                                                                            (orderItem['docstatus'] == 1)
+                                                                                ? 'Confirm'
+                                                                                : 'Draft',
+                                                                            style: (orderItem['docstatus'] != 1)
+                                                                                ? TextStyle(
+                                                                                    color: theme.colorScheme.secondary,
+                                                                                    fontWeight: FontWeight.w700,
+                                                                                    fontSize: 12,
+                                                                                  )
+                                                                                : TextStyle(
+                                                                                    color: theme.colorScheme.primary,
+                                                                                    fontWeight: FontWeight.w700,
+                                                                                    fontSize: 12,
+                                                                                  ),
+                                                                          ),
                                                                         ],
                                                                       ),
                                                                     );
@@ -866,19 +882,19 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   void onCallItemGroup() async {
     // isLoading = true;
 
-    final frappeFetchDataItemGroup.ItemGroupRequest requestItemGroup =
-        frappeFetchDataItemGroup.ItemGroupRequest(
+    final FrappeFetchDataItemGroup.ItemGroupRequest requestItemGroup =
+        FrappeFetchDataItemGroup.ItemGroupRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
       filters: '[]',
     );
 
     try {
-      final itemGroupRequset = await frappeFetchDataItemGroup
-          .requestItemGroup(requestQuery: requestItemGroup)
+      final itemGroupRequset = await FrappeFetchDataItemGroup.requestItemGroup(
+              requestQuery: requestItemGroup)
           .timeout(
-            Duration(seconds: 30),
-          );
+        Duration(seconds: 30),
+      );
 
       setState(() {
         AppState().dataItemGroup = itemGroupRequset;
@@ -905,8 +921,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   void onCallItemPrice() async {
     String? today = dateTimeFormat('date', null);
-    final frappeFetchDataItemPrice.ItemPriceRequest requestItemPrice =
-        frappeFetchDataItemPrice.ItemPriceRequest(
+    final FrappeFetchDataItemPrice.ItemPriceRequest requestItemPrice =
+        FrappeFetchDataItemPrice.ItemPriceRequest(
       cookie: AppState().setCookie,
       filters: '[["selling","=",1],["valid_from","<=","$today"]]',
       limit: 5000,
@@ -914,11 +930,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     try {
       // Add a timeout of 30 seconds to the profile request
-      final itemPriceRequest = await frappeFetchDataItemPrice
-          .requestItemPrice(requestQuery: requestItemPrice)
+      final itemPriceRequest = await FrappeFetchDataItemPrice.requestItemPrice(
+              requestQuery: requestItemPrice)
           .timeout(
-            Duration(seconds: 30),
-          );
+        Duration(seconds: 30),
+      );
 
       // print("item price request: $itemPriceRequest");
       setState(() {
@@ -946,8 +962,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   void onCallItem() async {
     isLoading = true;
 
-    final frappeFetchDataItem.ItemRequest requestItem =
-        frappeFetchDataItem.ItemRequest(
+    final FrappeFetchDataItem.ItemRequest requestItem =
+        FrappeFetchDataItem.ItemRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
       filters: '[["disabled","=",0],["is_sales_item","=",1]]',
@@ -956,11 +972,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     try {
       // Add a timeout of 30 seconds to the profile request
-      final itemRequest = await frappeFetchDataItem
-          .requestItem(requestQuery: requestItem)
-          .timeout(
-            Duration(seconds: 30),
-          );
+      final itemRequest =
+          await FrappeFetchDataItem.requestItem(requestQuery: requestItem)
+              .timeout(
+        Duration(seconds: 30),
+      );
 
       // print("titiew: $itemRequset");
       setState(() {
@@ -1028,7 +1044,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       // print('test, ${(cart.recapCart()).totalPrice}');
 
       cartData = cart.getAllItemCart();
-      print('check cart data, ${cartData}');
+      // print('check cart data, ${cartData}');
     });
   }
 
@@ -1091,18 +1107,21 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     });
     const Duration(seconds: 1);
 
-    for (int a = 0; a < order.items.length; a++) {
+    for (int a = 0; a < order['items'].length; a++) {
       InvoiceCartItem newItem = InvoiceCartItem(
-        id: order.items[a].id,
-        name: order.items[a].name,
-        itemName: order.items[a].item_name,
-        itemGroup: order.items[a].item_group,
-        uom: order.items[a].uom,
-        description: order.items[a].description,
-        qty: order.items[a].qty,
-        price: order.items[a].price,
-        notes: order.items[a].notes,
-        preference: order.items[a].preference,
+        id: order['items'][a]['name'],
+        name: order['items'][a]['item'],
+        itemName: order['items'][a]['item_name'],
+        itemGroup: order['items'][a]['item_group'],
+        uom: order['items'][a]['uom'] ?? '',
+        description:
+            order['items'][a]['description'] ?? order['items'][a]['item_name'],
+        qty: order['items'][a]['qty'],
+        price: order['items'][a]['price'].floor(),
+        notes: order['items'][a]['note'],
+        preference: order['items'][a]['preference'] ?? {},
+        status: order['items'][a]['docstatus'] == 1 ? true : false,
+        cartId: order['name'],
       );
 
       setState(() {
@@ -1128,8 +1147,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   onCallPosCart() async {
-    final frappeFetchDataCart.CreatePosCartRequest request =
-        frappeFetchDataCart.CreatePosCartRequest(
+    final FrappeFetchCreateCart.CreatePosCartRequest request =
+        FrappeFetchCreateCart.CreatePosCartRequest(
       cookie: AppState().setCookie,
       customer: '0',
       customerName: 'Guest',
@@ -1146,7 +1165,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     try {
       final callReqPosCart =
-          await frappeFetchDataCart.request(requestQuery: request);
+          await FrappeFetchCreateCart.request(requestQuery: request);
 
       if (callReqPosCart.isNotEmpty) {
         cartSelected = callReqPosCart;
@@ -1165,8 +1184,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           'item': itm.name,
           'item_name': itm.itemName,
           'item_group': itm.itemGroup,
+          'uom': itm.uom,
           'qty': itm.qty,
-          'notes': itm.notes
+          'notes': itm.notes,
+          'cartId': cartSelected.name,
         };
         onCallPosOrder(itemReq);
       }
@@ -1174,8 +1195,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   onCallPosOrder(dynamic paramItem) async {
-    final frappeFetchDataOrder.CreatePosOrderRequest request =
-        frappeFetchDataOrder.CreatePosOrderRequest(
+    final FrappeFetchCreateOrder.CreatePosOrderRequest request =
+        FrappeFetchCreateOrder.CreatePosOrderRequest(
       cookie: AppState().setCookie,
       customer: '0',
       customerName: 'Guest',
@@ -1187,13 +1208,14 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       item: paramItem['item'],
       itemName: paramItem['item_name'],
       itemGroup: paramItem['item_group'],
+      uom: paramItem['uom'],
       note: paramItem['notes'],
       qty: paramItem['qty'],
     );
 
     try {
       final reqPosOrder =
-          await frappeFetchDataOrder.request(requestQuery: request);
+          await FrappeFetchCreateOrder.request(requestQuery: request);
     } catch (error) {
       print('error pos order, $error');
       if (context.mounted) {
@@ -1203,8 +1225,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   onCallDataPosCart() async {
-    final frappeFetchDataGetCart.PosCartRequest request =
-        frappeFetchDataGetCart.PosCartRequest(
+    final FrappeFetchDataGetCart.PosCartRequest request =
+        FrappeFetchDataGetCart.PosCartRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
       filters: '[]',
@@ -1213,7 +1235,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     try {
       final callRequest =
-          await frappeFetchDataGetCart.requestPosCart(requestQuery: request);
+          await FrappeFetchDataGetCart.requestPosCart(requestQuery: request);
 
       if (callRequest.isNotEmpty) {
         setState(() {
@@ -1229,8 +1251,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   onCallDataPosOrder() async {
-    final frappeFetchDataGetOrder.PosOrderRequest request =
-        frappeFetchDataGetOrder.PosOrderRequest(
+    final FrappeFetchDataGetOrder.PosOrderRequest request =
+        FrappeFetchDataGetOrder.PosOrderRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
       filters: '[]',
@@ -1239,7 +1261,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     try {
       final callRequest =
-          await frappeFetchDataGetOrder.requestPosOrder(requestQuery: request);
+          await FrappeFetchDataGetOrder.requestPosOrder(requestQuery: request);
 
       if (callRequest.isNotEmpty) {
         setState(() {

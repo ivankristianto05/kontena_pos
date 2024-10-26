@@ -20,6 +20,8 @@ class InvoiceCartItem {
   late int totalPrice;
   String? notes;
   Map<String, Map<String, dynamic>>? addon;
+  bool? status;
+  String? cartId;
 
   InvoiceCartItem({
     required this.id,
@@ -33,6 +35,8 @@ class InvoiceCartItem {
     required this.description,
     this.notes,
     this.addon,
+    this.status,
+    this.cartId,
   }) {
     totalPrice = qty * price;
   }
@@ -71,6 +75,8 @@ class InvoiceCart {
         notes: '',
         uom: '',
         description: '',
+        status: false,
+        cartId: '',
       ),
     ); // Return an empty CartItem if not found
 

@@ -1208,6 +1208,7 @@ class _AddToCartState extends State<AddToCart> {
         notes: note,
         preference: {},
         itemGroup: item['item_group'],
+        status: false,
         // type: item['item_group'],
       );
 

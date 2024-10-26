@@ -13,6 +13,7 @@ class CreatePosOrderRequest {
   final String item;
   final String itemName;
   final String itemGroup;
+  final String uom;
   final String? note;
   final int qty;
 
@@ -28,6 +29,7 @@ class CreatePosOrderRequest {
     required this.item,
     required this.itemName,
     required this.itemGroup,
+    required this.uom,
     this.note,
     required this.qty,
   });
@@ -48,8 +50,11 @@ class CreatePosOrderRequest {
       "item": item,
       "item_name": itemName,
       "item_group": itemGroup,
+      "uom": uom,
       "note": note,
       "quantity": qty,
+      "ots_dlv": 0,
+      "ots_bill": 0,
     };
 
     data.removeWhere((key, value) => value == null);

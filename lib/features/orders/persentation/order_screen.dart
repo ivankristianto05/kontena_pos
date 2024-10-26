@@ -52,8 +52,7 @@ class _OrderScreenState extends State<OrderScreen> {
   OrderCart cart = OrderCart();
   late Map cartRecapData;
   late List<OrderCartItem> cartData;
-  TextEditingController enterGuestNameController =
-      TextEditingController();
+  TextEditingController enterGuestNameController = TextEditingController();
   String? table;
   String? pickupType;
   String typeTransaction = 'dine-in';
@@ -635,7 +634,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                             .resetOrderCart();
                                                         cartData = [];
                                                         cartSelected = null;
-                                                        
+
                                                         // modeView == 'order';
                                                       });
                                                     },
@@ -703,6 +702,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                           itemCount: cartData.length,
                                           itemBuilder: (context, index) {
                                             final itemData = cartData[index];
+                                            bool isCheck =
+                                                itemData.status ? true : false;
+                                            print('is checked, $isCheck');
                                             return Padding(
                                               padding:
                                                   const EdgeInsetsDirectional
@@ -716,7 +718,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
                                                             .start,
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     children: [
                                                       Text(
                                                         '${itemData.qty}x ${itemData.itemName}',
@@ -725,34 +729,24 @@ class _OrderScreenState extends State<OrderScreen> {
                                                       ),
                                                       if (modeView == 'confirm')
                                                         Checkbox(
-                                                          value: itemData.status,
-                                                          onChanged: (bool? value) {
-                                                            Map<String, dynamic> itemNew = cart.getItemCart(itemData.name);
-                                                            OrderCartItem newItem = OrderCartItem(
-                                                              id: itemNew['id'],
-                                                              name: itemNew['name'],
-                                                              itemName: itemNew['itemName'],
-                                                              itemGroup: itemNew['itemGroup'],
-                                                              uom: itemNew['uom'] ?? '',
-                                                              description: itemNew['description'] ?? '',
-                                                              qty: itemNew['qty'],
-                                                              price: itemNew['price'].floor(),
-                                                              notes: itemNew['note'],
-                                                              preference: itemNew['preference'] ?? {},
-                                                              status: itemNew['docstatus'] == null ? true : false,
-                                                            );
-                                                            print('check itemNew, ${itemNew['status']}');
-                                                            setState((){
-                                                              itemNew['status'] = true;
-                                                              cart.addItem(newItem, mode: OrderCartMode.update);
-                                                           });
-                                                           print('check cart, ${cartData}');
-                                                            // appState.setItemCheckedStatus(
-                                                            //   currentOrderId,
-                                                            //   listItem.items[i].id,
-                                                            //   value ?? false,
-                                                            // );
-                                                            // _checkAllCheckedStatus();
+                                                          value: isCheck,
+                                                          onChanged:
+                                                              (bool? value) {
+                                                            if (value != null) {
+                                                              print(
+                                                                  'check , $value');
+                                                              setState(() {
+                                                                isCheck = value;
+                                                              });
+                                                              onCheckboxChange(
+                                                                itemData,
+                                                                index,
+                                                                value ?? false,
+                                                              );
+                                                              print(
+                                                                  'check , $isCheck');
+                                                            }
+                                                            // isCheck = value!;
                                                           },
                                                         ),
                                                     ],
@@ -1174,6 +1168,7 @@ class _OrderScreenState extends State<OrderScreen> {
               'item': itm.name,
               'item_name': itm.itemName,
               'item_group': itm.itemGroup,
+              'uom': itm.uom,
               'qty': itm.qty,
               'notes': itm.notes
             };
@@ -1218,6 +1213,7 @@ class _OrderScreenState extends State<OrderScreen> {
       item: paramItem['item'],
       itemName: paramItem['item_name'],
       itemGroup: paramItem['item_group'],
+      uom: paramItem['uom'],
       note: paramItem['notes'] ?? '-',
       qty: paramItem['qty'],
     );
@@ -1259,7 +1255,7 @@ class _OrderScreenState extends State<OrderScreen> {
     if (tempPosCart.isNotEmpty) {
       for (dynamic cartTemp in tempPosCart) {
         dynamic tmp = cartTemp;
-        // print('test, ${tmp['name']}');
+
         tmp['items'] = tempPosOrder
             .where((ord) => ord['pos_cart'] == tmp['name'])
             .toList();
@@ -1268,7 +1264,7 @@ class _OrderScreenState extends State<OrderScreen> {
     }
 
     // print('check cart new, $cartNew');
-    print('check cart new, ${cartNew.length}');
+    // print('check cart new, ${cartNew.length}');
     setState(() {
       orderDisplay = cartNew;
     });
@@ -1326,7 +1322,7 @@ class _OrderScreenState extends State<OrderScreen> {
       // print('test, ${(cart.recapCart()).totalPrice}');
 
       cartData = cart.getAllItemCart();
-      print('check cart data, ${cartData}');
+      // print('check cart data, ${cartData}');
     });
   }
 
@@ -1339,7 +1335,7 @@ class _OrderScreenState extends State<OrderScreen> {
     print('check items, ${order['items'][0]['name']}');
     for (int a = 0; a < order['items'].length; a++) {
       OrderCartItem newItem = OrderCartItem(
-        id: order['items'][a]['id'] ?? order['items'][a]['name'],
+        id: order['items'][a]['name'],
         name: order['items'][a]['name'],
         itemName: order['items'][a]['item_name'],
         itemGroup: order['items'][a]['item_group'],
@@ -1366,5 +1362,39 @@ class _OrderScreenState extends State<OrderScreen> {
     // order.forEach((dt) {
     //   print('check, $dt');
     // });
+  }
+
+  onCheckboxChange(OrderCartItem itemOrder, int? index, bool? value) {
+    print('chekc item order, $itemOrder');
+    // print('test--- 1, ${tempPosOrder}');
+    // print('test--- 2, ${tempPosCart}');
+    OrderCartItem itemNew = cart.getItemByIndex(index!);
+    // itemNew.status = value;
+    // print('check item --- 3, ${itemNew.status}');
+    OrderCartItem newItem = OrderCartItem(
+      id: itemNew.id,
+      name: itemNew.name,
+      itemName: itemNew.itemName,
+      itemGroup: itemNew.itemGroup,
+      uom: itemNew.uom,
+      description: itemNew.description,
+      qty: itemNew.qty,
+      price: itemNew.price,
+      notes: itemNew.notes,
+      preference: itemNew.preference,
+      status: value ?? false,
+    );
+    // print('check itemNew, ${itemNew['status']}');
+    setState(() {
+      //   itemNew['status'] = true;
+      cart.addItem(newItem, mode: OrderCartMode.update);
+    });
+    // print('check cart, ${cartData}');
+    // appState.setItemCheckedStatus(
+    //   currentOrderId,
+    //   listItem.items[i].id,
+    //   value ?? false,
+    // );
+    // _checkAllCheckedStatus();
   }
 }

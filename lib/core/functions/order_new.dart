@@ -20,7 +20,7 @@ class OrderCartItem {
   late int totalPrice;
   String? notes;
   Map<String, Map<String, dynamic>>? addon;
-  bool? status;
+  bool status;
 
   OrderCartItem({
     required this.id,
@@ -34,7 +34,7 @@ class OrderCartItem {
     required this.description,
     this.notes,
     this.addon,
-    this.status,
+    required this.status,
   }) {
     totalPrice = qty * price;
   }
