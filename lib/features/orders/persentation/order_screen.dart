@@ -52,7 +52,7 @@ class _OrderScreenState extends State<OrderScreen> {
   OrderCart cart = OrderCart();
   late Map cartRecapData;
   late List<OrderCartItem> cartData;
-  final TextEditingController enterGuestNameController =
+  TextEditingController enterGuestNameController =
       TextEditingController();
   String? table;
   String? pickupType;
@@ -93,7 +93,7 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void dispose() {
     // enterGuestNameController.removeListener(_updateState);
-    enterGuestNameController.dispose();
+    // enterGuestNameController.dispose();
     super.dispose();
   }
 
@@ -634,8 +634,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                                         AppState
                                                             .resetOrderCart();
                                                         cartData = [];
-                                                        modeView = 'order';
                                                         cartSelected = null;
+                                                        
+                                                        // modeView == 'order';
                                                       });
                                                     },
                                                   ),
@@ -715,12 +716,45 @@ class _OrderScreenState extends State<OrderScreen> {
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
                                                             .start,
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
                                                       Text(
                                                         '${itemData.qty}x ${itemData.itemName}',
                                                         style: CustomTextStyles
                                                             .labelLargeBlack,
                                                       ),
+                                                      if (modeView == 'confirm')
+                                                        Checkbox(
+                                                          value: itemData.status,
+                                                          onChanged: (bool? value) {
+                                                            Map<String, dynamic> itemNew = cart.getItemCart(itemData.name);
+                                                            OrderCartItem newItem = OrderCartItem(
+                                                              id: itemNew['id'],
+                                                              name: itemNew['name'],
+                                                              itemName: itemNew['itemName'],
+                                                              itemGroup: itemNew['itemGroup'],
+                                                              uom: itemNew['uom'] ?? '',
+                                                              description: itemNew['description'] ?? '',
+                                                              qty: itemNew['qty'],
+                                                              price: itemNew['price'].floor(),
+                                                              notes: itemNew['note'],
+                                                              preference: itemNew['preference'] ?? {},
+                                                              status: itemNew['docstatus'] == null ? true : false,
+                                                            );
+                                                            print('check itemNew, ${itemNew['status']}');
+                                                            setState((){
+                                                              itemNew['status'] = true;
+                                                              cart.addItem(newItem, mode: OrderCartMode.update);
+                                                           });
+                                                           print('check cart, ${cartData}');
+                                                            // appState.setItemCheckedStatus(
+                                                            //   currentOrderId,
+                                                            //   listItem.items[i].id,
+                                                            //   value ?? false,
+                                                            // );
+                                                            // _checkAllCheckedStatus();
+                                                          },
+                                                        ),
                                                     ],
                                                   ),
                                                   // Dotted Divider Line
@@ -1313,8 +1347,9 @@ class _OrderScreenState extends State<OrderScreen> {
         description: order['items'][a]['description'] ?? '',
         qty: order['items'][a]['qty'],
         price: order['items'][a]['price'].floor(),
-        notes: order['items'][a]['notes'],
+        notes: order['items'][a]['note'],
         preference: order['items'][a]['preference'] ?? {},
+        status: order['items'][a]['docstatus'] == 1 ? true : false,
       );
 
       setState(() {
@@ -1322,7 +1357,8 @@ class _OrderScreenState extends State<OrderScreen> {
       });
     }
     setState(() {
-      enterGuestNameController.text = order.namaPemesan;
+      print('chekc ${order['customer_name']}');
+      enterGuestNameController.text = order['customer_name'].toString();
       typeTransaction = 'dine-in';
       cartData = cart.getAllItemCart();
       // isEdit = false;

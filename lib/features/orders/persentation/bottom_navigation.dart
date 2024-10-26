@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/core/functions/invoice.dart';
+import 'package:kontena_pos/core/functions/order_new.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 
@@ -11,7 +11,7 @@ class BottomNavigationOrder extends StatelessWidget {
   VoidCallback? onTapAction;
   String? isSelected;
 
-  InvoiceCart cart = InvoiceCart();
+  OrderCart cart = OrderCart();
 
   BottomNavigationOrder({
     super.key,
