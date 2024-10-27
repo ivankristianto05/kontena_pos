@@ -16,6 +16,8 @@ class CreatePosOrderRequest {
   final String uom;
   final String? note;
   final int qty;
+  final int status;
+  final String? id;
 
   CreatePosOrderRequest({
     required this.cookie,
@@ -32,15 +34,21 @@ class CreatePosOrderRequest {
     required this.uom,
     this.note,
     required this.qty,
+    required this.status,
+    this.id,
   });
 
   Map<String, String> formatHeader() {
     return {'Cookie': cookie};
   }
 
+  String? getParamID() {
+    return id;
+  }
+
   Map<String, dynamic> toJson() {
     final data = {
-      "docstatus": 0,
+      "docstatus": status,
       "customer": customer,
       "customer_name": customerName,
       "company": company,
@@ -53,7 +61,7 @@ class CreatePosOrderRequest {
       "uom": uom,
       "note": note,
       "quantity": qty,
-      "ots_dlv": 0,
+      "ots_dlv": status == 1 ? 1 : 0,
       "ots_bill": 0,
     };
 
@@ -64,7 +72,17 @@ class CreatePosOrderRequest {
 
 Future<Map<String, dynamic>> request(
     {required CreatePosOrderRequest requestQuery}) async {
-  String url = 'https://erp2.hotelkontena.com/api/resource/POS Order';
+  String url;
+
+  if (requestQuery.getParamID() != null) {
+    url =
+        'https://erp2.hotelkontena.com/api/resource/POS Order/${requestQuery.getParamID()}';
+  } else {
+    url = 'https://erp2.hotelkontena.com/api/resource/POS Order';
+  }
+
+  print('url, $url');
+  print('body, ${json.encode(requestQuery.toJson())}');
 
   final response = await http.post(
     Uri.parse(url),
@@ -72,13 +90,24 @@ Future<Map<String, dynamic>> request(
     body: json.encode(requestQuery.toJson()),
   );
 
+  print('response code, ${response.statusCode}');
+  print('respon body, ${response.body}');
+
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
 
-    if (responseBody.containsKey('data')) {
-      return responseBody['data'];
+    if (requestQuery.getParamID() != null) {
+      if (responseBody.containsKey('data')) {
+        return responseBody['data'];
+      } else {
+        return requestQuery.toJson();
+      }
     } else {
-      throw Exception(responseBody);
+      if (responseBody.containsKey('data')) {
+        return responseBody['data'];
+      } else {
+        throw Exception(responseBody);
+      }
     }
   } else {
     final responseBody = json.decode(response.body);

@@ -60,8 +60,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   //   }
   // ];
   String filterSearch = '';
-  bool isSearchActive = false;
-  bool isLoading = true;
   String selectedGroup = '';
 
   List<dynamic> item = [];
@@ -76,7 +74,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   String typeTransaction = 'dine-in';
   int totalAddon = 0;
   int totalAddonCheckout = 0;
+
+  bool isSearchActive = false;
+  bool isLoading = true;
   bool isEdit = true;
+  bool isLoadingContent = false;
   dynamic cartSelected;
 
 // // //   //  final String id;
@@ -98,13 +100,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   @override
   void initState() {
     super.initState();
-    onCallItemGroup();
-    onCallItemPrice();
-    onCallItem();
+    onTapRefreshMenu();
+    onTapRefreshOrder();
+    // onCallItemGroup();
+    // onCallItemPrice();
+    // onCallItem();
 
-    onCallDataPosCart();
-    onCallDataPosOrder();
-    reformatOrderCart();
+    // onCallDataPosCart();
+    // onCallDataPosOrder();
+    // reformatOrderCart();
 
     setState(() {
       cartData = cart.getAllItemCart();
@@ -163,14 +167,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           children: [
             TopBar(
               isSelected: 'invoice',
-              onTapRefresh: () {
-                onCallItemGroup();
-                onCallItemPrice();
-                onCallItem();
-                onCallDataPosCart();
-                onCallDataPosOrder();
+              onTapRefresh: () async {
+                if (modeView == 'item') {
+                  onTapRefreshMenu();
 
-                reformatOrderCart();
+                } else if (modeView == 'order') {
+                  onTapRefreshOrder();
+                }
               },
             ),
             Expanded(
@@ -268,7 +271,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                   ),
                                 ),
                               ),
-                            if (modeView == 'orderPay')
+                            if (modeView == 'order')
                               Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 50.0, 8.0, 0.0),
@@ -847,7 +850,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 isSelected: modeView,
                 onTapOrderToPay: () {
                   setState(() {
-                    modeView = 'orderPay';
+                    modeView = 'order';
                   });
                 },
                 onTapItem: () {
@@ -877,6 +880,29 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         ),
       ),
     );
+  }
+
+  onTapRefreshMenu() {
+    print('tap refresjh');
+    setState((){
+      // isLoadingContent = true;
+    });
+    onCallItemGroup();
+    onCallItemPrice();
+    onCallItem();
+    // onCallDataPosCart();
+    // onCallDataPosOrder();
+
+    // reformatOrderCart(); 
+  }
+
+  onTapRefreshOrder() async {
+    setState((){
+      isLoadingContent = true;
+    });
+    await onCallDataPosCart();
+    await onCallDataPosOrder();
+    await reformatOrderCart();
   }
 
   void onCallItemGroup() async {
@@ -1211,6 +1237,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       uom: paramItem['uom'],
       note: paramItem['notes'],
       qty: paramItem['qty'],
+      status: 1,
+      id: null,
     );
 
     try {

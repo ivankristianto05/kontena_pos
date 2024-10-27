@@ -54,7 +54,7 @@ class BottomNavigationInvoice extends StatelessWidget {
                   Text(
                     'Order to Pay',
                     style: TextStyle(
-                      color: isSelected == 'orderPay'
+                      color: isSelected == 'order'
                           ? theme.colorScheme.primary
                           : theme.colorScheme.primaryContainer,
                       fontSize: 16,
