@@ -9,6 +9,7 @@ class PosInvoiceRequest {
   final String? orderBy;
   final int? limit;
   final String? filters;
+  final String? id;
   // late http.Client client;
 
   PosInvoiceRequest({
@@ -18,6 +19,7 @@ class PosInvoiceRequest {
     this.limitStart,
     this.filters,
     this.orderBy,
+    this.id,
   }) {
     // client = http.Client();
   }
@@ -53,6 +55,13 @@ class PosInvoiceRequest {
       'Cookie': cookie,
     };
   }
+
+  Map<String, String> paramDetail() {
+    return {
+      'doctype': 'POS Invoice',
+      'name': id ?? '',
+    };
+  }
 }
 
 String queryParams(Map<String, dynamic> map) =>
@@ -73,6 +82,28 @@ Future<List<dynamic>> request(
     final responseBody = json.decode(response.body);
     if (responseBody.containsKey('data')) {
       return responseBody['data'];
+    } else {
+      throw Exception(responseBody);
+    }
+  } else {
+    throw Exception('System unknown error code ${response.statusCode}');
+  }
+}
+
+Future<Map<String, dynamic>> requestDetail(
+    {required PosInvoiceRequest requestQuery}) async {
+  String url =
+      'https://erp2.hotelkontena.com/api/method/frappe.desk.form.load.getdoc?${queryParams(requestQuery.paramDetail())}';
+  print('url, $url');
+  final response = await http.get(
+    Uri.parse(url),
+    headers: requestQuery.formatHeader(),
+  );
+
+  if (response.statusCode == 200) {
+    final responseBody = json.decode(response.body);
+    if (responseBody.containsKey('docs')) {
+      return responseBody['docs'][0];
     } else {
       throw Exception(responseBody);
     }
