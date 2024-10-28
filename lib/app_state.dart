@@ -271,6 +271,7 @@ class AppState extends ChangeNotifier {
   List<dynamic> dataItem = [];
   List<dynamic> dataItemGroup = [];
   List<dynamic> dataItemPrice = [];
+  List<dynamic> dataItemAddon = [];
 
   dynamic configCompany;
   dynamic configPOSProfile;

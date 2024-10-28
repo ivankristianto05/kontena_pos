@@ -21,6 +21,7 @@ class OrderCartItem {
   String? notes;
   Map<String, Map<String, dynamic>>? addon;
   bool status;
+  int docstatus;
 
   OrderCartItem({
     required this.id,
@@ -35,6 +36,7 @@ class OrderCartItem {
     this.notes,
     this.addon,
     required this.status,
+    required this.docstatus,
   }) {
     totalPrice = qty * price;
   }
@@ -74,6 +76,7 @@ class OrderCart {
         uom: '',
         description: '',
         status: false,
+        docstatus: 0,
       ),
     ); // Return an empty CartItem if not found
     print('test, ${existingItem.id}');

@@ -812,6 +812,78 @@ class _AddToCartState extends State<AddToCart> {
                         ),
                       ),
                     ),
+                  if (widget.idxMenu != null)
+                    Padding(
+                      padding:
+                          EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  8.0, 8.0, 8.0, 8.0),
+                              child: Container(
+                                width: double.infinity,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(2.0),
+                                ),
+                                child: CustomElevatedButton(
+                                  text: "Update to Cart",
+                                  buttonTextStyle: TextStyle(
+                                    color: theme.colorScheme.primaryContainer,
+                                  ),
+                                  buttonStyle: CustomButtonStyles.primary,
+                                  onPressed: () {
+                                    updateCart(
+                                      context,
+                                      widget.dataMenu,
+                                      selectedVarian,
+                                      selectedAddon,
+                                      notesController.text,
+                                      int.parse(qtyController.text),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  8.0, 8.0, 8.0, 8.0),
+                              child: Container(
+                                width: double.infinity,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(2.0),
+                                ),
+                                child: CustomElevatedButton(
+                                  text: "Add Item To Cart",
+                                  buttonTextStyle: TextStyle(
+                                    color: theme.colorScheme.primaryContainer,
+                                  ),
+                                  buttonStyle: CustomButtonStyles.primary,
+                                  onPressed: () {
+                                    addToCart(
+                                      context,
+                                      widget.dataMenu,
+                                      selectedVarian,
+                                      selectedAddon,
+                                      notesController.text,
+                                      int.parse(qtyController.text),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -1176,14 +1248,13 @@ class _AddToCartState extends State<AddToCart> {
         itemName: item['item_name'],
         notes: note,
         preference: {},
-        price: varian != null
-            ? varian['standard_rate'].toInt()
-            : item['standard_rate'].toInt(),
+        price: item['standard_rate'].floor(),
         qty: qty,
         uom: item['stock_uom'],
         description: item['item_name'],
         // addon: addon,
         itemGroup: item['item_group'],
+        docstatus: 0,
       );
 
       setState(() {
@@ -1209,11 +1280,101 @@ class _AddToCartState extends State<AddToCart> {
         preference: {},
         itemGroup: item['item_group'],
         status: false,
+        docstatus: 0,
         // type: item['item_group'],
       );
 
       // final cart = Provider.of<Cart>(context, listen: false);
       orderCart.addItem(newItem, mode: OrderCartMode.add);
+    }
+
+    Navigator.pop(context);
+    // Navigator.of(context).pushNamed(AppRoutes.invoiceScreen);
+  }
+
+  void updateCart(
+    BuildContext context,
+    dynamic item,
+    dynamic varian,
+    List<dynamic> addon,
+    String note,
+    int qty,
+  ) {
+    print('check item, ${item}');
+    // print('check varian, $varian');
+    // print('check addon, $addon');
+    // print('check qty, $qty');
+
+    String id = item['name'];
+
+    if (note != '') {
+      var notes = note.toLowerCase();
+      id += "-n${notes.hashCode}";
+    }
+
+    // invoice
+    if (widget.order == false) {
+      print('ivnoce');
+      InvoiceCartItem newItem = InvoiceCartItem(
+        id: id,
+        name: item['name'],
+        itemName: item['item_name'],
+        notes: note,
+        preference: {},
+        price: item['price'],
+        qty: qty,
+        uom: item['stock_uom'],
+        description: item['item_name'],
+        // addon: addon,
+        itemGroup: item['item_group'],
+        docstatus: item['docstatus'],
+      );
+
+      setState(() {
+        invoiceCart.addItem(newItem, mode: InvoiceCartMode.update);
+      });
+    } else {
+      print('order');
+      OrderCartItem itemNew = orderCart.getItemByIndex(widget.idxMenu!);
+      print('id, ${itemNew.id}');
+      OrderCartItem newItem = OrderCartItem(
+        id: itemNew.id,
+        name: itemNew.name,
+        itemName: itemNew.itemName,
+        itemGroup: itemNew.itemGroup,
+        uom: itemNew.uom,
+        description: itemNew.description,
+        qty: qty,
+        price: itemNew.price,
+        notes: itemNew.notes,
+        preference: itemNew.preference,
+        status: false,
+        docstatus: itemNew.docstatus,
+
+        // id: id,
+        // name: item['name'],
+        // itemName: item['item_name'],
+        // // variant: null,
+        // // variantId: null,
+        // uom: item['uom'],
+        // description: item['item_name'],
+        // qty: qty,
+        // price: item['price'],
+        // // variantPrice: item['standard_rate'].floor(),
+        // // addonsPrice:
+        // // item['standard_rate'].floor(), // Masukkan harga total addons
+        // // addons: null,
+        // notes: note,
+        // preference: {},
+        // itemGroup: item['item_group'],
+        // status: false,
+        // type: item['item_group'],
+      );
+
+      // final cart = Provider.of<Cart>(context, listen: false);
+      setState(() {
+        orderCart.addItem(newItem, mode: OrderCartMode.update);
+      });
     }
 
     Navigator.pop(context);

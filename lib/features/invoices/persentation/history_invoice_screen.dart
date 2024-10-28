@@ -8,12 +8,18 @@ import 'package:kontena_pos/core/theme/custom_text_style.dart';
 import 'package:kontena_pos/core/utils/alert.dart';
 import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
+import 'package:kontena_pos/core/utils/print.dart';
+import 'package:kontena_pos/widgets/custom_outlined_button.dart';
+import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/list_cart.dart';
+import 'package:kontena_pos/widgets/loading_content.dart';
 import 'package:kontena_pos/widgets/searchbar.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_invoice.dart'
     as FrappeFetchDataGetInvoice;
-// import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/core/api/frappe_thunder_pos/cancel_pos_invoice.dart'
+    as FrappeFetchCancelInvoice;
+import 'package:kontena_pos/core/api/send_printer.dart' as sendToPrinter;
 
 class HistoryInvoiceScreen extends StatefulWidget {
   const HistoryInvoiceScreen({Key? key}) : super(key: key);
@@ -26,15 +32,18 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<dynamic> tempPosOrder = [];
+  List<dynamic> filterPayment = [];
 
   dynamic invoiceSelected;
 
   bool isLoading = false;
+  bool isLoadingDetail = false;
 
   @override
   void initState() {
     super.initState();
     onTapRefresh();
+    onSetFilter();
   }
 
   @override
@@ -80,191 +89,198 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                               ],
                             ),
                             Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    8.0, 120.0, 8.0, 0.0),
-                                child: Align(
-                                  alignment: AlignmentDirectional(0.00, 0.00),
-                                  child: SingleChildScrollView(
-                                    child: Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  8.0, 60.0, 8.0, 8.0),
+                              child: FilterBar(
+                                filterData: filterPayment,
+                                fieldValue: 'mode_of_payment',
+                                onFilterSelected: (String type) {},
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsetsDirectional.fromSTEB(
+                                  8.0, 120.0, 8.0, 0.0),
+                              child: Align(
+                                alignment: AlignmentDirectional(0.00, 0.00),
+                                child: SingleChildScrollView(
+                                  child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Column(
                                       children: [
                                         if (isLoading == false)
-                                        AlignedGridView.count(
-                                          crossAxisCount: 1,
-                                          mainAxisSpacing: 6,
-                                          crossAxisSpacing: 6,
-                                          shrinkWrap: true,
-                                          itemCount: tempPosOrder.length,
-                                          itemBuilder: (context, index) {
-                                            final order = tempPosOrder[index];
-                                            return InkWell(
-                                              onTap: () {
-                                                onTapAction(context, order);
-                                              },
-                                              child: Card(
-                                                elevation: 2,
-                                                child: Column(
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                        16.0,
-                                                        16.0,
-                                                        16.0,
-                                                        10.0,
-                                                      ),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                order['name'],
-                                                                style: theme
-                                                                    .textTheme
-                                                                    .titleMedium,
-                                                              ),
-                                                              Text(
-                                                                'Table ${order['table']}',
-                                                                style: theme
-                                                                    .textTheme
-                                                                    .bodyMedium,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Divider(
-                                                            height: 5.0,
-                                                            thickness: 0.5,
-                                                            color: theme
-                                                                .colorScheme
-                                                                .outline,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                order['customer_name']
-                                                                    .toString(),
-                                                                style: theme
-                                                                    .textTheme
-                                                                    .bodyMedium,
-                                                              ),
-                                                              Text(
-                                                                'Total: ${numberFormat('idr_fixed', order['grand_total'])}',
-                                                                style: theme
-                                                                    .textTheme
-                                                                    .bodyMedium,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                              0.0,
-                                                              4.0,
-                                                              0.0,
-                                                              4.0,
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          AlignedGridView.count(
+                                            crossAxisCount: 1,
+                                            mainAxisSpacing: 6,
+                                            crossAxisSpacing: 6,
+                                            shrinkWrap: true,
+                                            itemCount: tempPosOrder.length,
+                                            itemBuilder: (context, index) {
+                                              final order = tempPosOrder[index];
+                                              return InkWell(
+                                                onTap: () {
+                                                  onTapAction(context, order);
+                                                },
+                                                child: Card(
+                                                  elevation: 2,
+                                                  child: Column(
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                          16.0,
+                                                          16.0,
+                                                          16.0,
+                                                          10.0,
+                                                        ),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
                                                               children: [
-                                                                Row(
-                                                                  children: [
-                                                                    Text(
-                                                                      dateTimeFormat(
-                                                                        'dateui',
-                                                                        order[
-                                                                            'posting_date'],
-                                                                      ).toString(),
-                                                                      style: theme
-                                                                          .textTheme
-                                                                          .labelSmall,
-                                                                    ),
-                                                                    Text(
-                                                                      ' | ${timeFormat(
-                                                                        'time_simple',
-                                                                        order[
-                                                                            'posting_time'],
-                                                                      ).toString()}',
-                                                                      style: theme
-                                                                          .textTheme
-                                                                          .labelSmall,
-                                                                    ),
-                                                                  ],
-                                                                ),
                                                                 Text(
-                                                                  'Paid: ${numberFormat('idr_fixed', order['paid_amount'])}',
+                                                                  order['name'],
+                                                                  style: theme
+                                                                      .textTheme
+                                                                      .titleMedium,
+                                                                ),
+                                                                if (order[
+                                                                        'table'] !=
+                                                                    null)
+                                                                  Text(
+                                                                    'Table ${order['table']}',
+                                                                    style: theme
+                                                                        .textTheme
+                                                                        .bodyMedium,
+                                                                  ),
+                                                                Text(
+                                                                    (order['docstatus'] ==
+                                                                            1)
+                                                                        ? order[
+                                                                            'status']
+                                                                        : (order['docstatus'] ==
+                                                                                2)
+                                                                            ? 'Cancelled'
+                                                                            : 'Draft',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      color:
+                                                                          () {
+                                                                        if (order['docstatus'] ==
+                                                                            1) {
+                                                                          return theme
+                                                                              .colorScheme
+                                                                              .onSecondary;
+                                                                        } else if (order['docstatus'] ==
+                                                                            2) {
+                                                                          return theme
+                                                                              .colorScheme
+                                                                              .error;
+                                                                        } else {
+                                                                          return theme
+                                                                              .colorScheme
+                                                                              .onPrimaryContainer;
+                                                                        }
+                                                                      }(),
+                                                                    )),
+                                                              ],
+                                                            ),
+                                                            Divider(
+                                                              height: 5.0,
+                                                              thickness: 0.5,
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .outline,
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                  order['customer_name']
+                                                                      .toString(),
                                                                   style: theme
                                                                       .textTheme
                                                                       .bodyMedium,
                                                                 ),
+                                                                Text(
+                                                                  '${numberFormat('idr_fixed', order['grand_total'])}',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: theme
+                                                                        .colorScheme
+                                                                        .secondary,
+                                                                  ),
+                                                                ),
                                                               ],
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      if (isLoading == true)
-                                           Container(
-                                              width: double.infinity,
-                                              height: 48.0,
-                                              decoration: BoxDecoration(
-                                                color: theme.colorScheme.primary,
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    EdgeInsetsDirectional.fromSTEB(
-                                                        8.0, 0.0, 8.0, 0.0),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Center(
-                                                      child: Container(
-                                                        width: 23,
-                                                        height: 23,
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          valueColor:
-                                                              AlwaysStoppedAnimation<
-                                                                  Color>(
-                                                            Colors.white,
-                                                          ),
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                0.0,
+                                                                4.0,
+                                                                0.0,
+                                                                4.0,
+                                                              ),
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        dateTimeFormat(
+                                                                          'dateui',
+                                                                          order[
+                                                                              'posting_date'],
+                                                                        ).toString(),
+                                                                        style: theme
+                                                                            .textTheme
+                                                                            .labelSmall,
+                                                                      ),
+                                                                      Text(
+                                                                        ' | ${timeFormat(
+                                                                          'time_simple',
+                                                                          order[
+                                                                              'posting_time'],
+                                                                        ).toString()}',
+                                                                        style: theme
+                                                                            .textTheme
+                                                                            .labelSmall,
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  // Text(
+                                                                  //   'Paid: ${numberFormat('idr_fixed', order['paid_amount'])}',
+                                                                  //   style: theme
+                                                                  //       .textTheme
+                                                                  //       .bodyMedium,
+                                                                  // ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ),
-                                                    ),
-                                                    Padding(
-                                                      padding: EdgeInsetsDirectional
-                                                          .fromSTEB(
-                                                              10.0, 0.0, 8.0, 0.0),
-                                                      child: Text(
-                                                        'Loading...',
-                                                        style: TextStyle(
-                                                            color: theme.colorScheme
-                                                                .primaryContainer),
-                                                      ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
+                                              );
+                                            },
+                                          ),
+                                        if (isLoading == true)
+                                          const LoadingContent(),
                                       ],
                                     ),
                                   ),
@@ -294,191 +310,343 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                 'Detail Invoice',
                                 style: TextStyle(
                                   color: theme.colorScheme.secondary,
-                                  fontSize: 14.0,
+                                  fontSize: 18.0,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                              Divider(
+                                height: 14.0,
+                                thickness: 1.0,
+                                color: theme.colorScheme.outline,
+                              ),
                               if (invoiceSelected != null)
-                                Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 16.0, 0.0, 0.0),
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          invoiceSelected['name'],
-                                          style: TextStyle(
-                                            color: theme.colorScheme.secondary,
-                                            fontWeight: FontWeight.bold,
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 16.0, 0.0, 0.0),
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            invoiceSelected['name'],
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          '${invoiceSelected['customer_name']}',
-                                          style: TextStyle(
-                                            color: theme.colorScheme.secondary,
-                                            // fontWeight: FontWeight.bold,
+                                          Text(
+                                            '${invoiceSelected['customer_name']}',
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                              // fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          '${dateTimeFormat('dateui', invoiceSelected['posting_date'])} | ${timeFormat('time_simple', invoiceSelected['posting_time'])}',
-                                          style: TextStyle(
-                                            color: theme.colorScheme.secondary,
-                                            // fontWeight: FontWeight.bold,
+                                          Text(
+                                            '${dateTimeFormat('dateui', invoiceSelected['posting_date'])} | ${timeFormat('time_simple', invoiceSelected['posting_time'])}',
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                              // fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        Divider(
-                                          height: 14.0,
-                                          thickness: 1.0,
-                                          color: theme.colorScheme.outline,
-                                        ),
-                                        Row(
+                                          Divider(
+                                            height: 14.0,
+                                            thickness: 1.0,
+                                            color: theme.colorScheme.outline,
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: [
+                                                    Text(
+                                                        '${invoiceSelected['payments'][0]['mode_of_payment']}'),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 24.0,
+                                                child: VerticalDivider(
+                                                  thickness: 1.0,
+                                                  color:
+                                                      theme.colorScheme.outline,
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: [
+                                                    Text(
+                                                        ' ${(invoiceSelected['docstatus'] == 1) ? invoiceSelected['status'] : (invoiceSelected['docstatus'] == 2) ? 'Cancelled' : 'Draft'}',
+                                                        style: TextStyle(
+                                                      color: () {
+                                                        if (invoiceSelected[
+                                                                'docstatus'] ==
+                                                            1) {
+                                                          return theme
+                                                              .colorScheme
+                                                              .onSecondary;
+                                                        } else if (invoiceSelected[
+                                                                'docstatus'] ==
+                                                            2) {
+                                                          return theme
+                                                              .colorScheme
+                                                              .error;
+                                                        } else {
+                                                          return theme
+                                                              .colorScheme
+                                                              .onPrimaryContainer;
+                                                        }
+                                                      }(),
+                                                    )),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Divider(
+                                            height: 14.0,
+                                            thickness: 1.0,
+                                            color: theme.colorScheme.outline,
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Total',
+                                              ),
+                                              Text(
+                                                  '${numberFormat('idr_fixed', invoiceSelected['grand_total'])}')
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Pay',
+                                              ),
+                                              Text(numberFormat(
+                                                  'idr_fixed',
+                                                  invoiceSelected[
+                                                      'paid_amount']))
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Change',
+                                              ),
+                                              Text((invoiceSelected[
+                                                          'paid_amount'] >=
+                                                      invoiceSelected[
+                                                          'grand_total'])
+                                                  ? numberFormat(
+                                                      'idr_fixed',
+                                                      (invoiceSelected[
+                                                              'paid_amount'] -
+                                                          invoiceSelected[
+                                                              'grand_total']))
+                                                  : numberFormat(
+                                                      'idr_fixed', 0))
+                                            ],
+                                          ),
+                                          Divider(
+                                            height: 14.0,
+                                            thickness: 1.0,
+                                            color: theme.colorScheme.outline,
+                                          ),
+                                          Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount:
+                                                    invoiceSelected['items']
+                                                        .length,
+                                                itemBuilder: (context, index) {
+                                                  final itemData =
+                                                      invoiceSelected['items']
+                                                          [index];
+                                                  print(
+                                                      'item data, ${itemData['qty']}');
+                                                  print(
+                                                      'item data, ${itemData['rate']}');
+                                                  return ListCart(
+                                                    title:
+                                                        "${itemData['item_name']} (${itemData['qty'].floor()})",
+                                                    subtitle:
+                                                        itemData['item_name'] ??
+                                                            '-',
+                                                    // addon: addon2,
+                                                    // addons: addons,
+                                                    qty: itemData['qty']
+                                                        .floor()
+                                                        .toString(),
+                                                    catatan: '',
+                                                    titleStyle: CustomTextStyles
+                                                        .labelLargeBlack,
+                                                    price: itemData['rate']
+                                                        .toString(),
+                                                    total: numberFormat(
+                                                        'idr',
+                                                        (itemData['qty'] *
+                                                            itemData['rate'])),
+                                                    priceStyle: CustomTextStyles
+                                                        .labelLargeBlack,
+                                                    labelStyle: CustomTextStyles
+                                                        .bodySmallBluegray300,
+                                                    editLabelStyle: TextStyle(
+                                                      color: theme
+                                                          .colorScheme.primary,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    padding: EdgeInsets.all(8),
+                                                    note: '',
+                                                    lineColor: appTheme.gray200,
+                                                    secondaryStyle:
+                                                        CustomTextStyles
+                                                            .bodySmallGray,
+                                                    isEdit: false,
+                                                    onTap: () => {},
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              if (invoiceSelected == null)
+                                Expanded(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 64.0, 0.0, 0.0),
+                                        child: Row(
                                           mainAxisSize: MainAxisSize.max,
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
                                           children: [
-                                            Expanded(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  Text(
-                                                    '${invoiceSelected['payments'][0]['mode_of_payment']}'
-                                                  ),
-                                                ],
+                                            Text(
+                                              'Transaksi belum dipilih',
+                                              style: TextStyle(
+                                                color: theme.colorScheme
+                                                    .onPrimaryContainer,
                                               ),
                                             ),
-                                            SizedBox(
-                                              height: 24.0,
-                                              child: VerticalDivider(
-                                                thickness: 1.0,
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              if (invoiceSelected != null)
+                                Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Divider(
+                                      height: 5.0,
+                                      thickness: 0.5,
+                                      color: theme.colorScheme.outline,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          0.0, 8.0, 0.0, 0.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          CustomOutlinedButton(
+                                            height: 48.0,
+                                            text: "Reprint Invoice",
+                                            buttonTextStyle: TextStyle(
                                                 color:
-                                                    theme.colorScheme.outline,
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  Text(
-                                                    '${invoiceSelected['status']}',
-                                                    style: TextStyle(
-                                                      color: () {
-                                                        if (invoiceSelected['status'] == 'Paid') {
-                                                          return theme.colorScheme.onSecondary;
-                                                        } else if (invoiceSelected['status'] == 'Cancelled') {
-                                                          return theme.colorScheme.error;
-                                                        } else {
-                                                          return theme.colorScheme.onPrimaryContainer;
-                                                        }
-                                                      }(), 
-                                                    )
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Divider(
-                                          height: 14.0,
-                                          thickness: 1.0,
-                                          color: theme.colorScheme.outline,
-                                        ),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'Total',
-                                            ),
-                                            Text(
-                                              '${numberFormat('idr_fixed', invoiceSelected['grand_total'])}'
-                                            )
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'Pay',
-                                            ),
-                                            Text(numberFormat('idr_fixed', invoiceSelected['paid_amount']))
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'Change',
-                                            ),
-                                            Text((invoiceSelected['paid_amount'] >= invoiceSelected['grand_total']) ? numberFormat('idr_fixed', (invoiceSelected['paid_amount'] - invoiceSelected['grand_total'])) : numberFormat('idr_fixed', 0))
-                                          ],
-                                        ),
-                                        Divider(
-                                          height: 14.0,
-                                          thickness: 1.0,
-                                          color: theme.colorScheme.outline,
-                                        ),
-                                        Column(
+                                                    theme.colorScheme.primary),
+                                            buttonStyle: CustomButtonStyles
+                                                .outlinePrimary,
+                                            onPressed: () {
+                                              onPrintInvoice(true);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          0.0, 8.0, 0.0, 0.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          CustomOutlinedButton(
+                                            height: 48.0,
+                                            text: "Reprint Checker",
+                                            buttonTextStyle: TextStyle(
+                                                color:
+                                                    theme.colorScheme.primary),
+                                            buttonStyle: CustomButtonStyles
+                                                .outlinePrimary,
+                                            onPressed: () {
+                                              // onPrintChecker();
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (invoiceSelected['docstatus'] == 1)
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 8.0, 0.0, 0.0),
+                                        child: Column(
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
-                                            ListView.builder(
-                                              shrinkWrap: true,
-                                              itemCount: invoiceSelected['items'].length,
-                                              itemBuilder: (context, index) {
-                                                final itemData = invoiceSelected['items'][index];
-                                                print('item data, ${itemData['qty']}');
-                                                print('item data, ${itemData['rate']}');
-                                                return ListCart(
-                                                  title:
-                                                      "${itemData['item_name']} (${itemData['qty'].floor()})",
-                                                  subtitle:
-                                                      itemData['item_name'] ?? '-',
-                                                  // addon: addon2,
-                                                  // addons: addons,
-                                                  qty: itemData['qty'].floor().toString(),
-                                                  catatan: '',
-                                                  titleStyle: CustomTextStyles
-                                                      .labelLargeBlack,
-                                                  price: itemData['rate'].toString(),
-                                                  total: numberFormat(
-                                                      'idr',
-                                                      (itemData['qty'] *
-                                                          itemData['rate'])),
-                                                  priceStyle: CustomTextStyles
-                                                      .labelLargeBlack,
-                                                  labelStyle: CustomTextStyles
-                                                      .bodySmallBluegray300,
-                                                  editLabelStyle: TextStyle(
-                                                    color:
-                                                        theme.colorScheme.primary,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                  padding: EdgeInsets.all(8),
-                                                  note: '',
-                                                  lineColor: appTheme.gray200,
-                                                  secondaryStyle: CustomTextStyles
-                                                      .bodySmallGray,
-                                                  isEdit: false,
-                                                  onTap: () => {},
+                                            CustomOutlinedButton(
+                                              height: 48.0,
+                                              text: "Void",
+                                              buttonTextStyle: TextStyle(
+                                                  color: theme.colorScheme
+                                                      .primaryContainer),
+                                              buttonStyle: CustomButtonStyles
+                                                  .errorButton,
+                                              onPressed: () {
+                                                // onPrintChecker();
+                                                onTapVoid(
+                                                  context,
+                                                  invoiceSelected,
                                                 );
                                               },
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                      ),
+                                  ],
+                                )
                             ],
                           ),
                         ),
@@ -496,29 +664,44 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
 
   onTapRefresh() async {
     print('yes');
-    setState((){
+    setState(() {
       isLoading = true;
     });
     await onCallDataPosOrder();
-    setState((){
+    setState(() {
       // isLoading = false;
     });
   }
 
-
   onTapAction(BuildContext context, dynamic item) async {
     print('yes click');
-    // setState(() {
-    //   invoiceSelected = item;
-    // });
+    // setState
+    setState(() {
+      // invoiceSelected = item;
+      isLoadingDetail = true;
+    });
     await onCallDataPosInvoiceDetail(item);
+    setState(() {});
   }
+
+  onTapVoid(BuildContext context, dynamic item) async {
+    setState(() {
+      isLoading = true;
+    });
+    await onCallCancelPosOrder(item);
+    setState(() {
+      isLoading = false;
+      invoiceSelected = null;
+    });
+    onTapRefresh();
+  }
+
   onCallDataPosOrder() async {
     final FrappeFetchDataGetInvoice.PosInvoiceRequest request =
         FrappeFetchDataGetInvoice.PosInvoiceRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: '[["docstatus","=",1]]',
+      filters: '[["pos_profile","=","${AppState().configPOSProfile['name']}"]]',
       orderBy: 'posting_date desc',
       limit: 2000,
     );
@@ -532,7 +715,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
           tempPosOrder = callRequest;
           isLoading = false;
         });
-        print('check ata, $tempPosOrder');
+        // print('check ata, $tempPosOrder');
       }
     } catch (error) {
       print('error call data pos order, $error');
@@ -543,7 +726,9 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
   }
 
   onCallDataPosInvoiceDetail(dynamic invoice) async {
-    final FrappeFetchDataGetInvoice.PosInvoiceRequest reqPosInvoiceDetail = FrappeFetchDataGetInvoice.PosInvoiceRequest(cookie: AppState().setCookie, id: invoice['name']);
+    final FrappeFetchDataGetInvoice.PosInvoiceRequest reqPosInvoiceDetail =
+        FrappeFetchDataGetInvoice.PosInvoiceRequest(
+            cookie: AppState().setCookie, id: invoice['name']);
 
     try {
       final request = await FrappeFetchDataGetInvoice.requestDetail(
@@ -552,10 +737,11 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
       if (request.isNotEmpty) {
         setState(() {
           invoiceSelected = request;
+          isLoading = false;
         });
       }
 
-      print('check detail, $request');
+      // print('check detail, $request');
 
       // if (context.mounted) {
       //   Navigator.of(context).pushNamedAndRemoveUntil(
@@ -574,6 +760,80 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
         }
       }
       return;
+    }
+  }
+
+  onCallCancelPosOrder(dynamic paramItem) async {
+    final FrappeFetchCancelInvoice.CancelPosInvoiceRequest request =
+        FrappeFetchCancelInvoice.CancelPosInvoiceRequest(
+      cookie: AppState().setCookie,
+      id: paramItem['name'],
+      status: paramItem['status'] == true ? 1 : 0,
+    );
+
+    try {
+      final callCancelPosOrder =
+          await FrappeFetchCancelInvoice.request(requestQuery: request);
+
+      if (callCancelPosOrder.isNotEmpty) {
+        if (context.mounted) {
+          alertSuccess(context, 'Success, order confirm..');
+        }
+        setState(() {
+          // AppState.resetOrderCart();
+          // cartData = [];
+          // // modeView = 'item';
+          // cartSelected = null;
+          // isLoadingContent = true;
+        });
+        // onTapRefreshOrder();
+      }
+    } catch (error) {
+      print('check error, ${error}');
+      if (context.mounted) {
+        alertError(context, error.toString());
+      }
+    }
+  }
+
+  onSetFilter() {
+    // print('check, ${AppState().configPOSProfile}');
+    setState(() {
+      filterPayment = AppState().configPOSProfile['payments'];
+    });
+    print('check, $filterPayment');
+  }
+
+  onPrintInvoice(bool reprint) async {
+    dynamic docPrint = await printInvoice(
+        reprint ? 'reprint' : null,
+        invoiceSelected,
+        AppState().configPrinter,
+        AppState().configCompany,
+        AppState().configPOSProfile,
+        AppState().configUser);
+
+    // print('print invoce, $docPrint');
+
+    final sendToPrinter.ToPrint request = sendToPrinter.ToPrint(
+      doc: docPrint,
+      ipAddress: '127.0.0.1',
+    );
+
+    try {
+      final callRespon = await sendToPrinter.request(requestQuery: request);
+      // print('call respon, ${callRespon}');
+      if (callRespon != null) {
+        // setState((){
+        //   paymentStatus = true;
+        //   invoice = callRespon;
+        // });
+      }
+    } catch (error) {
+      // print('error pos invoice, ${error}');
+      if (context.mounted) {
+        alertError(context, error.toString());
+      }
     }
   }
 }
