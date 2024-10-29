@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_authenticator/auth.dart'
@@ -12,7 +10,6 @@ import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
 import 'package:kontena_pos/core/app_export.dart';
-import 'package:kontena_pos/core/animation/fade.dart';
 import 'package:kontena_pos/core/utils/alert.dart' as alert;
 
 class LoginScreen extends StatefulWidget {

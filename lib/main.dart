@@ -3,8 +3,6 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/config_app.dart';
-import 'package:kontena_pos/core/functions/cart.dart';
-import 'package:kontena_pos/core/functions/order.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/routes/app_routes.dart';
 import 'package:kontena_pos/app_state.dart';
@@ -34,25 +32,10 @@ void main() async {
     });
   }
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => appState),
-        ChangeNotifierProxyProvider<AppState, OrderManager>(
-          create: (context) => appState.orderManager,
-          update: (context, appState, orderManager) => appState.orderManager,
-        ),
-        ChangeNotifierProxyProvider<AppState, Cart>(
-          create: (context) => Cart(appState),
-          update: (context, appState, cart) =>
-              Cart(appState), // Re-create Cart if AppState changes
-        ),
-      ],
-      child: MyApp(
-        configuration: configuration,
-      ),
-    ),
-  );
+  runApp(ChangeNotifierProvider(
+    create: (context) => appState,
+    child: MyApp(configuration: configuration),
+  ));
 }
 
 class MyApp extends StatefulWidget {

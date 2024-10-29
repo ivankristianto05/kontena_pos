@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
-import 'package:kontena_pos/constants.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 

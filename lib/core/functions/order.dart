@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kontena_pos/app_state.dart';
-import 'package:kontena_pos/core/functions/cart.dart';
 import 'package:kontena_pos/models/cartitem.dart';
 import 'package:kontena_pos/models/list_to_confirm.dart'; // Import untuk formatting tanggal
 
@@ -27,7 +26,7 @@ class OrderManager extends ChangeNotifier {
   String get namaPemesan => _namaPemesan;
 
   void setNamaPemesan(String name) {
-    if(_namaPemesan != name) {
+    if (_namaPemesan != name) {
       _namaPemesan = name;
       notifyListeners();
     }
@@ -106,27 +105,31 @@ class OrderManager extends ChangeNotifier {
       print('Order with orderId $orderId not found.');
     }
   }
-   bool isOrderConfirmed(String orderId) {
+
+  bool isOrderConfirmed(String orderId) {
     return _confirmedOrderIds.contains(orderId); // Cek di dalam Set
   }
-  void printConfirmedOrderIdsWithItems() {
-  for (var orderId in _confirmedOrderIds) {
-    // Cari order berdasarkan orderId di _confirmedOrders
-    final order = _confirmedOrders.firstWhere(
-      (order) => order.idOrder == orderId,
-    );
 
-    if (order != null) {
-      print('Order ID: ${order.idOrder}');
-      print('Items:');
-      for (var item in order.items) {
-        print('- Item ID: ${item.id}, Name: ${item.name}, Quantity: ${item.qty}');
+  void printConfirmedOrderIdsWithItems() {
+    for (var orderId in _confirmedOrderIds) {
+      // Cari order berdasarkan orderId di _confirmedOrders
+      final order = _confirmedOrders.firstWhere(
+        (order) => order.idOrder == orderId,
+      );
+
+      if (order != null) {
+        print('Order ID: ${order.idOrder}');
+        print('Items:');
+        for (var item in order.items) {
+          print(
+              '- Item ID: ${item.id}, Name: ${item.name}, Quantity: ${item.qty}');
+        }
+      } else {
+        print('Order with ID $orderId not found.');
       }
-    } else {
-      print('Order with ID $orderId not found.');
     }
   }
-}
+
   Future<void> createOrder({
     required TextEditingController guestNameController,
     required VoidCallback resetDropdown,

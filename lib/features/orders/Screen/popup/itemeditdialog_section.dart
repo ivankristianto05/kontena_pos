@@ -95,7 +95,7 @@ class _ItemEditDialogState extends State<ItemEditDialog> {
 
     // Ensure update in AppState
     widget.appState.update(() {
-      widget.appState.cartItems[widget.index] = editedItem;
+      // widget.appState.cartItems[widget.index] = editedItem;
     });
 
     Navigator.of(context).pop();

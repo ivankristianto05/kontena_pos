@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/core/functions/invoice.dart';
+import 'package:kontena_pos/core/functions/order_new.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 
-class BottomNavigationInvoice extends StatelessWidget {
+class BottomNavigationOrder extends StatelessWidget {
   // final double contentHeight;
-  VoidCallback? onTapOrderToPay;
-  VoidCallback? onTapItem;
-  VoidCallback? onTapPay;
+  VoidCallback? onTapMenu;
+  VoidCallback? onTapOrderToServed;
+  VoidCallback? onTapOrderToConfirm;
+  VoidCallback? onTapAction;
   String? isSelected;
 
-  InvoiceCart cart = InvoiceCart();
+  OrderCart cart = OrderCart();
 
-  BottomNavigationInvoice({
+  BottomNavigationOrder({
     super.key,
     // required this.contentHeight,
-    this.onTapOrderToPay,
-    this.onTapItem,
-    this.onTapPay,
+    this.onTapMenu,
+    this.onTapOrderToServed,
+    this.onTapOrderToConfirm,
+    this.onTapAction,
     this.isSelected,
   });
 
@@ -31,7 +33,7 @@ class BottomNavigationInvoice extends StatelessWidget {
       children: [
         Expanded(
           child: InkWell(
-            onTap: onTapOrderToPay,
+            onTap: onTapMenu,
             child: Container(
               height: MediaQuery.sizeOf(context).width * 0.07,
               decoration: BoxDecoration(
@@ -52,9 +54,9 @@ class BottomNavigationInvoice extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Order to Pay',
+                    'Menu',
                     style: TextStyle(
-                      color: isSelected == 'orderPay'
+                      color: isSelected == 'menu'
                           ? theme.colorScheme.primary
                           : theme.colorScheme.primaryContainer,
                       fontSize: 16,
@@ -68,7 +70,7 @@ class BottomNavigationInvoice extends StatelessWidget {
         ),
         Expanded(
           child: InkWell(
-            onTap: onTapItem,
+            onTap: onTapOrderToConfirm,
             child: Container(
               height: MediaQuery.sizeOf(context).width * 0.07,
               decoration: BoxDecoration(
@@ -89,9 +91,9 @@ class BottomNavigationInvoice extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Produk',
+                    'Confirm',
                     style: TextStyle(
-                      color: isSelected == 'item'
+                      color: isSelected == 'confirm'
                           ? theme.colorScheme.primary
                           : theme.colorScheme.primaryContainer,
                       fontSize: 16,
@@ -103,28 +105,43 @@ class BottomNavigationInvoice extends StatelessWidget {
             ),
           ),
         ),
-        // Expanded(
-        //   child: Container(
-        //     height: MediaQuery.sizeOf(context).width * 0.07,
-        //     decoration: BoxDecoration(
-        //       color: theme.colorScheme.secondary,
-        //     ),
-        //     child: Row(
-        //       mainAxisSize: MainAxisSize.max,
-        //       mainAxisAlignment: MainAxisAlignment.center,
-        //       children: [
-        //         Text(
-        //           'Voucher',
-        //           style: TextStyle(
-        //             color: theme.colorScheme.primaryContainer,
-        //             fontSize: 16,
-        //             fontWeight: FontWeight.bold,
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
+        Expanded(
+          child: InkWell(
+            onTap: onTapOrderToServed,
+            child: Container(
+              height: MediaQuery.sizeOf(context).width * 0.07,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.secondary,
+                // border: Border.all(
+                //   // right: BorderSide(
+                //   color: theme.colorScheme.primary,
+                //   width: 2.0,
+                //   // ),
+                //   // bottom: BorderSide(
+                //   //   color: theme.colorScheme.surface,
+                //   //   width: 1.0,
+                //   // ),
+                // ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Served',
+                    style: TextStyle(
+                      color: isSelected == 'served'
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.primaryContainer,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         Container(
           width: MediaQuery.sizeOf(context).width * 0.25,
           height: MediaQuery.sizeOf(context).width * 0.07,
@@ -136,7 +153,7 @@ class BottomNavigationInvoice extends StatelessWidget {
             children: [
               Expanded(
                 child: InkWell(
-                  onTap: onTapPay,
+                  onTap: onTapAction,
                   child: Container(
                     decoration: BoxDecoration(
                       color: cart.items.isNotEmpty
@@ -156,7 +173,7 @@ class BottomNavigationInvoice extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Bayar',
+                                'Order',
                                 style: cart.items.isNotEmpty
                                     ? TextStyle(
                                         color:

@@ -29,7 +29,7 @@ void alertSuccess(BuildContext context, String message) {
       ),
       duration: const Duration(seconds: 5),
       backgroundColor:
-          theme.colorScheme.primary, // You can customize the color here
+          theme.colorScheme.onSecondary, // You can customize the color here
     ),
   );
 }

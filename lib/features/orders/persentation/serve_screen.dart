@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Serve/iconbutton_section.dart';
-import 'package:kontena_pos/features/orders/Screen/components/Serve/servelist_section.dart';
+import 'package:kontena_pos/features/orders/Screen/components/Confirm/iconbutton_section.dart';
 import 'package:kontena_pos/features/orders/Screen/components/ordercard_section.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:provider/provider.dart';
@@ -113,15 +112,15 @@ class _ServeScreenState extends State<ServeScreen> {
                     ),
                   ),
                   child: DropdownWidget(
-                    dropdownwidth: screenWidth * 0.30,
+                    dropdownwidth: screenWidth * 0.25,
                     pickupDropdownWidth:
-                        screenWidth * 0.15, // Lebar dropdown untuk pickup
+                        screenWidth * 0.10, // Lebar dropdown untuk pickup
                     tableDropdownWidth:
                         screenWidth * 0.10, // Lebar dropdown untuk table
                   ),
                 ),
                 Container(
-                  child: ServeIconButton(),
+                  child: Iconbutton(),
                 ),
               ],
             ),
@@ -134,11 +133,11 @@ class _ServeScreenState extends State<ServeScreen> {
                     child: OrderCard(
                       screenWidth: screenWidth,
                       onOrderSelected: (orderId) {
-                        appState.setCurrentServeOrderId(orderId);
+                        appState.setCurrentConfirmOrderId(orderId);
                         //appState.printConfirmedOrders();
                       },
-                      orderan: appState.servedOrders,
-                      currentOrderId: appState.currentServeOrderId,
+                      orderan: appState.confirmedOrders,
+                      currentOrderId: appState.currentConfirmOrderId, // Pass selected order ID
                     ),
                   ),
                   Container(
@@ -147,7 +146,7 @@ class _ServeScreenState extends State<ServeScreen> {
                       color: Colors.white,
                     ),
                     child: OrderList(
-                      listorder: appState.servedOrders,
+                      listorder: appState.confirmedOrders,
                       screenWidth: screenWidth,
                       appState: appState,
                       onAllChecked: (bool isChecked) {
@@ -155,7 +154,7 @@ class _ServeScreenState extends State<ServeScreen> {
                           allItemsChecked = isChecked;
                         });
                       },
-                      currentOrderId: appState.currentServeOrderId,
+                      currentOrderId: appState.currentConfirmOrderId,
                     ),
                   ),
                 ],
@@ -172,9 +171,13 @@ class _ServeScreenState extends State<ServeScreen> {
                   ),
                   CustomButton(
                     screenWidth: MediaQuery.of(context).size.width,
-                    buttonText: 'Serve', // Text for the confirm page
+                    buttonText: 'Confirm', // Text for the confirm page
                     onPressed: () {
-                      print("order served");
+                      if (appState.currentConfirmOrderId.isNotEmpty) {
+                        appState.confirmOrderStatus(appState.currentConfirmOrderId);
+                        print("Order ${appState.currentConfirmOrderId} confirmed");
+                      }
+              
                     },
                   ),
                 ],

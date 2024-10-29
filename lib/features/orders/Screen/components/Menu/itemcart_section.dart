@@ -28,7 +28,7 @@ class ItemCart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<Cart>(context);
-  final cartItems = cart.items; // Mendapatkan item cart dari Cart
+    final cartItems = cart.items; // Mendapatkan item cart dari Cart
     return Container(
       width: screenWidth * 0.3,
       child: ListView.separated(
@@ -84,7 +84,10 @@ class ItemCart extends StatelessWidget {
                 // Quantity x Price
                 Text(
                   '${item.qty} x Rp ${currencyFormat.format(price)}',
-                  style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: textdetailcolor,
+                      fontWeight: FontWeight.w800),
                 ),
                 SizedBox(height: 8),
                 // Preference
@@ -94,7 +97,10 @@ class ItemCart extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
                       'Preference: ${item.preference['preference']!}',
-                      style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                          fontSize: 13,
+                          color: textdetailcolor,
+                          fontWeight: FontWeight.w800),
                     ),
                   ),
                 // Addons
@@ -103,7 +109,10 @@ class ItemCart extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
                       'Addons: ${item.addons!.entries.where((addon) => addon.value['selected'] == true).map((addon) => addon.key).join(', ')}',
-                      style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                          fontSize: 13,
+                          color: textdetailcolor,
+                          fontWeight: FontWeight.w800),
                     ),
                   ),
                 // Notes
@@ -112,7 +121,10 @@ class ItemCart extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Text(
                       'Notes: ${item.notes}',
-                      style: TextStyle(fontSize: 13, color: textdetailcolor,fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                          fontSize: 13,
+                          color: textdetailcolor,
+                          fontWeight: FontWeight.w800),
                     ),
                   ),
                 SizedBox(height: 8),
@@ -150,7 +162,7 @@ class ItemCart extends StatelessWidget {
                       onPressed: () {
                         cart.removeItem(index);
                         appState.update(() {
-                          appState.cartItems.remove(item);
+                          // appState.cartItems.remove(item);
                         });
                       },
                       child: Text(
