@@ -2,6 +2,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/functions/cart.dart';
+import 'package:kontena_pos/core/functions/invoice.dart';
+import 'package:kontena_pos/core/functions/order_new.dart';
 import 'package:kontena_pos/core/theme/custom_text_style.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
@@ -24,8 +26,9 @@ class _CardListItem extends State<CardListItem> {
   // Map<String, dynamic> item;
   int totalAddon = 0;
   int totalAddonCheckout = 0;
-  Cart cart = Cart(AppState());
-  late List<CartItem> cartData;
+  OrderCart orderCart = OrderCart();
+  InvoiceCart invoiceCart = InvoiceCart();
+  late List<OrderCartItem> cartData;
 
   @override
   void setState(VoidCallback callback) {
@@ -35,7 +38,7 @@ class _CardListItem extends State<CardListItem> {
   @override
   void initState() {
     super.initState();
-    cartData = cart.getAllItemCart();
+    cartData = orderCart.getAllItemCart();
   }
 
   @override
@@ -53,7 +56,7 @@ class _CardListItem extends State<CardListItem> {
               height: 700,
               child: Builder(
                 builder: (context) {
-                  final itemCart = cart.getAllItemCart();
+                  final itemCart = orderCart.getAllItemCart();
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: cartData.length,
@@ -68,7 +71,7 @@ class _CardListItem extends State<CardListItem> {
 
                       catatan = itemData.notes.toString();
                       print('addon, ${itemData.addon}');
-                      print('pref, ${itemData.pref}');
+                      // print('pref, ${itemData.pref}');
 
                       if (itemData.addon != null) {}
 
@@ -90,17 +93,17 @@ class _CardListItem extends State<CardListItem> {
                       //   });
                       // }
 
-                      if (itemData.pref != null) {
-                        int i = 1;
-                        itemData.pref?.forEach((element) {
-                          preference +=
-                              "${element['type']}: ${element['name']}";
-                          if (i < itemData.pref!.length) {
-                            preference += ", ";
-                          }
-                          i++;
-                        });
-                      }
+                      // if (itemData.preference != null) {
+                      //   int i = 1;
+                      //   itemData.preference?.forEach((element) {
+                      //     preference +=
+                      //         "${element['type']}: ${element['name']}";
+                      //     if (i < itemData.preference!.length) {
+                      //       preference += ", ";
+                      //     }
+                      //     i++;
+                      //   });
+                      // }
 
                       return Container(
                         child: ListCart(
@@ -118,7 +121,7 @@ class _CardListItem extends State<CardListItem> {
                           labelStyle: CustomTextStyles.bodySmallBluegray300,
                           editLabelStyle: CustomTextStyles.bodySmallOrange600,
                           padding: EdgeInsets.all(16),
-                          note: itemData.notes,
+                          note: itemData.notes ?? '',
                           lineColor: appTheme.gray200,
                           secondaryStyle: CustomTextStyles.bodySmallGray,
                           // onTap: () => onTapItem(context, index, itemData),

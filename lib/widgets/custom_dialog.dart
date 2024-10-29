@@ -90,7 +90,7 @@ class _DialogCustomWidgetWidgetState extends State<DialogCustomWidget> {
                   Divider(
                     height: 5.0,
                     thickness: 0.5,
-                    color: theme.colorScheme.surface,
+                    color: theme.colorScheme.outline,
                   ),
                   Expanded(
                     flex: 1,

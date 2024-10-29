@@ -20,7 +20,8 @@ class OrderCartItem {
   late int totalPrice;
   String? notes;
   Map<String, Map<String, dynamic>>? addon;
-  bool? status;
+  bool status;
+  int docstatus;
 
   OrderCartItem({
     required this.id,
@@ -34,7 +35,8 @@ class OrderCartItem {
     required this.description,
     this.notes,
     this.addon,
-    this.status,
+    required this.status,
+    required this.docstatus,
   }) {
     totalPrice = qty * price;
   }
@@ -74,18 +76,27 @@ class OrderCart {
         uom: '',
         description: '',
         status: false,
+        docstatus: 0,
       ),
     ); // Return an empty CartItem if not found
+    print('test, ${existingItem.id}');
+    print('test, ${existingItem.status}');
+    print('test, ${newItem.id}');
+    print('test, ${newItem.status}');
 
     if (existingItem.id.isNotEmpty) {
       // Item already exists, update the quantity
       if (mode == OrderCartMode.add) {
+        print('3');
         existingItem.qty += newItem.qty;
       } else {
+        print('4');
         // Default behavior: Add a new item
         existingItem.qty = newItem.qty;
+        existingItem.status = newItem.status;
       }
     } else {
+      print('5');
       // Item doesn't exist, add a new item
       _items.add(newItem);
     }
@@ -97,6 +108,7 @@ class OrderCart {
     _onCartChanged?.call();
 
     // Update app state
+    // print('check items, ${_items.status}');
     AppState.updateOrderCart(_items);
   }
 

@@ -5,9 +5,14 @@ import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 
 class FilterBar extends StatefulWidget {
   final void Function(String type) onFilterSelected;
+  final List<dynamic>? filterData;
+  final String? fieldValue;
+
   FilterBar({
     Key? key,
     required this.onFilterSelected,
+    this.filterData,
+    this.fieldValue,
   }) : super(key: key);
 
   @override
@@ -17,12 +22,23 @@ class FilterBar extends StatefulWidget {
 class _FilterBarState extends State<FilterBar> {
   String _selectedFilter = 'All'; // Default selected filter
   List<dynamic> filterDisplay = [];
+  String fieldName = 'name';
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      filterDisplay = AppState().dataItemGroup;
+      if (widget.filterData != null) {
+        filterDisplay = widget.filterData!;
+      } else {
+        filterDisplay = AppState().dataItemGroup;
+      }
+
+      if (widget.fieldValue != null) {
+        fieldName = widget.fieldValue!;
+      } else {
+        fieldName = 'name';
+      }
     });
   }
 
@@ -63,7 +79,8 @@ class _FilterBarState extends State<FilterBar> {
                       final filterItem = filterDisplay[index];
                       return Row(
                         children: [
-                          _buildFilterButton(filterItem['name'], buttonWidth),
+                          _buildFilterButton(
+                              filterItem[fieldName], buttonWidth),
                           const SizedBox(width: 8),
                         ],
                       );
@@ -89,7 +106,7 @@ class _FilterBarState extends State<FilterBar> {
       height: 50,
       width: width,
       child: CustomElevatedButton(
-        text: type ?? '',
+        text: type.toUpperCase(),
         buttonTextStyle: isSelected
             ? TextStyle(color: theme.colorScheme.primaryContainer)
             : TextStyle(color: theme.colorScheme.secondary),

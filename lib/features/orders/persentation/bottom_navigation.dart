@@ -56,7 +56,7 @@ class BottomNavigationOrder extends StatelessWidget {
                   Text(
                     'Menu',
                     style: TextStyle(
-                      color: isSelected == 'menu'
+                      color: isSelected == 'order'
                           ? theme.colorScheme.primary
                           : theme.colorScheme.primaryContainer,
                       fontSize: 16,

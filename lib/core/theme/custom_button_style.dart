@@ -24,6 +24,17 @@ class CustomButtonStyles {
         ),
       );
 
+  static ButtonStyle get outlineError => OutlinedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primaryContainer,
+        side: BorderSide(
+          color: theme.colorScheme.error,
+          width: 2,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+      );
+
   static ButtonStyle get primaryButton => ElevatedButton.styleFrom(
         backgroundColor: theme.colorScheme.primary,
         shape: RoundedRectangleBorder(

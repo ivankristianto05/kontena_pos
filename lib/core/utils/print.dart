@@ -504,6 +504,15 @@ dynamic printChecker(
           });
         }
       }
+
+      if (dt['note'] != '') {
+        docItem.add({
+          "key": "label",
+          "text": "Note: ${dt['note']}",
+          "style": "small",
+          "type": "left"
+        });
+      }
       // }
     }
   }

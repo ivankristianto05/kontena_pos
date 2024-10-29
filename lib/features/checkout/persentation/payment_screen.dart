@@ -1284,10 +1284,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
         'base_amount': element.totalPrice,
         'income_account': AppState().configCompany['default_income_account'],
         'cost_center': AppState().configCompany['cost_center'],
+        'pos_cart': element.cartId,
+        'pos_order': element.id,
       });
     }
 
-    print('check config payment, ${AppState().configCompany}');
+    // print('check config payment, ${AppState().configCompany}');
 
     // for (var methodPay in AppState().configCompany['payments']) {
     //   print('check, $methodPay');
@@ -1324,10 +1326,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
 
     try {
+      print('check request, ${request}');
       final callRespon =
           await frappeFetchDataInvoice.request(requestQuery: request);
       // print('call respon, ${callRespon}');
-      if (callRespon.containsKey('name')) {
+      if (callRespon != null) {
         setState(() {
           paymentStatus = true;
           invoice = callRespon;
@@ -1353,7 +1356,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         AppState().configPOSProfile,
         AppState().configUser);
 
-    // print('print invoce, $docPrint');
+    print('print invoce, $docPrint');
 
     final sendToPrinter.ToPrint request =
         sendToPrinter.ToPrint(doc: docPrint, ipAddress: '127.0.0.1');

@@ -31,6 +31,43 @@ class BottomNavigationInvoice extends StatelessWidget {
       children: [
         Expanded(
           child: InkWell(
+            onTap: onTapItem,
+            child: Container(
+              height: MediaQuery.sizeOf(context).width * 0.07,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.secondary,
+                // border: Border.all(
+                //   // right: BorderSide(
+                //   color: theme.colorScheme.primary,
+                //   width: 2.0,
+                //   // ),
+                //   // bottom: BorderSide(
+                //   //   color: theme.colorScheme.surface,
+                //   //   width: 1.0,
+                //   // ),
+                // ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Menu',
+                    style: TextStyle(
+                      color: isSelected == 'item'
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.primaryContainer,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: InkWell(
             onTap: onTapOrderToPay,
             child: Container(
               height: MediaQuery.sizeOf(context).width * 0.07,
@@ -54,7 +91,7 @@ class BottomNavigationInvoice extends StatelessWidget {
                   Text(
                     'Order to Pay',
                     style: TextStyle(
-                      color: isSelected == 'orderPay'
+                      color: isSelected == 'order'
                           ? theme.colorScheme.primary
                           : theme.colorScheme.primaryContainer,
                       fontSize: 16,
@@ -66,43 +103,7 @@ class BottomNavigationInvoice extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(
-          child: InkWell(
-            onTap: onTapItem,
-            child: Container(
-              height: MediaQuery.sizeOf(context).width * 0.07,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.secondary,
-                // border: Border.all(
-                //   // right: BorderSide(
-                //   color: theme.colorScheme.primary,
-                //   width: 2.0,
-                //   // ),
-                //   // bottom: BorderSide(
-                //   //   color: theme.colorScheme.surface,
-                //   //   width: 1.0,
-                //   // ),
-                // ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Produk',
-                    style: TextStyle(
-                      color: isSelected == 'item'
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.primaryContainer,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+
         // Expanded(
         //   child: Container(
         //     height: MediaQuery.sizeOf(context).width * 0.07,

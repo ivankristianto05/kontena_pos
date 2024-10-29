@@ -71,10 +71,18 @@ Future<Map<String, dynamic>> request(
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
 
-    if (responseBody.containsKey('data')) {
-      return responseBody['data'];
+    if (requestQuery.getParamID() != null) {
+      if (responseBody.containsKey('data')) {
+        return responseBody['data'];
+      } else {
+        return requestQuery.toJson();
+      }
     } else {
-      throw Exception(responseBody);
+      if (responseBody.containsKey('data')) {
+        return responseBody['data'];
+      } else {
+        throw Exception(responseBody);
+      }
     }
   } else {
     final responseBody = json.decode(response.body);

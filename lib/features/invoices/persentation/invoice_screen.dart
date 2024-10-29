@@ -6,19 +6,21 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/app_state.dart';
 
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
-    as frappeFetchDataItem;
+    as FrappeFetchDataItem;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item_group.dart'
-    as frappeFetchDataItemGroup;
+    as FrappeFetchDataItemGroup;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item_price.dart'
-    as frappeFetchDataItemPrice;
+    as FrappeFetchDataItemPrice;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/item_addon.dart'
+    as FrappeFetchDataItemAddon;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_cart.dart'
-    as frappeFetchDataCart;
+    as FrappeFetchCreateCart;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_cart.dart'
-    as frappeFetchDataGetCart;
+    as FrappeFetchDataGetCart;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_order.dart'
-    as frappeFetchDataOrder;
+    as FrappeFetchCreateOrder;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_order.dart'
-    as frappeFetchDataGetOrder;
+    as FrappeFetchDataGetOrder;
 
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/core/functions/invoice.dart';
@@ -33,10 +35,10 @@ import 'package:kontena_pos/widgets/custom_dialog.dart';
 import 'package:kontena_pos/widgets/empty_cart.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/list_cart.dart';
+import 'package:kontena_pos/widgets/loading_content.dart';
 import 'package:kontena_pos/widgets/searchbar.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:kontena_pos/widgets/type_transaction.dart';
-// import 'package:kontena_pos/models/cart_item.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:kontena_pos/core/utils/alert.dart' as alert;
 
@@ -60,8 +62,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   //   }
   // ];
   String filterSearch = '';
-  bool isSearchActive = false;
-  bool isLoading = true;
   String selectedGroup = '';
 
   List<dynamic> item = [];
@@ -76,7 +76,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   String typeTransaction = 'dine-in';
   int totalAddon = 0;
   int totalAddonCheckout = 0;
+
+  bool isSearchActive = false;
+  bool isLoading = true;
   bool isEdit = true;
+  bool isLoadingContent = false;
   dynamic cartSelected;
 
 // // //   //  final String id;
@@ -98,13 +102,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   @override
   void initState() {
     super.initState();
-    onCallItemGroup();
-    onCallItemPrice();
-    onCallItem();
+    onTapRefreshMenu();
+    onTapRefreshOrder();
+    // onCallItemGroup();
+    // onCallItemPrice();
+    // onCallItem();
 
-    onCallDataPosCart();
-    onCallDataPosOrder();
-    reformatOrderCart();
+    // onCallDataPosCart();
+    // onCallDataPosOrder();
+    // reformatOrderCart();
 
     setState(() {
       cartData = cart.getAllItemCart();
@@ -163,14 +169,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           children: [
             TopBar(
               isSelected: 'invoice',
-              onTapRefresh: () {
-                onCallItemGroup();
-                onCallItemPrice();
-                onCallItem();
-                onCallDataPosCart();
-                onCallDataPosOrder();
-
-                reformatOrderCart();
+              onTapRefresh: () async {
+                if (modeView == 'item') {
+                  onTapRefreshMenu();
+                } else if (modeView == 'order') {
+                  onTapRefreshOrder();
+                }
               },
             ),
             Expanded(
@@ -205,70 +209,59 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 child: Align(
                                   alignment: AlignmentDirectional(0.00, 0.00),
                                   child: SingleChildScrollView(
-                                    child: (isLoading == false &&
-                                            itemDisplay.isEmpty)
-                                        ? SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.7,
-                                            child: Skeletonizer(
-                                              enabled: isLoading,
-                                              child: Container(),
-                                            ),
-                                          )
-                                        : SizedBox(
-                                            width: MediaQuery.sizeOf(context)
-                                                .width,
-                                            child: Column(
-                                              children: [
-                                                MasonryGridView.count(
-                                                  crossAxisCount: 5,
-                                                  mainAxisSpacing: 6,
-                                                  crossAxisSpacing: 6,
-                                                  shrinkWrap: true,
-                                                  itemCount: itemDisplay.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    final currentItem =
-                                                        itemDisplay[index];
+                                    child: SizedBox(
+                                      width: MediaQuery.sizeOf(context).width,
+                                      child: Column(
+                                        children: [
+                                          if (isLoadingContent == false)
+                                            MasonryGridView.count(
+                                              crossAxisCount: 5,
+                                              mainAxisSpacing: 6,
+                                              crossAxisSpacing: 6,
+                                              shrinkWrap: true,
+                                              itemCount: itemDisplay.length,
+                                              itemBuilder: (context, index) {
+                                                final currentItem =
+                                                    itemDisplay[index];
 
-                                                    return ProductGrid(
-                                                      name: currentItem[
-                                                              'item_name'] ??
-                                                          '',
-                                                      category: currentItem[
-                                                              'item_group'] ??
-                                                          '',
-                                                      price: numberFormat(
-                                                          'idr',
-                                                          currentItem[
-                                                              'standard_rate']),
-                                                      image: CustomImageView(
-                                                        imagePath: ImageConstant
-                                                            .imgAdl1,
-                                                        height: 90.v,
-                                                        width: 70.h,
-                                                        margin: EdgeInsets.only(
-                                                            bottom: 1.v),
-                                                      ),
-                                                      onTap: () {
-                                                        onTapOpenItem(
-                                                          context,
-                                                          currentItem,
-                                                        );
-                                                      },
+                                                return ProductGrid(
+                                                  name: currentItem[
+                                                          'item_name'] ??
+                                                      '',
+                                                  category: currentItem[
+                                                          'item_group'] ??
+                                                      '',
+                                                  price: numberFormat(
+                                                      'idr',
+                                                      currentItem[
+                                                          'standard_rate']),
+                                                  image: CustomImageView(
+                                                    imagePath:
+                                                        ImageConstant.imgAdl1,
+                                                    height: 90.v,
+                                                    width: 70.h,
+                                                    margin: EdgeInsets.only(
+                                                        bottom: 1.v),
+                                                  ),
+                                                  onTap: () {
+                                                    onTapOpenItem(
+                                                      context,
+                                                      currentItem,
                                                     );
                                                   },
-                                                ),
-                                                // Text('testing'),
-                                              ],
+                                                );
+                                              },
                                             ),
-                                          ),
+                                          // Text('testing'),
+                                          if (isLoadingContent == true)
+                                            const LoadingContent(),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            if (modeView == 'orderPay')
+                            if (modeView == 'order')
                               Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 50.0, 8.0, 0.0),
@@ -483,6 +476,25 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                               ],
                                                                             ),
                                                                           ),
+                                                                          Text(
+                                                                              (orderItem['docstatus'] == 1)
+                                                                                  ? 'Confirm'
+                                                                                  : (orderItem['docstatus'] == 2)
+                                                                                      ? 'Cancelled'
+                                                                                      : 'Draft',
+                                                                              style: TextStyle(
+                                                                                color: () {
+                                                                                  if (orderItem['docstatus'] == 1) {
+                                                                                    return theme.colorScheme.primary;
+                                                                                  } else if (orderItem['docstatus'] == 2) {
+                                                                                    return theme.colorScheme.error;
+                                                                                  } else {
+                                                                                    return theme.colorScheme.onPrimaryContainer;
+                                                                                  }
+                                                                                }(),
+                                                                                fontWeight: FontWeight.w700,
+                                                                                fontSize: 12,
+                                                                              )),
                                                                         ],
                                                                       ),
                                                                     );
@@ -831,7 +843,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 isSelected: modeView,
                 onTapOrderToPay: () {
                   setState(() {
-                    modeView = 'orderPay';
+                    modeView = 'order';
                   });
                 },
                 onTapItem: () {
@@ -863,22 +875,46 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
-  void onCallItemGroup() async {
+  onTapRefreshMenu() async {
+    print('tap refresjh');
+    setState(() {
+      isLoadingContent = true;
+    });
+    await onCallItemGroup();
+    await onCallItemPrice();
+    await onCallItem();
+    await onCallItemAddon();
+    // onCallDataPosCart();
+    // onCallDataPosOrder();
+
+    // reformatOrderCart();
+  }
+
+  onTapRefreshOrder() async {
+    setState(() {
+      isLoadingContent = true;
+    });
+    await onCallDataPosCart();
+    await onCallDataPosOrder();
+    await reformatOrderCart();
+  }
+
+  onCallItemGroup() async {
     // isLoading = true;
 
-    final frappeFetchDataItemGroup.ItemGroupRequest requestItemGroup =
-        frappeFetchDataItemGroup.ItemGroupRequest(
+    final FrappeFetchDataItemGroup.ItemGroupRequest requestItemGroup =
+        FrappeFetchDataItemGroup.ItemGroupRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
       filters: '[]',
     );
 
     try {
-      final itemGroupRequset = await frappeFetchDataItemGroup
-          .requestItemGroup(requestQuery: requestItemGroup)
+      final itemGroupRequset = await FrappeFetchDataItemGroup.requestItemGroup(
+              requestQuery: requestItemGroup)
           .timeout(
-            Duration(seconds: 30),
-          );
+        Duration(seconds: 30),
+      );
 
       setState(() {
         AppState().dataItemGroup = itemGroupRequset;
@@ -886,7 +922,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         // isLoading = false;
       });
     } catch (error) {
-      isLoading = false;
+      isLoadingContent = false;
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
@@ -903,10 +939,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     }
   }
 
-  void onCallItemPrice() async {
+  onCallItemPrice() async {
     String? today = dateTimeFormat('date', null);
-    final frappeFetchDataItemPrice.ItemPriceRequest requestItemPrice =
-        frappeFetchDataItemPrice.ItemPriceRequest(
+    final FrappeFetchDataItemPrice.ItemPriceRequest requestItemPrice =
+        FrappeFetchDataItemPrice.ItemPriceRequest(
       cookie: AppState().setCookie,
       filters: '[["selling","=",1],["valid_from","<=","$today"]]',
       limit: 5000,
@@ -914,11 +950,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     try {
       // Add a timeout of 30 seconds to the profile request
-      final itemPriceRequest = await frappeFetchDataItemPrice
-          .requestItemPrice(requestQuery: requestItemPrice)
+      final itemPriceRequest = await FrappeFetchDataItemPrice.requestItemPrice(
+              requestQuery: requestItemPrice)
           .timeout(
-            Duration(seconds: 30),
-          );
+        Duration(seconds: 30),
+      );
 
       // print("item price request: $itemPriceRequest");
       setState(() {
@@ -926,7 +962,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         // itemDisplay = reformatItem(itemPriceRequest);
       });
     } catch (error) {
-      isLoading = false;
+      isLoadingContent = false;
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
@@ -943,11 +979,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     }
   }
 
-  void onCallItem() async {
+  onCallItem() async {
     isLoading = true;
 
-    final frappeFetchDataItem.ItemRequest requestItem =
-        frappeFetchDataItem.ItemRequest(
+    final FrappeFetchDataItem.ItemRequest requestItem =
+        FrappeFetchDataItem.ItemRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
       filters: '[["disabled","=",0],["is_sales_item","=",1]]',
@@ -956,11 +992,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     try {
       // Add a timeout of 30 seconds to the profile request
-      final itemRequest = await frappeFetchDataItem
-          .requestItem(requestQuery: requestItem)
-          .timeout(
-            Duration(seconds: 30),
-          );
+      final itemRequest =
+          await FrappeFetchDataItem.requestItem(requestQuery: requestItem)
+              .timeout(
+        Duration(seconds: 30),
+      );
 
       // print("titiew: $itemRequset");
       setState(() {
@@ -969,11 +1005,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           AppState().dataItemPrice,
         );
         itemDisplay = AppState().dataItem;
-        isLoading = false;
+        isLoadingContent = false;
       });
       // AppState().userDetail = profileResult;
     } catch (error) {
-      isLoading = false;
+      isLoadingContent = false;
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
@@ -986,6 +1022,186 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         }
       }
       return;
+    }
+  }
+
+  onCallItemAddon() async {
+    isLoading = true;
+
+    final FrappeFetchDataItemAddon.ItemAddonRequest request =
+        FrappeFetchDataItemAddon.ItemAddonRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[["disabled","=",0]]',
+      limit: 1500,
+    );
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final itemRequest =
+          await FrappeFetchDataItemAddon.request(requestQuery: request).timeout(
+        Duration(seconds: 30),
+      );
+
+      // print("titiew: $itemRequset");
+      setState(() {
+        AppState().dataItemAddon = itemRequest;
+        // itemDisplay = AppState().dataItem;
+        isLoadingContent = false;
+      });
+      // AppState().userDetail = profileResult;
+    } catch (error) {
+      isLoadingContent = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+        if (context.mounted) {
+          alert.alertError(context, 'Gagal mengambil data item dari server');
+        }
+      } else {
+        if (context.mounted) {
+          alert.alertError(context, error.toString());
+        }
+      }
+      return;
+    }
+  }
+
+  onCallPosCart() async {
+    final FrappeFetchCreateCart.CreatePosCartRequest request =
+        FrappeFetchCreateCart.CreatePosCartRequest(
+      cookie: AppState().setCookie,
+      customer: '0',
+      customerName: 'Guest',
+      company: AppState().configCompany['name'],
+      outlet: AppState().configPOSProfile['name'],
+      postingDate: dateTimeFormat('date', null).toString(),
+      priceList: AppState().configPOSProfile['selling_price_list'],
+      table: '1',
+      id: cartSelected != null ? cartSelected['name'] : null,
+    );
+    // print('cart selected, $cartSelected');
+
+    // request.getParamID()
+
+    try {
+      final callReqPosCart =
+          await FrappeFetchCreateCart.request(requestQuery: request);
+
+      if (callReqPosCart.isNotEmpty) {
+        cartSelected = callReqPosCart;
+      }
+    } catch (error) {
+      if (context.mounted) {
+        print('error pos cart, $error');
+        alert.alertError(context, error.toString());
+      }
+    }
+
+    if (cartSelected != null) {
+      for (InvoiceCartItem itm in cartData) {
+        print('cart data, ${itm.qty}');
+        dynamic itemReq = {
+          'item': itm.name,
+          'item_name': itm.itemName,
+          'item_group': itm.itemGroup,
+          'uom': itm.uom,
+          'qty': itm.qty,
+          'notes': itm.notes,
+          'cartId': cartSelected.name,
+        };
+        onCallPosOrder(itemReq);
+      }
+    }
+  }
+
+  onCallPosOrder(dynamic paramItem) async {
+    final FrappeFetchCreateOrder.CreatePosOrderRequest request =
+        FrappeFetchCreateOrder.CreatePosOrderRequest(
+      cookie: AppState().setCookie,
+      customer: '0',
+      customerName: 'Guest',
+      company: AppState().configCompany['name'],
+      postingDate: dateTimeFormat('date', null).toString(),
+      outlet: AppState().configPOSProfile['name'],
+      priceList: AppState().configPOSProfile['selling_price_list'],
+      cartNo: cartSelected['name'],
+      item: paramItem['item'],
+      itemName: paramItem['item_name'],
+      itemGroup: paramItem['item_group'],
+      uom: paramItem['uom'],
+      note: paramItem['notes'],
+      qty: paramItem['qty'],
+      status: 1,
+      id: null,
+    );
+
+    try {
+      final reqPosOrder =
+          await FrappeFetchCreateOrder.request(requestQuery: request);
+    } catch (error) {
+      print('error pos order, $error');
+      if (context.mounted) {
+        alert.alertError(context, error.toString());
+      }
+    }
+  }
+
+  onCallDataPosCart() async {
+    final FrappeFetchDataGetCart.PosCartRequest request =
+        FrappeFetchDataGetCart.PosCartRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+      limit: 1500,
+    );
+
+    try {
+      final callRequest =
+          await FrappeFetchDataGetCart.requestPosCart(requestQuery: request);
+
+      if (callRequest.isNotEmpty) {
+        setState(() {
+          tempPosCart = callRequest;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        isLoadingContent = false;
+      });
+      print('error call data pos cart, $error');
+      if (context.mounted) {
+        alert.alertError(context, error.toString());
+      }
+    }
+  }
+
+  onCallDataPosOrder() async {
+    final FrappeFetchDataGetOrder.PosOrderRequest request =
+        FrappeFetchDataGetOrder.PosOrderRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: '[]',
+      limit: 2000,
+    );
+
+    try {
+      final callRequest =
+          await FrappeFetchDataGetOrder.requestPosOrder(requestQuery: request);
+
+      if (callRequest.isNotEmpty) {
+        setState(() {
+          tempPosOrder = callRequest;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        isLoadingContent = false;
+      });
+      print('error call data pos order, $error');
+      if (context.mounted) {
+        alert.alertError(context, error.toString());
+      }
     }
   }
 
@@ -1028,7 +1244,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       // print('test, ${(cart.recapCart()).totalPrice}');
 
       cartData = cart.getAllItemCart();
-      print('check cart data, ${cartData}');
+      // print('check cart data, ${cartData}');
     });
   }
 
@@ -1091,18 +1307,22 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     });
     const Duration(seconds: 1);
 
-    for (int a = 0; a < order.items.length; a++) {
+    for (int a = 0; a < order['items'].length; a++) {
       InvoiceCartItem newItem = InvoiceCartItem(
-        id: order.items[a].id,
-        name: order.items[a].name,
-        itemName: order.items[a].item_name,
-        itemGroup: order.items[a].item_group,
-        uom: order.items[a].uom,
-        description: order.items[a].description,
-        qty: order.items[a].qty,
-        price: order.items[a].price,
-        notes: order.items[a].notes,
-        preference: order.items[a].preference,
+        id: order['items'][a]['name'],
+        name: order['items'][a]['item'],
+        itemName: order['items'][a]['item_name'],
+        itemGroup: order['items'][a]['item_group'],
+        uom: order['items'][a]['uom'] ?? '',
+        description:
+            order['items'][a]['description'] ?? order['items'][a]['item_name'],
+        qty: order['items'][a]['qty'],
+        price: order['items'][a]['price'].floor(),
+        notes: order['items'][a]['note'],
+        preference: order['items'][a]['preference'] ?? {},
+        status: order['items'][a]['docstatus'] == 1 ? true : false,
+        cartId: order['name'],
+        docstatus: order['items'][a]['docstatus'],
       );
 
       setState(() {
@@ -1127,133 +1347,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
-  onCallPosCart() async {
-    final frappeFetchDataCart.CreatePosCartRequest request =
-        frappeFetchDataCart.CreatePosCartRequest(
-      cookie: AppState().setCookie,
-      customer: '0',
-      customerName: 'Guest',
-      company: AppState().configCompany['name'],
-      outlet: AppState().configPOSProfile['name'],
-      postingDate: dateTimeFormat('date', null).toString(),
-      priceList: AppState().configPOSProfile['selling_price_list'],
-      table: '1',
-      id: cartSelected != null ? cartSelected['name'] : null,
-    );
-    // print('cart selected, $cartSelected');
-
-    // request.getParamID()
-
-    try {
-      final callReqPosCart =
-          await frappeFetchDataCart.request(requestQuery: request);
-
-      if (callReqPosCart.isNotEmpty) {
-        cartSelected = callReqPosCart;
-      }
-    } catch (error) {
-      if (context.mounted) {
-        print('error pos cart, $error');
-        alert.alertError(context, error.toString());
-      }
-    }
-
-    if (cartSelected != null) {
-      for (InvoiceCartItem itm in cartData) {
-        print('cart data, ${itm.qty}');
-        dynamic itemReq = {
-          'item': itm.name,
-          'item_name': itm.itemName,
-          'item_group': itm.itemGroup,
-          'qty': itm.qty,
-          'notes': itm.notes
-        };
-        onCallPosOrder(itemReq);
-      }
-    }
-  }
-
-  onCallPosOrder(dynamic paramItem) async {
-    final frappeFetchDataOrder.CreatePosOrderRequest request =
-        frappeFetchDataOrder.CreatePosOrderRequest(
-      cookie: AppState().setCookie,
-      customer: '0',
-      customerName: 'Guest',
-      company: AppState().configCompany['name'],
-      postingDate: dateTimeFormat('date', null).toString(),
-      outlet: AppState().configPOSProfile['name'],
-      priceList: AppState().configPOSProfile['selling_price_list'],
-      cartNo: cartSelected['name'],
-      item: paramItem['item'],
-      itemName: paramItem['item_name'],
-      itemGroup: paramItem['item_group'],
-      note: paramItem['notes'],
-      qty: paramItem['qty'],
-    );
-
-    try {
-      final reqPosOrder =
-          await frappeFetchDataOrder.request(requestQuery: request);
-    } catch (error) {
-      print('error pos order, $error');
-      if (context.mounted) {
-        alert.alertError(context, error.toString());
-      }
-    }
-  }
-
-  onCallDataPosCart() async {
-    final frappeFetchDataGetCart.PosCartRequest request =
-        frappeFetchDataGetCart.PosCartRequest(
-      cookie: AppState().setCookie,
-      fields: '["*"]',
-      filters: '[]',
-      limit: 1500,
-    );
-
-    try {
-      final callRequest =
-          await frappeFetchDataGetCart.requestPosCart(requestQuery: request);
-
-      if (callRequest.isNotEmpty) {
-        setState(() {
-          tempPosCart = callRequest;
-        });
-      }
-    } catch (error) {
-      print('error call data pos cart, $error');
-      if (context.mounted) {
-        alert.alertError(context, error.toString());
-      }
-    }
-  }
-
-  onCallDataPosOrder() async {
-    final frappeFetchDataGetOrder.PosOrderRequest request =
-        frappeFetchDataGetOrder.PosOrderRequest(
-      cookie: AppState().setCookie,
-      fields: '["*"]',
-      filters: '[]',
-      limit: 2000,
-    );
-
-    try {
-      final callRequest =
-          await frappeFetchDataGetOrder.requestPosOrder(requestQuery: request);
-
-      if (callRequest.isNotEmpty) {
-        setState(() {
-          tempPosOrder = callRequest;
-        });
-      }
-    } catch (error) {
-      print('error call data pos order, $error');
-      if (context.mounted) {
-        alert.alertError(context, error.toString());
-      }
-    }
-  }
-
   reformatOrderCart() async {
     List<dynamic> cartNew = [];
 
@@ -1275,6 +1368,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     print('check cart new, ${cartNew.length}');
     setState(() {
       orderDisplay = cartNew;
+      isLoadingContent = false;
     });
   }
 }
