@@ -58,6 +58,7 @@ class ListCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('check addon, ${addons}');
     return InkWell(
       onTap: onTap,
       child: Column(
@@ -86,7 +87,7 @@ class ListCart extends StatelessWidget {
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("${qty}X ${numberFormat('idr', double.parse(price))}"),
+                    Text("${qty}x ${numberFormat('idr', double.parse(price))}"),
                     Text(
                       total,
                       style: theme.textTheme.bodyMedium,
@@ -118,7 +119,7 @@ class ListCart extends StatelessWidget {
                                   children: [
                                     Row(
                                       children: [
-                                        Text('+ ${addonItem['name']}'),
+                                        Text('+ ${addonItem['item_name']}'),
                                       ],
                                     ),
                                     Padding(
@@ -128,7 +129,7 @@ class ListCart extends StatelessWidget {
                                       child: Row(
                                         children: [
                                           Text(
-                                              '${addonItem['qty']}X ${numberFormat('idr', addonItem['price'])}'),
+                                              '${addonItem['qty']}x ${numberFormat('idr', addonItem['rate'])}'),
                                         ],
                                       ),
                                     ),

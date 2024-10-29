@@ -17,9 +17,10 @@ class OrderCartItem {
   int qty;
   final Map<String, String> preference;
   final int price;
+  final int totalAddon;
   late int totalPrice;
   String? notes;
-  Map<String, Map<String, dynamic>>? addon;
+  List<dynamic>? addon;
   bool status;
   int docstatus;
 
@@ -33,6 +34,7 @@ class OrderCartItem {
     required this.price,
     required this.uom,
     required this.description,
+    required this.totalAddon,
     this.notes,
     this.addon,
     required this.status,
@@ -71,32 +73,33 @@ class OrderCart {
         itemName: '',
         itemGroup: '',
         preference: {},
-        addon: {},
+        addon: [],
         notes: '',
         uom: '',
         description: '',
         status: false,
         docstatus: 0,
+        totalAddon: 0,
       ),
     ); // Return an empty CartItem if not found
-    print('test, ${existingItem.id}');
-    print('test, ${existingItem.status}');
-    print('test, ${newItem.id}');
-    print('test, ${newItem.status}');
+    // print('test, ${existingItem.id}');
+    // print('test, ${existingItem.status}');
+    // print('test, ${newItem.id}');
+    // print('test, ${newItem.status}');
 
     if (existingItem.id.isNotEmpty) {
       // Item already exists, update the quantity
       if (mode == OrderCartMode.add) {
-        print('3');
+        // print('3');
         existingItem.qty += newItem.qty;
       } else {
-        print('4');
+        // print('4');
         // Default behavior: Add a new item
         existingItem.qty = newItem.qty;
         existingItem.status = newItem.status;
       }
     } else {
-      print('5');
+      // print('5');
       // Item doesn't exist, add a new item
       _items.add(newItem);
     }

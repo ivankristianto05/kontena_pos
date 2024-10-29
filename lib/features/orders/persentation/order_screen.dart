@@ -1079,7 +1079,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                         ],
                                       ),
                                     ),
-                                  if (cart.items.isEmpty) EmptyCart()
+                                  if (cartData.isEmpty) EmptyCart()
                                 ],
                               ),
                             ),
@@ -1790,6 +1790,8 @@ class _OrderScreenState extends State<OrderScreen> {
         preference: order['items'][a]['preference'] ?? {},
         status: order['items'][a]['docstatus'] == 1 ? true : false,
         docstatus: order['items'][a]['docstatus'],
+        addon: [],
+        totalAddon: 0,
       );
 
       setState(() {
@@ -1829,6 +1831,8 @@ class _OrderScreenState extends State<OrderScreen> {
       preference: itemNew.preference,
       status: value ?? false,
       docstatus: itemNew.docstatus,
+      addon: itemNew.addon,
+      totalAddon: itemNew.totalAddon,
     );
     // print('check itemNew, ${itemNew['status']}');
     setState(() {

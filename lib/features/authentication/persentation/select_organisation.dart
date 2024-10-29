@@ -265,6 +265,10 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                                         'assets/images/$filename.png',
                                                                         fit: BoxFit
                                                                             .cover,
+                                                                        width:
+                                                                            130.0,
+                                                                        height:
+                                                                            130.0,
                                                                         errorBuilder: (BuildContext context,
                                                                             Object
                                                                                 exception,
@@ -276,28 +280,40 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                                             'assets/images/image_not_found.png',
                                                                             fit:
                                                                                 BoxFit.cover,
+                                                                            width:
+                                                                                130.0,
+                                                                            height:
+                                                                                130.0,
                                                                           );
                                                                         },
                                                                       ),
-                                                                      const SizedBox(
-                                                                          height:
-                                                                              12.0),
-                                                                      AutoSizeText(
-                                                                        currentItem[
-                                                                            'name'],
+                                                                      Text(
+                                                                        currentItem['name']
+                                                                            .toString()
+                                                                            .toUpperCase(),
                                                                         style:
                                                                             TextStyle(
                                                                           color: theme
                                                                               .colorScheme
                                                                               .secondary,
                                                                         ),
-                                                                        maxLines:
-                                                                            1,
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                        minFontSize:
-                                                                            10,
                                                                       ),
+                                                                      // AutoSizeText(
+                                                                      //   currentItem[
+                                                                      //       'name'],
+                                                                      //   style:
+                                                                      //       TextStyle(
+                                                                      //     color: theme
+                                                                      //         .colorScheme
+                                                                      //         .secondary,
+                                                                      //   ),
+                                                                      //   maxLines:
+                                                                      //       1,
+                                                                      //   overflow:
+                                                                      //       TextOverflow.ellipsis,
+                                                                      //   minFontSize:
+                                                                      //       10,
+                                                                      // ),
                                                                     ],
                                                                   ),
                                                                 ),
