@@ -143,7 +143,7 @@ class _OrderScreenState extends State<OrderScreen> {
       key: scaffoldKey,
       backgroundColor: theme.colorScheme.background,
       body: SafeArea(
-        top: false,
+        top: true,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,

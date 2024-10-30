@@ -165,7 +165,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       key: scaffoldKey,
       backgroundColor: theme.colorScheme.background,
       body: SafeArea(
-        top: false,
+        top: true,
         child: Column(
           children: [
             TopBar(

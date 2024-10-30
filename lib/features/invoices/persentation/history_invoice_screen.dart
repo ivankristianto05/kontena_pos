@@ -62,7 +62,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
       key: scaffoldKey,
       backgroundColor: theme.colorScheme.background,
       body: SafeArea(
-        top: false,
+        top: true,
         child: Column(
           children: [
             TopBar(
