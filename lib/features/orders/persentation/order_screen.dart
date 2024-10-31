@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bluetooth_print/bluetooth_print_model.dart';
+// import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_pos/item.dart'
     as FrappeFetchDataItem;
@@ -1075,8 +1075,11 @@ class _OrderScreenState extends State<OrderScreen> {
                                             buttonStyle: CustomButtonStyles
                                                 .outlinePrimary,
                                             onPressed: () {
-                                              print('check app state, ${AppState().configPrinter}');
-                                              if (AppState().configPrinter['tipeConnection'] == 'Bluetooth') {
+                                              print(
+                                                  'check app state, ${AppState().configPrinter}');
+                                              if (AppState().configPrinter[
+                                                      'tipeConnection'] ==
+                                                  'Bluetooth') {
                                                 onPrintCheckerBluetooth();
                                               } else {
                                                 onPrintChecker();
@@ -1883,19 +1886,19 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   onPrintCheckerBluetooth() async {
-    if (AppState().isConnected && AppState().selectedPrinter != null) {
-      BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
-      Map<String, dynamic> config = Map();
-      List<LineText> list = [];
+    // if (AppState().isConnected && AppState().selectedPrinter != null) {
+    //   BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
+    //   Map<String, dynamic> config = Map();
+    //   List<LineText> list = [];
 
-      list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 1, align: LineText.ALIGN_CENTER,linefeed: 1));
-      list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', weight: 0, align: LineText.ALIGN_CENTER,linefeed: 1));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 0, align: LineText.ALIGN_LEFT,linefeed: 1));
-      list.add(LineText(linefeed: 1));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', align: LineText.ALIGN_LEFT, absolutePos: 0,relativePos: 0, linefeed: 0));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', align: LineText.ALIGN_LEFT, absolutePos: 350, relativePos: 0, linefeed: 0));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: '数量', align: LineText.ALIGN_LEFT, absolutePos: 500, relativePos: 0, linefeed: 1));
-      await bluetoothPrint.printReceipt(config, list);
-    }
+    //   list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 1, align: LineText.ALIGN_CENTER,linefeed: 1));
+    //   list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', weight: 0, align: LineText.ALIGN_CENTER,linefeed: 1));
+    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 0, align: LineText.ALIGN_LEFT,linefeed: 1));
+    //   list.add(LineText(linefeed: 1));
+    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', align: LineText.ALIGN_LEFT, absolutePos: 0,relativePos: 0, linefeed: 0));
+    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', align: LineText.ALIGN_LEFT, absolutePos: 350, relativePos: 0, linefeed: 0));
+    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: '数量', align: LineText.ALIGN_LEFT, absolutePos: 500, relativePos: 0, linefeed: 1));
+    //   await bluetoothPrint.printReceipt(config, list);
+    // }
   }
 }

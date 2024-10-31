@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:bluetooth_print/bluetooth_print_model.dart';
+// import 'package:bluetooth_print/bluetooth_print_model.dart';
+import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/functions/invoice.dart';
 // import 'package:kontena_pos/core/functions/order.dart';
@@ -106,11 +107,11 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void clearPrinter() {
-    _selectedPrinter = null;
-    _isConnected = false;
-    notifyListeners();
-  }
+  // void clearPrinter() {
+  //   _selectedPrinter = null;
+  //   _isConnected = false;
+  //   notifyListeners();
+  // }
 
   String typeTransaction = '';
   String setCookie = '';
