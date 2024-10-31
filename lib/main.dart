@@ -20,9 +20,6 @@ void main() async {
   final configuration =
       ConfigApp(); // Ensure this completes before running the app
 
-  print('kisweb, $kIsWeb');
-  print('platform android, ${Platform.isAndroid}');
-  print('platform ios, ${Platform.isIOS}');
 
   if (kIsWeb == false) {
     if ((Platform.isAndroid == false) && (Platform.isIOS == false)) {

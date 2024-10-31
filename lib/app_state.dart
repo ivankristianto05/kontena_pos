@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/functions/invoice.dart';
 // import 'package:kontena_pos/core/functions/order.dart';
@@ -87,6 +88,28 @@ class AppState extends ChangeNotifier {
   set configPrinter(dynamic _value) {
     _configPrinter = _value;
     prefs.setString('ff_configPrinter', jsonEncode(_value));
+  }
+
+  BluetoothDevice? _selectedPrinter;
+  bool _isConnected = false;
+
+  BluetoothDevice? get selectedPrinter => _selectedPrinter;
+  bool get isConnected => _isConnected;
+
+  void selectPrinter(BluetoothDevice printer) {
+    _selectedPrinter = printer;
+    notifyListeners();
+  }
+
+  void setConnectionStatus(bool status) {
+    _isConnected = status;
+    notifyListeners();
+  }
+
+  void clearPrinter() {
+    _selectedPrinter = null;
+    _isConnected = false;
+    notifyListeners();
   }
 
   String typeTransaction = '';
