@@ -259,8 +259,8 @@ class _LoginScreenState extends State<LoginScreen> {
         controller: enterPhoneController,
         focusNode: inputPhone,
         contentPadding: EdgeInsets.symmetric(
-          horizontal: 4.h,
-          vertical: 15.v,
+          horizontal: 3.h,
+          vertical: 12.v,
         ),
         hintText: "Masukin no hp / email mu",
         validator: (value) {

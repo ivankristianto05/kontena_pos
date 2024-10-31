@@ -54,6 +54,7 @@ dependencies:
   http: ^1.2.0
   window_manager: ^0.4.2
   path_provider: ^2.1.4
+  bluetooth_print: ^4.3.0
 
 dev_dependencies:
   flutter_test:

@@ -8,6 +8,7 @@ class ItemAddonRequest {
   final String? limitStart;
   final int? limit;
   final String? filters;
+  final String? id;
   // late http.Client client;
 
   ItemAddonRequest({
@@ -16,6 +17,7 @@ class ItemAddonRequest {
     this.limit,
     this.limitStart,
     this.filters,
+    this.id,
   }) {
     // client = http.Client();
   }
@@ -47,6 +49,13 @@ class ItemAddonRequest {
       'Cookie': cookie,
     };
   }
+
+  Map<String, String> paramDetail() {
+    return {
+      'doctype': 'POS Addon',
+      'name': id ?? '',
+    };
+  }
 }
 
 String queryParams(Map<String, dynamic> map) =>
@@ -61,11 +70,33 @@ Future<List<dynamic>> request({required ItemAddonRequest requestQuery}) async {
     Uri.parse(url),
     headers: requestQuery.formatHeader(),
   );
-
+  print('check ${json.decode(response.body)}');
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
     if (responseBody.containsKey('data')) {
       return responseBody['data'];
+    } else {
+      throw Exception(responseBody);
+    }
+  } else {
+    throw Exception('System unknown error code ${response.statusCode}');
+  }
+}
+
+Future<Map<String, dynamic>> requestDetail(
+    {required ItemAddonRequest requestQuery}) async {
+  String url =
+      'https://erp2.hotelkontena.com/api/method/frappe.desk.form.load.getdoc?${queryParams(requestQuery.paramDetail())}';
+  print('url, $url');
+  final response = await http.get(
+    Uri.parse(url),
+    headers: requestQuery.formatHeader(),
+  );
+
+  if (response.statusCode == 200) {
+    final responseBody = json.decode(response.body);
+    if (responseBody.containsKey('docs')) {
+      return responseBody['docs'][0];
     } else {
       throw Exception(responseBody);
     }

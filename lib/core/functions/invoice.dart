@@ -18,8 +18,9 @@ class InvoiceCartItem {
   final Map<String, String> preference;
   final int price;
   late int totalPrice;
+  final int totalAddon;
   String? notes;
-  Map<String, Map<String, dynamic>>? addon;
+  List<dynamic>? addon;
   bool? status;
   String? cartId;
   int docstatus;
@@ -39,6 +40,7 @@ class InvoiceCartItem {
     this.status,
     this.cartId,
     required this.docstatus,
+    required this.totalAddon,
   }) {
     totalPrice = qty * price;
   }
@@ -56,7 +58,7 @@ class InvoiceCart {
 
   void _recalculateTotalPrice() {
     for (var item in _items) {
-      item.totalPrice = item.qty * item.price;
+      item.totalPrice = item.qty * (item.price + item.totalAddon);
     }
   }
 
@@ -73,13 +75,14 @@ class InvoiceCart {
         itemName: '',
         itemGroup: '',
         preference: {},
-        addon: {},
+        addon: [],
         notes: '',
         uom: '',
         description: '',
         status: false,
         cartId: '',
         docstatus: 0,
+        totalAddon: 0,
       ),
     ); // Return an empty CartItem if not found
 

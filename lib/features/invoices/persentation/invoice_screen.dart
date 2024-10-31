@@ -28,6 +28,7 @@ import 'package:kontena_pos/core/functions/reformat_item_with_price.dart';
 import 'package:kontena_pos/core/theme/custom_text_style.dart';
 import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
+import 'package:kontena_pos/data/field.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
 import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
@@ -67,9 +68,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   List<dynamic> item = [];
   List<dynamic> itemDisplay = [];
   List<dynamic> orderDisplay = [];
+  List<dynamic> itemGroupDisplay = [];
 
   List<dynamic> tempPosCart = [];
   List<dynamic> tempPosOrder = [];
+  List<dynamic> tempAddon = [];
+  List<dynamic> tempAddonItem = [];
 
   String searchItemQuery = '';
   String modeView = 'item';
@@ -155,16 +159,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double smallButtonWidth = screenWidth * 0.05;
-    double buttonWidth = screenWidth * 0.15;
     double dataContentWidth = MediaQuery.sizeOf(context).width * 0.25;
 
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: theme.colorScheme.background,
       body: SafeArea(
-        top: false,
+        top: true,
         child: Column(
           children: [
             TopBar(
@@ -797,7 +798,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                   'idr',
                                                   itemData.qty *
                                                       (itemData.price +
-                                                          totalAddon)),
+                                                          itemData.totalAddon)),
                                               priceStyle: CustomTextStyles
                                                   .labelLargeBlack,
                                               labelStyle: CustomTextStyles
@@ -812,6 +813,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                               lineColor: appTheme.gray200,
                                               secondaryStyle: CustomTextStyles
                                                   .bodySmallGray,
+                                              addons: itemData.addon,
                                               isEdit: isEdit,
                                               onTap: () => onTapEditItem(
                                                   context, itemData, index),
@@ -911,16 +913,16 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     try {
       final itemGroupRequset = await FrappeFetchDataItemGroup.requestItemGroup(
-              requestQuery: requestItemGroup)
-          .timeout(
-        Duration(seconds: 30),
-      );
+          requestQuery: requestItemGroup);
 
-      setState(() {
-        AppState().dataItemGroup = itemGroupRequset;
-        // itemDisplay = itemGroupRequset;
-        // isLoading = false;
-      });
+      if (itemGroupRequset.isNotEmpty) {
+        setState(() {
+          AppState().dataItemGroup = itemGroupRequset;
+          itemGroupDisplay = itemGroupRequset;
+          // itemDisplay = itemGroupRequset;
+          // isLoading = false;
+        });
+      }
     } catch (error) {
       isLoadingContent = false;
       if (error is TimeoutException) {
@@ -1005,7 +1007,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           AppState().dataItemPrice,
         );
         itemDisplay = AppState().dataItem;
-        isLoadingContent = false;
+        // isLoadingContent = false;
       });
       // AppState().userDetail = profileResult;
     } catch (error) {
@@ -1026,32 +1028,93 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   onCallItemAddon() async {
-    isLoading = true;
+    // isLoading = true;
 
     final FrappeFetchDataItemAddon.ItemAddonRequest request =
         FrappeFetchDataItemAddon.ItemAddonRequest(
       cookie: AppState().setCookie,
-      fields: '["*"]',
-      filters: '[["disabled","=",0]]',
+      fields: fieldAddon,
+      filters: '[]',
       limit: 1500,
     );
 
     try {
       // Add a timeout of 30 seconds to the profile request
       final itemRequest =
-          await FrappeFetchDataItemAddon.request(requestQuery: request).timeout(
-        Duration(seconds: 30),
-      );
+          await FrappeFetchDataItemAddon.request(requestQuery: request);
 
       // print("titiew: $itemRequset");
+      if (itemRequest.isNotEmpty) {
+        setState(() {
+          AppState().dataItemAddon = itemRequest;
+        });
+        for (var el in itemRequest) {
+          await onCallItemAddonDetail(el);
+        }
+
+        // print('check data item addon, ${AppState().dataItemAddon}');
+      }
       setState(() {
-        AppState().dataItemAddon = itemRequest;
-        // itemDisplay = AppState().dataItem;
+        //   tempAddon = itemRequest;
+        //   // itemDisplay = AppState().dataItem;
         isLoadingContent = false;
       });
       // AppState().userDetail = profileResult;
     } catch (error) {
       isLoadingContent = false;
+      print('error, $error');
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+        if (context.mounted) {
+          alert.alertError(context, 'Gagal mengambil data item dari server');
+        }
+      } else {
+        if (context.mounted) {
+          alert.alertError(context, error.toString());
+        }
+      }
+      return;
+    }
+  }
+
+  onCallItemAddonDetail(dynamic item) async {
+    final FrappeFetchDataItemAddon.ItemAddonRequest request =
+        FrappeFetchDataItemAddon.ItemAddonRequest(
+      cookie: AppState().setCookie,
+      id: item['name'],
+    );
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final itemRequest =
+          await FrappeFetchDataItemAddon.requestDetail(requestQuery: request);
+
+      // print("titiew: $itemRequset");
+      if (itemRequest.isNotEmpty) {
+        // print('item addon detail, ${itemRequest}');
+        List<dynamic> tempAddon = AppState().dataItemAddon;
+        for (var tmpAdd in tempAddon) {
+          if (tmpAdd['name'] == itemRequest['name']) {
+            tmpAdd['items'] = itemRequest['items'];
+          }
+        }
+        setState(() {
+          AppState().dataItemAddon = tempAddon;
+        });
+        // print('check data addon update, ${AppState().dataItemAddon}');
+        // List<dynamic> tempAddon = AppState().dataItemAddon;
+      }
+
+      setState(() {
+        // AppState().dataItemAddon = itemRequest;
+        // itemDisplay = AppState().dataItem;
+        // isLoadingContent = false;
+      });
+      // AppState().userDetail = profileResult;
+    } catch (error) {
+      isLoadingContent = false;
+      print('error, $error');
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
@@ -1209,6 +1272,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     return item.where((itm) => itm['item_group'] != 'Addon').toList();
   }
 
+  dynamic reformatItemAddon(dynamic item, dynamic itemDetail) {}
+
   void onSearch(BuildContext context, dynamic value) async {}
 
   TextEditingController enterGuestNameController = TextEditingController();
@@ -1323,6 +1388,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         status: order['items'][a]['docstatus'] == 1 ? true : false,
         cartId: order['name'],
         docstatus: order['items'][a]['docstatus'],
+        addon: [],
+        totalAddon: 0,
       );
 
       setState(() {

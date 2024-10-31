@@ -20,16 +20,17 @@ void main() async {
   final configuration =
       ConfigApp(); // Ensure this completes before running the app
 
-  if ((kIsWeb != true) ||
-      (Platform.isAndroid != true) ||
-      (Platform.isIOS != true)) {
-    await windowManager.ensureInitialized();
-    windowManager.waitUntilReadyToShow().then((_) async {
-      // Hide window title bar
-      await windowManager.setFullScreen(false);
-      await windowManager.setAlwaysOnTop(false);
-      await windowManager.setSkipTaskbar(false);
-    });
+
+  if (kIsWeb == false) {
+    if ((Platform.isAndroid == false) && (Platform.isIOS == false)) {
+      await windowManager.ensureInitialized();
+      windowManager.waitUntilReadyToShow().then((_) async {
+        // Hide window title bar
+        await windowManager.setFullScreen(false);
+        await windowManager.setAlwaysOnTop(false);
+        await windowManager.setSkipTaskbar(false);
+      });
+    }
   }
 
   runApp(ChangeNotifierProvider(
