@@ -62,7 +62,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
       key: scaffoldKey,
       backgroundColor: theme.colorScheme.background,
       body: SafeArea(
-        top: false,
+        top: true,
         child: Column(
           children: [
             TopBar(
@@ -290,7 +290,6 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                           ],
                         ),
                       ),
-                      //list untuk detail invoice
                       Container(
                         width: MediaQuery.sizeOf(context).width * 0.25,
                         height: double.infinity,
