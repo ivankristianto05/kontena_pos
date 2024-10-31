@@ -1,6 +1,6 @@
+
 // import 'package:flutter/material.dart';
-// import 'package:kontena_pos/features/orders/Screen/components/Serve/iconbutton_section.dart';
-// import 'package:kontena_pos/features/orders/Screen/components/Serve/servelist_section.dart';
+// import 'package:kontena_pos/features/orders/Screen/components/Confirm/iconbutton_section.dart';
 // import 'package:kontena_pos/features/orders/Screen/components/ordercard_section.dart';
 // import 'package:kontena_pos/widgets/top_bar.dart';
 // import 'package:provider/provider.dart';
@@ -13,59 +13,74 @@
 // import 'package:kontena_pos/features/orders/Screen/components/searchbar_section.dart';
 // import 'package:kontena_pos/constants.dart';
 
-// class ServeScreen extends StatefulWidget {
-//   @override
-//   _ServeScreenState createState() => _ServeScreenState();
-// }
+// // import 'package:flutter/material.dart';
+// // import 'package:kontena_pos/features/orders/Screen/components/Serve/iconbutton_section.dart';
+// // import 'package:kontena_pos/features/orders/Screen/components/Serve/servelist_section.dart';
+// // import 'package:kontena_pos/features/orders/Screen/components/ordercard_section.dart';
+// // import 'package:kontena_pos/widgets/top_bar.dart';
+// // import 'package:provider/provider.dart';
+// // import 'package:kontena_pos/app_state.dart';
+// // import 'package:kontena_pos/features/orders/Screen/components/custombutton_section.dart';
+// // import 'package:kontena_pos/features/orders/Screen/components/Confirm/orderlist_section.dart';
+// // import 'package:kontena_pos/features/orders/Screen/components/dropdown_section.dart';
+// // import 'package:kontena_pos/features/orders/Screen/components/guestname_section.dart';
+// // import 'package:kontena_pos/features/orders/Screen/components/footer_section.dart';
+// // import 'package:kontena_pos/features/orders/Screen/components/searchbar_section.dart';
+// // import 'package:kontena_pos/constants.dart';
 
-// class _ServeScreenState extends State<ServeScreen> {
-//   final TextEditingController _guestNameController = TextEditingController();
-//   String _selectedFilterType = 'All';
-//   String _searchQuery = '';
-//   bool allItemsChecked = false; // To track if all items are checked
+// // class ServeScreen extends StatefulWidget {
+// //   @override
+// //   _ServeScreenState createState() => _ServeScreenState();
+// // }
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     _guestNameController.addListener(_handleTextChanged);
-//   }
+// // class _ServeScreenState extends State<ServeScreen> {
+// //   final TextEditingController _guestNameController = TextEditingController();
+// //   String _selectedFilterType = 'All';
+// //   String _searchQuery = '';
+// //   bool allItemsChecked = false; // To track if all items are checked
 
-//   @override
-//   void dispose() {
-//     _guestNameController.removeListener(_handleTextChanged);
-//     _guestNameController.dispose();
-//     super.dispose();
-//   }
+// //   @override
+// //   void initState() {
+// //     super.initState();
+// //     _guestNameController.addListener(_handleTextChanged);
+// //   }
 
-//   void _handleTextChanged() {
-//     // Optionally debounce the input change
-//     WidgetsBinding.instance.addPostFrameCallback((_) {
-//       // Implement debouncing if needed to avoid frequent state updates
-//       setState(() {
-//         // Update your state here if needed
-//       });
-//     });
-//   }
+// //   @override
+// //   void dispose() {
+// //     _guestNameController.removeListener(_handleTextChanged);
+// //     _guestNameController.dispose();
+// //     super.dispose();
+// //   }
 
-//   void _handleFilterSelected(String type) {
-//     setState(() {
-//       _selectedFilterType = type;
-//     });
-//   }
+// //   void _handleTextChanged() {
+// //     // Optionally debounce the input change
+// //     WidgetsBinding.instance.addPostFrameCallback((_) {
+// //       // Implement debouncing if needed to avoid frequent state updates
+// //       setState(() {
+// //         // Update your state here if needed
+// //       });
+// //     });
+// //   }
 
-//   void _handleSearchChanged(String query) {
-//     setState(() {
-//       _searchQuery = query;
-//     });
-//   }
+// //   void _handleFilterSelected(String type) {
+// //     setState(() {
+// //       _selectedFilterType = type;
+// //     });
+// //   }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final appState = Provider.of<AppState>(context);
-//     double screenWidth = MediaQuery.of(context).size.width;
-//     double searchbarWidth = screenWidth * 0.65;
-//     double smallButtonWidth = screenWidth * 0.05;
-//     double buttonWidth = screenWidth * 0.15;
+// //   void _handleSearchChanged(String query) {
+// //     setState(() {
+// //       _searchQuery = query;
+// //     });
+// //   }
+
+// //   @override
+// //   Widget build(BuildContext context) {
+// //     final appState = Provider.of<AppState>(context);
+// //     double screenWidth = MediaQuery.of(context).size.width;
+// //     double searchbarWidth = screenWidth * 0.65;
+// //     double smallButtonWidth = screenWidth * 0.05;
+// //     double buttonWidth = screenWidth * 0.15;
 
 //     return Scaffold(
 //       // appBar: BuildAppbar(
@@ -113,15 +128,15 @@
 //                     ),
 //                   ),
 //                   child: DropdownWidget(
-//                     dropdownwidth: screenWidth * 0.30,
+//                     dropdownwidth: screenWidth * 0.25,
 //                     pickupDropdownWidth:
-//                         screenWidth * 0.15, // Lebar dropdown untuk pickup
+//                         screenWidth * 0.10, // Lebar dropdown untuk pickup
 //                     tableDropdownWidth:
 //                         screenWidth * 0.10, // Lebar dropdown untuk table
 //                   ),
 //                 ),
 //                 Container(
-//                   child: ServeIconButton(),
+//                   child: Iconbutton(),
 //                 ),
 //               ],
 //             ),
@@ -134,11 +149,11 @@
 //                     child: OrderCard(
 //                       screenWidth: screenWidth,
 //                       onOrderSelected: (orderId) {
-//                         appState.setCurrentServeOrderId(orderId);
+//                         appState.setCurrentConfirmOrderId(orderId);
 //                         //appState.printConfirmedOrders();
 //                       },
-//                       orderan: appState.servedOrders,
-//                       currentOrderId: appState.currentServeOrderId,
+//                       orderan: appState.confirmedOrders,
+//                       currentOrderId: appState.currentConfirmOrderId, // Pass selected order ID
 //                     ),
 //                   ),
 //                   Container(
@@ -147,7 +162,7 @@
 //                       color: Colors.white,
 //                     ),
 //                     child: OrderList(
-//                       listorder: appState.servedOrders,
+//                       listorder: appState.confirmedOrders,
 //                       screenWidth: screenWidth,
 //                       appState: appState,
 //                       onAllChecked: (bool isChecked) {
@@ -155,7 +170,7 @@
 //                           allItemsChecked = isChecked;
 //                         });
 //                       },
-//                       currentOrderId: appState.currentServeOrderId,
+//                       currentOrderId: appState.currentConfirmOrderId,
 //                     ),
 //                   ),
 //                 ],
@@ -172,9 +187,13 @@
 //                   ),
 //                   CustomButton(
 //                     screenWidth: MediaQuery.of(context).size.width,
-//                     buttonText: 'Serve', // Text for the confirm page
+//                     buttonText: 'Confirm', // Text for the confirm page
 //                     onPressed: () {
-//                       print("order served");
+//                       if (appState.currentConfirmOrderId.isNotEmpty) {
+//                         appState.confirmOrderStatus(appState.currentConfirmOrderId);
+//                         print("Order ${appState.currentConfirmOrderId} confirmed");
+//                       }
+              
 //                     },
 //                   ),
 //                 ],
@@ -186,3 +205,123 @@
 //     );
 //   }
 // }
+
+// //     return Scaffold(
+// //       // appBar: BuildAppbar(
+// //       //   smallButtonWidth: smallButtonWidth,
+// //       //   buttonWidth: buttonWidth,
+// //       // ),
+// //       body: Container(
+// //         color: itembackgroundcolor,
+// //         child: Column(
+// //           crossAxisAlignment: CrossAxisAlignment.start,
+// //           children: [
+// //             TopBar(),
+// //             Row(
+// //               children: [
+// //                 Container(
+// //                   height: 55,
+// //                   child: Searchbar(
+// //                     screenWidth: searchbarWidth,
+// //                     onSearchChanged: _handleSearchChanged,
+// //                   ),
+// //                 ),
+// //                 GuestNameTextFieldButton(
+// //                   screenWidth: screenWidth,
+// //                   guestNameController: _guestNameController,
+// //                   smallButtonWidth: smallButtonWidth,
+// //                 ),
+// //               ],
+// //             ),
+// //             Row(
+// //               children: [
+// //                 Container(
+// //                   width: searchbarWidth,
+// //                 ),
+// //                 Container(
+// //                   decoration: BoxDecoration(
+// //                     border: Border(
+// //                       top: BorderSide(
+// //                         color: Colors.grey,
+// //                         width: 1.0,
+// //                       ),
+// //                       bottom: BorderSide(
+// //                         color: Colors.grey,
+// //                         width: 1.0,
+// //                       ),
+// //                     ),
+// //                   ),
+// //                   child: DropdownWidget(
+// //                     dropdownwidth: screenWidth * 0.30,
+// //                     pickupDropdownWidth:
+// //                         screenWidth * 0.15, // Lebar dropdown untuk pickup
+// //                     tableDropdownWidth:
+// //                         screenWidth * 0.10, // Lebar dropdown untuk table
+// //                   ),
+// //                 ),
+// //                 Container(
+// //                   child: ServeIconButton(),
+// //                 ),
+// //               ],
+// //             ),
+// //             Expanded(
+// //               child: Row(
+// //                 children: [
+// //                   Container(
+// //                     width: screenWidth * 0.65,
+// //                     alignment: Alignment.topLeft,
+// //                     child: OrderCard(
+// //                       screenWidth: screenWidth,
+// //                       onOrderSelected: (orderId) {
+// //                         appState.setCurrentServeOrderId(orderId);
+// //                         //appState.printConfirmedOrders();
+// //                       },
+// //                       orderan: appState.servedOrders,
+// //                       currentOrderId: appState.currentServeOrderId,
+// //                     ),
+// //                   ),
+// //                   Container(
+// //                     width: screenWidth * 0.35,
+// //                     decoration: BoxDecoration(
+// //                       color: Colors.white,
+// //                     ),
+// //                     child: OrderList(
+// //                       listorder: appState.servedOrders,
+// //                       screenWidth: screenWidth,
+// //                       appState: appState,
+// //                       onAllChecked: (bool isChecked) {
+// //                         setState(() {
+// //                           allItemsChecked = isChecked;
+// //                         });
+// //                       },
+// //                       currentOrderId: appState.currentServeOrderId,
+// //                     ),
+// //                   ),
+// //                 ],
+// //               ),
+// //             ),
+// //             Container(
+// //               height: 50,
+// //               child: Row(
+// //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+// //                 children: [
+// //                   Container(
+// //                     width: screenWidth * 0.65,
+// //                     child: Footer(screenWidth: screenWidth),
+// //                   ),
+// //                   CustomButton(
+// //                     screenWidth: MediaQuery.of(context).size.width,
+// //                     buttonText: 'Serve', // Text for the confirm page
+// //                     onPressed: () {
+// //                       print("order served");
+// //                     },
+// //                   ),
+// //                 ],
+// //               ),
+// //             ),
+// //           ],
+// //         ),
+// //       ),
+// //     );
+// //   }
+// // }
