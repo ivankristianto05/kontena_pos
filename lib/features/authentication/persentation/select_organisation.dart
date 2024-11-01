@@ -66,6 +66,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
         key: scaffoldKey,
         backgroundColor: theme.colorScheme.primaryContainer,
         body: SafeArea(
+          top: true,
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Padding(
@@ -81,7 +82,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: MediaQuery.sizeOf(context).width * 0.6,
+                        width: MediaQuery.sizeOf(context).width * 0.8,
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primaryContainer,
                         ),
@@ -168,6 +169,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                       style: theme.textTheme.titleLarge,
                                     ),
                                   SingleChildScrollView(
+                                    primary: true,
                                     child: Column(
                                       mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment:
@@ -200,6 +202,8 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                           mainAxisSpacing: 6,
                                                           crossAxisSpacing: 6,
                                                           shrinkWrap: true,
+                                                          physics:
+                                                              const NeverScrollableScrollPhysics(),
                                                           itemCount:
                                                               companyDisplay
                                                                   .length,
@@ -353,6 +357,8 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                           mainAxisSpacing: 6,
                                                           crossAxisSpacing: 6,
                                                           shrinkWrap: true,
+                                                          physics:
+                                                              const NeverScrollableScrollPhysics(),
                                                           itemCount:
                                                               posProfileDisplay
                                                                   .length,

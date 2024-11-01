@@ -586,3 +586,7 @@ dynamic printChecker(
 
   return docToPrint;
 }
+
+dynamic printCheckerBluetooth(
+  dynamic dataOrder,
+) {}

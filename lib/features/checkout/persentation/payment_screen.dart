@@ -75,7 +75,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       key: scaffoldKey,
       backgroundColor: theme.colorScheme.background,
       body: SafeArea(
-        top: false,
+        top: true,
         child: Column(
           children: [
             Container(
@@ -129,6 +129,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Expanded(
+                    flex: 1,
                     child: Container(
                       height: double.infinity,
                       // height: 600.0,
@@ -189,7 +190,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   if (paymentMethod == 'CASH')
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 150.0, 0.0, 16.0),
+                                          0.0, 50.0, 0.0, 16.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
@@ -809,6 +810,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             NumPad(
+                              initialValue: payment,
                               onResult: (value) {
                                 setState(() {
                                   payment = double.parse(value);
@@ -844,6 +846,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         )),
                   ),
                   Expanded(
+                    flex: 1,
                     child: Container(
                       height: double.infinity,
                       decoration: BoxDecoration(
@@ -1273,19 +1276,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
     for (var element in cartData) {
       tempItem.add({
         'item_code': element.name,
-        'item_name': element.itemName,
-        'description': element.description,
-        'uom': element.uom,
-        'conversion_factor': 1,
+        // 'item_name': element.itemName,
+        // 'description': element.description,
+        // 'uom': element.uom,
+        // 'conversion_factor': 1,
         'qty': element.qty,
-        'rate': element.price,
-        'amount': element.totalPrice,
-        'base_rate': element.price,
-        'base_amount': element.totalPrice,
-        'income_account': AppState().configCompany['default_income_account'],
-        'cost_center': AppState().configCompany['cost_center'],
-        'pos_cart': element.cartId,
-        'pos_order': element.id,
+        // 'rate': element.price,
+        // 'amount': element.totalPrice,
+        // 'base_rate': element.price,
+        // 'base_amount': element.totalPrice,
+        // 'income_account': AppState().configCompany['default_income_account'],
+        // 'cost_center': AppState().configCompany['cost_center'],
+        // 'pos_cart': element.cartId,
+        'pos_order': element.id.contains('CORD') ? element.id : null,
       });
     }
 
@@ -1329,7 +1332,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       print('check request, ${request}');
       final callRespon =
           await frappeFetchDataInvoice.request(requestQuery: request);
-      // print('call respon, ${callRespon}');
+      print('call respon, ${callRespon}');
       if (callRespon != null) {
         setState(() {
           paymentStatus = true;

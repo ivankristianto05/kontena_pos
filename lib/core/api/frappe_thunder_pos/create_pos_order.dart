@@ -60,9 +60,7 @@ class CreatePosOrderRequest {
       "item_group": itemGroup,
       "uom": uom,
       "note": note,
-      "quantity": qty,
-      "ots_dlv": status == 1 ? 1 : 0,
-      "ots_bill": 0,
+      "qty": qty,
     };
 
     data.removeWhere((key, value) => value == null);

@@ -66,7 +66,7 @@ class ProductGrid extends StatelessWidget {
                     child: AutoSizeText(
                       category,
                       style: theme.textTheme.labelMedium,
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       minFontSize: 9,
                     ),
