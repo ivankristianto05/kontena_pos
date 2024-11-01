@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 // import 'package:bluetooth_print/bluetooth_print_model.dart';
-import 'package:blue_thermal_printer/blue_thermal_printer.dart';
+// import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/functions/invoice.dart';
 // import 'package:kontena_pos/core/functions/order.dart';
 import 'package:kontena_pos/core/functions/order_new.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 // import 'package:kontena_pos/core/functions/serve.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'models/cartitem.dart';
@@ -37,9 +38,19 @@ class AppState extends ChangeNotifier {
     });
 
     _safeInit(() {
-      if (prefs.containsKey('ff_configUser')) {
+      if (prefs.containsKey('ff_configPrinter')) {
         try {
-          _configUser = json.decode(prefs.getString('_configUser') ?? '');
+          _configPrinter = json.decode(prefs.getString('_configPrinter') ?? '');
+        } catch (e) {
+          print("Can't decode persisted json. Error: $e.");
+        }
+      }
+    });
+
+    _safeInit(() {
+      if (prefs.containsKey('ff_selectedPrinter')) {
+        try {
+          _selectedPrinter = json.decode(prefs.getString('_selectedPrinter') ?? '');
         } catch (e) {
           print("Can't decode persisted json. Error: $e.");
         }
@@ -88,19 +99,27 @@ class AppState extends ChangeNotifier {
   dynamic get configPrinter => _configPrinter;
   set configPrinter(dynamic _value) {
     _configPrinter = _value;
+    PrintBluetoothThermal.connect(macPrinterAddress: _value['selectedMacAddPrinter']);
     prefs.setString('ff_configPrinter', jsonEncode(_value));
   }
 
-  BluetoothDevice? _selectedPrinter;
+  BluetoothInfo? _selectedPrinter;
+  BluetoothInfo? get selectedPrinter => _selectedPrinter;
+  set selectedPrinter(BluetoothInfo? _value) {
+    _selectedPrinter = _value!;
+    // prefs.setString('ff_selectedPrinter', jsonEncode(_value));
+  }
+
+  // BluetoothDevice? _selectedPrinter;
   bool _isConnected = false;
 
-  BluetoothDevice? get selectedPrinter => _selectedPrinter;
+  // BluetoothDevice? get selectedPrinter => _selectedPrinter;
   bool get isConnected => _isConnected;
 
-  void selectPrinter(BluetoothDevice printer) {
-    _selectedPrinter = printer;
+  // void selectPrinter(BluetoothDevice printer) {
+    // _selectedPrinter = printer;
     notifyListeners();
-  }
+  // }
 
   void setConnectionStatus(bool status) {
     _isConnected = status;

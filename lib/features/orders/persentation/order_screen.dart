@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:blue_thermal_printer/blue_thermal_printer.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+// import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 // import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_invoice.dart'
@@ -54,6 +55,7 @@ import 'package:kontena_pos/widgets/searchbar.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:kontena_pos/widgets/type_transaction.dart';
 import 'package:kontena_pos/app_state.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:styled_divider/styled_divider.dart';
 
@@ -2347,70 +2349,77 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   onPrintCheckerBluetooth() async {
-    BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
-    // String name = cartSelected[];
-    bluetooth.isConnected.then((isConnected) {
-      if (isConnected == true) {
-        List<dynamic> tempItem = [];
-        List<dynamic> docItem = [];
-        bluetooth.printLeftRight(
-          "No",
-          cartSelected['name'],
-          Size.medium.val,
-        );
+    bool connectionStatus = await PrintBluetoothThermal.connectionStatus;
+    if (connectionStatus) {
+      bool result = false;
+      List<int> ticket = await testTicket();
+      result = await PrintBluetoothThermal.writeBytes(ticket);
+      print('result print, $result');
+    }
+    // BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
+    // // String name = cartSelected[];
+    // bluetooth.isConnected.then((isConnected) {
+    //   if (isConnected == true) {
+    //     List<dynamic> tempItem = [];
+    //     List<dynamic> docItem = [];
+    //     bluetooth.printLeftRight(
+    //       "No",
+    //       cartSelected['name'],
+    //       Size.medium.val,
+    //     );
 
-        String docTime = '';
+    //     String docTime = '';
 
-        if ((cartSelected['posting_date'] != null) ||
-            (cartSelected['posting_time'] != null)) {
-          var tmpDate = dateTimeFormat('dateui', cartSelected['posting_date']);
-          var tmpTime = timeFormat('time_simple', cartSelected['posting_time']);
-          docTime = '$tmpDate $tmpTime';
-        }
-        bluetooth.printLeftRight(
-          "Date",
-          docTime,
-          Size.medium.val,
-        );
+    //     if ((cartSelected['posting_date'] != null) ||
+    //         (cartSelected['posting_time'] != null)) {
+    //       var tmpDate = dateTimeFormat('dateui', cartSelected['posting_date']);
+    //       var tmpTime = timeFormat('time_simple', cartSelected['posting_time']);
+    //       docTime = '$tmpDate $tmpTime';
+    //     }
+    //     bluetooth.printLeftRight(
+    //       "Date",
+    //       docTime,
+    //       Size.medium.val,
+    //     );
 
-        if (cartSelected['customer'] != null) {
-          String tmpCustomer = cartSelected['customer_name'] != ''
-              ? cartSelected['customer_name']
-              : '';
-          bluetooth.printLeftRight(
-            "Customer",
-            tmpCustomer,
-            Size.medium.val,
-          );
-          // docHeader.add({"key": "line", "type": "line"});
-        }
-        bluetooth.printNewLine();
+    //     if (cartSelected['customer'] != null) {
+    //       String tmpCustomer = cartSelected['customer_name'] != ''
+    //           ? cartSelected['customer_name']
+    //           : '';
+    //       bluetooth.printLeftRight(
+    //         "Customer",
+    //         tmpCustomer,
+    //         Size.medium.val,
+    //       );
+    //       // docHeader.add({"key": "line", "type": "line"});
+    //     }
+    //     bluetooth.printNewLine();
 
-        if (cartSelected['items'] != null) {
-          tempItem = cartSelected['items'];
-        } else {
-          tempItem = ((cartSelected['items'] != null) &&
-                  (cartSelected['items'].length > 2))
-              ? cartSelected['items']
-              : [];
-        }
+    //     if (cartSelected['items'] != null) {
+    //       tempItem = cartSelected['items'];
+    //     } else {
+    //       tempItem = ((cartSelected['items'] != null) &&
+    //               (cartSelected['items'].length > 2))
+    //           ? cartSelected['items']
+    //           : [];
+    //     }
 
-        if (tempItem.isNotEmpty) {
-          for (var dt in tempItem) {
-            // if (dt['parent_addon_idx'] == null) {
-            String qty = numberFormat('number_fixed', dt['qty']);
-            String tmpTitle = '${qty}x  ${dt['item_name']}';
-            bluetooth.printLeftRight(
-              tmpTitle,
-              "[ ]",
-              Size.medium.val,
-            );
-          }
-        }
-        bluetooth.printNewLine();
-        bluetooth.paperCut();
-      }
-    });
+    //     if (tempItem.isNotEmpty) {
+    //       for (var dt in tempItem) {
+    //         // if (dt['parent_addon_idx'] == null) {
+    //         String qty = numberFormat('number_fixed', dt['qty']);
+    //         String tmpTitle = '${qty}x  ${dt['item_name']}';
+    //         bluetooth.printLeftRight(
+    //           tmpTitle,
+    //           "[ ]",
+    //           Size.medium.val,
+    //         );
+    //       }
+    //     }
+        // bluetooth.printNewLine();
+        // bluetooth.paperCut();
+      // }
+    // });
     // if (AppState().isConnected && AppState().selectedPrinter != null) {
     //   BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
     //   Map<String, dynamic> config = Map();
@@ -2425,5 +2434,40 @@ class _OrderScreenState extends State<OrderScreen> {
     //   // list.add(LineText(type: LineText.TYPE_TEXT, content: '数量', align: LineText.ALIGN_LEFT, absolutePos: 500, relativePos: 0, linefeed: 1));
     //   await bluetoothPrint.printReceipt(config, list);
     // }
+  }
+
+  Future<List<int>> testTicket() async {
+    List<int> bytes = [];
+    // Using default profile
+    final profile = await CapabilityProfile.load();
+    final generator = Generator(PaperSize.mm80, profile);
+    //bytes += generator.setGlobalFont(PosFontType.fontA);
+    bytes += generator.reset();
+
+    // final ByteData data = await rootBundle.load('assets/mylogo.jpg');
+    // final Uint8List bytesImg = data.buffer.asUint8List();
+    // img.Image? image = img.decodeImage(bytesImg);
+
+    bytes += generator.text('Bold text', styles: PosStyles(bold: true));
+    bytes += generator.text('Reverse text', styles: PosStyles(reverse: true));
+    bytes += generator.text('Underlined text', styles: PosStyles(underline: true), linesAfter: 1);
+    bytes += generator.text('Align left', styles: PosStyles(align: PosAlign.left));
+    bytes += generator.text('Align center', styles: PosStyles(align: PosAlign.center));
+    bytes += generator.text('Align right', styles: PosStyles(align: PosAlign.right), linesAfter: 1);
+
+    bytes += generator.row([
+      PosColumn(
+        text: 'col5',
+        width: 6,
+        styles: PosStyles(align: PosAlign.left, underline: true),
+      ),
+      PosColumn(
+        text: 'col7',
+        width: 6,
+        styles: PosStyles(align: PosAlign.right, underline: true),
+      ),
+    ]);
+
+    return bytes;
   }
 }
