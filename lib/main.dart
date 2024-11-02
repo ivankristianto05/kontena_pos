@@ -2,6 +2,7 @@ import 'dart:core';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kontena_pos/config_app.dart';
 import 'package:provider/provider.dart';
 import 'package:kontena_pos/routes/app_routes.dart';
@@ -19,7 +20,6 @@ void main() async {
   await appState.initializeState();
   final configuration =
       ConfigApp(); // Ensure this completes before running the app
-
 
   if (kIsWeb == false) {
     if ((Platform.isAndroid == false) && (Platform.isIOS == false)) {
@@ -83,6 +83,13 @@ class _MyAppState extends State<MyApp> {
     return FutureBuilder<String>(
       future: _initialRouteFuture,
       builder: (context, snapshot) {
+        if (Platform.isAndroid || Platform.isIOS) {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.landscapeLeft,
+            DeviceOrientation.landscapeRight,
+          ]);
+        }
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {

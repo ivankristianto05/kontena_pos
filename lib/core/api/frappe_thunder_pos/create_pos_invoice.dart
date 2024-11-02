@@ -89,7 +89,7 @@ class CreatePosInvoiceRequest {
 Future<Map<String, dynamic>> request(
     {required CreatePosInvoiceRequest requestQuery}) async {
   String url = 'https://erp2.hotelkontena.com/api/resource/POS Invoice';
-  print('check data, ${json.encode(requestQuery.toJson())}');
+  // print('check data, ${json.encode(requestQuery.toJson())}');
   final response = await http.post(
     Uri.parse(url),
     headers: requestQuery.formatHeader(),
@@ -98,7 +98,7 @@ Future<Map<String, dynamic>> request(
 
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
-
+    print('check, $responseBody');
     if (responseBody.containsKey('data')) {
       return responseBody['data'];
     } else {

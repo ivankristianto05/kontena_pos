@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bluetooth_print/bluetooth_print_model.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+// import 'package:blue_thermal_printer/blue_thermal_printer.dart';
+// import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_invoice.dart'
     as FrappeFetchDataGetInvoice;
@@ -15,6 +17,8 @@ import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_cart.dart'
     as FrappeFetchDataGetCart;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_order.dart'
     as FrappeFetchDataGetOrder;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_delivery.dart'
+    as FrappeFetchDataGetDelivery;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_cart.dart'
     as FrappeFetchCreateCart;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/create_pos_order.dart'
@@ -23,26 +27,28 @@ import 'package:kontena_pos/core/api/frappe_thunder_pos/submit_pos_order.dart'
     as FrappeFetchSubmitOrder;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/cancel_pos_order.dart'
     as FrappeFetchCancelOrder;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/submit_pos_delivery.dart'
+    as FrappeFetchSubmitDelivery;
 import 'package:kontena_pos/core/api/send_printer.dart' as sendToPrinter;
 
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/core/functions/order_new.dart';
 import 'package:kontena_pos/core/functions/reformat_item_with_price.dart';
-import 'package:kontena_pos/core/plugins/bluetooth_print.dart';
 import 'package:kontena_pos/core/theme/custom_text_style.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/alert.dart';
 import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/core/utils/print.dart';
+import 'package:kontena_pos/core/utils/print_bluetooth.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
 import 'package:kontena_pos/features/orders/persentation/bottom_navigation.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
 import 'package:kontena_pos/widgets/custom_dialog.dart';
-import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/widgets/custom_outlined_button.dart';
 import 'package:kontena_pos/widgets/empty_cart.dart';
+import 'package:kontena_pos/widgets/empty_data.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/loading_content.dart';
 import 'package:kontena_pos/widgets/searchbar.dart';
@@ -50,6 +56,7 @@ import 'package:kontena_pos/widgets/table_number.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:kontena_pos/widgets/type_transaction.dart';
 import 'package:kontena_pos/app_state.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:styled_divider/styled_divider.dart';
 
@@ -78,6 +85,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   List<dynamic> itemDisplay = [];
   List<dynamic> orderDisplay = [];
+  List<dynamic> servedDisplay = [];
   List<dynamic> tempPosCart = [];
   List<dynamic> tempPosOrder = [];
   List<dynamic> tempPosServed = [];
@@ -196,23 +204,27 @@ class _OrderScreenState extends State<OrderScreen> {
                                   onFilterSelected: (String type) {},
                                 ),
                               ),
-                            if (modeView == 'order')
+                            if (modeView == 'order' &&
+                                isLoadingContent == false)
                               Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
                                     8.0, 120.0, 8.0, 0.0),
                                 child: Align(
-                                  alignment: AlignmentDirectional(0.00, 0.00),
+                                  alignment: Alignment.topLeft,
                                   child: SingleChildScrollView(
+                                    primary: true,
                                     child: SizedBox(
                                       width: MediaQuery.sizeOf(context).width,
                                       child: Column(
                                         children: [
-                                          if (isLoadingContent == false)
+                                          if (itemDisplay.isNotEmpty)
                                             MasonryGridView.count(
                                               crossAxisCount: 5,
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
                                               itemCount: itemDisplay.length,
                                               itemBuilder: (context, index) {
                                                 final currentItem =
@@ -245,30 +257,41 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 );
                                               },
                                             ),
-                                          if (isLoadingContent == true)
-                                            const LoadingContent(),
+                                          if (itemDisplay.isEmpty) EmptyData(),
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            if (modeView == 'confirm')
+                            if (modeView == 'confirm' &&
+                                isLoadingContent == false)
                               Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 50.0, 8.0, 0.0),
                                 child: Align(
-                                  alignment: AlignmentDirectional(0.00, 0.00),
+                                  alignment: Alignment.topLeft,
                                   child: SingleChildScrollView(
                                     primary: true,
-                                    scrollDirection: Axis.vertical,
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          if (isLoadingContent == false)
+                                          Text(
+                                            'Confirm',
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          if (orderDisplay.isNotEmpty)
                                             AlignedGridView.count(
-                                              crossAxisCount: 3,
+                                              crossAxisCount: 4,
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
@@ -448,7 +471,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                                 CrossAxisAlignment.start,
                                                                             children: [
                                                                               Text(
-                                                                                "${orderItem['quantity']}x",
+                                                                                "${orderItem['qty']}x",
                                                                                 style: const TextStyle(
                                                                                   fontWeight: FontWeight.w600,
                                                                                   fontSize: 14,
@@ -467,15 +490,16 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                                       maxFontSize: 14,
                                                                                       overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
                                                                                     ),
-                                                                                    if ((orderItem['note'] != null) && (orderItem['note'] != '')) const SizedBox(height: 4),
-                                                                                    AutoSizeText(
-                                                                                      "Notes: ${orderItem['note']}",
-                                                                                      style: theme.textTheme.labelSmall,
-                                                                                      maxLines: 2,
-                                                                                      minFontSize: 10,
-                                                                                      maxFontSize: 12,
-                                                                                      overflow: TextOverflow.ellipsis,
-                                                                                    ),
+                                                                                    const SizedBox(height: 4),
+                                                                                    if ((orderItem.containsKey('note')) && (orderItem['note'] != null) && (orderItem['note'] != ''))
+                                                                                      AutoSizeText(
+                                                                                        "Notes: ${orderItem['note']}",
+                                                                                        style: theme.textTheme.labelSmall,
+                                                                                        maxLines: 2,
+                                                                                        minFontSize: 10,
+                                                                                        maxFontSize: 12,
+                                                                                        overflow: TextOverflow.ellipsis,
+                                                                                      ),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -522,208 +546,219 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 );
                                               },
                                             ),
-                                          if (isLoadingContent == true)
-                                            const LoadingContent(),
+                                          if (itemDisplay.isEmpty) EmptyData(),
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                              if (modeView == 'served')
+                            if (modeView == 'served' &&
+                                isLoadingContent == false)
                               Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 50.0, 8.0, 0.0),
                                 child: Align(
-                                  alignment: AlignmentDirectional(0.00, 0.00),
+                                  alignment: Alignment.topLeft,
                                   child: SingleChildScrollView(
                                     primary: true,
                                     scrollDirection: Axis.vertical,
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          if (isLoadingContent == false)
+                                          Text(
+                                            'Served',
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          if (servedDisplay.isNotEmpty)
                                             AlignedGridView.count(
                                               crossAxisCount: 3,
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
+                                              //itemCount: servedDisplay.length,
                                               itemCount:tempPosServed.length,
                                               itemBuilder: (context, index) {
                                                 final order = tempPosServed[index];
+                                                //final order = servedDisplay[index];
                                                 dynamic orderItemList =
                                                     order['items'];
                                                 return InkWell(
                                                   onTap: () {
-                                                    onTapActionServe(context, order);
+                                                    // addToCartFromOrder(
+                                                    //     context, order);
                                                   },
                                                   child: Card(
-                                                  elevation: 2,
-                                                  child: Column(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                          16.0,
-                                                          16.0,
-                                                          16.0,
-                                                          10.0,
-                                                        ),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  order['name'],
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .titleMedium,
-                                                                ),
-                                                                if (order[
-                                                                        'table'] !=
-                                                                    null)
-                                                                  Text(
-                                                                    'Table ${order['table']}',
-                                                                    style: theme
-                                                                        .textTheme
-                                                                        .bodyMedium,
-                                                                  ),
-                                                                Text(
-                                                                    (order['docstatus'] ==
-                                                                            1)
-                                                                        ? order[
-                                                                            'status']
-                                                                        : (order['docstatus'] ==
-                                                                                2)
-                                                                            ? 'Cancelled'
-                                                                            : 'Draft',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600,
-                                                                      color:
-                                                                          () {
-                                                                        if (order['docstatus'] ==
-                                                                            1) {
-                                                                          return theme
-                                                                              .colorScheme
-                                                                              .onSecondary;
-                                                                        } else if (order['docstatus'] ==
-                                                                            2) {
-                                                                          return theme
-                                                                              .colorScheme
-                                                                              .error;
-                                                                        } else {
-                                                                          return theme
-                                                                              .colorScheme
-                                                                              .onPrimaryContainer;
-                                                                        }
-                                                                      }(),
-                                                                    )),
-                                                              ],
-                                                            ),
-                                                            Divider(
-                                                              height: 5.0,
-                                                              thickness: 0.5,
-                                                              color: theme
-                                                                  .colorScheme
-                                                                  .outline,
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  order['customer_name']
-                                                                      .toString(),
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .bodyMedium,
-                                                                ),
-                                                                Text(
-                                                                  '${numberFormat('idr_fixed', order['grand_total'])}',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: theme
-                                                                        .colorScheme
-                                                                        .secondary,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                0.0,
-                                                                4.0,
-                                                                0.0,
-                                                                4.0,
-                                                              ),
-                                                              child: Row(
+                                                    elevation: 2,
+                                                    child: Column(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                            16.0,
+                                                            16.0,
+                                                            16.0,
+                                                            10.0,
+                                                          ),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
                                                                         .spaceBetween,
                                                                 children: [
-                                                                  Row(
-                                                                    children: [
-                                                                      Text(
-                                                                        dateTimeFormat(
-                                                                          'dateui',
-                                                                          order[
-                                                                              'posting_date'],
-                                                                        ).toString(),
-                                                                        style: theme
-                                                                            .textTheme
-                                                                            .labelSmall,
-                                                                      ),
-                                                                      Text(
-                                                                        ' | ${timeFormat(
-                                                                          'time_simple',
-                                                                          order[
-                                                                              'posting_time'],
-                                                                        ).toString()}',
-                                                                        style: theme
-                                                                            .textTheme
-                                                                            .labelSmall,
-                                                                      ),
-                                                                    ],
+                                                                  Text(
+                                                                    order[
+                                                                        'name'],
+                                                                    style: theme
+                                                                        .textTheme
+                                                                        .titleMedium,
                                                                   ),
-                                                                  // Text(
-                                                                  //   'Paid: ${numberFormat('idr_fixed', order['paid_amount'])}',
-                                                                  //   style: theme
-                                                                  //       .textTheme
-                                                                  //       .bodyMedium,
-                                                                  // ),
+                                                                  if (order[
+                                                                          'table'] !=
+                                                                      null)
+                                                                    Text(
+                                                                      'Table ${order['table']}',
+                                                                      style: theme
+                                                                          .textTheme
+                                                                          .bodyMedium,
+                                                                    ),
+                                                                  Text(
+                                                                      (order['docstatus'] ==
+                                                                              1)
+                                                                          ? order[
+                                                                              'status']
+                                                                          : (order['docstatus'] ==
+                                                                                  2)
+                                                                              ? 'Cancelled'
+                                                                              : 'Draft',
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                        color:
+                                                                            () {
+                                                                          if (order['docstatus'] ==
+                                                                              1) {
+                                                                            return theme.colorScheme.onSecondary;
+                                                                          } else if (order['docstatus'] ==
+                                                                              2) {
+                                                                            return theme.colorScheme.error;
+                                                                          } else {
+                                                                            return theme.colorScheme.onPrimaryContainer;
+                                                                          }
+                                                                        }(),
+                                                                      )),
                                                                 ],
                                                               ),
-                                                            ),
-                                                          ],
+                                                              Divider(
+                                                                height: 5.0,
+                                                                thickness: 0.5,
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .outline,
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Text(
+                                                                    order['customer_name']
+                                                                        .toString(),
+                                                                    style: theme
+                                                                        .textTheme
+                                                                        .bodyMedium,
+                                                                  ),
+                                                                  Text(
+                                                                    '${numberFormat('idr_fixed', order['grand_total'])}',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: theme
+                                                                          .colorScheme
+                                                                          .secondary,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                  0.0,
+                                                                  4.0,
+                                                                  0.0,
+                                                                  4.0,
+                                                                ),
+                                                                child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Row(
+                                                                      children: [
+                                                                        Text(
+                                                                          dateTimeFormat(
+                                                                            'dateui',
+                                                                            order['posting_date'],
+                                                                          ).toString(),
+                                                                          style: theme
+                                                                              .textTheme
+                                                                              .labelSmall,
+                                                                        ),
+                                                                        Text(
+                                                                          ' | ${timeFormat(
+                                                                            'time_simple',
+                                                                            order['posting_time'],
+                                                                          ).toString()}',
+                                                                          style: theme
+                                                                              .textTheme
+                                                                              .labelSmall,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    // Text(
+                                                                    //   'Paid: ${numberFormat('idr_fixed', order['paid_amount'])}',
+                                                                    //   style: theme
+                                                                    //       .textTheme
+                                                                    //       .bodyMedium,
+                                                                    // ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
                                                 );
                                               },
                                             ),
-                                          if (isLoadingContent == true)
-                                            const LoadingContent(),
+                                          if (itemDisplay.isEmpty) EmptyData(),
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
+                              ),
+                            if (isLoadingContent)
+                              const Align(
+                                alignment: AlignmentDirectional(0.00, 0.00),
+                                child: LoadingContent(),
                               ),
                           ],
                         ),
@@ -1017,294 +1052,302 @@ class _OrderScreenState extends State<OrderScreen> {
                                     ),
                                   if (cartData.isNotEmpty)
                                     Expanded(
-                                      child: SingleChildScrollView(
-                                        primary: true,
-                                        child: Column(
-                                          // height: double.infinity,
-                                          children: [
-                                            ListView.builder(
-                                              shrinkWrap: true,
-                                              itemCount: cartData.length,
-                                              itemBuilder: (context, index) {
-                                                final itemData =
-                                                    cartData[index];
-                                                bool isCheck = itemData.status
-                                                    ? true
-                                                    : false;
-                                                print('is checked, $isCheck');
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsetsDirectional
-                                                          .fromSTEB(
-                                                          8.0, 4.0, 8.0, 8.0),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Row(
+                                        child: Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    0.0, 0.0, 0.0, 0.0),
+                                            child: Builder(
+                                              builder: (context) {
+                                                return ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: cartData.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final itemData =
+                                                        cartData[index];
+                                                    bool isCheck =
+                                                        itemData.status
+                                                            ? true
+                                                            : false;
+                                                    print(
+                                                        'is checked, $isCheck');
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsetsDirectional
+                                                              .fromSTEB(8.0,
+                                                              4.0, 8.0, 8.0),
+                                                      child: Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
                                                                 .start,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
                                                         children: [
-                                                          Text(
-                                                            '${itemData.qty}x ${itemData.itemName}',
-                                                            style: CustomTextStyles
-                                                                .labelLargeBlack,
-                                                          ),
-                                                          if ((modeView ==
-                                                                  'confirm') &&
-                                                              (itemData
-                                                                      .docstatus !=
-                                                                  2))
-                                                            Checkbox(
-                                                              value: isCheck,
-                                                              onChanged: (bool?
-                                                                  value) {
-                                                                if (value !=
-                                                                    null) {
-                                                                  print(
-                                                                      'check , $value');
-                                                                  setState(() {
-                                                                    isCheck =
-                                                                        value;
-                                                                  });
-                                                                  onCheckboxChange(
-                                                                    itemData,
-                                                                    index,
-                                                                    value,
-                                                                  );
-                                                                  print(
-                                                                      'check , $isCheck');
-                                                                }
-                                                                // isCheck = value!;
-                                                              },
-                                                            ),
-                                                          if ((modeView ==
-                                                                  'confirm') &&
-                                                              (itemData
-                                                                      .docstatus ==
-                                                                  2))
-                                                            Text(
-                                                              'Cancelled',
-                                                              style: TextStyle(
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .error,
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                '${itemData.qty}x ${itemData.itemName}',
+                                                                style: CustomTextStyles
+                                                                    .labelLargeBlack,
                                                               ),
-                                                            )
-                                                        ],
-                                                      ),
-                                                      // Dotted Divider Line
-                                                      StyledDivider(
-                                                        height: 15.0,
-                                                        thickness: 2.0,
-                                                        color: theme.colorScheme
-                                                            .outline,
-                                                        lineStyle:
-                                                            DividerLineStyle
-                                                                .dotted,
-                                                      ),
-                                                      Text(
-                                                        '${itemData.qty} x Rp ${numberFormat('idr_fixed', itemData.price)}',
-                                                        style: TextStyle(
-                                                          color: theme
-                                                              .colorScheme
-                                                              .secondary,
-                                                        ),
-                                                      ),
-                                                      if (itemData.notes != '')
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  top: 4.0),
-                                                          child: Text(
-                                                            'Notes: ${itemData.notes}',
+                                                              if (((modeView ==
+                                                                          'confirm') ||
+                                                                      ((modeView ==
+                                                                          'served'))) &&
+                                                                  (itemData
+                                                                          .docstatus !=
+                                                                      2))
+                                                                Checkbox(
+                                                                  value:
+                                                                      isCheck,
+                                                                  onChanged:
+                                                                      (bool?
+                                                                          value) {
+                                                                    if (value !=
+                                                                        null) {
+                                                                      print(
+                                                                          'check , $value');
+                                                                      setState(
+                                                                          () {
+                                                                        isCheck =
+                                                                            value;
+                                                                      });
+                                                                      onCheckboxChange(
+                                                                        itemData,
+                                                                        index,
+                                                                        value,
+                                                                      );
+                                                                      print(
+                                                                          'check , $isCheck');
+                                                                    }
+                                                                    // isCheck = value!;
+                                                                  },
+                                                                ),
+                                                              if ((modeView ==
+                                                                      'confirm') &&
+                                                                  (itemData
+                                                                          .docstatus ==
+                                                                      2))
+                                                                Text(
+                                                                  'Cancelled',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: theme
+                                                                        .colorScheme
+                                                                        .error,
+                                                                  ),
+                                                                )
+                                                            ],
+                                                          ),
+                                                          // Dotted Divider Line
+                                                          StyledDivider(
+                                                            height: 15.0,
+                                                            thickness: 2.0,
+                                                            color: theme
+                                                                .colorScheme
+                                                                .outline,
+                                                            lineStyle:
+                                                                DividerLineStyle
+                                                                    .dotted,
+                                                          ),
+                                                          Text(
+                                                            '${itemData.qty} x Rp ${numberFormat('idr_fixed', itemData.price)}',
                                                             style: TextStyle(
-                                                              fontSize: 12,
                                                               color: theme
                                                                   .colorScheme
                                                                   .secondary,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
                                                             ),
                                                           ),
-                                                        ),
-                                                      SizedBox(height: 8),
-                                                      if (itemData.docstatus !=
-                                                          2)
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
+                                                          if ((itemData.notes !=
+                                                                  null) &&
+                                                              (itemData.notes !=
+                                                                  ''))
                                                             Padding(
                                                               padding:
-                                                                  EdgeInsetsDirectional
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      top: 4.0),
+                                                              child: Text(
+                                                                'Notes: ${itemData.notes}',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: theme
+                                                                      .colorScheme
+                                                                      .secondary,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          SizedBox(height: 8),
+                                                          if (itemData
+                                                                  .docstatus !=
+                                                              2)
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: EdgeInsetsDirectional
                                                                       .fromSTEB(
                                                                           0.0,
                                                                           8.0,
                                                                           0.0,
                                                                           0.0),
-                                                              child: Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  CustomOutlinedButton(
-                                                                    height:
-                                                                        32.0,
-                                                                    width: 80.0,
-                                                                    text:
-                                                                        "Edit",
-                                                                    buttonTextStyle: TextStyle(
-                                                                        color: theme
-                                                                            .colorScheme
-                                                                            .primary),
-                                                                    buttonStyle:
-                                                                        CustomButtonStyles
-                                                                            .outlinePrimary,
-                                                                    onPressed:
-                                                                        () {
-                                                                      onTapEditItem(
-                                                                        context,
-                                                                        itemData,
-                                                                        index,
-                                                                      );
-                                                                    },
+                                                                  child: Column(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .max,
+                                                                    children: [
+                                                                      CustomOutlinedButton(
+                                                                        height:
+                                                                            32.0,
+                                                                        width:
+                                                                            80.0,
+                                                                        text:
+                                                                            "Edit",
+                                                                        buttonTextStyle:
+                                                                            TextStyle(color: theme.colorScheme.primary),
+                                                                        buttonStyle:
+                                                                            CustomButtonStyles.outlinePrimary,
+                                                                        onPressed:
+                                                                            () {
+                                                                          onTapEditItem(
+                                                                            context,
+                                                                            itemData,
+                                                                            index,
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    ],
                                                                   ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
+                                                                ),
+                                                                Padding(
+                                                                  padding: EdgeInsetsDirectional
                                                                       .fromSTEB(
                                                                           0.0,
                                                                           8.0,
                                                                           0.0,
                                                                           0.0),
-                                                              child: Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                children: [
-                                                                  CustomOutlinedButton(
-                                                                    height:
-                                                                        32.0,
-                                                                    width: 80.0,
-                                                                    text:
-                                                                        "Delete",
-                                                                    buttonTextStyle: TextStyle(
-                                                                        color: theme
-                                                                            .colorScheme
-                                                                            .error),
-                                                                    buttonStyle:
-                                                                        CustomButtonStyles
-                                                                            .outlineError,
-                                                                    onPressed:
-                                                                        () {
-                                                                      onTapDelete(
-                                                                        context,
-                                                                        itemData,
-                                                                        index,
-                                                                      );
-                                                                    },
+                                                                  child: Column(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .max,
+                                                                    children: [
+                                                                      CustomOutlinedButton(
+                                                                        height:
+                                                                            32.0,
+                                                                        width:
+                                                                            80.0,
+                                                                        text:
+                                                                            "Delete",
+                                                                        buttonTextStyle:
+                                                                            TextStyle(color: theme.colorScheme.error),
+                                                                        buttonStyle:
+                                                                            CustomButtonStyles.outlineError,
+                                                                        onPressed:
+                                                                            () {
+                                                                          onTapDelete(
+                                                                            context,
+                                                                            itemData,
+                                                                            index,
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    ],
                                                                   ),
-                                                                ],
-                                                              ),
+                                                                ),
+                                                                // CustomElevatedButton(
+                                                                //   text: "Delete",
+                                                                //   buttonTextStyle: TextStyle(
+                                                                //       color: theme
+                                                                //           .colorScheme
+                                                                //           .primaryContainer),
+                                                                //   buttonStyle:
+                                                                //       CustomButtonStyles
+                                                                //           .outlineError,
+                                                                //   onPressed: () {
+                                                                //     onTapDelete(
+                                                                //       context,
+                                                                //       itemData,
+                                                                //       index,
+                                                                //     );
+                                                                //   },
+                                                                // ),
+                                                                // ElevatedButton(
+                                                                //   style: ElevatedButton
+                                                                //       .styleFrom(
+                                                                //     backgroundColor: theme
+                                                                //         .colorScheme
+                                                                //         .primaryContainer,
+                                                                //     padding: EdgeInsets
+                                                                //         .symmetric(
+                                                                //             horizontal:
+                                                                //                 16),
+                                                                //   ),
+                                                                //   onPressed: () {},
+                                                                //   child: Text(
+                                                                //     'Edit',
+                                                                //     style: TextStyle(
+                                                                //       color: theme
+                                                                //           .colorScheme
+                                                                //           .primary,
+                                                                //       fontSize: 14,
+                                                                //     ),
+                                                                //   ),
+                                                                // ),
+                                                                // ElevatedButton(
+                                                                //   style: ElevatedButton
+                                                                //       .styleFrom(
+                                                                //     backgroundColor: theme
+                                                                //         .colorScheme
+                                                                //         .error,
+                                                                //     padding: EdgeInsets
+                                                                //         .symmetric(
+                                                                //             horizontal:
+                                                                //                 16),
+                                                                //   ),
+                                                                //   onPressed: () {},
+                                                                //   child: Text(
+                                                                //     'Delete',
+                                                                //     style: TextStyle(
+                                                                //         color:
+                                                                //             Colors.white,
+                                                                //         fontSize: 14),
+                                                                //   ),
+                                                                // ),
+                                                              ],
                                                             ),
-                                                            // CustomElevatedButton(
-                                                            //   text: "Delete",
-                                                            //   buttonTextStyle: TextStyle(
-                                                            //       color: theme
-                                                            //           .colorScheme
-                                                            //           .primaryContainer),
-                                                            //   buttonStyle:
-                                                            //       CustomButtonStyles
-                                                            //           .outlineError,
-                                                            //   onPressed: () {
-                                                            //     onTapDelete(
-                                                            //       context,
-                                                            //       itemData,
-                                                            //       index,
-                                                            //     );
-                                                            //   },
-                                                            // ),
-                                                            // ElevatedButton(
-                                                            //   style: ElevatedButton
-                                                            //       .styleFrom(
-                                                            //     backgroundColor: theme
-                                                            //         .colorScheme
-                                                            //         .primaryContainer,
-                                                            //     padding: EdgeInsets
-                                                            //         .symmetric(
-                                                            //             horizontal:
-                                                            //                 16),
-                                                            //   ),
-                                                            //   onPressed: () {},
-                                                            //   child: Text(
-                                                            //     'Edit',
-                                                            //     style: TextStyle(
-                                                            //       color: theme
-                                                            //           .colorScheme
-                                                            //           .primary,
-                                                            //       fontSize: 14,
-                                                            //     ),
-                                                            //   ),
-                                                            // ),
-                                                            // ElevatedButton(
-                                                            //   style: ElevatedButton
-                                                            //       .styleFrom(
-                                                            //     backgroundColor: theme
-                                                            //         .colorScheme
-                                                            //         .error,
-                                                            //     padding: EdgeInsets
-                                                            //         .symmetric(
-                                                            //             horizontal:
-                                                            //                 16),
-                                                            //   ),
-                                                            //   onPressed: () {},
-                                                            //   child: Text(
-                                                            //     'Delete',
-                                                            //     style: TextStyle(
-                                                            //         color:
-                                                            //             Colors.white,
-                                                            //         fontSize: 14),
-                                                            //   ),
-                                                            // ),
-                                                          ],
-                                                        ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    16.0,
-                                                                    8.0,
-                                                                    0.0),
-                                                        child: Divider(
-                                                          height: 5.0,
-                                                          thickness: 0.5,
-                                                          color: theme
-                                                              .colorScheme
-                                                              .outline,
-                                                        ),
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                                        0.0,
+                                                                        16.0,
+                                                                        8.0,
+                                                                        0.0),
+                                                            child: Divider(
+                                                              height: 5.0,
+                                                              thickness: 0.5,
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .outline,
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ],
-                                                  ),
+                                                    );
+                                                  },
                                                 );
                                               },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                                            ))),
                                   if (cartSelected != null)
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
@@ -1321,8 +1364,11 @@ class _OrderScreenState extends State<OrderScreen> {
                                             buttonStyle: CustomButtonStyles
                                                 .outlinePrimary,
                                             onPressed: () {
-                                              print('check app state, ${AppState().configPrinter}');
-                                              if (AppState().configPrinter['tipeConnection'] == 'Bluetooth') {
+                                              print(
+                                                  'check app state, ${AppState().configPrinter}');
+                                              if (AppState().configPrinter[
+                                                      'tipeConnection'] ==
+                                                  'Bluetooth') {
                                                 onPrintCheckerBluetooth();
                                               } else {
                                                 onPrintChecker();
@@ -1374,13 +1420,19 @@ class _OrderScreenState extends State<OrderScreen> {
                 onTapOrderToConfirm: () {
                   setState(() {
                     modeView = 'confirm';
+                    cartSelected = null;
+                    cart.clearCart();
+                    cartData = cart.getAllItemCart();
                   });
                   onTapRefreshOrder();
                   // Navigator.pushNamed(context, AppRoutes.confirmScreen);
                 },
                 onTapOrderToServed: () {
-                  setState((){
+                  setState(() {
                     modeView = 'served';
+                    cartSelected = null;
+                    cart.clearCart();
+                    cartData = cart.getAllItemCart();
                   });
                   onTapRefreshHistory();
                   // Navigator.pushNamed(context, AppRoutes.servescreen);
@@ -1408,13 +1460,15 @@ class _OrderScreenState extends State<OrderScreen> {
       ),
     );
   }
-onTapRefreshHistory() async {
+
+  onTapRefreshHistory() async {
     print('serve screen');
     setState(() {
-      isLoadingContent = false;
+      isLoadingContent = true;
     });
     await onCallDataInvoicePosOrder();
   }
+
   onTapRefreshMenu() async {
     print('tap refresjh');
     setState(() {
@@ -1455,9 +1509,6 @@ onTapRefreshHistory() async {
         await onCallCreatePosCart();
       } else {
         for (OrderCartItem itm in cartData) {
-          print('cart data, ${itm.itemName}');
-          print('cart data, ${itm.itemGroup}');
-          print('cart data, ${itm.status}');
           dynamic itemReq = {};
           if (itm.id.contains('CORD')) {
             itemReq = {
@@ -1493,10 +1544,6 @@ onTapRefreshHistory() async {
     } else if (modeView == 'confirm') {
       if (cartSelected != null) {
         for (OrderCartItem itm in cartData) {
-          print('cart data, ${itm.itemName}');
-          print('cart data, ${itm.itemGroup}');
-          print('cart data, ${itm.status}');
-
           dynamic itemReq = {
             'id': itm.id,
             'name': itm.name,
@@ -1519,6 +1566,32 @@ onTapRefreshHistory() async {
           cartSelected = null;
         });
         await onTapRefreshOrder();
+      }
+    } else if (modeView == 'served') {
+      if (cartSelected != null) {
+        for (OrderCartItem itm in cartData) {
+          dynamic itemReq = {
+            'id': itm.id,
+            'name': itm.name,
+            'item_name': itm.itemName,
+            'item_group': itm.itemGroup,
+            'uom': itm.uom,
+            'qty': itm.qty,
+            'notes': itm.notes,
+            'status': itm.status,
+          };
+          // onCallPosOrder(itemReq);
+          if (itm.docstatus == 0) {
+            await onCallSubmitPosDelivery(itemReq);
+          }
+        }
+        setState(() {
+          AppState.resetOrderCart();
+          cartData = [];
+          modeView = 'confirm';
+          cartSelected = null;
+        });
+        await onTapRefreshHistory();
       }
     }
 
@@ -1778,6 +1851,32 @@ onTapRefreshHistory() async {
     }
   }
 
+  onCallDataPosDelivery({String? id}) async {
+    final FrappeFetchDataGetDelivery.PosDeliveryRequest request =
+        FrappeFetchDataGetDelivery.PosDeliveryRequest(
+      cookie: AppState().setCookie,
+      fields: '["*"]',
+      filters: id != null ? '[["name","=","$id"]]' : '[]',
+      limit: 2000,
+    );
+
+    try {
+      final callRequest =
+          await FrappeFetchDataGetDelivery.request(requestQuery: request);
+      // print('check pos order, $callRequest');
+      if (callRequest.isNotEmpty) {
+        setState(() {
+          tempPosServed = callRequest;
+        });
+      }
+    } catch (error) {
+      print('error call data pos order, $error');
+      if (context.mounted) {
+        alertError(context, error.toString());
+      }
+    }
+  }
+
   onCallDataInvoicePosOrder() async {
     final FrappeFetchDataGetInvoice.PosInvoiceRequest request =
         FrappeFetchDataGetInvoice.PosInvoiceRequest(
@@ -1796,6 +1895,8 @@ onTapRefreshHistory() async {
         setState(() {
           tempPosServed = callRequest;
           isLoading = false;
+            print('Data received: $tempPosServed');
+
         });
         // print('check ata, $tempPosOrder');
       }
@@ -1962,6 +2063,30 @@ onTapRefreshHistory() async {
 
       if (callCancelPosOrder.isNotEmpty) {
         if (context.mounted) {
+          alertSuccess(context, 'Success order cancelled..');
+        }
+      }
+    } catch (error) {
+      print('check error, ${error}');
+      if (context.mounted) {
+        alertError(context, error.toString());
+      }
+    }
+  }
+
+  onCallSubmitPosDelivery(dynamic paramItem) async {
+    final FrappeFetchSubmitDelivery.SubmitPosServedReq request =
+        FrappeFetchSubmitDelivery.SubmitPosServedReq(
+      cookie: AppState().setCookie,
+      id: paramItem['id'],
+    );
+
+    try {
+      final callSubmitPosOrder =
+          await FrappeFetchSubmitDelivery.request(requestQuery: request);
+
+      if (callSubmitPosOrder.isNotEmpty) {
+        if (context.mounted) {
           alertSuccess(context, 'Success, order confirm..');
         }
         setState(() {
@@ -1985,7 +2110,7 @@ onTapRefreshHistory() async {
     List<dynamic> cartNew = [];
 
     // print('temp cart, ${tempPosCart[0]}');
-    // print('temp order, ${tempPosOrder[0]}');
+    print('temp order, ${tempPosOrder}');
 
     if (tempPosCart.isNotEmpty) {
       for (dynamic cartTemp in tempPosCart) {
@@ -1994,11 +2119,7 @@ onTapRefreshHistory() async {
 
         tmp['items'] = tempPosOrder
             .where((ord) => ord['pos_cart'] == tmp['name'])
-            .map((ord) {
-          ord['qty'] = ord[
-              'quantity']; // Mengganti 'qty' dengan 'quantity' dari hasil filter
-          return ord;
-        }).toList();
+            .toList();
         cartNew.add(tmp);
       }
     }
@@ -2007,6 +2128,33 @@ onTapRefreshHistory() async {
     // print('check cart new, ${cartNew.length}');
     setState(() {
       orderDisplay = cartNew;
+      isLoadingContent = false;
+    });
+    // onTapRefreshOrder();
+  }
+
+  reformatServedCart() async {
+    List<dynamic> cartNew = [];
+
+    // print('temp cart, ${tempPosCart[0]}');
+    print('temp served, ${tempPosServed}');
+
+    if (tempPosCart.isNotEmpty) {
+      for (dynamic cartTemp in tempPosCart) {
+        dynamic tmp = cartTemp;
+        // print('temp order, $tempPosOrder');
+
+        tmp['items'] = tempPosServed
+            .where((ord) => ord['pos_cart'] == tmp['name'])
+            .toList();
+        cartNew.add(tmp);
+      }
+    }
+
+    // print('check cart new, $cartNew');
+    // print('check cart new, ${cartNew.length}');
+    setState(() {
+      servedDisplay = cartNew;
       isLoadingContent = false;
     });
     // onTapRefreshOrder();
@@ -2143,7 +2291,9 @@ onTapRefreshHistory() async {
         uom: order['items'][a]['uom'] ?? '',
         description: order['items'][a]['description'] ?? '',
         qty: order['items'][a]['qty'],
-        price: order['items'][a]['price'].floor(),
+        price: order['items'][a]['price'] != null
+            ? order['items'][a]['price'].floor()
+            : 0,
         notes: order['items'][a]['note'],
         preference: order['items'][a]['preference'] ?? {},
         status: order['items'][a]['docstatus'] == 1 ? true : false,
@@ -2232,22 +2382,127 @@ onTapRefreshHistory() async {
       }
     }
   }
-}
 
   onPrintCheckerBluetooth() async {
-    if (AppState().isConnected && AppState().selectedPrinter != null) {
-      BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
-      Map<String, dynamic> config = Map();
-      List<LineText> list = [];
-
-      list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 1, align: LineText.ALIGN_CENTER,linefeed: 1));
-      list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', weight: 0, align: LineText.ALIGN_CENTER,linefeed: 1));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 0, align: LineText.ALIGN_LEFT,linefeed: 1));
-      list.add(LineText(linefeed: 1));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', align: LineText.ALIGN_LEFT, absolutePos: 0,relativePos: 0, linefeed: 0));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', align: LineText.ALIGN_LEFT, absolutePos: 350, relativePos: 0, linefeed: 0));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: '数量', align: LineText.ALIGN_LEFT, absolutePos: 500, relativePos: 0, linefeed: 1));
-      await bluetoothPrint.printReceipt(config, list);
+    bool connectionStatus = await PrintBluetoothThermal.connectionStatus;
+    if (connectionStatus) {
+      bool result = false;
+      List<int> ticket = await testTicket();
+      result = await PrintBluetoothThermal.writeBytes(ticket);
+      print('result print, $result');
     }
+    // BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
+    // // String name = cartSelected[];
+    // bluetooth.isConnected.then((isConnected) {
+    //   if (isConnected == true) {
+    //     List<dynamic> tempItem = [];
+    //     List<dynamic> docItem = [];
+    //     bluetooth.printLeftRight(
+    //       "No",
+    //       cartSelected['name'],
+    //       Size.medium.val,
+    //     );
+
+    //     String docTime = '';
+
+    //     if ((cartSelected['posting_date'] != null) ||
+    //         (cartSelected['posting_time'] != null)) {
+    //       var tmpDate = dateTimeFormat('dateui', cartSelected['posting_date']);
+    //       var tmpTime = timeFormat('time_simple', cartSelected['posting_time']);
+    //       docTime = '$tmpDate $tmpTime';
+    //     }
+    //     bluetooth.printLeftRight(
+    //       "Date",
+    //       docTime,
+    //       Size.medium.val,
+    //     );
+
+    //     if (cartSelected['customer'] != null) {
+    //       String tmpCustomer = cartSelected['customer_name'] != ''
+    //           ? cartSelected['customer_name']
+    //           : '';
+    //       bluetooth.printLeftRight(
+    //         "Customer",
+    //         tmpCustomer,
+    //         Size.medium.val,
+    //       );
+    //       // docHeader.add({"key": "line", "type": "line"});
+    //     }
+    //     bluetooth.printNewLine();
+
+    //     if (cartSelected['items'] != null) {
+    //       tempItem = cartSelected['items'];
+    //     } else {
+    //       tempItem = ((cartSelected['items'] != null) &&
+    //               (cartSelected['items'].length > 2))
+    //           ? cartSelected['items']
+    //           : [];
+    //     }
+
+    //     if (tempItem.isNotEmpty) {
+    //       for (var dt in tempItem) {
+    //         // if (dt['parent_addon_idx'] == null) {
+    //         String qty = numberFormat('number_fixed', dt['qty']);
+    //         String tmpTitle = '${qty}x  ${dt['item_name']}';
+    //         bluetooth.printLeftRight(
+    //           tmpTitle,
+    //           "[ ]",
+    //           Size.medium.val,
+    //         );
+    //       }
+    //     }
+        // bluetooth.printNewLine();
+        // bluetooth.paperCut();
+      // }
+    // });
+    // if (AppState().isConnected && AppState().selectedPrinter != null) {
+    //   BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
+    //   Map<String, dynamic> config = Map();
+    //   List<LineText> list = [];
+
+    //   list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 1, align: LineText.ALIGN_CENTER,linefeed: 1));
+    //   list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', weight: 0, align: LineText.ALIGN_CENTER,linefeed: 1));
+    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 0, align: LineText.ALIGN_LEFT,linefeed: 1));
+    //   list.add(LineText(linefeed: 1));
+    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', align: LineText.ALIGN_LEFT, absolutePos: 0,relativePos: 0, linefeed: 0));
+    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', align: LineText.ALIGN_LEFT, absolutePos: 350, relativePos: 0, linefeed: 0));
+    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: '数量', align: LineText.ALIGN_LEFT, absolutePos: 500, relativePos: 0, linefeed: 1));
+    //   await bluetoothPrint.printReceipt(config, list);
+    // }
   }
 
+  Future<List<int>> testTicket() async {
+    List<int> bytes = [];
+    // Using default profile
+    final profile = await CapabilityProfile.load();
+    final generator = Generator(PaperSize.mm80, profile);
+    //bytes += generator.setGlobalFont(PosFontType.fontA);
+    bytes += generator.reset();
+
+    // final ByteData data = await rootBundle.load('assets/mylogo.jpg');
+    // final Uint8List bytesImg = data.buffer.asUint8List();
+    // img.Image? image = img.decodeImage(bytesImg);
+
+    bytes += generator.text('Bold text', styles: PosStyles(bold: true));
+    bytes += generator.text('Reverse text', styles: PosStyles(reverse: true));
+    bytes += generator.text('Underlined text', styles: PosStyles(underline: true), linesAfter: 1);
+    bytes += generator.text('Align left', styles: PosStyles(align: PosAlign.left));
+    bytes += generator.text('Align center', styles: PosStyles(align: PosAlign.center));
+    bytes += generator.text('Align right', styles: PosStyles(align: PosAlign.right), linesAfter: 1);
+
+    bytes += generator.row([
+      PosColumn(
+        text: 'col5',
+        width: 6,
+        styles: PosStyles(align: PosAlign.left, underline: true),
+      ),
+      PosColumn(
+        text: 'col7',
+        width: 6,
+        styles: PosStyles(align: PosAlign.right, underline: true),
+      ),
+    ]);
+
+    return bytes;
+  }
+}

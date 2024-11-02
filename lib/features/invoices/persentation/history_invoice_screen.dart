@@ -10,6 +10,7 @@ import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/core/utils/print.dart';
 import 'package:kontena_pos/widgets/custom_outlined_button.dart';
+import 'package:kontena_pos/widgets/empty_data.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/list_cart.dart';
 import 'package:kontena_pos/widgets/loading_content.dart';
@@ -97,196 +98,195 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                 onFilterSelected: (String type) {},
                               ),
                             ),
-                            Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 120.0, 8.0, 0.0),
-                              child: Align(
-                                alignment: AlignmentDirectional(0.00, 0.00),
-                                child: SingleChildScrollView(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      children: [
-                                        if (isLoading == false)
-                                          AlignedGridView.count(
-                                            crossAxisCount: 1,
-                                            mainAxisSpacing: 6,
-                                            crossAxisSpacing: 6,
-                                            shrinkWrap: true,
-                                            itemCount: tempPosOrder.length,
-                                            itemBuilder: (context, index) {
-                                              final order = tempPosOrder[index];
-                                              return InkWell(
-                                                onTap: () {
-                                                  onTapAction(context, order);
-                                                },
-                                                child: Card(
-                                                  elevation: 2,
-                                                  child: Column(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                          16.0,
-                                                          16.0,
-                                                          16.0,
-                                                          10.0,
-                                                        ),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  order['name'],
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .titleMedium,
-                                                                ),
-                                                                if (order[
-                                                                        'table'] !=
-                                                                    null)
-                                                                  Text(
-                                                                    'Table ${order['table']}',
-                                                                    style: theme
-                                                                        .textTheme
-                                                                        .bodyMedium,
-                                                                  ),
-                                                                Text(
-                                                                    (order['docstatus'] ==
-                                                                            1)
-                                                                        ? order[
-                                                                            'status']
-                                                                        : (order['docstatus'] ==
-                                                                                2)
-                                                                            ? 'Cancelled'
-                                                                            : 'Draft',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600,
-                                                                      color:
-                                                                          () {
-                                                                        if (order['docstatus'] ==
-                                                                            1) {
-                                                                          return theme
-                                                                              .colorScheme
-                                                                              .onSecondary;
-                                                                        } else if (order['docstatus'] ==
-                                                                            2) {
-                                                                          return theme
-                                                                              .colorScheme
-                                                                              .error;
-                                                                        } else {
-                                                                          return theme
-                                                                              .colorScheme
-                                                                              .onPrimaryContainer;
-                                                                        }
-                                                                      }(),
-                                                                    )),
-                                                              ],
-                                                            ),
-                                                            Divider(
-                                                              height: 5.0,
-                                                              thickness: 0.5,
-                                                              color: theme
-                                                                  .colorScheme
-                                                                  .outline,
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  order['customer_name']
-                                                                      .toString(),
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .bodyMedium,
-                                                                ),
-                                                                Text(
-                                                                  '${numberFormat('idr_fixed', order['grand_total'])}',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: theme
-                                                                        .colorScheme
-                                                                        .secondary,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                0.0,
-                                                                4.0,
-                                                                0.0,
-                                                                4.0,
-                                                              ),
-                                                              child: Row(
+                            if (isLoading == false)
+                              Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    8.0, 120.0, 8.0, 0.0),
+                                child: Align(
+                                  alignment: Alignment.topCenter,
+                                  child: SingleChildScrollView(
+                                    primary: true,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          if (tempPosOrder.isNotEmpty)
+                                            AlignedGridView.count(
+                                              crossAxisCount: 1,
+                                              mainAxisSpacing: 6,
+                                              crossAxisSpacing: 6,
+                                              shrinkWrap: true,
+                                              itemCount: tempPosOrder.length,
+                                              itemBuilder: (context, index) {
+                                                final order =
+                                                    tempPosOrder[index];
+                                                return InkWell(
+                                                  onTap: () {
+                                                    onTapAction(context, order);
+                                                  },
+                                                  child: Card(
+                                                    elevation: 2,
+                                                    child: Column(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                            16.0,
+                                                            16.0,
+                                                            16.0,
+                                                            10.0,
+                                                          ),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
                                                                         .spaceBetween,
                                                                 children: [
-                                                                  Row(
-                                                                    children: [
-                                                                      Text(
-                                                                        dateTimeFormat(
-                                                                          'dateui',
-                                                                          order[
-                                                                              'posting_date'],
-                                                                        ).toString(),
-                                                                        style: theme
-                                                                            .textTheme
-                                                                            .labelSmall,
-                                                                      ),
-                                                                      Text(
-                                                                        ' | ${timeFormat(
-                                                                          'time_simple',
-                                                                          order[
-                                                                              'posting_time'],
-                                                                        ).toString()}',
-                                                                        style: theme
-                                                                            .textTheme
-                                                                            .labelSmall,
-                                                                      ),
-                                                                    ],
+                                                                  Text(
+                                                                    order[
+                                                                        'name'],
+                                                                    style: theme
+                                                                        .textTheme
+                                                                        .titleMedium,
                                                                   ),
-                                                                  // Text(
-                                                                  //   'Paid: ${numberFormat('idr_fixed', order['paid_amount'])}',
-                                                                  //   style: theme
-                                                                  //       .textTheme
-                                                                  //       .bodyMedium,
-                                                                  // ),
+                                                                  if (order[
+                                                                          'table'] !=
+                                                                      null)
+                                                                    Text(
+                                                                      'Table ${order['table']}',
+                                                                      style: theme
+                                                                          .textTheme
+                                                                          .bodyMedium,
+                                                                    ),
+                                                                  Text(
+                                                                      (order['docstatus'] ==
+                                                                              1)
+                                                                          ? order[
+                                                                              'status']
+                                                                          : (order['docstatus'] ==
+                                                                                  2)
+                                                                              ? 'Cancelled'
+                                                                              : 'Draft',
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                        color:
+                                                                            () {
+                                                                          if (order['docstatus'] ==
+                                                                              1) {
+                                                                            return theme.colorScheme.onSecondary;
+                                                                          } else if (order['docstatus'] ==
+                                                                              2) {
+                                                                            return theme.colorScheme.error;
+                                                                          } else {
+                                                                            return theme.colorScheme.onPrimaryContainer;
+                                                                          }
+                                                                        }(),
+                                                                      )),
                                                                 ],
                                                               ),
-                                                            ),
-                                                          ],
+                                                              Divider(
+                                                                height: 5.0,
+                                                                thickness: 0.5,
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .outline,
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Text(
+                                                                    order['customer_name']
+                                                                        .toString(),
+                                                                    style: theme
+                                                                        .textTheme
+                                                                        .bodyMedium,
+                                                                  ),
+                                                                  Text(
+                                                                    '${numberFormat('idr_fixed', order['grand_total'])}',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: theme
+                                                                          .colorScheme
+                                                                          .secondary,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                  0.0,
+                                                                  4.0,
+                                                                  0.0,
+                                                                  4.0,
+                                                                ),
+                                                                child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Row(
+                                                                      children: [
+                                                                        Text(
+                                                                          dateTimeFormat(
+                                                                            'dateui',
+                                                                            order['posting_date'],
+                                                                          ).toString(),
+                                                                          style: theme
+                                                                              .textTheme
+                                                                              .labelSmall,
+                                                                        ),
+                                                                        Text(
+                                                                          ' | ${timeFormat(
+                                                                            'time_simple',
+                                                                            order['posting_time'],
+                                                                          ).toString()}',
+                                                                          style: theme
+                                                                              .textTheme
+                                                                              .labelSmall,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    // Text(
+                                                                    //   'Paid: ${numberFormat('idr_fixed', order['paid_amount'])}',
+                                                                    //   style: theme
+                                                                    //       .textTheme
+                                                                    //       .bodyMedium,
+                                                                    // ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        if (isLoading == true)
-                                          const LoadingContent(),
-                                      ],
+                                                );
+                                              },
+                                            ),
+                                          if (tempPosOrder.isEmpty) EmptyData(),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
+                            if (isLoading)
+                              const Align(
+                                alignment: AlignmentDirectional(0.00, 0.00),
+                                child: LoadingContent(),
+                              ),
                           ],
                         ),
                       ),
@@ -702,7 +702,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
       cookie: AppState().setCookie,
       fields: '["*"]',
       filters: '[["pos_profile","=","${AppState().configPOSProfile['name']}"]]',
-      orderBy: 'posting_date desc',
+      orderBy: 'creation desc',
       limit: 2000,
     );
 
@@ -710,13 +710,12 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
       final callRequest =
           await FrappeFetchDataGetInvoice.request(requestQuery: request);
 
-      if (callRequest.isNotEmpty) {
-        setState(() {
-          tempPosOrder = callRequest;
-          isLoading = false;
-        });
-        // print('check ata, $tempPosOrder');
-      }
+      print('result, $callRequest');
+      if (callRequest.isNotEmpty) {}
+      setState(() {
+        tempPosOrder = callRequest;
+        isLoading = false;
+      });
     } catch (error) {
       print('error call data pos order, $error');
       if (context.mounted) {

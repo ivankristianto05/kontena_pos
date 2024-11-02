@@ -1,17 +1,19 @@
-import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
 
+// import 'package:blue_thermal_printer/blue_thermal_printer.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/config_app.dart';
+import 'package:kontena_pos/core/utils/print_bluetooth.dart';
 // import 'package:kontena_pos/core/plugins/bluetooth_print_model.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
-import 'package:kontena_pos/core/utils/alert.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
-import 'package:bluetooth_print/bluetooth_print.dart';
-import 'package:bluetooth_print/bluetooth_print_model.dart';
+// import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:kontena_pos/core/api/get_printer.dart' as callGetPrinter;
+// import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 
 class SettingDevices extends StatefulWidget {
   SettingDevices({Key? key}) : super(key: key);
@@ -27,11 +29,24 @@ class _SettingDevicesState extends State<SettingDevices> {
   List<dynamic> listPrinter = [];
   String selectedPrinter = '';
 
-  BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
+  // BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
+  // List<BluetoothDevice> _devices = [];
+  // BluetoothDevice? _device;
   bool _connected = false;
-  BluetoothDevice? _device;
-  String tips = 'no device connect';
-  // ApiCallResponse? testPrintResult;
+
+  // -----------
+  // print bluetooth thermal plugin
+  String _msg = '';
+  String _info = '';
+  List<BluetoothInfo> items = [];
+  List<String> _options = ["permission bluetooth granted", "bluetooth enabled", "connection status", "update info"];
+  bool _progress = false;
+  String _msgprogress = "";
+  BluetoothInfo? selected;
+
+  String optionprinttype = "80 mm";
+  List<String> optionsSize = ["58 mm", "80 mm"];
+
 
   @override
   void setState(VoidCallback callback) {
@@ -41,21 +56,33 @@ class _SettingDevicesState extends State<SettingDevices> {
     //     selectedPrinter = AppState().configPrinter;
     //   });
     // }
+    // printerManager.scanResults.listen((devices) async {
+    //   // print('UI: Devices found ${devices.length}');
+    //   setState(() {
+    //     _devices = devices;
+    //   });
+    // });
   }
 
   @override
   void initState() {
     super.initState();
-    onGetPrinter(context);
+    // onGetPrinter(context);
+    // initPlatformState();
+    platformState();
 
     if (AppState().configPrinter != null) {
       setState(() {
-        selectedPrinter = AppState().configPrinter['selectedPrinter'];
         selectedTipePrinter = AppState().configPrinter['tipeConnection'];
+        selectedPrinter = AppState().configPrinter['selectedPrinter'];
+
+        if (selectedTipePrinter == 'Bluetooth') {
+
+        }
       });
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => initBluetooth());
+    // WidgetsBinding.instance.addPostFrameCallback((_) => initBluetooth());
   }
 
   @override
@@ -63,39 +90,144 @@ class _SettingDevicesState extends State<SettingDevices> {
     super.dispose();
   }
 
-  Future<void> initBluetooth() async {
-    bluetoothPrint.startScan(timeout: Duration(seconds: 4));
+  // Future<void> initPlatformState() async {
+  //   print('init platform state');
+  //   bool? isConnected = await bluetooth.isConnected;
+  //   List<BluetoothDevice> devices = [];
+  //   try {
+  //     devices = await bluetooth.getBondedDevices();
+  //   } on PlatformException {}
 
-    bool isConnected = await bluetoothPrint.isConnected ?? false;
+  //   bluetooth.onStateChanged().listen((state) {
+  //     switch (state) {
+  //       case BlueThermalPrinter.CONNECTED:
+  //         setState(() {
+  //           _connected = true;
+  //           print("bluetooth device state: connected");
+  //         });
+  //         break;
+  //       case BlueThermalPrinter.DISCONNECTED:
+  //         setState(() {
+  //           _connected = false;
+  //           print("bluetooth device state: disconnected");
+  //         });
+  //         break;
+  //       case BlueThermalPrinter.DISCONNECT_REQUESTED:
+  //         setState(() {
+  //           _connected = false;
+  //           print("bluetooth device state: disconnect requested");
+  //         });
+  //         break;
+  //       case BlueThermalPrinter.STATE_TURNING_OFF:
+  //         setState(() {
+  //           _connected = false;
+  //           print("bluetooth device state: bluetooth turning off");
+  //         });
+  //         break;
+  //       case BlueThermalPrinter.STATE_OFF:
+  //         setState(() {
+  //           _connected = false;
+  //           print("bluetooth device state: bluetooth off");
+  //         });
+  //         break;
+  //       case BlueThermalPrinter.STATE_ON:
+  //         setState(() {
+  //           _connected = false;
+  //           print("bluetooth device state: bluetooth on");
+  //         });
+  //         break;
+  //       case BlueThermalPrinter.STATE_TURNING_ON:
+  //         setState(() {
+  //           _connected = false;
+  //           print("bluetooth device state: bluetooth turning on");
+  //         });
+  //         break;
+  //       case BlueThermalPrinter.ERROR:
+  //         setState(() {
+  //           _connected = false;
+  //           print("bluetooth device state: error");
+  //         });
+  //         break;
+  //       default:
+  //         print(state);
+  //         break;
+  //     }
+  //   });
 
-    bluetoothPrint.state.listen((state) {
-      print('******************* cur device status: $state');
+  //   if (!mounted) return;
+  //   setState(() {
+  //     _devices = devices;
+  //   });
 
-      switch (state) {
-        case BluetoothPrint.CONNECTED:
-          setState(() {
-            _connected = true;
-            tips = 'connect success';
-          });
-          break;
-        case BluetoothPrint.DISCONNECTED:
-          setState(() {
-            _connected = false;
-            tips = 'disconnect success';
-          });
-          break;
-        default:
-          break;
-      }
-    });
+  //   if (isConnected == true) {
+  //     setState(() {
+  //       _connected = true;
+  //     });
+  //   }
+  // }
 
-    if (!mounted) return;
+  // List<DropdownMenuItem<BluetoothDevice>> _getDeviceItems() {
+  //   List<DropdownMenuItem<BluetoothDevice>> items = [];
+  //   if (_devices.isEmpty) {
+  //     items.add(DropdownMenuItem(
+  //       child: Text('NONE'),
+  //     ));
+  //   } else {
+  //     _devices.forEach((device) {
+  //       items.add(DropdownMenuItem(
+  //         child: Text(device.name ?? ""),
+  //         value: device,
+  //       ));
+  //     });
+  //   }
+  //   return items;
+  // }
 
-    if (isConnected) {
-      setState(() {
-        _connected = true;
-      });
-    }
+  void _connect() {
+  //   // print('connect');
+  //   // print(_device);
+  //   // print('---');
+  //   if (_device != null) {
+  //     // print(1);
+  //     bluetooth.isConnected.then((isConnected) {
+  //       // print(2);
+  //       if (isConnected != true) {
+  //         // print(3);
+  //         bluetooth.connect(_device!).catchError((error) {
+  //           setState(() => _connected = false);
+  //           // print('false');
+  //         });
+  //         // print('true');
+  //         setState(() => _connected = true);
+  //       }
+  //       print('check ${_connected}');
+  //     });
+  //   } else {
+  //     show('No device selected.');
+  //   }
+  }
+
+  // Future show(
+  //   String message, {
+  //   Duration duration = const Duration(seconds: 3),
+  // }) async {
+  //   await new Future.delayed(new Duration(milliseconds: 100));
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     new SnackBar(
+  //       content: new Text(
+  //         message,
+  //         style: new TextStyle(
+  //           color: Colors.white,
+  //         ),
+  //       ),
+  //       duration: duration,
+  //     ),
+  //   );
+  // }
+
+  void _disconnect() {
+  //   bluetooth.disconnect();
+  //   setState(() => _connected = false);
   }
 
   @override
@@ -341,69 +473,45 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                   CrossAxisAlignment
                                                                       .start,
                                                               children: [
-                                                                Container(
-                                                                  width: 280.0,
-                                                                  height: 45.0,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: theme
-                                                                        .colorScheme
-                                                                        .primaryContainer,
-                                                                    border:
-                                                                        Border
-                                                                            .all(
-                                                                      color: theme
-                                                                          .colorScheme
-                                                                          .outline,
-                                                                      width:
-                                                                          2.0,
-                                                                    ),
-                                                                  ),
-                                                                  child:
-                                                                      DropdownButtonHideUnderline(
-                                                                    child:
-                                                                        Padding(
-                                                                      padding: const EdgeInsets
-                                                                          .all(
-                                                                          8.0),
-                                                                      child: DropdownButton<
-                                                                          String>(
-                                                                        isExpanded:
-                                                                            true,
-                                                                        hint: Text(
-                                                                            "Select an Option"),
-                                                                        value: listPrinter.isNotEmpty &&
-                                                                                listPrinter.any((printer) => printer['name'] == selectedPrinter)
-                                                                            ? selectedPrinter
-                                                                            : null,
-                                                                        items: listPrinter.map<
-                                                                            DropdownMenuItem<
-                                                                                String>>((dynamic
-                                                                            dt) {
-                                                                          return DropdownMenuItem<
-                                                                              String>(
-                                                                            value:
-                                                                                dt['name'],
-                                                                            child:
-                                                                                Text(
-                                                                              dt['name'],
-                                                                              style: TextStyle(fontWeight: FontWeight.normal),
-                                                                            ),
-                                                                          );
-                                                                        }).toList(),
-                                                                        onChanged:
-                                                                            (String?
-                                                                                newValue) {
-                                                                          setState(
-                                                                              () {
-                                                                            selectedPrinter =
-                                                                                newValue!;
-                                                                          });
-                                                                        },
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
+                                                                // Container(
+                                                                //   width: 280.0,
+                                                                //   height: 45.0,
+                                                                //   decoration:
+                                                                //       BoxDecoration(
+                                                                //     color: theme
+                                                                //         .colorScheme
+                                                                //         .primaryContainer,
+                                                                //     border:
+                                                                //         Border
+                                                                //             .all(
+                                                                //       color: theme
+                                                                //           .colorScheme
+                                                                //           .outline,
+                                                                //       width:
+                                                                //           2.0,
+                                                                //     ),
+                                                                //   ),
+                                                                //   child:
+                                                                //       DropdownButtonHideUnderline(
+                                                                //     child:
+                                                                //         Padding(
+                                                                //       padding: const EdgeInsets
+                                                                //           .all(
+                                                                //           8.0),
+                                                                //       child:
+                                                                //           DropdownButton(
+                                                                //         items:
+                                                                //             _getDeviceItems(),
+                                                                //         onChanged: (BluetoothDevice?
+                                                                //                 value) =>
+                                                                //             setState(() =>
+                                                                //                 _device = value),
+                                                                //         value:
+                                                                //             _device,
+                                                                //       ),
+                                                                //     ),
+                                                                //   ),
+                                                                // ),
                                                                 Padding(
                                                                   padding: EdgeInsetsDirectional
                                                                       .fromSTEB(
@@ -428,7 +536,9 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                             .primaryButton,
                                                                     onPressed:
                                                                         () async {
-                                                                      await onGetPrinter(
+                                                                      print(
+                                                                          'button');
+                                                                      onGetPrinter(
                                                                           context);
                                                                     },
                                                                   ),
@@ -509,34 +619,110 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                       padding: const EdgeInsets
                                                                           .all(
                                                                           8.0),
-                                                                      child: StreamBuilder<List<BluetoothDevice>>(
-                                                                        stream: bluetoothPrint.scanResults,
-                                                                        initialData: [],
-                                                                        builder: (c, snapshot) {
-                                                                          List<BluetoothDevice> devices = snapshot.data ?? [];
-                                                                          BluetoothDevice? selectedDevice = _device;
-
-                                                                          return DropdownButton<BluetoothDevice>(
-                                                                            hint: Text('Select Bluetooth Device'),
-                                                                            value: selectedDevice, // Perangkat yang dipilih
-                                                                            onChanged: (BluetoothDevice? newDevice) {
-                                                                              setState(() {
-                                                                                _device = newDevice; // Simpan perangkat yang dipilih
-                                                                              });
-                                                                            },
-                                                                            items: devices.map((d) {
-                                                                              return DropdownMenuItem<BluetoothDevice>(
-                                                                                value: d,
-                                                                                child: Text(d.name ?? d.address ?? ''), // Tampilkan nama atau alamat
+                                                                      child:
+                                                                          DropdownButton(
+                                                                        items:
+                                                                            items.map((dv) {
+                                                                              return DropdownMenuItem<BluetoothInfo>(
+                                                                                value: dv,
+                                                                                child: Text('${dv.name} - ${dv.macAdress}'),
                                                                               );
                                                                             }).toList(),
-                                                                          );
+                                                                        value: selected,
+                                                                        onChanged: (BluetoothInfo? dvc) {
+                                                                          // String mac = items[]
+                                                                          setState((){
+                                                                            selected = dvc;
+                                                                            connect(dvc!.macAdress);
+                                                                          });
+
                                                                         },
                                                                       ),
-
                                                                     ),
                                                                   ),
                                                                 ),
+                                                                if (_connected ==
+                                                                    false)
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            5.0,
+                                                                            0.0,
+                                                                            0.0,
+                                                                            0.0),
+                                                                    child:
+                                                                        CustomElevatedButton(
+                                                                      text:
+                                                                          "Connect",
+                                                                      width:
+                                                                          120.0,
+                                                                      height:
+                                                                          42.0,
+                                                                      buttonTextStyle: TextStyle(
+                                                                          color: theme
+                                                                              .colorScheme
+                                                                              .primary),
+                                                                      buttonStyle:
+                                                                          CustomButtonStyles
+                                                                              .outlinePrimary,
+                                                                      onPressed:
+                                                                          () async {
+                                                                        // await onConnectPrinterBluetooth(
+                                                                        //     context);
+                                                                        connect(selected!.macAdress);
+                                                                      },
+                                                                    ),
+                                                                  ),
+                                                                // if (_connected)
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            5.0,
+                                                                            0.0,
+                                                                            0.0,
+                                                                            0.0),
+                                                                    child:
+                                                                        CustomElevatedButton(
+                                                                      text:
+                                                                          "Disconnect",
+                                                                      width:
+                                                                          120.0,
+                                                                      height:
+                                                                          42.0,
+                                                                      buttonTextStyle: TextStyle(
+                                                                          color: theme
+                                                                              .colorScheme
+                                                                              .secondary),
+                                                                      buttonStyle:
+                                                                          CustomButtonStyles
+                                                                              .outlineSecondary,
+                                                                      onPressed:
+                                                                          () async {
+                                                                        // await onDisconnectPrinterBluetooth(
+                                                                        //     context);
+                                                                        disconnect();
+                                                                      },
+                                                                    ),
+                                                                  ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                                        0.0,
+                                                                        12.0,
+                                                                        0.0,
+                                                                        0.0),
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
                                                                 Padding(
                                                                   padding: EdgeInsetsDirectional
                                                                       .fromSTEB(
@@ -547,7 +733,7 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                   child:
                                                                       CustomElevatedButton(
                                                                     text:
-                                                                        "Connect",
+                                                                        "Get Printer",
                                                                     width:
                                                                         120.0,
                                                                     height:
@@ -561,8 +747,10 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                             .outlinePrimary,
                                                                     onPressed:
                                                                         () async {
-                                                                      await onConnectPrinterBluetooth(
-                                                                          context);
+                                                                      // await initPlatformState();
+                                                                      print('yes');
+                                                                      // getPermission();
+                                                                      getBluetoots();
                                                                     },
                                                                   ),
                                                                 ),
@@ -576,7 +764,7 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                   child:
                                                                       CustomElevatedButton(
                                                                     text:
-                                                                        "Disconnect",
+                                                                        "Test Print",
                                                                     width:
                                                                         120.0,
                                                                     height:
@@ -584,95 +772,19 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                     buttonTextStyle: TextStyle(
                                                                         color: theme
                                                                             .colorScheme
-                                                                            .secondary),
+                                                                            .primary),
                                                                     buttonStyle:
                                                                         CustomButtonStyles
-                                                                            .outlineSecondary,
+                                                                            .outlinePrimary,
                                                                     onPressed:
                                                                         () async {
-                                                                      await onDisconnectPrinterBluetooth(
-                                                                          context);
+                                                                      // await onTestPrintBluetooth(
+                                                                      //     context);
+                                                                      printTest();
                                                                     },
                                                                   ),
                                                                 ),
                                                               ],
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                      0.0,
-                                                                      12.0,
-                                                                      0.0,
-                                                                      0.0),
-                                                            child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            5.0,
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0),
-                                                                    child:
-                                                                        CustomElevatedButton(
-                                                                      text:
-                                                                          "Get Printer",
-                                                                      width:
-                                                                          120.0,
-                                                                      height:
-                                                                          42.0,
-                                                                      buttonTextStyle: TextStyle(
-                                                                          color: theme
-                                                                              .colorScheme
-                                                                              .primary),
-                                                                      buttonStyle:
-                                                                          CustomButtonStyles
-                                                                              .outlinePrimary,
-                                                                      onPressed:
-                                                                          () async {
-                                                                        await onGetPrinterBluetooth(
-                                                                            context);
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding: EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                            5.0,
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0),
-                                                                    child:
-                                                                        CustomElevatedButton(
-                                                                      text:
-                                                                          "Test Print",
-                                                                      width:
-                                                                          120.0,
-                                                                      height:
-                                                                          42.0,
-                                                                      buttonTextStyle: TextStyle(
-                                                                          color: theme
-                                                                              .colorScheme
-                                                                              .primary),
-                                                                      buttonStyle:
-                                                                          CustomButtonStyles
-                                                                              .outlinePrimary,
-                                                                      onPressed:
-                                                                          () async {
-                                                                        await onTestPrintBluetooth(context);
-                                                                            
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                ],
                                                             ),
                                                           ),
                                                         ],
@@ -681,7 +793,6 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                   ],
                                                 ),
                                               ),
-                                              
                                             Padding(
                                               padding: EdgeInsetsDirectional
                                                   .fromSTEB(
@@ -717,7 +828,6 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                 ],
                                               ),
                                             ),
-                                            
                                           ],
                                         ),
                                       ),
@@ -758,58 +868,267 @@ class _SettingDevicesState extends State<SettingDevices> {
   }
 
   onGetPrinterBluetooth(BuildContext context) async {
-    bluetoothPrint.startScan(timeout: Duration(seconds: 4));
+    // setState(() {
+    //   _progress = true;
+    //   _msjprogress = "Wait";
+    //   items = [];
+    // });
+    // final List<BluetoothInfo> listResult =
+    //     await PrintBluetoothThermal.pairedBluetooths;
+
+    // /*await Future.forEach(listResult, (BluetoothInfo bluetooth) {
+    //   String name = bluetooth.name;
+    //   String mac = bluetooth.macAdress;
+    // });*/
+
+    // setState(() {
+    //   _progress = false;
+    // });
+
+    // if (listResult.length == 0) {
+    //   _msj =
+    //       "There are no bluetoohs linked, go to settings and link the printer";
+    // } else {
+    //   _msj = "Touch an item in the list to connect";
+    // }
+
+    // setState(() {
+    //   items = listResult;
+    // });
   }
 
-  onConnectPrinterBluetooth(BuildContext context) async{
-    if (_connected == false) {
-      if (_device!=null && _device!.address !=null) {
-        await bluetoothPrint.connect(_device!);
-      } else {
-        alertError(context, 'Please select device');
-      }
-    }
+  onConnectPrinterBluetooth(BuildContext context, String mac) async {
+    // setState(() {
+    //   _progress = true;
+    //   _msjprogress = "Connecting...";
+    //   connected = false;
+    // });
+    // final bool result =
+    //     // await PrintBluetoothThermal.connect(macPrinterAddress: mac);
+    //     // print("state conected $result");
+    // if (result) connected = true;
+    // setState(() {
+    //   _progress = false;
+    // });
   }
 
   onDisconnectPrinterBluetooth(BuildContext context) async {
-    if (_connected) {
-      await bluetoothPrint.disconnect();
-    }
+    // final bool status = await PrintBluetoothThermal.disconnect;
+    // setState(() {
+    //   connected = false;
+    // });
+    // print("status disconnect $status");
   }
 
   onTestPrintBluetooth(BuildContext context) async {
-    if (_connected) {
-      Map<String, dynamic> config = Map();
-      List<LineText> list = [];
-
-      list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 1, align: LineText.ALIGN_CENTER,linefeed: 1));
-      list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', weight: 0, align: LineText.ALIGN_CENTER,linefeed: 1));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 0, align: LineText.ALIGN_LEFT,linefeed: 1));
-      list.add(LineText(linefeed: 1));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', align: LineText.ALIGN_LEFT, absolutePos: 0,relativePos: 0, linefeed: 0));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', align: LineText.ALIGN_LEFT, absolutePos: 350, relativePos: 0, linefeed: 0));
-      // list.add(LineText(type: LineText.TYPE_TEXT, content: '数量', align: LineText.ALIGN_LEFT, absolutePos: 500, relativePos: 0, linefeed: 1));
-      await bluetoothPrint.printReceipt(config, list);
-    }
+    // printerManager.stopScan();
+    // bluetooth.isConnected.then((isConnected) {
+    //   if (isConnected == true) {
+    //     bluetooth.printNewLine();
+    //     bluetooth.printLeftRight(
+    //       "No",
+    //       "123",
+    //       Size.medium.val,
+    //     );
+    //     bluetooth.printLeftRight(
+    //       "Kasir",
+    //       "abc",
+    //       Size.medium.val,
+    //     );
+    //     bluetooth.printLeftRight(
+    //       "Menu",
+    //       "",
+    //       Size.medium.val,
+    //     );
+    //     bluetooth.printLeftRight(
+    //       "1x IDR 10.000",
+    //       "IDR 10.000",
+    //       Size.medium.val,
+    //     );
+    //   }
+    // });
   }
 
   onTapSaveConfigPrinter(BuildContext context) async {
     setState(() {
-      AppState().configPrinter = {
-        'selectedPrinter': selectedPrinter,
-        'tipeConnection': selectedTipePrinter,
-      };
-      AppState().selectPrinter(_device!);
+      if (selectedTipePrinter == 'USB') {
+        AppState().configPrinter = {
+          'tipeConnection': selectedTipePrinter,
+          'selectedPrinter': selectedPrinter,
+          'selectedMacAddPrinter': null,
+          // 'printer': null,
+        };
+      } else {
+        AppState().configPrinter = {  
+          'tipeConnection': selectedTipePrinter,
+          'selectedPrinter': selected!.name,
+          'selectedMacAddPrinter': selected!.macAdress,
+          // 'printer': null,
+        };
+        AppState().selectedPrinter = selected;
+      }
+      // AppState().sele
+      // AppState().selectPrinter(_device!);
       // Contoh logika koneksi perangkat Bluetooth di sini
       // bool isConnected = await connectToDevice(newDevice);
-      AppState().setConnectionStatus(_connected);
+      // AppState().setConnectionStatus(_connected);
       // AppState().selectedPrinter = _device;
-
     });
     dynamic configPrinter = ConfigApp().generateConfig(
       AppState().configPrinter,
     );
     ConfigApp().writeConfig(configPrinter);
     print('check data, ${AppState().configPrinter}');
+  }
+
+  getPermission() async {
+    bool status = await PrintBluetoothThermal.isPermissionBluetoothGranted;
+    setState(() {
+      _info = "permission bluetooth granted: $status";
+    });
+  }
+
+  Future<void> platformState() async {
+    String platformVersion;
+    // int porcentbatery = 0;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      platformVersion = await PrintBluetoothThermal.platformVersion;
+      // print("patformversion: $platformVersion");
+      // porcentbatery = await PrintBluetoothThermal.batteryLevel;
+    } on PlatformException {
+      platformVersion = 'Failed to get platform version.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    final bool result = await PrintBluetoothThermal.bluetoothEnabled;
+    print("bluetooth enabled: $result");
+    if (result) {
+      _msg = "Bluetooth enabled, please search and connect";
+    } else {
+      _msg = "Bluetooth not enabled";
+    }
+
+    setState(() {
+      _info = platformVersion;
+    });
+  }
+
+  Future<void> getBluetoots() async {
+    setState(() {
+      _progress = true;
+      _msgprogress = "Wait";
+      items = [];
+    });
+    final List<BluetoothInfo> listResult = await PrintBluetoothThermal.pairedBluetooths;
+
+    /*await Future.forEach(listResult, (BluetoothInfo bluetooth) {
+      String name = bluetooth.name;
+      String mac = bluetooth.macAdress;
+    });*/
+
+    setState(() {
+      _progress = false;
+    });
+
+    if (listResult.length == 0) {
+      _msg = "There are no bluetoohs linked, go to settings and link the printer";
+    } else {
+      _msg = "Touch an item in the list to connect";
+    }
+
+    setState(() {
+      items = listResult;
+    });
+  }
+
+  Future<void> connect(String mac) async {
+    setState(() {
+      _progress = true;
+      _msgprogress = "Connecting...";
+      _connected = false;
+    });
+    final bool result = await PrintBluetoothThermal.connect(macPrinterAddress: mac);
+    print("state conected $result");
+    if (result) _connected = true;
+    setState(() {
+      _progress = false;
+    });
+  }
+
+  Future<void> disconnect() async {
+    final bool status = await PrintBluetoothThermal.disconnect;
+    setState(() {
+      _connected = false;
+    });
+    print("status disconnect $status");
+  }
+
+  Future<void> printTest() async {
+    /*if (kDebugMode) {
+      bool result = await PrintBluetoothThermalWindows.writeBytes(bytes: "Hello \n".codeUnits);
+      return;
+    }*/
+
+    // print('check, ${selected.}')
+
+    bool connectionStatus = await PrintBluetoothThermal.connectionStatus;
+    //print("connection status: $conexionStatus");
+    if (connectionStatus) {
+      bool result = false;
+      if (Platform.isWindows) {
+        // List<int> ticket = await testWindows();
+        // result = await PrintBluetoothThermalWindows.writeBytes(bytes: ticket);
+      } else {
+        List<int> ticket = await testTicket();
+        result = await PrintBluetoothThermal.writeBytes(ticket);
+      }
+      print("print test result:  $result");
+    } else {
+      print("print test conexionStatus: $connectionStatus");
+      setState(() {
+        disconnect();
+      });
+      //throw Exception("Not device connected");
+    }
+  }
+
+  Future<List<int>> testTicket() async {
+    List<int> bytes = [];
+    // Using default profile
+    final profile = await CapabilityProfile.load();
+    final generator = Generator(optionprinttype == "58 mm" ? PaperSize.mm58 : PaperSize.mm80, profile);
+    //bytes += generator.setGlobalFont(PosFontType.fontA);
+    bytes += generator.reset();
+
+    // final ByteData data = await rootBundle.load('assets/mylogo.jpg');
+    // final Uint8List bytesImg = data.buffer.asUint8List();
+    // img.Image? image = img.decodeImage(bytesImg);
+
+    bytes += generator.text('Bold text', styles: PosStyles(bold: true));
+    bytes += generator.text('Reverse text', styles: PosStyles(reverse: true));
+    bytes += generator.text('Underlined text', styles: PosStyles(underline: true), linesAfter: 1);
+    bytes += generator.text('Align left', styles: PosStyles(align: PosAlign.left));
+    bytes += generator.text('Align center', styles: PosStyles(align: PosAlign.center));
+    bytes += generator.text('Align right', styles: PosStyles(align: PosAlign.right), linesAfter: 1);
+
+    bytes += generator.row([
+      PosColumn(
+        text: 'col5',
+        width: 6,
+        styles: PosStyles(align: PosAlign.left, underline: true),
+      ),
+      PosColumn(
+        text: 'col7',
+        width: 6,
+        styles: PosStyles(align: PosAlign.right, underline: true),
+      ),
+    ]);
+
+    return bytes;
   }
 }

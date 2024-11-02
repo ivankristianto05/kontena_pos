@@ -253,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController enterPhoneController = TextEditingController();
   FocusNode inputPhone = FocusNode();
   Widget _buildPhoneNumberSection(BuildContext context) {
-    // enterPhoneController.text = 'hello@thunderlab.id';
+    enterPhoneController.text = 'administrator';
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       CustomTextFormField(
         controller: enterPhoneController,
@@ -281,7 +281,7 @@ class _LoginScreenState extends State<LoginScreen> {
   FocusNode inputPassword = FocusNode();
   late bool _obscurePassword = true;
   Widget _buildPasswordSection(BuildContext context) {
-    // enterPasswordController.text = 'devkontena';
+    enterPasswordController.text = 'adminkontena';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

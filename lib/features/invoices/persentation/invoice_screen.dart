@@ -34,6 +34,7 @@ import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dar
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
 import 'package:kontena_pos/widgets/custom_dialog.dart';
 import 'package:kontena_pos/widgets/empty_cart.dart';
+import 'package:kontena_pos/widgets/empty_data.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/list_cart.dart';
 import 'package:kontena_pos/widgets/loading_content.dart';
@@ -203,23 +204,26 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                   onFilterSelected: (String type) {},
                                 ),
                               ),
-                            if (modeView == 'item')
+                            if (modeView == 'item' && isLoadingContent == false)
                               Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
                                     8.0, 120.0, 8.0, 0.0),
                                 child: Align(
                                   alignment: AlignmentDirectional(0.00, 0.00),
                                   child: SingleChildScrollView(
+                                    primary: true,
                                     child: SizedBox(
                                       width: MediaQuery.sizeOf(context).width,
                                       child: Column(
                                         children: [
-                                          if (isLoadingContent == false)
+                                          if (itemDisplay.isNotEmpty)
                                             MasonryGridView.count(
                                               crossAxisCount: 5,
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
                                               itemCount: itemDisplay.length,
                                               itemBuilder: (context, index) {
                                                 final currentItem =
@@ -254,15 +258,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                               },
                                             ),
                                           // Text('testing'),
-                                          if (isLoadingContent == true)
-                                            const LoadingContent(),
+                                          if (itemDisplay.isEmpty) EmptyData(),
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            if (modeView == 'order')
+                            if (modeView == 'order' &&
+                                isLoadingContent == false)
                               Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 50.0, 8.0, 0.0),
@@ -271,248 +275,251 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: Column(
                                       children: [
-                                        AlignedGridView.count(
-                                          crossAxisCount: 3,
-                                          mainAxisSpacing: 6,
-                                          crossAxisSpacing: 6,
-                                          shrinkWrap: true,
-                                          itemCount: orderDisplay.length,
-                                          itemBuilder: (context, index) {
-                                            // print(
-                                            //     'check order, ${orderDisplay[index]}');
-                                            // final currentOrderId =
-                                            //     AppState().currentOrderId;
-                                            final order = orderDisplay[index];
-                                            dynamic orderItemList =
-                                                order['items'];
-                                            // final isSelected =
-                                            //     order.idOrder == currentOrderId;
-                                            return InkWell(
-                                              onTap: () {
-                                                // AppState().setCurrentOrderId(order
-                                                //     .idOrder); // Update the currentOrderId in AppState
-                                                // onOrderSelected(order.idOrder);
-                                                addToCartFromOrder(
-                                                    context, order);
-                                              },
-                                              child: Card(
-                                                elevation: 2,
-                                                child: Column(
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                        16.0,
-                                                        16.0,
-                                                        16.0,
-                                                        10.0,
-                                                      ),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                order['name'],
-                                                                style: theme
-                                                                    .textTheme
-                                                                    .titleMedium,
-                                                              ),
-                                                              Text(
-                                                                'Table ${order['table']}',
-                                                                style: theme
-                                                                    .textTheme
-                                                                    .bodyMedium,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                order['customer_name']
-                                                                    .toString(),
-                                                                style: theme
-                                                                    .textTheme
-                                                                    .bodyMedium,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                              0.0,
-                                                              4.0,
-                                                              0.0,
-                                                              4.0,
-                                                            ),
-                                                            child: Row(
+                                        if (orderDisplay.isNotEmpty)
+                                          AlignedGridView.count(
+                                            crossAxisCount: 3,
+                                            mainAxisSpacing: 6,
+                                            crossAxisSpacing: 6,
+                                            shrinkWrap: true,
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            itemCount: orderDisplay.length,
+                                            itemBuilder: (context, index) {
+                                              // print(
+                                              //     'check order, ${orderDisplay[index]}');
+                                              // final currentOrderId =
+                                              //     AppState().currentOrderId;
+                                              final order = orderDisplay[index];
+                                              dynamic orderItemList =
+                                                  order['items'];
+                                              // final isSelected =
+                                              //     order.idOrder == currentOrderId;
+                                              return InkWell(
+                                                onTap: () {
+                                                  // AppState().setCurrentOrderId(order
+                                                  //     .idOrder); // Update the currentOrderId in AppState
+                                                  // onOrderSelected(order.idOrder);
+                                                  addToCartFromOrder(
+                                                      context, order);
+                                                },
+                                                child: Card(
+                                                  elevation: 2,
+                                                  child: Column(
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                          16.0,
+                                                          16.0,
+                                                          16.0,
+                                                          10.0,
+                                                        ),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
                                                               children: [
                                                                 Text(
-                                                                  dateTimeFormat(
-                                                                    'dateui',
-                                                                    order[
-                                                                        'date'],
-                                                                  ).toString(),
+                                                                  order['name'],
                                                                   style: theme
                                                                       .textTheme
-                                                                      .labelSmall,
+                                                                      .titleMedium,
+                                                                ),
+                                                                Text(
+                                                                  'Table ${order['table']}',
+                                                                  style: theme
+                                                                      .textTheme
+                                                                      .bodyMedium,
                                                                 ),
                                                               ],
                                                             ),
-                                                          ),
-                                                          Divider(
-                                                            height: 5.0,
-                                                            thickness: 0.5,
-                                                            color: theme
-                                                                .colorScheme
-                                                                .outline,
-                                                          ),
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                              0.0,
-                                                              4.0,
-                                                              0.0,
-                                                              4.0,
-                                                            ),
-                                                            child: Column(
+                                                            Row(
                                                               children: [
-                                                                ListView
-                                                                    .separated(
-                                                                  separatorBuilder:
-                                                                      (context,
-                                                                              index) =>
-                                                                          Divider(
-                                                                    height: 12,
-                                                                    thickness:
-                                                                        0.5,
-                                                                    color: theme
-                                                                        .colorScheme
-                                                                        .outline,
-                                                                  ),
-                                                                  shrinkWrap:
-                                                                      true,
-                                                                  physics:
-                                                                      const NeverScrollableScrollPhysics(),
-                                                                  itemCount:
-                                                                      orderItemList
-                                                                          .length,
-                                                                  itemBuilder:
-                                                                      (context,
-                                                                          idx) {
-                                                                    dynamic
-                                                                        orderItem =
-                                                                        orderItemList[
-                                                                            idx];
-                                                                    print(
-                                                                        'check item qty, ${orderItem['quantity']}');
-                                                                    return Padding(
-                                                                      padding: const EdgeInsets
-                                                                          .only(
-                                                                          bottom:
-                                                                              8.0),
-                                                                      child:
-                                                                          Row(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          Text(
-                                                                            "${orderItem['quantity']}",
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontWeight: FontWeight.w600,
-                                                                              fontSize: 14,
-                                                                            ),
-                                                                          ),
-                                                                          const SizedBox(
-                                                                              width: 8),
-                                                                          Expanded(
-                                                                            child:
-                                                                                Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                AutoSizeText(
-                                                                                  "${orderItem['item_name']} - ${orderItem['variant'] ?? ''}",
-                                                                                  style: theme.textTheme.titleMedium,
-                                                                                  maxLines: 2, // Allows up to 2 lines
-                                                                                  minFontSize: 10,
-                                                                                  maxFontSize: 14,
-                                                                                  overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
-                                                                                ),
-                                                                                // if ((orderItem['preference'] != null) && (orderItem['preference'] != null)) const SizedBox(height: 4),
-                                                                                // AutoSizeText(
-                                                                                //   "Preference: ${orderItem['preference']}",
-                                                                                //   style: theme.textTheme.labelSmall,
-                                                                                //   maxLines: 1,
-                                                                                //   minFontSize: 10,
-                                                                                //   maxFontSize: 12,
-                                                                                //   overflow: TextOverflow.ellipsis,
-                                                                                // ),
-                                                                                // if (orderItem['addons'] != null && orderItem['addons']!.isNotEmpty) const SizedBox(height: 4),
-                                                                                // AutoSizeText(
-                                                                                //   "+ ${orderItem['addons']!.keys.join(', ')}",
-                                                                                //   style: theme.textTheme.labelSmall,
-                                                                                //   maxLines: 1,
-                                                                                //   minFontSize: 10,
-                                                                                //   maxFontSize: 12,
-                                                                                //   overflow: TextOverflow.ellipsis,
-                                                                                // ),
-                                                                                if ((orderItem['note'] != null) && (orderItem['note'] != '')) const SizedBox(height: 4),
-                                                                                AutoSizeText(
-                                                                                  "Notes: ${orderItem['note']}",
-                                                                                  style: theme.textTheme.labelSmall,
-                                                                                  maxLines: 2,
-                                                                                  minFontSize: 10,
-                                                                                  maxFontSize: 12,
-                                                                                  overflow: TextOverflow.ellipsis,
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                              (orderItem['docstatus'] == 1)
-                                                                                  ? 'Confirm'
-                                                                                  : (orderItem['docstatus'] == 2)
-                                                                                      ? 'Cancelled'
-                                                                                      : 'Draft',
-                                                                              style: TextStyle(
-                                                                                color: () {
-                                                                                  if (orderItem['docstatus'] == 1) {
-                                                                                    return theme.colorScheme.primary;
-                                                                                  } else if (orderItem['docstatus'] == 2) {
-                                                                                    return theme.colorScheme.error;
-                                                                                  } else {
-                                                                                    return theme.colorScheme.onPrimaryContainer;
-                                                                                  }
-                                                                                }(),
-                                                                                fontWeight: FontWeight.w700,
-                                                                                fontSize: 12,
-                                                                              )),
-                                                                        ],
-                                                                      ),
-                                                                    );
-                                                                  },
+                                                                Text(
+                                                                  order['customer_name']
+                                                                      .toString(),
+                                                                  style: theme
+                                                                      .textTheme
+                                                                      .bodyMedium,
                                                                 ),
                                                               ],
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                0.0,
+                                                                4.0,
+                                                                0.0,
+                                                                4.0,
+                                                              ),
+                                                              child: Row(
+                                                                children: [
+                                                                  Text(
+                                                                    dateTimeFormat(
+                                                                      'dateui',
+                                                                      order[
+                                                                          'date'],
+                                                                    ).toString(),
+                                                                    style: theme
+                                                                        .textTheme
+                                                                        .labelSmall,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            Divider(
+                                                              height: 5.0,
+                                                              thickness: 0.5,
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .outline,
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                0.0,
+                                                                4.0,
+                                                                0.0,
+                                                                4.0,
+                                                              ),
+                                                              child: Column(
+                                                                children: [
+                                                                  ListView
+                                                                      .separated(
+                                                                    separatorBuilder:
+                                                                        (context,
+                                                                                index) =>
+                                                                            Divider(
+                                                                      height:
+                                                                          12,
+                                                                      thickness:
+                                                                          0.5,
+                                                                      color: theme
+                                                                          .colorScheme
+                                                                          .outline,
+                                                                    ),
+                                                                    shrinkWrap:
+                                                                        true,
+                                                                    physics:
+                                                                        const NeverScrollableScrollPhysics(),
+                                                                    itemCount:
+                                                                        orderItemList
+                                                                            .length,
+                                                                    itemBuilder:
+                                                                        (context,
+                                                                            idx) {
+                                                                      dynamic
+                                                                          orderItem =
+                                                                          orderItemList[
+                                                                              idx];
+                                                                      print(
+                                                                          'check item qty, ${orderItem['quantity']}');
+                                                                      return Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            bottom:
+                                                                                8.0),
+                                                                        child:
+                                                                            Row(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Text(
+                                                                              "${orderItem['qty']}",
+                                                                              style: const TextStyle(
+                                                                                fontWeight: FontWeight.w600,
+                                                                                fontSize: 14,
+                                                                              ),
+                                                                            ),
+                                                                            const SizedBox(width: 8),
+                                                                            Expanded(
+                                                                              child: Column(
+                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                children: [
+                                                                                  AutoSizeText(
+                                                                                    "${orderItem['item_name']} - ${orderItem['variant'] ?? ''}",
+                                                                                    style: theme.textTheme.titleMedium,
+                                                                                    maxLines: 2, // Allows up to 2 lines
+                                                                                    minFontSize: 10,
+                                                                                    maxFontSize: 14,
+                                                                                    overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
+                                                                                  ),
+                                                                                  // if ((orderItem['preference'] != null) && (orderItem['preference'] != null)) const SizedBox(height: 4),
+                                                                                  // AutoSizeText(
+                                                                                  //   "Preference: ${orderItem['preference']}",
+                                                                                  //   style: theme.textTheme.labelSmall,
+                                                                                  //   maxLines: 1,
+                                                                                  //   minFontSize: 10,
+                                                                                  //   maxFontSize: 12,
+                                                                                  //   overflow: TextOverflow.ellipsis,
+                                                                                  // ),
+                                                                                  // if (orderItem['addons'] != null && orderItem['addons']!.isNotEmpty) const SizedBox(height: 4),
+                                                                                  // AutoSizeText(
+                                                                                  //   "+ ${orderItem['addons']!.keys.join(', ')}",
+                                                                                  //   style: theme.textTheme.labelSmall,
+                                                                                  //   maxLines: 1,
+                                                                                  //   minFontSize: 10,
+                                                                                  //   maxFontSize: 12,
+                                                                                  //   overflow: TextOverflow.ellipsis,
+                                                                                  // ),
+                                                                                  const SizedBox(height: 4),
+                                                                                  if ((orderItem.containsKey('note')) && (orderItem['note'] != null) && (orderItem['note'] != ''))
+                                                                                    AutoSizeText(
+                                                                                      "Notes: ${orderItem['note']}",
+                                                                                      style: theme.textTheme.labelSmall,
+                                                                                      maxLines: 2,
+                                                                                      minFontSize: 10,
+                                                                                      maxFontSize: 12,
+                                                                                      overflow: TextOverflow.ellipsis,
+                                                                                    ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            Text(
+                                                                                (orderItem['docstatus'] == 1)
+                                                                                    ? 'Confirm'
+                                                                                    : (orderItem['docstatus'] == 2)
+                                                                                        ? 'Cancelled'
+                                                                                        : 'Draft',
+                                                                                style: TextStyle(
+                                                                                  color: () {
+                                                                                    if (orderItem['docstatus'] == 1) {
+                                                                                      return theme.colorScheme.primary;
+                                                                                    } else if (orderItem['docstatus'] == 2) {
+                                                                                      return theme.colorScheme.error;
+                                                                                    } else {
+                                                                                      return theme.colorScheme.onPrimaryContainer;
+                                                                                    }
+                                                                                  }(),
+                                                                                  fontWeight: FontWeight.w700,
+                                                                                  fontSize: 12,
+                                                                                )),
+                                                                          ],
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          },
-                                        ),
+                                              );
+                                            },
+                                          ),
+                                        if (orderDisplay.isEmpty) EmptyData(),
                                       ],
                                     ),
                                   ),
@@ -522,7 +529,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                         ),
                       ),
                       Column(
-                        // mainAxisSize: MainAxisSize.max,
+                        mainAxisSize: MainAxisSize.max,
                         children: [
                           Container(
                             width: dataContentWidth,
@@ -721,8 +728,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                           ),
                           Expanded(
                             child: Container(
-                              width: dataContentWidth,
-                              height: double.infinity,
+                              width: MediaQuery.sizeOf(context).width * 0.25,
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.primaryContainer,
                               ),
@@ -732,98 +738,78 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   if (cartData.isNotEmpty)
-                                    SingleChildScrollView(
-                                      primary: true,
-                                      child: SizedBox(
-                                        height: 700,
-                                        child: ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: cartData.length,
-                                          itemBuilder: (context, index) {
-                                            final itemData = cartData[index];
+                                    Expanded(
+                                      // Menggunakan Expanded untuk memungkinkan ListView memiliki ruang penuh dalam Column
+                                      child: Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 0.0, 0.0, 0.0),
+                                        child: Builder(
+                                          builder: (context) {
+                                            // final itemCart = cartData;
+                                            return ListView.builder(
+                                              primary: false,
+                                              shrinkWrap: true,
+                                              scrollDirection: Axis.vertical,
+                                              itemCount: cartData.length,
+                                              itemBuilder: (context, index) {
+                                                final itemData =
+                                                    cartData[index];
 
-                                            String addon2 = '';
-                                            String catatan = '';
-                                            String preference = '';
-                                            totalAddon = 0;
-                                            List<dynamic> addons = [];
+                                                String addon2 = '';
+                                                String catatan = '';
+                                                String preference = '';
+                                                totalAddon = 0;
+                                                List<dynamic> addons = [];
 
-                                            catatan = itemData.notes.toString();
+                                                catatan =
+                                                    itemData.notes.toString();
 
-                                            if (itemData.addon != null) {}
-
-                                            // if (itemData.addon!.isNotEmpty) {
-                                            //   itemData.addon!.forEach((value) {
-                                            //     addons.add({
-                                            //       'name': value['nama_menu'],
-                                            //       'qty': value['qty'],
-                                            //       'price': numberFormat('idr', value['harga']),
-                                            //     });
-                                            //     // String itemName = value["itemName"] as String;
-                                            //     // String price = value["price"];
-
-                                            //     // addon2 +=
-                                            //     //     "$itemName - (${numberFormat('idr', double.parse(price))})\n";
-                                            //     totalAddon +=
-                                            //         (double.parse(value['harga'].toString()).toInt() *
-                                            //             double.parse(value['qty'].toString()).toInt());
-                                            //   });
-                                            // }
-
-                                            if (itemData.preference != null) {
-                                              int i = 1;
-                                              // itemData.preference.forEach((element) {
-                                              //   preference +=
-                                              //       "${element['type']}: ${element['name']}";
-                                              //   if (i < itemData.pref!.length) {
-                                              //     preference += ", ";
-                                              //   }
-                                              //   i++;
-                                              // });
-                                            }
-
-                                            return ListCart(
-                                              title:
-                                                  "${itemData.itemName} (${itemData.qty})",
-                                              subtitle:
-                                                  itemData.itemName ?? '-',
-                                              // addon: addon2,
-                                              // addons: addons,
-                                              qty: itemData.qty.toString(),
-                                              catatan: preference,
-                                              titleStyle: CustomTextStyles
-                                                  .labelLargeBlack,
-                                              price: itemData.price.toString(),
-                                              total: numberFormat(
-                                                  'idr',
-                                                  itemData.qty *
-                                                      (itemData.price +
-                                                          itemData.totalAddon)),
-                                              priceStyle: CustomTextStyles
-                                                  .labelLargeBlack,
-                                              labelStyle: CustomTextStyles
-                                                  .bodySmallBluegray300,
-                                              editLabelStyle: TextStyle(
-                                                color:
-                                                    theme.colorScheme.primary,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              padding: EdgeInsets.all(16),
-                                              note: itemData.notes ?? '',
-                                              lineColor: appTheme.gray200,
-                                              secondaryStyle: CustomTextStyles
-                                                  .bodySmallGray,
-                                              addons: itemData.addon,
-                                              isEdit: isEdit,
-                                              onTap: () => onTapEditItem(
-                                                  context, itemData, index),
+                                                return ListCart(
+                                                  title:
+                                                      "${itemData.itemName} (${itemData.qty})",
+                                                  subtitle:
+                                                      itemData.itemName ?? '-',
+                                                  // addon: addon2,
+                                                  // addons: addons,
+                                                  qty: itemData.qty.toString(),
+                                                  catatan: preference,
+                                                  titleStyle: CustomTextStyles
+                                                      .labelLargeBlack,
+                                                  price:
+                                                      itemData.price.toString(),
+                                                  total: numberFormat(
+                                                      'idr',
+                                                      itemData.qty *
+                                                          (itemData.price +
+                                                              itemData
+                                                                  .totalAddon)),
+                                                  priceStyle: CustomTextStyles
+                                                      .labelLargeBlack,
+                                                  labelStyle: CustomTextStyles
+                                                      .bodySmallBluegray300,
+                                                  editLabelStyle: TextStyle(
+                                                    color: theme
+                                                        .colorScheme.primary,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  padding: EdgeInsets.all(16),
+                                                  note: itemData.notes ?? '',
+                                                  lineColor: appTheme.gray200,
+                                                  secondaryStyle:
+                                                      CustomTextStyles
+                                                          .bodySmallGray,
+                                                  addons: itemData.addon,
+                                                  isEdit: isEdit,
+                                                  onTap: () => onTapEditItem(
+                                                      context, itemData, index),
+                                                );
+                                              },
                                             );
                                           },
                                         ),
-                                        // ],
                                       ),
                                     ),
-                                  if (cart.items.isEmpty) EmptyCart()
+                                  if (cartData.isEmpty) EmptyCart()
                                 ],
                               ),
                             ),
@@ -1397,7 +1383,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       });
     }
     setState(() {
-      enterGuestNameController.text = order.namaPemesan;
+      enterGuestNameController.text = order['customer_name'];
       typeTransaction = 'dine-in';
       cartData = cart.getAllItemCart();
       isEdit = false;

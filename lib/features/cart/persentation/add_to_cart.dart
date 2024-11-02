@@ -121,688 +121,257 @@ class _AddToCartState extends State<AddToCart> {
   @override
   Widget build(BuildContext context) {
     // print('varian display, $varianDisplay');
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: MediaQuery.sizeOf(context).width * 0.8,
-              height: MediaQuery.sizeOf(context).height * 0.8,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              16.0, 16.0, 16.0, 16.0),
-                          child: Text(
-                            widget.dataMenu['item_name'],
-                            style: theme.textTheme.labelMedium,
+    return SafeArea(
+      top: true,
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: MediaQuery.sizeOf(context).width * 0.8,
+                height: MediaQuery.sizeOf(context).height * 0.8,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
+                            child: Text(
+                              widget.dataMenu['item_name'],
+                              style: theme.textTheme.labelMedium,
+                            ),
                           ),
-                        ),
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () async {
-                            Navigator.of(context).pop(false);
-                            // context.pushNamed('HomePage');
-                          },
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    16.0, 16.0, 16.0, 16.0),
-                                child: Icon(
-                                  Icons.close_rounded,
-                                  color: theme.colorScheme.onBackground,
-                                  size: 20.0,
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              Navigator.of(context).pop(false);
+                              // context.pushNamed('HomePage');
+                            },
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      16.0, 16.0, 16.0, 16.0),
+                                  child: Icon(
+                                    Icons.close_rounded,
+                                    color: theme.colorScheme.onBackground,
+                                    size: 20.0,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Divider(
-                    height: 1.0,
-                    thickness: 1.0,
-                    color: theme.colorScheme.surface,
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                            width: 100.0,
-                            height: double.infinity,
-                            // decoration: BoxDecoration(
-                            //   color: theme.colorScheme,
-                            // ),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 24.0, 16.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Varian:',
-                                            style: theme.textTheme.labelMedium),
-                                        const SizedBox(height: 4.0),
-                                        Container(
-                                          decoration: const BoxDecoration(),
-                                          child: _buildSearchVarianSection(
-                                              context),
-                                        ),
-                                        const SizedBox(height: 4.0),
-                                        Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(0.0, 12.0, 0.0, 16.0),
-                                          child: Builder(
-                                            builder: (context) {
-                                              // final variant =
-                                              //     varianDisplay.toList();
-                                              return Column(
-                                                mainAxisSize: MainAxisSize.max,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  if (varianDisplay.isNotEmpty)
-                                                    ListView.builder(
-                                                      physics:
-                                                          const BouncingScrollPhysics(),
-                                                      shrinkWrap: true,
-                                                      itemCount:
-                                                          varianDisplay.length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        if (isLoading) {
-                                                        } else {
-                                                          final currentVarian =
-                                                              varianDisplay[
-                                                                  index];
+                    Divider(
+                      height: 1.0,
+                      thickness: 1.0,
+                      color: theme.colorScheme.surface,
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              width: 100.0,
+                              height: double.infinity,
+                              // decoration: BoxDecoration(
+                              //   color: theme.colorScheme,
+                              // ),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              16.0, 24.0, 16.0, 0.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Varian:',
+                                              style:
+                                                  theme.textTheme.labelMedium),
+                                          const SizedBox(height: 4.0),
+                                          Container(
+                                            decoration: const BoxDecoration(),
+                                            child: _buildSearchVarianSection(
+                                                context),
+                                          ),
+                                          const SizedBox(height: 4.0),
+                                          Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(0.0, 12.0, 0.0, 16.0),
+                                            child: Builder(
+                                              builder: (context) {
+                                                // final variant =
+                                                //     varianDisplay.toList();
+                                                return Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    if (varianDisplay
+                                                        .isNotEmpty)
+                                                      ListView.builder(
+                                                        physics:
+                                                            const BouncingScrollPhysics(),
+                                                        shrinkWrap: true,
+                                                        itemCount: varianDisplay
+                                                            .length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          if (isLoading) {
+                                                          } else {
+                                                            final currentVarian =
+                                                                varianDisplay[
+                                                                    index];
 
-                                                          return Column(
-                                                            children: [
-                                                              InkWell(
-                                                                onTap: () {
-                                                                  if (selectedVarian ==
-                                                                      null) {
-                                                                    setState(
-                                                                        () {
-                                                                      selectedVarian =
-                                                                          currentVarian;
-                                                                    });
-                                                                  } else {
-                                                                    if (selectedVarian[
-                                                                            'id_varian'] ==
-                                                                        currentVarian[
-                                                                            'id_varian']) {
-                                                                      setState(
-                                                                          () {
-                                                                        selectedVarian =
-                                                                            null;
-                                                                      });
-                                                                    } else {
+                                                            return Column(
+                                                              children: [
+                                                                InkWell(
+                                                                  onTap: () {
+                                                                    if (selectedVarian ==
+                                                                        null) {
                                                                       setState(
                                                                           () {
                                                                         selectedVarian =
                                                                             currentVarian;
                                                                       });
+                                                                    } else {
+                                                                      if (selectedVarian[
+                                                                              'id_varian'] ==
+                                                                          currentVarian[
+                                                                              'id_varian']) {
+                                                                        setState(
+                                                                            () {
+                                                                          selectedVarian =
+                                                                              null;
+                                                                        });
+                                                                      } else {
+                                                                        setState(
+                                                                            () {
+                                                                          selectedVarian =
+                                                                              currentVarian;
+                                                                        });
+                                                                      }
                                                                     }
-                                                                  }
-                                                                },
-                                                                child:
-                                                                    Container(
-                                                                  width: double
-                                                                      .infinity,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: ((selectedVarian !=
-                                                                                null) &&
-                                                                            (selectedVarian['id_varian'] ==
-                                                                                varianDisplay[index][
-                                                                                    'id_varian']))
-                                                                        ? theme
-                                                                            .colorScheme
-                                                                            .primary
-                                                                        : theme
-                                                                            .colorScheme
-                                                                            .primaryContainer,
-                                                                    border:
-                                                                        Border
-                                                                            .all(
+                                                                  },
+                                                                  child:
+                                                                      Container(
+                                                                    width: double
+                                                                        .infinity,
+                                                                    decoration:
+                                                                        BoxDecoration(
                                                                       color: ((selectedVarian != null) && (selectedVarian['id_varian'] == varianDisplay[index]['id_varian']))
                                                                           ? theme
                                                                               .colorScheme
                                                                               .primary
                                                                           : theme
                                                                               .colorScheme
-                                                                              .surface,
-                                                                    ),
-                                                                  ),
-                                                                  child:
-                                                                      Padding(
-                                                                    padding:
-                                                                        const EdgeInsetsDirectional
-                                                                            .fromSTEB(
-                                                                      12.0,
-                                                                      12.0,
-                                                                      12.0,
-                                                                      12.0,
+                                                                              .primaryContainer,
+                                                                      border:
+                                                                          Border
+                                                                              .all(
+                                                                        color: ((selectedVarian != null) &&
+                                                                                (selectedVarian['id_varian'] == varianDisplay[index]['id_varian']))
+                                                                            ? theme.colorScheme.primary
+                                                                            : theme.colorScheme.surface,
+                                                                      ),
                                                                     ),
                                                                     child:
-                                                                        Column(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
-                                                                      children: [
-                                                                        Text(
-                                                                          currentVarian[
-                                                                              'nama_varian'],
-                                                                          style: ((selectedVarian != null) && (selectedVarian['id_varian'] == varianDisplay[index]['id_varian']))
-                                                                              ? TextStyle(color: theme.colorScheme.background)
-                                                                              : theme.textTheme.labelMedium,
-                                                                        ),
-                                                                      ],
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsetsDirectional
+                                                                              .fromSTEB(
+                                                                        12.0,
+                                                                        12.0,
+                                                                        12.0,
+                                                                        12.0,
+                                                                      ),
+                                                                      child:
+                                                                          Column(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.max,
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        children: [
+                                                                          Text(
+                                                                            currentVarian['nama_varian'],
+                                                                            style: ((selectedVarian != null) && (selectedVarian['id_varian'] == varianDisplay[index]['id_varian']))
+                                                                                ? TextStyle(color: theme.colorScheme.background)
+                                                                                : theme.textTheme.labelMedium,
+                                                                          ),
+                                                                        ],
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ),
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 4,
-                                                              )
-                                                            ],
-                                                          );
-                                                        }
-                                                      },
-                                                    ),
-                                                  if (varianDisplay.isEmpty)
-                                                    Container(
-                                                      width: double.infinity,
-                                                      height: 30.0,
-                                                      decoration: BoxDecoration(
-                                                          color: theme
-                                                              .colorScheme
-                                                              .surface),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsetsDirectional
-                                                                .fromSTEB(8.0,
-                                                                4.0, 8.0, 4.0),
-                                                        child: Text(
-                                                          'No Varian',
-                                                          style: TextStyle(
-                                                              color: theme
-                                                                  .colorScheme
-                                                                  .onPrimaryContainer),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                ],
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 1.0,
-                          height: double.infinity,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface,
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            width: 100.0,
-                            height: double.infinity,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer,
-                            ),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 24.0, 16.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Note:',
-                                          style: theme.textTheme.labelMedium,
-                                        ),
-                                        const SizedBox(height: 4.0),
-                                        Container(
-                                          decoration: const BoxDecoration(),
-                                          child: _buildNotesSection(context),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 8.0, 16.0, 16.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(0.0, 0.0, 0.0, 8.0),
-                                          child: Text(
-                                            'Preference:',
-                                            style: theme.textTheme.labelMedium,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(0.0, 8.0, 0.0, 8.0),
-                                          child: Builder(
-                                            builder: (context) {
-                                              String prefGroup = '';
-                                              int idxPref = 0;
-                                              return Column(
-                                                mainAxisSize: MainAxisSize.max,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  if (prefDisplay.isNotEmpty)
-                                                    ListView.builder(
-                                                      physics:
-                                                          const BouncingScrollPhysics(),
-                                                      shrinkWrap: true,
-                                                      itemCount:
-                                                          prefDisplay.length,
-                                                      itemBuilder:
-                                                          (context, prefIndex) {
-                                                        if (isLoading) {
-                                                        } else {
-                                                          final currentPref =
-                                                              prefDisplay[
-                                                                  prefIndex];
-
-                                                          if (prefGroup !=
-                                                              currentPref[
-                                                                  'type']) {
-                                                            prefGroup =
-                                                                currentPref[
-                                                                    'type'];
-                                                            idxPref = 0;
-                                                          } else {
-                                                            idxPref++;
+                                                                const SizedBox(
+                                                                  height: 4,
+                                                                )
+                                                              ],
+                                                            );
                                                           }
-
-                                                          return Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .start,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              if (idxPref == 0)
-                                                                Text(
-                                                                  prefGroup,
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .labelSmall,
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .start,
-                                                                ),
-                                                              InkWell(
-                                                                onTap: () {
-                                                                  selctedPref(
-                                                                    context,
-                                                                    prefIndex,
-                                                                    currentPref,
-                                                                  );
-                                                                },
-                                                                child:
-                                                                    Container(
-                                                                  width: double
-                                                                      .infinity,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: (selectedPref.contains(currentPref) ==
-                                                                            true)
-                                                                        ? theme
-                                                                            .colorScheme
-                                                                            .primary
-                                                                        : theme
-                                                                            .colorScheme
-                                                                            .primaryContainer,
-                                                                    border:
-                                                                        Border
-                                                                            .all(
-                                                                      color: (selectedPref.contains(currentPref) ==
-                                                                              true)
-                                                                          ? theme
-                                                                              .colorScheme
-                                                                              .primary
-                                                                          : theme
-                                                                              .colorScheme
-                                                                              .surface,
-                                                                    ),
-                                                                  ),
-                                                                  child:
-                                                                      Padding(
-                                                                    padding:
-                                                                        const EdgeInsetsDirectional
-                                                                            .fromSTEB(
-                                                                      12.0,
-                                                                      12.0,
-                                                                      12.0,
-                                                                      12.0,
-                                                                    ),
-                                                                    child:
-                                                                        Column(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .max,
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
-                                                                      children: [
-                                                                        Text(
-                                                                          currentPref[
-                                                                              'name'],
-                                                                          style: (selectedPref.contains(currentPref) == true)
-                                                                              ? TextStyle(color: theme.colorScheme.background)
-                                                                              : theme.textTheme.labelMedium,
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                height: 4,
-                                                              )
-                                                            ],
-                                                          );
-                                                        }
-                                                      },
-                                                    ),
-                                                  if (prefDisplay.isEmpty)
-                                                    Container(
-                                                      width: double.infinity,
-                                                      height: 30.0,
-                                                      decoration: BoxDecoration(
-                                                          color: theme
-                                                              .colorScheme
-                                                              .surface),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsetsDirectional
-                                                                .fromSTEB(8.0,
-                                                                4.0, 8.0, 4.0),
-                                                        child: Text(
-                                                          'No Preference',
-                                                          style: TextStyle(
-                                                              color: theme
-                                                                  .colorScheme
-                                                                  .onPrimaryContainer),
+                                                        },
+                                                      ),
+                                                    if (varianDisplay.isEmpty)
+                                                      Container(
+                                                        width: double.infinity,
+                                                        height: 30.0,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .surface),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                  8.0,
+                                                                  4.0,
+                                                                  8.0,
+                                                                  4.0),
+                                                          child: Text(
+                                                            'No Varian',
+                                                            style: TextStyle(
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .onPrimaryContainer),
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                ],
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 1.0,
-                          height: double.infinity,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface,
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            width: 100.0,
-                            height: double.infinity,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer,
-                            ),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 24.0, 16.0, 0.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Addon:',
-                                            style: theme.textTheme.labelMedium),
-                                        const SizedBox(height: 4.0),
-                                        Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .fromSTEB(0.0, 8.0, 0.0, 16.0),
-                                            child: _buildAddonSection(
-                                              context,
-                                              addonDisplay,
-                                            )),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            width: 100.0,
-                            height: double.infinity,
-                            decoration: BoxDecoration(
-                                color: theme.colorScheme.background),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      16.0, 24.0, 0.0, 4.0),
-                                  child: Text(
-                                    'Summary:',
-                                    style: theme.textTheme.labelMedium,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 0.0, 0.0, 0.0),
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .fromSTEB(0.0, 0.0, 16.0, 0.0),
-                                            child: Text(
-                                              widget.dataMenu['item_name'],
-                                              style: theme.textTheme.bodyMedium,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8.0),
-                                          Text(
-                                            'Varian:',
-                                            style: theme.textTheme.labelMedium,
-                                          ),
-                                          Text(
-                                            (selectedVarian != null)
-                                                ? selectedVarian['nama_varian']
-                                                : '-',
-                                            style: theme.textTheme.bodyMedium,
-                                          ),
-                                          const SizedBox(height: 8.0),
-                                          Text(
-                                            'Preference:',
-                                            style: theme.textTheme.labelMedium,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .fromSTEB(0.0, 8.0, 0.0, 8.0),
-                                            child: Builder(
-                                              builder: (context) {
-                                                return Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    ListView.builder(
-                                                      physics:
-                                                          const BouncingScrollPhysics(),
-                                                      shrinkWrap: true,
-                                                      itemCount:
-                                                          selectedPref.length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        final selPref =
-                                                            selectedPref[index];
-
-                                                        return Column(
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                Text(
-                                                                  "${selPref['name'].toString()}",
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8.0),
-                                          Text(
-                                            'Notes:',
-                                            style: theme.textTheme.labelMedium,
-                                          ),
-                                          Text(
-                                            notes,
-                                            style: theme.textTheme.bodyMedium,
-                                          ),
-                                          const SizedBox(height: 8.0),
-                                          Text(
-                                            'Addon:',
-                                            style: theme.textTheme.labelMedium,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .fromSTEB(0.0, 8.0, 0.0, 8.0),
-                                            child: Builder(
-                                              builder: (context) {
-                                                return Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    ListView.builder(
-                                                      physics:
-                                                          const BouncingScrollPhysics(),
-                                                      shrinkWrap: true,
-                                                      itemCount:
-                                                          selectedAddon.length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        final selAddon =
-                                                            selectedAddon[
-                                                                index];
-
-                                                        return Column(
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                Text(
-                                                                  "${selAddon['qty']}x ",
-                                                                ),
-                                                                Text(
-                                                                  selAddon[
-                                                                      'item_name'],
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    ),
                                                   ],
                                                 );
                                               },
@@ -811,171 +380,622 @@ class _AddToCartState extends State<AddToCart> {
                                         ],
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      16.0, 0.0, 16.0, 16.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Divider(
-                                        height: 1.0,
-                                        thickness: 1.0,
-                                        color: theme.colorScheme.surface,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsetsDirectional
-                                            .fromSTEB(0.0, 16.0, 0.0, 16.0),
-                                        child: Text(
-                                          'QTY',
-                                          style: TextStyle(
-                                            color: appTheme.gray500,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 0.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            _buildQtySection(context),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(
-                    height: 1.0,
-                    thickness: 1.0,
-                    color: theme.colorScheme.surface,
-                  ),
-                  if (widget.idxMenu == null)
-                    Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          16.0, 16.0, 16.0, 16.0),
-                      child: Container(
-                        width: double.infinity,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
-                          borderRadius: BorderRadius.circular(2.0),
-                        ),
-                        child: CustomElevatedButton(
-                          text: "Add Item To Cart",
-                          buttonTextStyle: TextStyle(
-                            color: theme.colorScheme.primaryContainer,
+                          Container(
+                            width: 1.0,
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                            ),
                           ),
-                          buttonStyle: CustomButtonStyles.primary,
-                          onPressed: () {
-                            addToCart(
-                              context,
-                              widget.dataMenu,
-                              selectedVarian,
-                              selectedAddon,
-                              notesController.text,
-                              int.parse(qtyController.text),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  if (widget.idxMenu != null)
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
                           Expanded(
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 8.0, 8.0, 8.0),
-                              child: Container(
-                                width: double.infinity,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary,
-                                  borderRadius: BorderRadius.circular(2.0),
+                            child: Container(
+                              width: 100.0,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primaryContainer,
+                              ),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              16.0, 24.0, 16.0, 0.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Note:',
+                                            style: theme.textTheme.labelMedium,
+                                          ),
+                                          const SizedBox(height: 4.0),
+                                          Container(
+                                            decoration: const BoxDecoration(),
+                                            child: _buildNotesSection(context),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              16.0, 8.0, 16.0, 16.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(0.0, 0.0, 0.0, 8.0),
+                                            child: Text(
+                                              'Preference:',
+                                              style:
+                                                  theme.textTheme.labelMedium,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(0.0, 8.0, 0.0, 8.0),
+                                            child: Builder(
+                                              builder: (context) {
+                                                String prefGroup = '';
+                                                int idxPref = 0;
+                                                return Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    if (prefDisplay.isNotEmpty)
+                                                      ListView.builder(
+                                                        physics:
+                                                            const BouncingScrollPhysics(),
+                                                        shrinkWrap: true,
+                                                        itemCount:
+                                                            prefDisplay.length,
+                                                        itemBuilder: (context,
+                                                            prefIndex) {
+                                                          if (isLoading) {
+                                                          } else {
+                                                            final currentPref =
+                                                                prefDisplay[
+                                                                    prefIndex];
+
+                                                            if (prefGroup !=
+                                                                currentPref[
+                                                                    'type']) {
+                                                              prefGroup =
+                                                                  currentPref[
+                                                                      'type'];
+                                                              idxPref = 0;
+                                                            } else {
+                                                              idxPref++;
+                                                            }
+
+                                                            return Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                if (idxPref ==
+                                                                    0)
+                                                                  Text(
+                                                                    prefGroup,
+                                                                    style: theme
+                                                                        .textTheme
+                                                                        .labelSmall,
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .start,
+                                                                  ),
+                                                                InkWell(
+                                                                  onTap: () {
+                                                                    selctedPref(
+                                                                      context,
+                                                                      prefIndex,
+                                                                      currentPref,
+                                                                    );
+                                                                  },
+                                                                  child:
+                                                                      Container(
+                                                                    width: double
+                                                                        .infinity,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      color: (selectedPref.contains(currentPref) ==
+                                                                              true)
+                                                                          ? theme
+                                                                              .colorScheme
+                                                                              .primary
+                                                                          : theme
+                                                                              .colorScheme
+                                                                              .primaryContainer,
+                                                                      border:
+                                                                          Border
+                                                                              .all(
+                                                                        color: (selectedPref.contains(currentPref) ==
+                                                                                true)
+                                                                            ? theme.colorScheme.primary
+                                                                            : theme.colorScheme.surface,
+                                                                      ),
+                                                                    ),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsetsDirectional
+                                                                              .fromSTEB(
+                                                                        12.0,
+                                                                        12.0,
+                                                                        12.0,
+                                                                        12.0,
+                                                                      ),
+                                                                      child:
+                                                                          Column(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.max,
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        children: [
+                                                                          Text(
+                                                                            currentPref['name'],
+                                                                            style: (selectedPref.contains(currentPref) == true)
+                                                                                ? TextStyle(color: theme.colorScheme.background)
+                                                                                : theme.textTheme.labelMedium,
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                  height: 4,
+                                                                )
+                                                              ],
+                                                            );
+                                                          }
+                                                        },
+                                                      ),
+                                                    if (prefDisplay.isEmpty)
+                                                      Container(
+                                                        width: double.infinity,
+                                                        height: 30.0,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .surface),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                                  8.0,
+                                                                  4.0,
+                                                                  8.0,
+                                                                  4.0),
+                                                          child: Text(
+                                                            'No Preference',
+                                                            style: TextStyle(
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .onPrimaryContainer),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                child: CustomElevatedButton(
-                                  text: "Update to Cart",
-                                  buttonTextStyle: TextStyle(
-                                    color: theme.colorScheme.primaryContainer,
-                                  ),
-                                  buttonStyle: CustomButtonStyles.primary,
-                                  onPressed: () {
-                                    updateCart(
-                                      context,
-                                      widget.dataMenu,
-                                      selectedVarian,
-                                      selectedAddon,
-                                      notesController.text,
-                                      int.parse(qtyController.text),
-                                    );
-                                  },
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 1.0,
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              width: 100.0,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primaryContainer,
+                              ),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              16.0, 24.0, 16.0, 0.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Addon:',
+                                              style:
+                                                  theme.textTheme.labelMedium),
+                                          const SizedBox(height: 4.0),
+                                          Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                      0.0, 8.0, 0.0, 16.0),
+                                              child: _buildAddonSection(
+                                                context,
+                                                addonDisplay,
+                                              )),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
                           ),
                           Expanded(
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  8.0, 8.0, 8.0, 8.0),
-                              child: Container(
-                                width: double.infinity,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary,
-                                  borderRadius: BorderRadius.circular(2.0),
-                                ),
-                                child: CustomElevatedButton(
-                                  text: "Add Item To Cart",
-                                  buttonTextStyle: TextStyle(
-                                    color: theme.colorScheme.primaryContainer,
+                            child: Container(
+                              width: 100.0,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                  color: theme.colorScheme.background),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            16.0, 24.0, 0.0, 4.0),
+                                    child: Text(
+                                      'Summary:',
+                                      style: theme.textTheme.labelMedium,
+                                    ),
                                   ),
-                                  buttonStyle: CustomButtonStyles.primary,
-                                  onPressed: () {
-                                    addToCart(
-                                      context,
-                                      widget.dataMenu,
-                                      selectedVarian,
-                                      selectedAddon,
-                                      notesController.text,
-                                      int.parse(qtyController.text),
-                                    );
-                                  },
-                                ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              16.0, 0.0, 0.0, 0.0),
+                                      child: SingleChildScrollView(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                      0.0, 0.0, 16.0, 0.0),
+                                              child: Text(
+                                                widget.dataMenu['item_name'],
+                                                style:
+                                                    theme.textTheme.bodyMedium,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8.0),
+                                            Text(
+                                              'Varian:',
+                                              style:
+                                                  theme.textTheme.labelMedium,
+                                            ),
+                                            Text(
+                                              (selectedVarian != null)
+                                                  ? selectedVarian[
+                                                      'nama_varian']
+                                                  : '-',
+                                              style: theme.textTheme.bodyMedium,
+                                            ),
+                                            const SizedBox(height: 8.0),
+                                            Text(
+                                              'Preference:',
+                                              style:
+                                                  theme.textTheme.labelMedium,
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                      0.0, 8.0, 0.0, 8.0),
+                                              child: Builder(
+                                                builder: (context) {
+                                                  return Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      ListView.builder(
+                                                        physics:
+                                                            const BouncingScrollPhysics(),
+                                                        shrinkWrap: true,
+                                                        itemCount:
+                                                            selectedPref.length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          final selPref =
+                                                              selectedPref[
+                                                                  index];
+
+                                                          return Column(
+                                                            children: [
+                                                              Row(
+                                                                children: [
+                                                                  Text(
+                                                                    "${selPref['name'].toString()}",
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8.0),
+                                            Text(
+                                              'Notes:',
+                                              style:
+                                                  theme.textTheme.labelMedium,
+                                            ),
+                                            Text(
+                                              notes,
+                                              style: theme.textTheme.bodyMedium,
+                                            ),
+                                            const SizedBox(height: 8.0),
+                                            Text(
+                                              'Addon:',
+                                              style:
+                                                  theme.textTheme.labelMedium,
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                      0.0, 8.0, 0.0, 8.0),
+                                              child: Builder(
+                                                builder: (context) {
+                                                  return Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      ListView.builder(
+                                                        physics:
+                                                            const BouncingScrollPhysics(),
+                                                        shrinkWrap: true,
+                                                        itemCount: selectedAddon
+                                                            .length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          final selAddon =
+                                                              selectedAddon[
+                                                                  index];
+
+                                                          return Column(
+                                                            children: [
+                                                              Row(
+                                                                children: [
+                                                                  Text(
+                                                                    "${selAddon['qty']}x ",
+                                                                  ),
+                                                                  Text(
+                                                                    selAddon[
+                                                                        'item_name'],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            16.0, 0.0, 16.0, 16.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Divider(
+                                          height: 1.0,
+                                          thickness: 1.0,
+                                          color: theme.colorScheme.surface,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(0.0, 16.0, 0.0, 16.0),
+                                          child: Text(
+                                            'QTY',
+                                            style: TextStyle(
+                                              color: appTheme.gray500,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 0.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              _buildQtySection(context),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                ],
+                    Divider(
+                      height: 1.0,
+                      thickness: 1.0,
+                      color: theme.colorScheme.surface,
+                    ),
+                    if (widget.idxMenu == null)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            16.0, 16.0, 16.0, 16.0),
+                        child: Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary,
+                            borderRadius: BorderRadius.circular(2.0),
+                          ),
+                          child: CustomElevatedButton(
+                            text: "Add Item To Cart",
+                            buttonTextStyle: TextStyle(
+                              color: theme.colorScheme.primaryContainer,
+                            ),
+                            buttonStyle: CustomButtonStyles.primary,
+                            onPressed: () {
+                              addToCart(
+                                context,
+                                widget.dataMenu,
+                                selectedVarian,
+                                selectedAddon,
+                                notesController.text,
+                                int.parse(qtyController.text),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    if (widget.idxMenu != null)
+                      Padding(
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    8.0, 8.0, 8.0, 8.0),
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary,
+                                    borderRadius: BorderRadius.circular(2.0),
+                                  ),
+                                  child: CustomElevatedButton(
+                                    text: "Update to Cart",
+                                    buttonTextStyle: TextStyle(
+                                      color: theme.colorScheme.primaryContainer,
+                                    ),
+                                    buttonStyle: CustomButtonStyles.primary,
+                                    onPressed: () {
+                                      updateCart(
+                                        context,
+                                        widget.dataMenu,
+                                        selectedVarian,
+                                        selectedAddon,
+                                        notesController.text,
+                                        int.parse(qtyController.text),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    8.0, 8.0, 8.0, 8.0),
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary,
+                                    borderRadius: BorderRadius.circular(2.0),
+                                  ),
+                                  child: CustomElevatedButton(
+                                    text: "Add Item To Cart",
+                                    buttonTextStyle: TextStyle(
+                                      color: theme.colorScheme.primaryContainer,
+                                    ),
+                                    buttonStyle: CustomButtonStyles.primary,
+                                    onPressed: () {
+                                      addToCart(
+                                        context,
+                                        widget.dataMenu,
+                                        selectedVarian,
+                                        selectedAddon,
+                                        notesController.text,
+                                        int.parse(qtyController.text),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   // widget search varian
   TextEditingController searchVarianController = TextEditingController();
-  FocusNode inputSearchVarian = FocusNode();
+  // FocusNode inputSearchVarian = FocusNode();
   Widget _buildSearchVarianSection(BuildContext context) {
     // searchVarianController.text = 'test';
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -991,7 +1011,7 @@ class _AddToCartState extends State<AddToCart> {
       // const SizedBox(height: 6),
       CustomTextFormField(
         controller: searchVarianController,
-        focusNode: inputSearchVarian,
+        // focusNode: inputSearchVarian,
         contentPadding: EdgeInsets.symmetric(
           horizontal: 3.h,
           vertical: 9.v,
@@ -1011,7 +1031,7 @@ class _AddToCartState extends State<AddToCart> {
           return null;
         },
         onTapOutside: (value) {
-          inputSearchVarian.unfocus();
+          // inputSearchVarian.unfocus();
         },
       ),
     ]);

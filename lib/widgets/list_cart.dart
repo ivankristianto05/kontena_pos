@@ -58,7 +58,6 @@ class ListCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('check addon, ${addons}');
     return InkWell(
       onTap: onTap,
       child: Column(

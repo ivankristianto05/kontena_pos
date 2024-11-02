@@ -54,7 +54,7 @@ class ConfigApp {
       final contents = await file.readAsString();
       // String dataDecode = generateDecode64(contents);
       String dataDecode = decryptBase64WithKey(contents, 'tlab123');
-      // print('test config, ${jsonDecode(dataDecode)}');
+      print('test config, ${jsonDecode(dataDecode)}');
       return jsonDecode(dataDecode);
     } catch (e) {
       print('error: $e');
