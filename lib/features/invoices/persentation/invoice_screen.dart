@@ -116,6 +116,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     // onCallDataPosCart();
     // onCallDataPosOrder();
     // reformatOrderCart();
+    // print('check config pos profile, ${AppState().configPosProfile}');
 
     setState(() {
       cartData = cart.getAllItemCart();
@@ -1123,9 +1124,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       customer: '0',
       customerName: 'Guest',
       company: AppState().configCompany['name'],
-      outlet: AppState().configPOSProfile['name'],
+      outlet: AppState().configPosProfile['name'],
       postingDate: dateTimeFormat('date', null).toString(),
-      priceList: AppState().configPOSProfile['selling_price_list'],
+      priceList: AppState().configPosProfile['selling_price_list'],
       table: '1',
       id: cartSelected != null ? cartSelected['name'] : null,
     );
@@ -1172,8 +1173,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       customerName: 'Guest',
       company: AppState().configCompany['name'],
       postingDate: dateTimeFormat('date', null).toString(),
-      outlet: AppState().configPOSProfile['name'],
-      priceList: AppState().configPOSProfile['selling_price_list'],
+      outlet: AppState().configPosProfile['name'],
+      priceList: AppState().configPosProfile['selling_price_list'],
       cartNo: cartSelected['name'],
       item: paramItem['item'],
       itemName: paramItem['item_name'],

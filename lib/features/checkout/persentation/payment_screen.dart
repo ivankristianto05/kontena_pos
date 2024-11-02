@@ -1311,11 +1311,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
       company: AppState().configCompany['name'],
       postingDate: dateTimeFormat('date', null).toString(),
       postingTime: timeFormat('time_full', 'now'),
-      outlet: AppState().configPOSProfile['name'],
-      currency: AppState().configPOSProfile['currency'],
+      outlet: AppState().configPosProfile['name'],
+      currency: AppState().configPosProfile['currency'],
       conversionRate: 1,
-      sellingPriceList: AppState().configPOSProfile['selling_price_list'],
-      priceListCurrency: AppState().configPOSProfile['currency'],
+      sellingPriceList: AppState().configPosProfile['selling_price_list'],
+      priceListCurrency: AppState().configPosProfile['currency'],
       plcConversionRate: 1,
       debitTo: AppState().configCompany['default_receivable_account'],
       costCenter: AppState().configCompany['cost_center'],
@@ -1356,7 +1356,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         invoice,
         AppState().configPrinter,
         AppState().configCompany,
-        AppState().configPOSProfile,
+        AppState().configPosProfile,
         AppState().configUser);
 
     print('print invoce, $docPrint');

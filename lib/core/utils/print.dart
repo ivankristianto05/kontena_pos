@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
@@ -587,6 +588,477 @@ dynamic printChecker(
   return docToPrint;
 }
 
-dynamic printCheckerBluetooth(
+Future<List<int>> printCheckerBluetooth(
   dynamic dataOrder,
-) {}
+  dynamic configPrinter,
+) async {
+  print('check data order, $dataOrder');
+  final profile = await CapabilityProfile.load();
+  final generator = Generator(PaperSize.mm80, profile);
+  List<int> docPrint = [];
+  List<dynamic> tempItem = [];
+
+  docPrint += generator.reset();
+
+  docPrint += generator.hr();
+  docPrint += generator.row([
+    PosColumn(
+      text: 'No',
+      width: 6,
+      styles: PosStyles(
+        align: PosAlign.left,
+        height: PosTextSize.size1,
+      ),
+    ),
+    PosColumn(
+      text: dataOrder['name'],
+      width: 6,
+      styles: PosStyles(
+        align: PosAlign.right,
+        height: PosTextSize.size1,
+      ),
+    ),
+  ]);
+
+  String docTime = '';
+
+  if ((dataOrder['posting_date'] != null) ||
+      (dataOrder['posting_time'] != null)) {
+    var tmpDate = dateTimeFormat('dateui', dataOrder['posting_date']);
+    var tmpTime = timeFormat('time_simple', dataOrder['posting_time']);
+    docTime = '$tmpDate $tmpTime';
+  }
+
+  docPrint += generator.row([
+    PosColumn(
+      text: 'Date',
+      width: 6,
+      styles: PosStyles(
+        align: PosAlign.left,
+        height: PosTextSize.size1,
+      ),
+    ),
+    PosColumn(
+      text: docTime,
+      width: 6,
+      styles: PosStyles(
+        align: PosAlign.right,
+        height: PosTextSize.size1,
+      ),
+    ),
+  ]);
+
+  if (dataOrder['customer'] != null) {
+    String tmpCustomer =
+        dataOrder['customer_name'] != '' ? dataOrder['customer_name'] : '';
+    docPrint += generator.row([
+      PosColumn(
+        text: 'Customer',
+        width: 6,
+        styles: PosStyles(
+          align: PosAlign.left,
+          height: PosTextSize.size1,
+        ),
+      ),
+      PosColumn(
+        text: tmpCustomer,
+        width: 6,
+        styles: PosStyles(
+          align: PosAlign.right,
+          height: PosTextSize.size1,
+        ),
+      ),
+    ]);
+    docPrint += generator.hr();
+  }
+
+  if (dataOrder['items'] != null) {
+    tempItem = dataOrder['items'];
+  } else {
+    tempItem = ((dataOrder['items'] != null) && (dataOrder['items'].length > 2))
+        ? dataOrder['items']
+        : [];
+  }
+
+  if (tempItem.isNotEmpty) {
+    for (var dt in tempItem) {
+      String qty = numberFormat('number_fixed', dt['qty']);
+      String tmpTitle = '${qty}x  ${dt['item_name']}';
+
+      docPrint += generator.row([
+        PosColumn(
+          text: tmpTitle,
+          width: 6,
+          styles: PosStyles(
+            align: PosAlign.left,
+            height: PosTextSize.size1,
+          ),
+        ),
+        PosColumn(
+          text: '[   ]',
+          width: 6,
+          styles: PosStyles(
+            align: PosAlign.right,
+            height: PosTextSize.size1,
+          ),
+        ),
+      ]);
+
+      if ((dt['note'] != null) && (dt['note'] != '')) {
+        docPrint += generator.text(
+          'Note: ${dt["note"]}',
+          styles: PosStyles(align: PosAlign.left),
+        );
+      }
+    }
+  }
+
+  docPrint += generator.feed(2);
+  docPrint += generator.cut();
+
+  return docPrint;
+}
+
+Future<List<int>> printInvoiceBluetooth(
+  String? type,
+  dynamic invoice,
+  dynamic configPrinter,
+  dynamic configCompany,
+  dynamic configPosProfile,
+  dynamic configUser,
+) async {
+  print('check data order, $invoice');
+  dynamic dataTemp = {
+    'service': invoice['service'] ?? '',
+    'creation':
+        '${dateTimeFormat('dateui', invoice['posting_date'])} ${timeFormat('time_simple', invoice['posting_time'])}',
+    'name': invoice['name'],
+    'title': invoice['title'],
+    'grand_total': invoice['grand_total'],
+    'items': ((invoice['items'] != null)) ? invoice['items'] : [],
+    'payments': ((invoice['payments'] != null)) ? invoice['payments'] : [],
+    'vouchers': [],
+    'change': 0,
+    'receipt_no': invoice['name']
+  };
+
+  final profile = await CapabilityProfile.load();
+  final generator = Generator(PaperSize.mm80, profile);
+  List<int> docPrint = [];
+  // List<dynamic> tempItem = [];
+
+  docPrint += generator.reset();
+
+  // header
+  try {
+    String outletCode =
+        (configPosProfile['name'] != null) ? configPosProfile['name'] : '';
+    docPrint += generator.text(
+      outletCode,
+      styles: PosStyles(
+        align: PosAlign.center,
+        // height: PosTextSize.size2,
+      ),
+    );
+  } catch (e) {
+    debugPrint('error outlet, $e');
+  }
+
+  try {
+    if (invoice['void_at'] == null) {
+      if (type == 'reprint') {
+        docPrint += generator.text(
+          '** Reprinted **',
+          styles: PosStyles(
+            align: PosAlign.center,
+            // height: PosTextSize.size2,
+          ),
+        );
+        docPrint += generator.emptyLines(1);
+      } else if (type == 'bill') {
+        docPrint += generator.text(
+          '** Bill **',
+          styles: PosStyles(
+            align: PosAlign.center,
+            // height: PosTextSize.size2,
+          ),
+        );
+        docPrint += generator.emptyLines(1);
+      } else {
+        docPrint += generator.emptyLines(1);
+      }
+    } else {
+      docPrint += generator.text(
+        '** Cancelled **',
+        styles: PosStyles(
+          align: PosAlign.center,
+          // height: PosTextSize.size2,
+        ),
+      );
+      docPrint += generator.emptyLines(1);
+    }
+  } catch (e) {
+    debugPrint('Error reprint, $e');
+  }
+
+  String service =
+      (dataTemp.containsKey('service') && (dataTemp['service'] != null))
+          ? dataTemp['service']
+          : '-';
+
+  try {
+    docPrint += generator.row([
+      PosColumn(
+        text: 'No',
+        width: 6,
+        styles: PosStyles(
+          align: PosAlign.left,
+          height: PosTextSize.size1,
+        ),
+      ),
+      PosColumn(
+        text: dataTemp['receipt_no'],
+        width: 6,
+        styles: PosStyles(
+          align: PosAlign.right,
+          height: PosTextSize.size1,
+        ),
+      ),
+    ]);
+
+    docPrint += generator.row([
+      PosColumn(
+        text: (service != '') ? service : '-',
+        width: 6,
+        styles: PosStyles(
+          align: PosAlign.left,
+          height: PosTextSize.size1,
+        ),
+      ),
+      PosColumn(
+        text: dataTemp['creation'],
+        width: 6,
+        styles: PosStyles(
+          align: PosAlign.right,
+          height: PosTextSize.size1,
+        ),
+      ),
+    ]);
+
+    docPrint += generator.row([
+      PosColumn(
+        text: 'Customer',
+        width: 6,
+        styles: PosStyles(
+          align: PosAlign.left,
+          height: PosTextSize.size1,
+        ),
+      ),
+      PosColumn(
+        text: dataTemp['title'],
+        width: 6,
+        styles: PosStyles(
+          align: PosAlign.right,
+          height: PosTextSize.size1,
+        ),
+      ),
+    ]);
+
+    String ksr = (configUser['name'] != null) ? configUser['name'] : '';
+
+    if (ksr != '') {
+      docPrint += generator.row([
+        PosColumn(
+          text: 'Kasir',
+          width: 6,
+          styles: PosStyles(
+            align: PosAlign.left,
+            height: PosTextSize.size1,
+          ),
+        ),
+        PosColumn(
+          text: ksr,
+          width: 6,
+          styles: PosStyles(
+            align: PosAlign.right,
+            height: PosTextSize.size1,
+          ),
+        ),
+      ]);
+      docPrint += generator.hr();
+    }
+  } catch (e) {
+    debugPrint('Error header, $e');
+  }
+
+  // CART ITEMS
+  List<dynamic> tempItem = dataTemp['items'];
+  List<dynamic> itemLines = [];
+  // item = [];
+
+  try {
+    for (int i = 0; i < tempItem.length; i++) {
+      docPrint += generator.text(
+        tempItem[i]['item_name'],
+        styles: PosStyles(
+          align: PosAlign.left,
+          // height: PosTextSize.size2,
+        ),
+      );
+      String qty = numberFormat('number_fixed', tempItem[i]['qty']);
+      String rate = numberFormat('idr_fixed', tempItem[i]['rate']);
+      String amount = numberFormat('idr_fixed', tempItem[i]['amount']);
+
+      docPrint += generator.row([
+        PosColumn(
+          text: '$qty x $rate',
+          width: 6,
+          styles: PosStyles(
+            align: PosAlign.left,
+            height: PosTextSize.size1,
+          ),
+        ),
+        PosColumn(
+          text: amount,
+          width: 6,
+          styles: PosStyles(
+            align: PosAlign.right,
+            height: PosTextSize.size1,
+          ),
+        ),
+      ]);
+    }
+  } catch (e) {
+    debugPrint('Error Item, $e');
+  }
+
+  try {
+    String grandTotal = numberFormat('idr_fixed', dataTemp['grand_total']);
+    docPrint += generator.hr();
+    docPrint += generator.row([
+      PosColumn(
+        text: 'TOTAL',
+        width: 6,
+        styles: PosStyles(
+          align: PosAlign.left,
+          height: PosTextSize.size1,
+        ),
+      ),
+      PosColumn(
+        text: grandTotal,
+        width: 6,
+        styles: PosStyles(
+          align: PosAlign.right,
+          height: PosTextSize.size1,
+        ),
+      ),
+    ]);
+    docPrint += generator.hr();
+  } catch (e) {
+    debugPrint('Error total, $e');
+  }
+
+  // PAYMENT & CHANGE
+  List<dynamic> tempPayment = dataTemp['payments'];
+  double nominalChange =
+      getChangePayment(dataTemp['payments'], dataTemp['grand_total']);
+
+  try {
+    if ((tempPayment.isNotEmpty) && (nominalChange > 0)) {
+      for (var dt in tempPayment) {
+        docPrint += generator.row([
+          PosColumn(
+            text: dt['mode_of_payment'],
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.left,
+              height: PosTextSize.size1,
+            ),
+          ),
+          PosColumn(
+            text:
+                numberFormat('idr_fixed', (dt['amount'] + dataTemp['chnage'])),
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.right,
+              height: PosTextSize.size1,
+            ),
+          ),
+        ]);
+      }
+      docPrint += generator.row([
+        PosColumn(
+          text: 'Change',
+          width: 6,
+          styles: PosStyles(
+            align: PosAlign.left,
+            height: PosTextSize.size1,
+          ),
+        ),
+        PosColumn(
+          text: numberFormat('idr_fixed', nominalChange),
+          width: 6,
+          styles: PosStyles(
+            align: PosAlign.right,
+            height: PosTextSize.size1,
+          ),
+        ),
+      ]);
+      // '0x07'
+    } else if (tempPayment.isNotEmpty) {
+      for (var dt in tempPayment) {
+        docPrint += generator.row([
+          PosColumn(
+            text: dt['mode_of_payment'],
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.left,
+              height: PosTextSize.size1,
+            ),
+          ),
+          PosColumn(
+            text: numberFormat('idr_fixed', dt['amount']),
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.right,
+              height: PosTextSize.size1,
+            ),
+          ),
+        ]);
+      }
+    }
+  } catch (e) {
+    debugPrint('Error payments, $e');
+  }
+
+  try {
+    docPrint += generator.emptyLines(2);
+    docPrint += generator.text(
+      "Thank You",
+      styles: PosStyles(
+        align: PosAlign.center,
+        // height: PosTextSize.size2,
+      ),
+    );
+    docPrint += generator.emptyLines(1);
+    docPrint += generator.hr();
+    docPrint += generator.emptyLines(1);
+
+    if ((type != 'bill') & (type != 'reprint')) {
+      if (tempPayment.isNotEmpty) {
+        String getPayment = tempPayment[0]['mode_of_payment'];
+        if (getPayment.toLowerCase() == 'cash') {
+          docPrint += generator.drawer();
+          // footer.add({"key": "openCashDrawer"});
+        }
+      }
+    }
+  } catch (e) {
+    debugPrint('Error footer, $e');
+  }
+
+  docPrint += generator.feed(1);
+  docPrint += generator.cut();
+
+  return docPrint;
+}

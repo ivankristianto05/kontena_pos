@@ -50,7 +50,8 @@ class AppState extends ChangeNotifier {
     _safeInit(() {
       if (prefs.containsKey('ff_selectedPrinter')) {
         try {
-          _selectedPrinter = json.decode(prefs.getString('_selectedPrinter') ?? '');
+          _selectedPrinter =
+              json.decode(prefs.getString('_selectedPrinter') ?? '');
         } catch (e) {
           print("Can't decode persisted json. Error: $e.");
         }
@@ -85,8 +86,17 @@ class AppState extends ChangeNotifier {
   List<dynamic> dataItemAddon = [];
   List<dynamic> listPrinter = [];
 
-  dynamic configCompany;
-  dynamic configPOSProfile;
+  dynamic _configCompany;
+  dynamic get configCompany => _configCompany;
+  set configCompany(dynamic _value) {
+    _configCompany = _value;
+  }
+
+  dynamic _configPosProfile;
+  dynamic get configPosProfile => _configPosProfile;
+  set configPosProfile(dynamic _value) {
+    _configPosProfile = _value;
+  }
 
   dynamic _configUser;
   dynamic get configUser => _configUser;
@@ -99,7 +109,9 @@ class AppState extends ChangeNotifier {
   dynamic get configPrinter => _configPrinter;
   set configPrinter(dynamic _value) {
     _configPrinter = _value;
-    PrintBluetoothThermal.connect(macPrinterAddress: _value['selectedMacAddPrinter']);
+
+    PrintBluetoothThermal.connect(
+        macPrinterAddress: _value['selectedMacAddPrinter']);
     prefs.setString('ff_configPrinter', jsonEncode(_value));
   }
 
@@ -116,9 +128,9 @@ class AppState extends ChangeNotifier {
   // BluetoothDevice? get selectedPrinter => _selectedPrinter;
   bool get isConnected => _isConnected;
 
-  // void selectPrinter(BluetoothDevice printer) {
-    // _selectedPrinter = printer;
-    notifyListeners();
+  //  void selectPrinter(BluetoothDevice printer) {
+  // _selectedPrinter = printer;
+  notifyListeners();
   // }
 
   void setConnectionStatus(bool status) {

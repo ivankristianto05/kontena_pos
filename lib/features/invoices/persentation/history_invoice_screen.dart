@@ -21,6 +21,7 @@ import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_invoice.dart'
 import 'package:kontena_pos/core/api/frappe_thunder_pos/cancel_pos_invoice.dart'
     as FrappeFetchCancelInvoice;
 import 'package:kontena_pos/core/api/send_printer.dart' as sendToPrinter;
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 
 class HistoryInvoiceScreen extends StatefulWidget {
   const HistoryInvoiceScreen({Key? key}) : super(key: key);
@@ -592,7 +593,13 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                             buttonStyle: CustomButtonStyles
                                                 .outlinePrimary,
                                             onPressed: () {
-                                              onPrintInvoice(true);
+                                              if (AppState().configPrinter[
+                                                      'tipeConnection'] ==
+                                                  'Bluetooth') {
+                                                onPrintInvoiceBluetooth(true);
+                                              } else {
+                                                onPrintInvoice(true);
+                                              }
                                             },
                                           ),
                                         ],
@@ -701,7 +708,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
         FrappeFetchDataGetInvoice.PosInvoiceRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: '[["pos_profile","=","${AppState().configPOSProfile['name']}"]]',
+      filters: '[["pos_profile","=","${AppState().configPosProfile['name']}"]]',
       orderBy: 'creation desc',
       limit: 2000,
     );
@@ -798,7 +805,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
   onSetFilter() {
     // print('check, ${AppState().configPOSProfile}');
     setState(() {
-      filterPayment = AppState().configPOSProfile['payments'];
+      filterPayment = AppState().configPosProfile['payments'];
     });
     print('check, $filterPayment');
   }
@@ -809,7 +816,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
         invoiceSelected,
         AppState().configPrinter,
         AppState().configCompany,
-        AppState().configPOSProfile,
+        AppState().configPosProfile,
         AppState().configUser);
 
     // print('print invoce, $docPrint');
@@ -833,6 +840,24 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
       if (context.mounted) {
         alertError(context, error.toString());
       }
+    }
+  }
+
+  onPrintInvoiceBluetooth(bool reprint) async {
+    bool connectionStatus = await PrintBluetoothThermal.connectionStatus;
+    if (connectionStatus) {
+      bool result = false;
+      List<int> ticket = await printInvoiceBluetooth(
+        reprint ? 'reprint' : null,
+        invoiceSelected,
+        AppState().configPrinter,
+        AppState().configCompany,
+        AppState().configPosProfile,
+        AppState().configUser,
+      );
+
+      result = await PrintBluetoothThermal.writeBytes(ticket);
+      print('result print, $result');
     }
   }
 }

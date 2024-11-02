@@ -187,7 +187,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      AppState().configPOSProfile['name'],
+                      AppState().configPosProfile['name'],
                       style: TextStyle(
                         color: theme.colorScheme.secondary,
                         fontSize: 16,

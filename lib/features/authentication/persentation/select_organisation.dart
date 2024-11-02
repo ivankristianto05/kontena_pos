@@ -520,7 +520,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
 
       if (reqPosProfile.isNotEmpty) {
         setState(() {
-          AppState().configPOSProfile = reqPosProfile;
+          AppState().configPosProfile = reqPosProfile;
         });
       }
 
