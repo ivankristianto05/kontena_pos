@@ -52,6 +52,7 @@ import 'package:kontena_pos/widgets/empty_data.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/loading_content.dart';
 import 'package:kontena_pos/widgets/searchbar.dart';
+import 'package:kontena_pos/widgets/table_number.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:kontena_pos/widgets/type_transaction.dart';
 import 'package:kontena_pos/app_state.dart';
@@ -75,10 +76,12 @@ class _OrderScreenState extends State<OrderScreen> {
   String? table;
   String? pickupType;
   String typeTransaction = 'dine-in';
+  String tableNumber = '1';
   String modeView = 'order';
 
   bool isLoading = true;
   bool isLoadingContent = false;
+  bool isLoadingDetail = false;
 
   List<dynamic> itemDisplay = [];
   List<dynamic> orderDisplay = [];
@@ -89,6 +92,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   dynamic cartSelected;
   dynamic orderCartSelected;
+  dynamic servesSelected;
 
   @override
   void setState(VoidCallback callback) {
@@ -108,6 +112,8 @@ class _OrderScreenState extends State<OrderScreen> {
       cartData = cart.getAllItemCart();
       AppState().typeTransaction = 'dine-in';
       typeTransaction = 'dine-in';
+      AppState().tableNumber = '1';
+      tableNumber = '1';
     });
 
     print('check cartdata, $cartData');
@@ -579,64 +585,22 @@ class _OrderScreenState extends State<OrderScreen> {
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
-                                              itemCount: servedDisplay.length,
-                                              //itemCount:tempPosServed.length,
+                                              //itemCount: servedDisplay.length,
+                                              itemCount:tempPosServed.length,
                                               itemBuilder: (context, index) {
-                                                final order =
-                                                    servedDisplay[index];
-                                                //final order = tempPosServed[index];
-                                                print('served, ${order}');
+                                                final order = tempPosServed[index];
+                                                //final order = servedDisplay[index];
                                                 dynamic orderItemList =
                                                     order['items'];
                                                 return InkWell(
                                                   onTap: () {
-                                                    addToCartFromOrder(
-                                                        context, order);
+                                                    // addToCartFromOrder(
+                                                    //     context, order);
                                                   },
                                                   child: Card(
                                                     elevation: 2,
                                                     child: Column(
                                                       children: [
-                                                        if ((cartSelected !=
-                                                                null) &&
-                                                            (cartSelected[
-                                                                    'name'] ==
-                                                                order['name']))
-                                                          Container(
-                                                            width:
-                                                                double.infinity,
-                                                            height: 24.0,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: theme
-                                                                  .colorScheme
-                                                                  .primary,
-                                                            ),
-                                                            child: Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0.0,
-                                                                          4.0,
-                                                                          0.0,
-                                                                          4.0),
-                                                              child: Text(
-                                                                'Selected',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: theme
-                                                                      .colorScheme
-                                                                      .primaryContainer,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
                                                         Padding(
                                                           padding:
                                                               const EdgeInsetsDirectional
@@ -663,15 +627,54 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                         .textTheme
                                                                         .titleMedium,
                                                                   ),
+                                                                  if (order[
+                                                                          'table'] !=
+                                                                      null)
+                                                                    Text(
+                                                                      'Table ${order['table']}',
+                                                                      style: theme
+                                                                          .textTheme
+                                                                          .bodyMedium,
+                                                                    ),
                                                                   Text(
-                                                                    'Table ${order['table']}',
-                                                                    style: theme
-                                                                        .textTheme
-                                                                        .bodyMedium,
-                                                                  ),
+                                                                      (order['docstatus'] ==
+                                                                              1)
+                                                                          ? order[
+                                                                              'status']
+                                                                          : (order['docstatus'] ==
+                                                                                  2)
+                                                                              ? 'Cancelled'
+                                                                              : 'Draft',
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                        color:
+                                                                            () {
+                                                                          if (order['docstatus'] ==
+                                                                              1) {
+                                                                            return theme.colorScheme.onSecondary;
+                                                                          } else if (order['docstatus'] ==
+                                                                              2) {
+                                                                            return theme.colorScheme.error;
+                                                                          } else {
+                                                                            return theme.colorScheme.onPrimaryContainer;
+                                                                          }
+                                                                        }(),
+                                                                      )),
                                                                 ],
                                                               ),
+                                                              Divider(
+                                                                height: 5.0,
+                                                                thickness: 0.5,
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .outline,
+                                                              ),
                                                               Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
                                                                 children: [
                                                                   Text(
                                                                     order['customer_name']
@@ -679,6 +682,15 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                     style: theme
                                                                         .textTheme
                                                                         .bodyMedium,
+                                                                  ),
+                                                                  Text(
+                                                                    '${numberFormat('idr_fixed', order['grand_total'])}',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: theme
+                                                                          .colorScheme
+                                                                          .secondary,
+                                                                    ),
                                                                   ),
                                                                 ],
                                                               ),
@@ -692,139 +704,38 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                   4.0,
                                                                 ),
                                                                 child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
                                                                   children: [
-                                                                    Text(
-                                                                      dateTimeFormat(
-                                                                        'dateui',
-                                                                        order[
-                                                                            'date'],
-                                                                      ).toString(),
-                                                                      style: theme
-                                                                          .textTheme
-                                                                          .labelSmall,
+                                                                    Row(
+                                                                      children: [
+                                                                        Text(
+                                                                          dateTimeFormat(
+                                                                            'dateui',
+                                                                            order['posting_date'],
+                                                                          ).toString(),
+                                                                          style: theme
+                                                                              .textTheme
+                                                                              .labelSmall,
+                                                                        ),
+                                                                        Text(
+                                                                          ' | ${timeFormat(
+                                                                            'time_simple',
+                                                                            order['posting_time'],
+                                                                          ).toString()}',
+                                                                          style: theme
+                                                                              .textTheme
+                                                                              .labelSmall,
+                                                                        ),
+                                                                      ],
                                                                     ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                              Divider(
-                                                                height: 5.0,
-                                                                thickness: 0.5,
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .outline,
-                                                              ),
-                                                              Padding(
-                                                                padding:
-                                                                    EdgeInsetsDirectional
-                                                                        .fromSTEB(
-                                                                  0.0,
-                                                                  4.0,
-                                                                  0.0,
-                                                                  4.0,
-                                                                ),
-                                                                child: Column(
-                                                                  children: [
-                                                                    ListView
-                                                                        .separated(
-                                                                      separatorBuilder:
-                                                                          (context, index) =>
-                                                                              Divider(
-                                                                        height:
-                                                                            12,
-                                                                        thickness:
-                                                                            0.5,
-                                                                        color: theme
-                                                                            .colorScheme
-                                                                            .outline,
-                                                                      ),
-                                                                      shrinkWrap:
-                                                                          true,
-                                                                      itemCount:
-                                                                          orderItemList
-                                                                              .length,
-                                                                      itemBuilder:
-                                                                          (context,
-                                                                              idx) {
-                                                                        dynamic
-                                                                            orderItem =
-                                                                            orderItemList[idx];
-                                                                        print(
-                                                                            'check served order, ${orderItem} ');
-                                                                        print(
-                                                                            '-=-=-=-=-=-=-=-=-=-');
-                                                                        return Padding(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              bottom: 8.0),
-                                                                          child:
-                                                                              Row(
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              Text(
-                                                                                "${orderItem['qty']}x",
-                                                                                style: const TextStyle(
-                                                                                  fontWeight: FontWeight.w600,
-                                                                                  fontSize: 14,
-                                                                                ),
-                                                                              ),
-                                                                              const SizedBox(width: 8),
-                                                                              Expanded(
-                                                                                child: Column(
-                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                  children: [
-                                                                                    AutoSizeText(
-                                                                                      "${orderItem['item_name']} - ${orderItem['variant'] ?? ''}",
-                                                                                      style: theme.textTheme.titleMedium,
-                                                                                      maxLines: 2, // Allows up to 2 lines
-                                                                                      minFontSize: 10,
-                                                                                      maxFontSize: 14,
-                                                                                      overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
-                                                                                    ),
-                                                                                    const SizedBox(height: 4),
-                                                                                    if ((orderItem.containsKey('note')) && (orderItem['note'] != null))
-                                                                                      AutoSizeText(
-                                                                                        "Notes: ${orderItem['note']}",
-                                                                                        style: theme.textTheme.labelSmall,
-                                                                                        maxLines: 2,
-                                                                                        minFontSize: 10,
-                                                                                        maxFontSize: 12,
-                                                                                        overflow: TextOverflow.ellipsis,
-                                                                                      ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              Text(
-                                                                                (orderItem['docstatus'] == 1)
-                                                                                    ? 'Confirm'
-                                                                                    : (orderItem['docstatus'] == 2)
-                                                                                        ? 'Cancelled'
-                                                                                        : 'Draft',
-                                                                                style: (orderItem['docstatus'] != 1)
-                                                                                    ? TextStyle(
-                                                                                        color: () {
-                                                                                          if (orderItem['docstatus'] == 1) {
-                                                                                            return theme.colorScheme.primary;
-                                                                                          } else if (orderItem['docstatus'] == 2) {
-                                                                                            return theme.colorScheme.error;
-                                                                                          } else {
-                                                                                            return theme.colorScheme.onPrimaryContainer;
-                                                                                          }
-                                                                                        }(),
-                                                                                        fontWeight: FontWeight.w700,
-                                                                                        fontSize: 12,
-                                                                                      )
-                                                                                    : TextStyle(
-                                                                                        color: theme.colorScheme.primary,
-                                                                                        fontWeight: FontWeight.w700,
-                                                                                        fontSize: 12,
-                                                                                      ),
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        );
-                                                                      },
-                                                                    ),
+                                                                    // Text(
+                                                                    //   'Paid: ${numberFormat('idr_fixed', order['paid_amount'])}',
+                                                                    //   style: theme
+                                                                    //       .textTheme
+                                                                    //       .bodyMedium,
+                                                                    // ),
                                                                   ],
                                                                 ),
                                                               ),
@@ -920,7 +831,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                         hoverColor: Colors.transparent,
                                         highlightColor: Colors.transparent,
                                         onTap: () {
-                                          onTapTypeTransaction(context);
+                                          onTapTableNumber(context);
                                         },
                                         child: Container(
                                           height: 48.0,
@@ -972,6 +883,63 @@ class _OrderScreenState extends State<OrderScreen> {
                                         ),
                                       ),
                                     ),
+                                    InkWell(
+                                        splashColor: Colors.transparent,
+                                        focusColor: Colors.transparent,
+                                        hoverColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        onTap: () {
+                                          onTapTableNumber(context);
+                                        },
+                                        child: Container(
+                                          height: 48.0,
+                                          decoration: BoxDecoration(
+                                            color: theme
+                                                .colorScheme.primaryContainer,
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                color:
+                                                    theme.colorScheme.outline,
+                                                width: 0.5,
+                                              ),
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    8.0, 0.0, 8.0, 0.0),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                if (tableNumber == '')
+                                                  Text(
+                                                    'Pilih Nomor Meja',
+                                                    style: theme
+                                                        .textTheme.labelMedium,
+                                                  ),
+                                                if (tableNumber != '')
+                                                  Text(
+                                                    tableNumber,
+                                                    style: theme
+                                                        .textTheme.titleSmall,
+                                                  ),
+                                                Icon(
+                                                  Icons
+                                                      .keyboard_arrow_down_rounded,
+                                                  color: theme
+                                                      .colorScheme.secondary,
+                                                  size: 24.0,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     InkWell(
                                       splashColor: Colors.transparent,
                                       focusColor: Colors.transparent,
@@ -1498,10 +1466,7 @@ class _OrderScreenState extends State<OrderScreen> {
     setState(() {
       isLoadingContent = true;
     });
-    //await onCallDataInvoicePosOrder();
-    await onCallDataPosCart();
-    await onCallDataPosDelivery();
-    await reformatServedCart();
+    await onCallDataInvoicePosOrder();
   }
 
   onTapRefreshMenu() async {
@@ -1657,6 +1622,54 @@ class _OrderScreenState extends State<OrderScreen> {
     //   //   SnackBar(content: Text('Error: $e')),
     //   // );
     // }
+  }
+
+  onTapActionServe(BuildContext context, dynamic item) async {
+    //print('serve selected, $item');
+    setState(() {
+      // invoiceSelected = item;
+      isLoadingDetail = true;
+    });
+    await onCallDataPosInvoiceDetail(item);
+    setState(() {});
+  }
+
+  onCallDataPosInvoiceDetail(dynamic invoice) async {
+    final FrappeFetchDataGetInvoice.PosInvoiceRequest reqPosInvoiceDetail =
+        FrappeFetchDataGetInvoice.PosInvoiceRequest(
+            cookie: AppState().setCookie, id: invoice['name']);
+
+    try {
+      final request = await FrappeFetchDataGetInvoice.requestDetail(
+          requestQuery: reqPosInvoiceDetail);
+
+      if (request.isNotEmpty) {
+        setState(() {
+          servesSelected = request;
+          isLoading = false;
+        });
+      }
+
+      // print('check detail, $request');
+
+      // if (context.mounted) {
+      //   Navigator.of(context).pushNamedAndRemoveUntil(
+      //     AppRoutes.invoiceScreen,
+      //     (route) => false,
+      //   );
+      // }
+    } catch (error) {
+      // isLoading = false;
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        if (context.mounted) {
+          alertError(context, error.toString());
+        }
+      }
+      return;
+    }
   }
 
   onTapDelete(BuildContext context, dynamic item, int index) async {
@@ -1882,7 +1895,8 @@ class _OrderScreenState extends State<OrderScreen> {
         setState(() {
           tempPosServed = callRequest;
           isLoading = false;
-          print('Data received: $tempPosServed');
+            print('Data received: $tempPosServed');
+
         });
         // print('check ata, $tempPosOrder');
       }
@@ -2164,6 +2178,27 @@ class _OrderScreenState extends State<OrderScreen> {
             typeTransaction = AppState().typeTransaction;
           }),
           print('check type transaction, $typeTransaction')
+        });
+  }
+
+  void onTapTableNumber(BuildContext context) async {
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: const Color(0x8A000000),
+      barrierColor: const Color(0x00000000),
+      context: context,
+      builder: (context) {
+        return TableNumber(
+          selected: tableNumber,
+        );
+      },
+    ).then((value) => {
+          setState(() {
+            tableNumber = AppState().tableNumber;
+          }),
+          print('check table number , $tableNumber')
         });
   }
 

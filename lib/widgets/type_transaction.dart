@@ -156,7 +156,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                                 MainAxisAlignment.center,
                                             children: [
                                               Text(
-                                                'DINE-IN',
+                                                'DINE IN',
                                                 style: (typeTransaction ==
                                                         "dine-in")
                                                     ? TextStyle(

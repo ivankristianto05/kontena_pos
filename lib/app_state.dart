@@ -145,6 +145,7 @@ class AppState extends ChangeNotifier {
   // }
 
   String typeTransaction = '';
+  String tableNumber = '';
   String setCookie = '';
 
   static List<InvoiceCartItem> invoiceCartItems =
