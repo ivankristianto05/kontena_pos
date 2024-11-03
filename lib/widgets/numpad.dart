@@ -5,10 +5,12 @@ import 'package:kontena_pos/core/utils/number_ui.dart';
 class NumPad extends StatefulWidget {
   final Function(String) onResult;
   double? initialValue = 0.0;
+  bool isDisable = false;
   NumPad({
     super.key,
     required this.onResult,
     this.initialValue,
+    required this.isDisable,
   });
   @override
   _NumPadWidgetState createState() => _NumPadWidgetState();
@@ -45,7 +47,7 @@ class _NumPadWidgetState extends State<NumPad> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.width * 0.3,
+      height: MediaQuery.of(context).size.width * 0.35,
       decoration: BoxDecoration(
         color: theme.colorScheme.primaryContainer,
       ),
@@ -101,11 +103,13 @@ class _NumPadWidgetState extends State<NumPad> {
                                       hoverColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
-                                        setState(() {
-                                          nominal = addNominal(
-                                              nominal, number.toString());
-                                        });
-                                        widget.onResult(nominal.toString());
+                                        if (widget.isDisable == false) {
+                                          setState(() {
+                                            nominal = addNominal(
+                                                nominal, number.toString());
+                                          });
+                                          widget.onResult(nominal.toString());
+                                        }
                                       },
                                       child: Container(
                                         width: double.infinity,
@@ -150,11 +154,13 @@ class _NumPadWidgetState extends State<NumPad> {
                                       hoverColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
-                                        setState(() {
-                                          nominal = addNominal(
-                                              nominal, number.toString());
-                                        });
-                                        widget.onResult(nominal.toString());
+                                        if (widget.isDisable == false) {
+                                          setState(() {
+                                            nominal = addNominal(
+                                                nominal, number.toString());
+                                          });
+                                          widget.onResult(nominal.toString());
+                                        }
                                       },
                                       child: Container(
                                         width: double.infinity,
@@ -199,11 +205,13 @@ class _NumPadWidgetState extends State<NumPad> {
                                       hoverColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
-                                        setState(() {
-                                          nominal = addNominal(
-                                              nominal, number.toString());
-                                        });
-                                        widget.onResult(nominal.toString());
+                                        if (widget.isDisable == false) {
+                                          setState(() {
+                                            nominal = addNominal(
+                                                nominal, number.toString());
+                                          });
+                                          widget.onResult(nominal.toString());
+                                        }
                                       },
                                       child: Container(
                                         width: double.infinity,
@@ -243,10 +251,12 @@ class _NumPadWidgetState extends State<NumPad> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                setState(() {
-                                  nominal = addNominal(nominal, '0');
-                                });
-                                widget.onResult(nominal.toString());
+                                if (widget.isDisable == false) {
+                                  setState(() {
+                                    nominal = addNominal(nominal, '0');
+                                  });
+                                  widget.onResult(nominal.toString());
+                                }
                               },
                               child: Container(
                                 width: double.infinity,
@@ -286,10 +296,12 @@ class _NumPadWidgetState extends State<NumPad> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                setState(() {
-                                  nominal = addNominal(nominal, '9');
-                                });
-                                widget.onResult(nominal.toString());
+                                if (widget.isDisable == false) {
+                                  setState(() {
+                                    nominal = addNominal(nominal, '9');
+                                  });
+                                  widget.onResult(nominal.toString());
+                                }
                               },
                               child: Container(
                                 width: double.infinity,
@@ -322,10 +334,12 @@ class _NumPadWidgetState extends State<NumPad> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                setState(() {
-                                  nominal = addNominal(nominal, '6');
-                                });
-                                widget.onResult(nominal.toString());
+                                if (widget.isDisable == false) {
+                                  setState(() {
+                                    nominal = addNominal(nominal, '6');
+                                  });
+                                  widget.onResult(nominal.toString());
+                                }
                               },
                               child: Container(
                                 width: double.infinity,
@@ -358,10 +372,12 @@ class _NumPadWidgetState extends State<NumPad> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                setState(() {
-                                  nominal = addNominal(nominal, '3');
-                                });
-                                widget.onResult(nominal.toString());
+                                if (widget.isDisable == false) {
+                                  setState(() {
+                                    nominal = addNominal(nominal, '3');
+                                  });
+                                  widget.onResult(nominal.toString());
+                                }
                               },
                               child: Container(
                                 width: double.infinity,
@@ -394,10 +410,12 @@ class _NumPadWidgetState extends State<NumPad> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                setState(() {
-                                  nominal = addNominal(nominal, '00');
-                                });
-                                widget.onResult(nominal.toString());
+                                if (widget.isDisable == false) {
+                                  setState(() {
+                                    nominal = addNominal(nominal, '00');
+                                  });
+                                  widget.onResult(nominal.toString());
+                                }
                               },
                               child: Container(
                                 width: double.infinity,
@@ -439,16 +457,18 @@ class _NumPadWidgetState extends State<NumPad> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                if (nominal > 10) {
-                                  setState(() {
-                                    nominal = removeNominal(nominal);
-                                  });
-                                } else {
-                                  setState(() {
-                                    nominal = 0;
-                                  });
+                                if (widget.isDisable == false) {
+                                  if (nominal > 10) {
+                                    setState(() {
+                                      nominal = removeNominal(nominal);
+                                    });
+                                  } else {
+                                    setState(() {
+                                      nominal = 0;
+                                    });
+                                  }
+                                  widget.onResult(nominal.toString());
                                 }
-                                widget.onResult(nominal.toString());
                               },
                               child: Container(
                                 width: double.infinity,
@@ -480,10 +500,12 @@ class _NumPadWidgetState extends State<NumPad> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                setState(() {
-                                  nominal = 0;
-                                });
-                                widget.onResult(nominal.toString());
+                                if (widget.isDisable == false) {
+                                  setState(() {
+                                    nominal = 0;
+                                  });
+                                  widget.onResult(nominal.toString());
+                                }
                               },
                               child: Container(
                                 width: double.infinity,

@@ -23,9 +23,11 @@ class ListCart extends StatelessWidget {
   final EdgeInsets padding;
   final Color lineColor;
   final TextStyle labelStyle;
-  final VoidCallback? onTap; // Added onTap parameter
+  final VoidCallback? onEdit; // Added onTap parameter
+  final VoidCallback? onDelete; // Added onTap parameter
   final String catatan;
   final bool isEdit;
+  final int docstatus;
   // final String catatan;
 
   ListCart({
@@ -51,16 +53,17 @@ class ListCart extends StatelessWidget {
     this.lineColor = Colors.black, // Default line color is black
     this.labelStyle = const TextStyle(fontSize: 14, color: Colors.black),
     this.addons,
-    this.onTap,
+    this.onEdit,
+    this.onDelete,
     this.catatan = "",
     this.isEdit = true,
+    this.docstatus = 0,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
+    print('dco stas, $docstatus');
+    return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -93,7 +96,7 @@ class ListCart extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (addons != null)
+                if ((addons != null) && (addons?.length != 0))
                   Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 8.0, 0.0),
                     child: Column(
@@ -177,22 +180,83 @@ class ListCart extends StatelessWidget {
               ],
             ),
           ),
-          if (isEdit)
-            Padding(
-              padding:
-                  const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 12.0),
-              child: Text(
-                'Edit',
-                style: editLabelStyle,
+          // if (isEdit)
+          Row(
+            mainAxisAlignment:
+                MainAxisAlignment
+                    .spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if ((docstatus == 0) && (isEdit == true))
+              Padding(
+                padding: EdgeInsetsDirectional
+                    .fromSTEB(
+                        8.0,
+                        0.0,
+                        0.0,
+                        0.0),
+                child: Column(
+                  mainAxisSize:
+                      MainAxisSize
+                          .max,
+                  children: [
+                    InkWell(
+                      onTap: onEdit,
+                      child: Padding(
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
+                        child: Text(
+                          'Edit',
+                          style: TextStyle(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+              if ((docstatus == 0) && (isEdit == true))
+              Padding(
+                padding: EdgeInsetsDirectional
+                    .fromSTEB(
+                        0.0,
+                        0.0,
+                        8.0,
+                        0.0),
+                child: Column(
+                  mainAxisSize:
+                      MainAxisSize
+                          .max,
+                  children: [
+                    InkWell(
+                      onTap: onDelete,
+                      child: Padding(
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
+                        child: Text(
+                          'Delete',
+                          style: TextStyle(
+                            color: theme.colorScheme.error,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                  ],
+                ),
+              ),
+            ],
+          ),
           Divider(
             height: 5.0,
             thickness: 0.5,
             color: theme.colorScheme.outline,
           ),
         ],
-      ),
+      // ),
     );
   }
 }

@@ -12,7 +12,7 @@ class OrderCartItem {
   final String name;
   final String itemName;
   final String itemGroup;
-  final String uom;
+  final String? uom;
   final String description;
   int qty;
   final Map<String, String> preference;
@@ -21,6 +21,7 @@ class OrderCartItem {
   late int totalPrice;
   String? notes;
   List<dynamic>? addon;
+  bool? isChecked;
   bool status;
   int docstatus;
 
@@ -32,13 +33,14 @@ class OrderCartItem {
     required this.qty,
     required this.preference,
     required this.price,
-    required this.uom,
+    this.uom,
     required this.description,
     required this.totalAddon,
     this.notes,
     this.addon,
     required this.status,
     required this.docstatus,
+    this.isChecked,
   }) {
     totalPrice = qty * price;
   }
@@ -56,7 +58,11 @@ class OrderCart {
 
   void _recalculateTotalPrice() {
     for (var item in _items) {
-      item.totalPrice = item.qty * item.price;
+      print('check item docstatus, ${item.docstatus}');
+      if (item.docstatus != 2) {
+        item.totalPrice = item.qty * item.price;
+
+      }
     }
   }
 
@@ -77,6 +83,7 @@ class OrderCart {
         notes: '',
         uom: '',
         description: '',
+        isChecked: false,
         status: false,
         docstatus: 0,
         totalAddon: 0,
@@ -117,6 +124,7 @@ class OrderCart {
 
   void removeItem(String itemId) {
     _items.removeWhere((item) => item.id == itemId);
+    print('cgecj items, $_items');
 
     // Recalculate total price
     _recalculateTotalPrice();
@@ -187,7 +195,7 @@ class OrderCart {
     };
 
     for (var item in AppState.orderCartItems) {
-      recap['totalPrice'] += item.totalPrice;
+      recap['totalPrice'] += item.docstatus !=2 ? item.totalPrice : 0;
 
       if (!recap['items'].containsKey(item.name)) {
         recap['items'][item.name] = {

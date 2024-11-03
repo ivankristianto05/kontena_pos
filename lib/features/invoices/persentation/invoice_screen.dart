@@ -39,6 +39,7 @@ import 'package:kontena_pos/widgets/filter_bar.dart';
 import 'package:kontena_pos/widgets/list_cart.dart';
 import 'package:kontena_pos/widgets/loading_content.dart';
 import 'package:kontena_pos/widgets/searchbar.dart';
+import 'package:kontena_pos/widgets/table_number.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
 import 'package:kontena_pos/widgets/type_transaction.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -70,7 +71,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   List<dynamic> itemDisplay = [];
   List<dynamic> orderDisplay = [];
   List<dynamic> itemGroupDisplay = [];
-
   List<dynamic> tempPosCart = [];
   List<dynamic> tempPosOrder = [];
   List<dynamic> tempAddon = [];
@@ -79,6 +79,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   String searchItemQuery = '';
   String modeView = 'item';
   String typeTransaction = 'dine-in';
+  String tableNumber = '1';
+  String filterItemDefault = '';
+  String search = '';
+  String filter = '';
+
+
   int totalAddon = 0;
   int totalAddonCheckout = 0;
 
@@ -107,8 +113,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   @override
   void initState() {
     super.initState();
-    onTapRefreshMenu();
-    onTapRefreshOrder();
+    if (AppState().dataItem.isEmpty) {
+      onTapRefreshMenu();
+    }
+
+    if (orderDisplay.isEmpty) {
+      onTapRefreshOrder();
+    }
     // onCallItemGroup();
     // onCallItemPrice();
     // onCallItem();
@@ -122,6 +133,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       cartData = cart.getAllItemCart();
       AppState().typeTransaction = 'dine-in';
       typeTransaction = 'dine-in';
+      AppState().tableNumber = '1';
+      tableNumber = '1';
+      itemGroupDisplay = AppState().configPosProfile['item_groups'];
+      filterItemDefault = itemGroupDisplay.map((itemGroup) => '"${itemGroup['item_group']}"').join(', ');
     });
     // cartData = cart.getAllItemCart();
 
@@ -190,10 +205,16 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       Expanded(
                         child: Stack(
                           children: [
+                            if (modeView == 'item')
                             Column(
                               children: [
                                 Searchbar(
-                                  onCompleted: () {},
+                                  onChanged: (value) {
+                                    print('value, $value');
+                                    setState((){
+                                      search = value;
+                                    });
+                                  }
                                 ),
                               ],
                             ),
@@ -202,7 +223,18 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 padding: EdgeInsetsDirectional.fromSTEB(
                                     8.0, 60.0, 8.0, 8.0),
                                 child: FilterBar(
-                                  onFilterSelected: (String type) {},
+                                  filterData: itemGroupDisplay,
+                                  fieldValue: 'item_group',
+                                  onFilterSelected: (String type) {
+                                    // print('check type, $type');
+                                    setState((){
+                                      if (type == 'All') {
+                                        filter = '';
+                                      } else {
+                                        filter = type;
+                                      }
+                                    });
+                                  },
                                 ),
                               ),
                             if (modeView == 'item' && isLoadingContent == false)
@@ -210,56 +242,65 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 padding: EdgeInsetsDirectional.fromSTEB(
                                     8.0, 120.0, 8.0, 0.0),
                                 child: Align(
-                                  alignment: AlignmentDirectional(0.00, 0.00),
+                                  alignment: Alignment.topLeft,
                                   child: SingleChildScrollView(
                                     primary: true,
+                                    physics: const AlwaysScrollableScrollPhysics(),
                                     child: SizedBox(
                                       width: MediaQuery.sizeOf(context).width,
                                       child: Column(
                                         children: [
-                                          if (itemDisplay.isNotEmpty)
-                                            MasonryGridView.count(
-                                              crossAxisCount: 5,
-                                              mainAxisSpacing: 6,
-                                              crossAxisSpacing: 6,
-                                              shrinkWrap: true,
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              itemCount: itemDisplay.length,
-                                              itemBuilder: (context, index) {
-                                                final currentItem =
-                                                    itemDisplay[index];
+                                          Builder(
+                                            builder: (context) {
+                                              final produk = AppState().dataItem;
+                                              final itemMenu = menu(produk, search, filter);
+                                              // print('check item menu, $itemMenu');
+                                              return itemMenu.isNotEmpty ? MasonryGridView.count(
+                                                crossAxisCount: 5,
+                                                mainAxisSpacing: 6,
+                                                crossAxisSpacing: 6,
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: itemMenu.length,
+                                                itemBuilder: (context, index) {
+                                                  final currentItem =
+                                                      itemMenu[index];
 
-                                                return ProductGrid(
-                                                  name: currentItem[
-                                                          'item_name'] ??
-                                                      '',
-                                                  category: currentItem[
-                                                          'item_group'] ??
-                                                      '',
-                                                  price: numberFormat(
-                                                      'idr',
-                                                      currentItem[
-                                                          'standard_rate']),
-                                                  image: CustomImageView(
-                                                    imagePath:
-                                                        ImageConstant.imgAdl1,
-                                                    height: 90.v,
-                                                    width: 70.h,
-                                                    margin: EdgeInsets.only(
-                                                        bottom: 1.v),
-                                                  ),
-                                                  onTap: () {
-                                                    onTapOpenItem(
-                                                      context,
-                                                      currentItem,
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                          // Text('testing'),
-                                          if (itemDisplay.isEmpty) EmptyData(),
+                                                  return ProductGrid(
+                                                    name: currentItem[
+                                                            'item_name'] ??
+                                                        '',
+                                                    category: currentItem[
+                                                            'item_group'] ??
+                                                        '',
+                                                    price: numberFormat(
+                                                        'idr',
+                                                        currentItem[
+                                                            'standard_rate']),
+                                                    image: CustomImageView(
+                                                      imagePath:
+                                                          ImageConstant.imgAdl1,
+                                                      height: 90.v,
+                                                      width: 70.h,
+                                                      margin: EdgeInsets.only(
+                                                          bottom: 1.v),
+                                                    ),
+                                                    onTap: () {
+                                                      onTapOpenItem(
+                                                        context,
+                                                        currentItem,
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              ) : EmptyData();
+                                            }
+                                          ),
+                                          // if (itemDisplay.isNotEmpty)
+                                            
+                                          // // Text('testing'),
+                                          // if (itemDisplay.isEmpty) EmptyData(),
                                         ],
                                       ),
                                     ),
@@ -270,260 +311,287 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 isLoadingContent == false)
                               Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
-                                    8.0, 50.0, 8.0, 0.0),
-                                child: SingleChildScrollView(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      children: [
-                                        if (orderDisplay.isNotEmpty)
-                                          AlignedGridView.count(
-                                            crossAxisCount: 3,
-                                            mainAxisSpacing: 6,
-                                            crossAxisSpacing: 6,
-                                            shrinkWrap: true,
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            itemCount: orderDisplay.length,
-                                            itemBuilder: (context, index) {
-                                              // print(
-                                              //     'check order, ${orderDisplay[index]}');
-                                              // final currentOrderId =
-                                              //     AppState().currentOrderId;
-                                              final order = orderDisplay[index];
-                                              dynamic orderItemList =
-                                                  order['items'];
-                                              // final isSelected =
-                                              //     order.idOrder == currentOrderId;
-                                              return InkWell(
-                                                onTap: () {
-                                                  // AppState().setCurrentOrderId(order
-                                                  //     .idOrder); // Update the currentOrderId in AppState
-                                                  // onOrderSelected(order.idOrder);
-                                                  addToCartFromOrder(
-                                                      context, order);
-                                                },
-                                                child: Card(
-                                                  elevation: 2,
-                                                  child: Column(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                          16.0,
-                                                          16.0,
-                                                          16.0,
-                                                          10.0,
-                                                        ),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  order['name'],
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .titleMedium,
-                                                                ),
-                                                                Text(
-                                                                  'Table ${order['table']}',
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .bodyMedium,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Text(
-                                                                  order['customer_name']
-                                                                      .toString(),
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .bodyMedium,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                0.0,
-                                                                4.0,
-                                                                0.0,
-                                                                4.0,
-                                                              ),
-                                                              child: Row(
+                                    8.0, 8.0, 8.0, 0.0),
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                // child: SingleChildScrollView(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                                8.0, 4.0, 8.0, 0.0),
+                                            child: Text(
+                                              'Order To Pay ',
+                                              style: TextStyle(
+                                                color:
+                                                    theme.colorScheme.secondary,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          Divider(
+                                            height: 5.0,
+                                            thickness: 0.5,
+                                            color: theme
+                                                .colorScheme
+                                                .outline,
+                                          ),
+                                          if (orderDisplay.isNotEmpty)
+                                            Expanded(
+                                            child: AlignedGridView.count(
+                                              crossAxisCount: 3,
+                                              mainAxisSpacing: 6,
+                                              crossAxisSpacing: 6,
+                                              shrinkWrap: true,
+                                              // physics:
+                                              //     const NeverScrollableScrollPhysics(),
+                                              itemCount: orderDisplay.length,
+                                              itemBuilder: (context, index) {
+                                                // print(
+                                                //     'check order, ${orderDisplay[index]}');
+                                                // final currentOrderId =
+                                                //     AppState().currentOrderId;
+                                                final order = orderDisplay[index];
+                                                dynamic orderItemList =
+                                                    order['items'];
+                                                // final isSelected =
+                                                //     order.idOrder == currentOrderId;
+                                                return InkWell(
+                                                  onTap: () {
+                                                    // AppState().setCurrentOrderId(order
+                                                    //     .idOrder); // Update the currentOrderId in AppState
+                                                    // onOrderSelected(order.idOrder);
+                                                    addToCartFromOrder(
+                                                        context, order);
+                                                  },
+                                                  child: Card(
+                                                    elevation: 2,
+                                                    child: Column(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsetsDirectional
+                                                                  .fromSTEB(
+                                                            16.0,
+                                                            16.0,
+                                                            16.0,
+                                                            10.0,
+                                                          ),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
                                                                 children: [
                                                                   Text(
-                                                                    dateTimeFormat(
-                                                                      'dateui',
-                                                                      order[
-                                                                          'date'],
-                                                                    ).toString(),
+                                                                    order['name'],
                                                                     style: theme
                                                                         .textTheme
-                                                                        .labelSmall,
+                                                                        .titleMedium,
+                                                                  ),
+                                                                  Text(
+                                                                    'Table ${order['table']}',
+                                                                    style: theme
+                                                                        .textTheme
+                                                                        .bodyMedium,
                                                                   ),
                                                                 ],
                                                               ),
-                                                            ),
-                                                            Divider(
-                                                              height: 5.0,
-                                                              thickness: 0.5,
-                                                              color: theme
-                                                                  .colorScheme
-                                                                  .outline,
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                0.0,
-                                                                4.0,
-                                                                0.0,
-                                                                4.0,
-                                                              ),
-                                                              child: Column(
+                                                              Row(
                                                                 children: [
-                                                                  ListView
-                                                                      .separated(
-                                                                    separatorBuilder:
-                                                                        (context,
-                                                                                index) =>
-                                                                            Divider(
-                                                                      height:
-                                                                          12,
-                                                                      thickness:
-                                                                          0.5,
-                                                                      color: theme
-                                                                          .colorScheme
-                                                                          .outline,
-                                                                    ),
-                                                                    shrinkWrap:
-                                                                        true,
-                                                                    physics:
-                                                                        const NeverScrollableScrollPhysics(),
-                                                                    itemCount:
-                                                                        orderItemList
-                                                                            .length,
-                                                                    itemBuilder:
-                                                                        (context,
-                                                                            idx) {
-                                                                      dynamic
-                                                                          orderItem =
-                                                                          orderItemList[
-                                                                              idx];
-                                                                      print(
-                                                                          'check item qty, ${orderItem['quantity']}');
-                                                                      return Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .only(
-                                                                            bottom:
-                                                                                8.0),
-                                                                        child:
-                                                                            Row(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: [
-                                                                            Text(
-                                                                              "${orderItem['qty']}",
-                                                                              style: const TextStyle(
-                                                                                fontWeight: FontWeight.w600,
-                                                                                fontSize: 14,
-                                                                              ),
-                                                                            ),
-                                                                            const SizedBox(width: 8),
-                                                                            Expanded(
-                                                                              child: Column(
-                                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                children: [
-                                                                                  AutoSizeText(
-                                                                                    "${orderItem['item_name']} - ${orderItem['variant'] ?? ''}",
-                                                                                    style: theme.textTheme.titleMedium,
-                                                                                    maxLines: 2, // Allows up to 2 lines
-                                                                                    minFontSize: 10,
-                                                                                    maxFontSize: 14,
-                                                                                    overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
-                                                                                  ),
-                                                                                  // if ((orderItem['preference'] != null) && (orderItem['preference'] != null)) const SizedBox(height: 4),
-                                                                                  // AutoSizeText(
-                                                                                  //   "Preference: ${orderItem['preference']}",
-                                                                                  //   style: theme.textTheme.labelSmall,
-                                                                                  //   maxLines: 1,
-                                                                                  //   minFontSize: 10,
-                                                                                  //   maxFontSize: 12,
-                                                                                  //   overflow: TextOverflow.ellipsis,
-                                                                                  // ),
-                                                                                  // if (orderItem['addons'] != null && orderItem['addons']!.isNotEmpty) const SizedBox(height: 4),
-                                                                                  // AutoSizeText(
-                                                                                  //   "+ ${orderItem['addons']!.keys.join(', ')}",
-                                                                                  //   style: theme.textTheme.labelSmall,
-                                                                                  //   maxLines: 1,
-                                                                                  //   minFontSize: 10,
-                                                                                  //   maxFontSize: 12,
-                                                                                  //   overflow: TextOverflow.ellipsis,
-                                                                                  // ),
-                                                                                  const SizedBox(height: 4),
-                                                                                  if ((orderItem.containsKey('note')) && (orderItem['note'] != null) && (orderItem['note'] != ''))
-                                                                                    AutoSizeText(
-                                                                                      "Notes: ${orderItem['note']}",
-                                                                                      style: theme.textTheme.labelSmall,
-                                                                                      maxLines: 2,
-                                                                                      minFontSize: 10,
-                                                                                      maxFontSize: 12,
-                                                                                      overflow: TextOverflow.ellipsis,
-                                                                                    ),
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                            Text(
-                                                                                (orderItem['docstatus'] == 1)
-                                                                                    ? 'Confirm'
-                                                                                    : (orderItem['docstatus'] == 2)
-                                                                                        ? 'Cancelled'
-                                                                                        : 'Draft',
-                                                                                style: TextStyle(
-                                                                                  color: () {
-                                                                                    if (orderItem['docstatus'] == 1) {
-                                                                                      return theme.colorScheme.primary;
-                                                                                    } else if (orderItem['docstatus'] == 2) {
-                                                                                      return theme.colorScheme.error;
-                                                                                    } else {
-                                                                                      return theme.colorScheme.onPrimaryContainer;
-                                                                                    }
-                                                                                  }(),
-                                                                                  fontWeight: FontWeight.w700,
-                                                                                  fontSize: 12,
-                                                                                )),
-                                                                          ],
-                                                                        ),
-                                                                      );
-                                                                    },
+                                                                  Text(
+                                                                    order['customer_name']
+                                                                        .toString(),
+                                                                    style: theme
+                                                                        .textTheme
+                                                                        .bodyMedium,
                                                                   ),
                                                                 ],
                                                               ),
-                                                            ),
-                                                          ],
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                  0.0,
+                                                                  4.0,
+                                                                  0.0,
+                                                                  4.0,
+                                                                ),
+                                                                child: Row(
+                                                                  children: [
+                                                                    Text(
+                                                                      dateTimeFormat(
+                                                                        'dateui',
+                                                                        order[
+                                                                            'date'],
+                                                                      ).toString(),
+                                                                      style: theme
+                                                                          .textTheme
+                                                                          .labelSmall,
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Divider(
+                                                                height: 5.0,
+                                                                thickness: 0.5,
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .outline,
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                  0.0,
+                                                                  4.0,
+                                                                  0.0,
+                                                                  4.0,
+                                                                ),
+                                                                child: Column(
+                                                                  children: [
+                                                                    ListView
+                                                                        .separated(
+                                                                      separatorBuilder:
+                                                                          (context,
+                                                                                  index) =>
+                                                                              Divider(
+                                                                        height:
+                                                                            12,
+                                                                        thickness:
+                                                                            0.5,
+                                                                        color: theme
+                                                                            .colorScheme
+                                                                            .outline,
+                                                                      ),
+                                                                      shrinkWrap:
+                                                                          true,
+                                                                      physics:
+                                                                          const NeverScrollableScrollPhysics(),
+                                                                      itemCount:
+                                                                          orderItemList
+                                                                              .length,
+                                                                      itemBuilder:
+                                                                          (context,
+                                                                              idx) {
+                                                                        dynamic
+                                                                            orderItem =
+                                                                            orderItemList[
+                                                                                idx];
+                                                                        print(
+                                                                            'check item qty, ${orderItem['quantity']}');
+                                                                        return Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              bottom:
+                                                                                  8.0),
+                                                                          child:
+                                                                              Row(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Text(
+                                                                                "${orderItem['qty']}",
+                                                                                style: const TextStyle(
+                                                                                  fontWeight: FontWeight.w600,
+                                                                                  fontSize: 14,
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(width: 8),
+                                                                              Expanded(
+                                                                                child: Column(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: [
+                                                                                    AutoSizeText(
+                                                                                      "${orderItem['item_name']} - ${orderItem['variant'] ?? ''}",
+                                                                                      style: theme.textTheme.titleMedium,
+                                                                                      maxLines: 2, // Allows up to 2 lines
+                                                                                      minFontSize: 10,
+                                                                                      maxFontSize: 14,
+                                                                                      overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
+                                                                                    ),
+                                                                                    // if ((orderItem['preference'] != null) && (orderItem['preference'] != null)) const SizedBox(height: 4),
+                                                                                    // AutoSizeText(
+                                                                                    //   "Preference: ${orderItem['preference']}",
+                                                                                    //   style: theme.textTheme.labelSmall,
+                                                                                    //   maxLines: 1,
+                                                                                    //   minFontSize: 10,
+                                                                                    //   maxFontSize: 12,
+                                                                                    //   overflow: TextOverflow.ellipsis,
+                                                                                    // ),
+                                                                                    // if (orderItem['addons'] != null && orderItem['addons']!.isNotEmpty) const SizedBox(height: 4),
+                                                                                    // AutoSizeText(
+                                                                                    //   "+ ${orderItem['addons']!.keys.join(', ')}",
+                                                                                    //   style: theme.textTheme.labelSmall,
+                                                                                    //   maxLines: 1,
+                                                                                    //   minFontSize: 10,
+                                                                                    //   maxFontSize: 12,
+                                                                                    //   overflow: TextOverflow.ellipsis,
+                                                                                    // ),
+                                                                                    const SizedBox(height: 4),
+                                                                                    if ((orderItem.containsKey('note')) && (orderItem['note'] != null) && (orderItem['note'] != ''))
+                                                                                      AutoSizeText(
+                                                                                        "Notes: ${orderItem['note']}",
+                                                                                        style: theme.textTheme.labelSmall,
+                                                                                        maxLines: 2,
+                                                                                        minFontSize: 10,
+                                                                                        maxFontSize: 12,
+                                                                                        overflow: TextOverflow.ellipsis,
+                                                                                      ),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                              Text(
+                                                                                  (orderItem['docstatus'] == 1)
+                                                                                      ? 'Confirm'
+                                                                                      : (orderItem['docstatus'] == 2)
+                                                                                          ? 'Cancelled'
+                                                                                          : 'Draft',
+                                                                                  style: TextStyle(
+                                                                                    color: () {
+                                                                                      if (orderItem['docstatus'] == 1) {
+                                                                                        return theme.colorScheme.primary;
+                                                                                      } else if (orderItem['docstatus'] == 2) {
+                                                                                        return theme.colorScheme.error;
+                                                                                      } else {
+                                                                                        return theme.colorScheme.onPrimaryContainer;
+                                                                                      }
+                                                                                    }(),
+                                                                                    fontWeight: FontWeight.w700,
+                                                                                    fontSize: 12,
+                                                                                  )),
+                                                                            ],
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        if (orderDisplay.isEmpty) EmptyData(),
-                                      ],
+                                                );
+                                              },
+                                            ),),
+                                          if (orderDisplay.isEmpty) EmptyData(),
+                                        ],
+                                      ),
                                     ),
-                                  ),
+                                // ),
                                 ),
                               ),
                           ],
@@ -540,6 +608,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               border: Border(
                                 left: BorderSide(
                                   color: theme.colorScheme.outline,
+                                  width: 0.5,
                                 ),
                               ),
                             ),
@@ -645,6 +714,63 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                 ),
                                               ],
                                             ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () {
+                                        onTapTableNumber(context);
+                                      },
+                                      child: Container(
+                                        height: 48.0,
+                                        decoration: BoxDecoration(
+                                          color: theme
+                                              .colorScheme.primaryContainer,
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              color:
+                                                  theme.colorScheme.outline,
+                                              width: 0.5,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  8.0, 0.0, 8.0, 0.0),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              if (tableNumber == '')
+                                                Text(
+                                                  'Pilih Nomor Meja',
+                                                  style: theme
+                                                      .textTheme.labelMedium,
+                                                ),
+                                              if (tableNumber != '')
+                                                Text(
+                                                  tableNumber,
+                                                  style: theme
+                                                      .textTheme.titleSmall,
+                                                ),
+                                              Icon(
+                                                Icons
+                                                    .keyboard_arrow_down_rounded,
+                                                color: theme
+                                                    .colorScheme.secondary,
+                                                size: 24.0,
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
@@ -766,6 +892,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                     itemData.notes.toString();
 
                                                 return ListCart(
+                                                  docstatus: itemData.docstatus,
                                                   title:
                                                       "${itemData.itemName} (${itemData.qty})",
                                                   subtitle:
@@ -800,8 +927,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                       CustomTextStyles
                                                           .bodySmallGray,
                                                   addons: itemData.addon,
-                                                  isEdit: isEdit,
-                                                  onTap: () => onTapEditItem(
+                                                  isEdit: true,
+                                                  onEdit: () => onTapEditItem(
+                                                      context, itemData, index),
+                                                  onDelete: () => onTapDelete(
                                                       context, itemData, index),
                                                 );
                                               },
@@ -864,12 +993,17 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 
+  List<dynamic> menu(List<dynamic> data, String search, String filter) {
+    // itemDisplay = AppState().dataItem;
+    return data.where((item) => (item['item_name'].toString().toLowerCase().contains(search.toLowerCase()) && item['item_group'].toString().toLowerCase().contains(filter.toLowerCase()))).toList();
+  }
+
   onTapRefreshMenu() async {
     print('tap refresjh');
     setState(() {
       isLoadingContent = true;
     });
-    await onCallItemGroup();
+    // await onCallItemGroup();
     await onCallItemPrice();
     await onCallItem();
     await onCallItemAddon();
@@ -975,7 +1109,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         FrappeFetchDataItem.ItemRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: '[["disabled","=",0],["is_sales_item","=",1]]',
+      filters: '[["disabled","=",0],["is_sales_item","=",1],["item_group","in",[$filterItemDefault]]]',
+      // filters: '[["disabled","=",0],["is_sales_item","=",1]]',
       limit: 1500,
     );
 
@@ -1313,12 +1448,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           'item_name': item.itemName,
           'notes': item.notes,
           'name': item.name,
-          'variant': item.variant,
-          'variantId': item.variantId,
+          // 'variant': item.variant,
+          // 'variantId': item.variantId,
           'qty': item.qty,
-          'variantPrice': item.variantPrice,
+          // 'variantPrice': item.variantPrice,
           'totalPrice': item.totalPrice,
-          'addonsPrice': item.addonsPrice,
+          // 'addonsPrice': item.addonsPrice ?? 0,
         };
 
         return Padding(
@@ -1330,6 +1465,44 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         );
       },
     ).then((value) => {});
+    setState(() {
+      cartData = cart.getAllItemCart();
+    });
+  }
+
+  onTapDelete(BuildContext context, dynamic item, int index) async {
+    print('check item id, ${item.id}');
+    await showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Color(0x80000000),
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          child: Padding(
+            padding:
+                MediaQuery.viewInsetsOf(
+                    context),
+            child: DialogCustomWidget(
+              description:
+                  'Are you sure to delete item?',
+              isConfirm: true,
+              captionConfirm: 'Delete',
+              styleConfirm: TextStyle(
+                color: theme
+                    .colorScheme.error,
+              ),
+              onConfirm: () async {
+                cart.removeItem(item.id);
+              },
+            ),
+          ),
+        );
+      },
+    );
+    setState((){
+      cartData = cart.getAllItemCart();
+    });
   }
 
   void onTapTypeTransaction(BuildContext context) async {
@@ -1353,41 +1526,67 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         });
   }
 
+  void onTapTableNumber(BuildContext context) async {
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: const Color(0x8A000000),
+      barrierColor: const Color(0x00000000),
+      context: context,
+      builder: (context) {
+        return TableNumber(
+          selected: tableNumber,
+        );
+      },
+    ).then((value) => {
+          setState(() {
+            tableNumber = AppState().tableNumber;
+          }),
+          print('check table number , $tableNumber')
+        });
+  }
+
   void addToCartFromOrder(BuildContext context, dynamic order) async {
     setState(() {
       cart.clearCart();
+      AppState.resetInvoiceCart();
     });
     const Duration(seconds: 1);
 
     for (int a = 0; a < order['items'].length; a++) {
-      InvoiceCartItem newItem = InvoiceCartItem(
-        id: order['items'][a]['name'],
-        name: order['items'][a]['item'],
-        itemName: order['items'][a]['item_name'],
-        itemGroup: order['items'][a]['item_group'],
-        uom: order['items'][a]['uom'] ?? '',
-        description:
-            order['items'][a]['description'] ?? order['items'][a]['item_name'],
-        qty: order['items'][a]['qty'],
-        price: order['items'][a]['price'].floor(),
-        notes: order['items'][a]['note'],
-        preference: order['items'][a]['preference'] ?? {},
-        status: order['items'][a]['docstatus'] == 1 ? true : false,
-        cartId: order['name'],
-        docstatus: order['items'][a]['docstatus'],
-        addon: [],
-        totalAddon: 0,
-      );
+      if (order['items'][a]['docstatus'] == 1) {
+        InvoiceCartItem newItem = InvoiceCartItem(
+          id: order['items'][a]['name'],
+          name: order['items'][a]['item'],
+          itemName: order['items'][a]['item_name'],
+          itemGroup: order['items'][a]['item_group'],
+          uom: order['items'][a]['uom'] ?? '',
+          description:
+              order['items'][a]['description'] ?? order['items'][a]['item_name'],
+          qty: order['items'][a]['qty'],
+          price: order['items'][a]['price'].floor(),
+          notes: order['items'][a]['note'],
+          preference: order['items'][a]['preference'] ?? {},
+          status: order['items'][a]['docstatus'] == 1 ? true : false,
+          cartId: order['name'],
+          docstatus: order['items'][a]['docstatus'],
+          addon: [],
+          totalAddon: 0,
+        );
+        setState(() {
+          cart.addItem(newItem, mode: InvoiceCartMode.add);
+        });
+      }
 
-      setState(() {
-        cart.addItem(newItem, mode: InvoiceCartMode.add);
-      });
     }
     setState(() {
       enterGuestNameController.text = order['customer_name'];
       typeTransaction = 'dine-in';
       cartData = cart.getAllItemCart();
-      isEdit = false;
+      // isEdit = false;
+      cartSelected = order;
+      tableNumber = order['table'];
     });
     // order.forEach((dt) {
     //   print('check, $dt');

@@ -13,7 +13,7 @@ class CreatePosOrderRequest {
   final String item;
   final String itemName;
   final String itemGroup;
-  final String uom;
+  final String? uom;
   final String? note;
   final int qty;
   final int status;
@@ -31,7 +31,7 @@ class CreatePosOrderRequest {
     required this.item,
     required this.itemName,
     required this.itemGroup,
-    required this.uom,
+    this.uom,
     this.note,
     required this.qty,
     required this.status,
@@ -48,7 +48,7 @@ class CreatePosOrderRequest {
 
   Map<String, dynamic> toJson() {
     final data = {
-      "docstatus": status,
+      // "docstatus": status,
       "customer": customer,
       "customer_name": customerName,
       "company": company,
@@ -58,7 +58,7 @@ class CreatePosOrderRequest {
       "item": item,
       "item_name": itemName,
       "item_group": itemGroup,
-      "uom": uom,
+      // "uom": uom,
       "note": note,
       "qty": qty,
     };
@@ -71,6 +71,7 @@ class CreatePosOrderRequest {
 Future<Map<String, dynamic>> request(
     {required CreatePosOrderRequest requestQuery}) async {
   String url;
+  http.Response response;
 
   if (requestQuery.getParamID() != null) {
     url =
@@ -78,23 +79,26 @@ Future<Map<String, dynamic>> request(
   } else {
     url = 'https://erp2.hotelkontena.com/api/resource/POS Order';
   }
-
-  print('url, $url');
-  print('body, ${json.encode(requestQuery.toJson())}');
-
-  final response = await http.post(
-    Uri.parse(url),
-    headers: requestQuery.formatHeader(),
-    body: json.encode(requestQuery.toJson()),
-  );
-
-  print('response code, ${response.statusCode}');
-  print('respon body, ${response.body}');
+  if (requestQuery.getParamID() != null) {
+    response = await http.put(
+      Uri.parse(url),
+      headers: requestQuery.formatHeader(),
+      body: json.encode(requestQuery.toJson()),
+    );
+  } else {
+    response = await http.post(
+      Uri.parse(url),
+      headers: requestQuery.formatHeader(),
+      body: json.encode(requestQuery.toJson()),
+    );
+  }
 
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
 
     if (requestQuery.getParamID() != null) {
+        print('respon data order, ${responseBody}');
+        print('respon data order, ${requestQuery.toJson()}');
       if (responseBody.containsKey('data')) {
         return responseBody['data'];
       } else {

@@ -159,7 +159,9 @@ class _TableNumberState extends State<TableNumber> {
                             hoverColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                             onTap: () {
-                              setState(() {});
+                              setState(() {
+                                AppState().tableNumber = TableNumber;
+                              });
                               Navigator.of(context).pop();
                             },
                             child: Container(

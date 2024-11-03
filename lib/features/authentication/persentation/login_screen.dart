@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
-                        width: MediaQuery.sizeOf(context).width * 0.2,
+                        width: MediaQuery.sizeOf(context).width * 0.5,
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primaryContainer,
                           border: Border.all(

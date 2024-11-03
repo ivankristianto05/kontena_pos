@@ -810,6 +810,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             NumPad(
+                              isDisable: paymentStatus,
                               initialValue: payment,
                               onResult: (value) {
                                 setState(() {

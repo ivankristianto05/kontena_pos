@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  print_bluetooth_thermal
   screen_retriever_windows
   window_manager
 )

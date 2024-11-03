@@ -29,6 +29,8 @@ import 'package:kontena_pos/core/api/frappe_thunder_pos/cancel_pos_order.dart'
     as FrappeFetchCancelOrder;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/submit_pos_delivery.dart'
     as FrappeFetchSubmitDelivery;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/delete_pos_order.dart'
+    as FrappeFetchDeleteOrder;
 import 'package:kontena_pos/core/api/send_printer.dart' as sendToPrinter;
 
 import 'package:flutter/material.dart';
@@ -78,11 +80,16 @@ class _OrderScreenState extends State<OrderScreen> {
   String typeTransaction = 'dine-in';
   String tableNumber = '1';
   String modeView = 'order';
+  String filterItemDefault = '';
+  String filterItemGroupSelected = '';
+  String search = '';
+  String filter = '';
 
   bool isLoading = true;
   bool isLoadingContent = false;
   bool isLoadingDetail = false;
 
+  List<dynamic> itemGroupDisplay = [];
   List<dynamic> itemDisplay = [];
   List<dynamic> orderDisplay = [];
   List<dynamic> servedDisplay = [];
@@ -104,9 +111,18 @@ class _OrderScreenState extends State<OrderScreen> {
   void initState() {
     super.initState();
     // enterGuestNameController.addListener(_updateState);
-    onTapRefreshMenu();
-    onTapRefreshOrder();
-    onTapRefreshHistory();
+
+    if (AppState().dataItem.isEmpty) {
+      onTapRefreshMenu();
+    }
+
+    if (orderDisplay.isEmpty) {
+      onTapRefreshOrder();
+    }
+
+    if (servedDisplay.isEmpty) {
+      onTapRefreshHistory();
+    }
 
     setState(() {
       cartData = cart.getAllItemCart();
@@ -114,9 +130,11 @@ class _OrderScreenState extends State<OrderScreen> {
       typeTransaction = 'dine-in';
       AppState().tableNumber = '1';
       tableNumber = '1';
+      itemGroupDisplay = AppState().configPosProfile['item_groups'];
+      filterItemDefault = "${itemGroupDisplay.map((itemGroup) => '"${itemGroup['item_group']}"').join(', ')}";
     });
 
-    print('check cartdata, $cartData');
+    
   }
 
   @override
@@ -125,37 +143,6 @@ class _OrderScreenState extends State<OrderScreen> {
     // enterGuestNameController.dispose();
     super.dispose();
   }
-
-  // void _updateState() {
-  //   setState(() {});
-  // }
-
-  // void _showItemDetailsDialog(
-  //     String name, int price, String idMenu, String type) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return ItemDetailsDialog(
-  //         name: name,
-  //         price: price,
-  //         idMenu: idMenu,
-  //         type: type,
-  //       );
-  //     },
-  //   );
-  // }
-
-  // void _handleFilterSelected(String type) {
-  //   setState(() {
-  //     _selectedFilterType = type;
-  //   });
-  // }
-
-  // void _handleSearchChanged(String query) {
-  //   setState(() {
-  //     _searchQuery = query;
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -189,10 +176,23 @@ class _OrderScreenState extends State<OrderScreen> {
                       Expanded(
                         child: Stack(
                           children: [
+                            if (modeView == 'order')
                             Column(
                               children: [
                                 Searchbar(
-                                  onCompleted: () {},
+                                  onChanged: (value) {
+                                    print('value, $value');
+                                    setState((){
+                                      search = value;
+                                    });
+                                  }
+                                  // onCompleted: (value) {
+                                  //   print('check search value $value');
+                                  //   // onSearchFilterMenu(value, '');
+                                  //   setState(() {
+                                  //     // search = value;
+                                  //   });
+                                  // },
                                 ),
                               ],
                             ),
@@ -201,7 +201,18 @@ class _OrderScreenState extends State<OrderScreen> {
                                 padding: EdgeInsetsDirectional.fromSTEB(
                                     8.0, 60.0, 8.0, 8.0),
                                 child: FilterBar(
-                                  onFilterSelected: (String type) {},
+                                  filterData: itemGroupDisplay,
+                                  fieldValue: 'item_group',
+                                  onFilterSelected: (String type) {
+                                    // print('check type, $type');
+                                    setState((){
+                                      if (type == 'All') {
+                                        filter = '';
+                                      } else {
+                                        filter = type;
+                                      }
+                                    });
+                                  },
                                 ),
                               ),
                             if (modeView == 'order' &&
@@ -212,52 +223,113 @@ class _OrderScreenState extends State<OrderScreen> {
                                 child: Align(
                                   alignment: Alignment.topLeft,
                                   child: SingleChildScrollView(
-                                    primary: true,
+                                    // primary: true,
+                                    physics: const AlwaysScrollableScrollPhysics(),
                                     child: SizedBox(
                                       width: MediaQuery.sizeOf(context).width,
                                       child: Column(
                                         children: [
-                                          if (itemDisplay.isNotEmpty)
-                                            MasonryGridView.count(
-                                              crossAxisCount: 5,
-                                              mainAxisSpacing: 6,
-                                              crossAxisSpacing: 6,
-                                              shrinkWrap: true,
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              itemCount: itemDisplay.length,
-                                              itemBuilder: (context, index) {
-                                                final currentItem =
-                                                    itemDisplay[index];
-                                                return ProductGrid(
-                                                  name: currentItem[
-                                                          'item_name'] ??
-                                                      '',
-                                                  category: currentItem[
-                                                          'item_group'] ??
-                                                      '',
-                                                  price: numberFormat(
-                                                      'idr',
-                                                      currentItem[
-                                                          'standard_rate']),
-                                                  image: CustomImageView(
-                                                    imagePath:
-                                                        ImageConstant.imgAdl1,
-                                                    height: 90.v,
-                                                    width: 70.h,
-                                                    margin: EdgeInsets.only(
-                                                        bottom: 1.v),
+                                          Builder(
+                                            builder: (context) {
+                                              final produk = AppState().dataItem;
+                                              final itemMenu = menu(produk, search, filter);
+                                              // print('check item menu, $itemMenu');
+                                              return (itemMenu.isNotEmpty) ? MasonryGridView.count(
+                                                // gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                                                // ),
+                                                  crossAxisCount: 5, // Jumlah kolom
+                                                mainAxisSpacing: 6,
+                                                crossAxisSpacing: 6,
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                itemCount: itemMenu.length,
+                                                itemBuilder: (context, index) {
+                                                  final currentItem =
+                                                      itemMenu[index];
+                                                  bool isVisible = onSearchFilterMenu(currentItem['item_name'], search)! ? true : false;
+                                                  // print('check visible, ${onSearchFilterMenu(currentItem['item_name'], search)}');
+                                                  return Visibility(
+                                                    visible: isVisible,
+                                                    child: ProductGrid(
+                                                    name: currentItem[
+                                                            'item_name'] ??
+                                                        '',
+                                                    category: currentItem[
+                                                            'item_group'] ??
+                                                        '',
+                                                    price: numberFormat(
+                                                        'idr',
+                                                        currentItem[
+                                                            'standard_rate']),
+                                                    image: CustomImageView(
+                                                      imagePath:
+                                                          ImageConstant.imgAdl1,
+                                                      height: 90.v,
+                                                      width: 70.h,
+                                                      margin: EdgeInsets.only(
+                                                          bottom: 1.v),
+                                                    ),
+                                                    onTap: () {
+                                                      onTapOpenItem(
+                                                        context,
+                                                        currentItem,
+                                                      );
+                                                    },
                                                   ),
-                                                  onTap: () {
-                                                    onTapOpenItem(
-                                                      context,
-                                                      currentItem,
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                          if (itemDisplay.isEmpty) EmptyData(),
+                                                  ) ;
+                                                },
+                                              ) : EmptyCart();
+                                            }
+                                          ),
+                                          // if (itemDisplay.isNotEmpty)
+                                          //   MasonryGridView.builder(
+                                          //     gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                                          //       crossAxisCount: 5, // Jumlah kolom
+                                          //     ),
+                                          //     mainAxisSpacing: 6,
+                                          //     crossAxisSpacing: 6,
+                                          //     shrinkWrap: true,
+                                          //     physics:
+                                          //         const NeverScrollableScrollPhysics(),
+                                          //     itemCount: itemDisplay.length,
+                                          //     itemBuilder: (context, index) {
+                                          //       final currentItem =
+                                          //           itemDisplay[index];
+                                          //       bool isVisible = onSearchFilterMenu(currentItem['item_name'], search)! ? true : false;
+                                          //       // print('check visible, ${onSearchFilterMenu(currentItem['item_name'], search)}');
+                                          //       return Visibility(
+                                          //         visible: isVisible,
+                                          //         child: ProductGrid(
+                                          //         name: currentItem[
+                                          //                 'item_name'] ??
+                                          //             '',
+                                          //         category: currentItem[
+                                          //                 'item_group'] ??
+                                          //             '',
+                                          //         price: numberFormat(
+                                          //             'idr',
+                                          //             currentItem[
+                                          //                 'standard_rate']),
+                                          //         image: CustomImageView(
+                                          //           imagePath:
+                                          //               ImageConstant.imgAdl1,
+                                          //           height: 90.v,
+                                          //           width: 70.h,
+                                          //           margin: EdgeInsets.only(
+                                          //               bottom: 1.v),
+                                          //         ),
+                                          //         onTap: () {
+                                          //           onTapOpenItem(
+                                          //             context,
+                                          //             currentItem,
+                                          //           );
+                                          //         },
+                                          //       ),
+                                          //       ) ;
+                                          //     },
+                                          //   ),
+                                          // if (itemDisplay.isEmpty) EmptyData(),
                                         ],
                                       ),
                                     ),
@@ -268,11 +340,11 @@ class _OrderScreenState extends State<OrderScreen> {
                                 isLoadingContent == false)
                               Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
-                                    8.0, 50.0, 8.0, 0.0),
+                                    8.0, 8.0, 8.0, 0.0),
                                 child: Align(
                                   alignment: Alignment.topLeft,
-                                  child: SingleChildScrollView(
-                                    primary: true,
+                                  // child: SingleChildScrollView(
+                                    // primary: false,
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(
@@ -281,17 +353,29 @@ class _OrderScreenState extends State<OrderScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            'Confirm',
-                                            style: TextStyle(
-                                              color:
-                                                  theme.colorScheme.secondary,
-                                              fontWeight: FontWeight.bold,
+                                          Padding(
+                                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                                8.0, 4.0, 8.0, 0.0),
+                                            child: Text(
+                                              'Confirm',
+                                              style: TextStyle(
+                                                color:
+                                                    theme.colorScheme.secondary,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
+                                          Divider(
+                                            height: 5.0,
+                                            thickness: 0.5,
+                                            color: theme
+                                                .colorScheme
+                                                .outline,
+                                          ),
                                           if (orderDisplay.isNotEmpty)
-                                            AlignedGridView.count(
-                                              crossAxisCount: 4,
+                                            Expanded(
+                                            child:AlignedGridView.count(
+                                              crossAxisCount: 3,
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
@@ -545,24 +629,24 @@ class _OrderScreenState extends State<OrderScreen> {
                                                   ),
                                                 );
                                               },
-                                            ),
-                                          if (itemDisplay.isEmpty) EmptyData(),
+                                            ),),
+                                          if (orderDisplay.isEmpty) EmptyData(),
                                         ],
                                       ),
                                     ),
-                                  ),
+                                  // ),
                                 ),
                               ),
                             if (modeView == 'served' &&
                                 isLoadingContent == false)
                               Padding(
                                 padding: const EdgeInsetsDirectional.fromSTEB(
-                                    8.0, 50.0, 8.0, 0.0),
+                                    8.0, 8.0, 8.0, 0.0),
                                 child: Align(
                                   alignment: Alignment.topLeft,
-                                  child: SingleChildScrollView(
-                                    primary: true,
-                                    scrollDirection: Axis.vertical,
+                                  // child: SingleChildScrollView(
+                                    // primary: true,
+                                    // scrollDirection: Axis.vertical,
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(
@@ -571,31 +655,43 @@ class _OrderScreenState extends State<OrderScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            'Served',
-                                            style: TextStyle(
-                                              color:
-                                                  theme.colorScheme.secondary,
-                                              fontWeight: FontWeight.bold,
+                                          Padding(
+                                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                                8.0, 4.0, 8.0, 0.0),
+                                            child: Text(
+                                              'Served',
+                                              style: TextStyle(
+                                                color:
+                                                    theme.colorScheme.secondary,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
+                                          Divider(
+                                            height: 5.0,
+                                            thickness: 0.5,
+                                            color: theme
+                                                .colorScheme
+                                                .outline,
+                                          ),
                                           if (servedDisplay.isNotEmpty)
-                                            AlignedGridView.count(
+                                            Expanded(
+                                            child: AlignedGridView.count(
                                               crossAxisCount: 3,
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
-                                              //itemCount: servedDisplay.length,
-                                              itemCount:tempPosServed.length,
+                                              itemCount: servedDisplay.length,
+                                              // itemCount:tempPosServed.length,
                                               itemBuilder: (context, index) {
-                                                final order = tempPosServed[index];
-                                                //final order = servedDisplay[index];
+                                                // final order = tempPosServed[index];
+                                                final order = servedDisplay[index];
                                                 dynamic orderItemList =
                                                     order['items'];
                                                 return InkWell(
                                                   onTap: () {
-                                                    // addToCartFromOrder(
-                                                    //     context, order);
+                                                    addToCartFromOrder(
+                                                        context, order);
                                                   },
                                                   child: Card(
                                                     elevation: 2,
@@ -636,32 +732,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                           .textTheme
                                                                           .bodyMedium,
                                                                     ),
-                                                                  Text(
-                                                                      (order['docstatus'] ==
-                                                                              1)
-                                                                          ? order[
-                                                                              'status']
-                                                                          : (order['docstatus'] ==
-                                                                                  2)
-                                                                              ? 'Cancelled'
-                                                                              : 'Draft',
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.w600,
-                                                                        color:
-                                                                            () {
-                                                                          if (order['docstatus'] ==
-                                                                              1) {
-                                                                            return theme.colorScheme.onSecondary;
-                                                                          } else if (order['docstatus'] ==
-                                                                              2) {
-                                                                            return theme.colorScheme.error;
-                                                                          } else {
-                                                                            return theme.colorScheme.onPrimaryContainer;
-                                                                          }
-                                                                        }(),
-                                                                      )),
+                                                                  
                                                                 ],
                                                               ),
                                                               Divider(
@@ -683,15 +754,6 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                         .textTheme
                                                                         .bodyMedium,
                                                                   ),
-                                                                  Text(
-                                                                    '${numberFormat('idr_fixed', order['grand_total'])}',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: theme
-                                                                          .colorScheme
-                                                                          .secondary,
-                                                                    ),
-                                                                  ),
                                                                 ],
                                                               ),
                                                               Padding(
@@ -704,38 +766,135 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                   4.0,
                                                                 ),
                                                                 child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
                                                                   children: [
-                                                                    Row(
-                                                                      children: [
-                                                                        Text(
-                                                                          dateTimeFormat(
-                                                                            'dateui',
-                                                                            order['posting_date'],
-                                                                          ).toString(),
-                                                                          style: theme
-                                                                              .textTheme
-                                                                              .labelSmall,
-                                                                        ),
-                                                                        Text(
-                                                                          ' | ${timeFormat(
-                                                                            'time_simple',
-                                                                            order['posting_time'],
-                                                                          ).toString()}',
-                                                                          style: theme
-                                                                              .textTheme
-                                                                              .labelSmall,
-                                                                        ),
-                                                                      ],
+                                                                    Text(
+                                                                      dateTimeFormat(
+                                                                        'dateui',
+                                                                        order[
+                                                                            'date'],
+                                                                      ).toString(),
+                                                                      style: theme
+                                                                          .textTheme
+                                                                          .labelSmall,
                                                                     ),
-                                                                    // Text(
-                                                                    //   'Paid: ${numberFormat('idr_fixed', order['paid_amount'])}',
-                                                                    //   style: theme
-                                                                    //       .textTheme
-                                                                    //       .bodyMedium,
-                                                                    // ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Divider(
+                                                                height: 5.0,
+                                                                thickness: 0.5,
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .outline,
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                  0.0,
+                                                                  4.0,
+                                                                  0.0,
+                                                                  4.0,
+                                                                ),
+                                                                child: Column(
+                                                                  children: [
+                                                                    ListView
+                                                                        .separated(
+                                                                      separatorBuilder:
+                                                                          (context, index) =>
+                                                                              Divider(
+                                                                        height:
+                                                                            12,
+                                                                        thickness:
+                                                                            0.5,
+                                                                        color: theme
+                                                                            .colorScheme
+                                                                            .outline,
+                                                                      ),
+                                                                      shrinkWrap:
+                                                                          true,
+                                                                      itemCount:
+                                                                          orderItemList
+                                                                              .length,
+                                                                      itemBuilder:
+                                                                          (context,
+                                                                              idx) {
+                                                                        dynamic
+                                                                            orderItem =
+                                                                            orderItemList[idx];
+                                                                        return Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              bottom: 8.0),
+                                                                          child:
+                                                                              Row(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Text(
+                                                                                "${orderItem['qty']}x",
+                                                                                style: const TextStyle(
+                                                                                  fontWeight: FontWeight.w600,
+                                                                                  fontSize: 14,
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(width: 8),
+                                                                              Expanded(
+                                                                                child: Column(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: [
+                                                                                    AutoSizeText(
+                                                                                      "${orderItem['item_name']} - ${orderItem['variant'] ?? ''}",
+                                                                                      style: theme.textTheme.titleMedium,
+                                                                                      maxLines: 2, // Allows up to 2 lines
+                                                                                      minFontSize: 10,
+                                                                                      maxFontSize: 14,
+                                                                                      overflow: TextOverflow.ellipsis, // Ellipsis if it exceeds 2 lines
+                                                                                    ),
+                                                                                    const SizedBox(height: 4),
+                                                                                    if ((orderItem.containsKey('note')) && (orderItem['note'] != null) && (orderItem['note'] != ''))
+                                                                                      AutoSizeText(
+                                                                                        "Notes: ${orderItem['note']}",
+                                                                                        style: theme.textTheme.labelSmall,
+                                                                                        maxLines: 2,
+                                                                                        minFontSize: 10,
+                                                                                        maxFontSize: 12,
+                                                                                        overflow: TextOverflow.ellipsis,
+                                                                                      ),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                              Text(
+                                                                                (orderItem['docstatus'] == 1)
+                                                                                    ? 'Confirm'
+                                                                                    : (orderItem['docstatus'] == 2)
+                                                                                        ? 'Cancelled'
+                                                                                        : 'Draft',
+                                                                                style: (orderItem['docstatus'] != 1)
+                                                                                    ? TextStyle(
+                                                                                        color: () {
+                                                                                          if (orderItem['docstatus'] == 1) {
+                                                                                            return theme.colorScheme.primary;
+                                                                                          } else if (orderItem['docstatus'] == 2) {
+                                                                                            return theme.colorScheme.error;
+                                                                                          } else {
+                                                                                            return theme.colorScheme.onPrimaryContainer;
+                                                                                          }
+                                                                                        }(),
+                                                                                        fontWeight: FontWeight.w700,
+                                                                                        fontSize: 12,
+                                                                                      )
+                                                                                    : TextStyle(
+                                                                                        color: theme.colorScheme.primary,
+                                                                                        fontWeight: FontWeight.w700,
+                                                                                        fontSize: 12,
+                                                                                      ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                    ),
                                                                   ],
                                                                 ),
                                                               ),
@@ -747,12 +906,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                                   ),
                                                 );
                                               },
-                                            ),
-                                          if (itemDisplay.isEmpty) EmptyData(),
+                                            ),),
+                                          if (servedDisplay.isEmpty) EmptyData(),
                                         ],
                                       ),
                                     ),
-                                  ),
+                                  // ),
                                 ),
                               ),
                             if (isLoadingContent)
@@ -774,6 +933,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               border: Border(
                                 left: BorderSide(
                                   color: theme.colorScheme.outline,
+                                  width: 0.5,
                                 ),
                               ),
                             ),
@@ -968,6 +1128,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                           .colorScheme.error,
                                                     ),
                                                     onConfirm: () {
+                                                      cart.clearCart();
                                                       setState(() {
                                                         AppState
                                                             .resetOrderCart();
@@ -1069,8 +1230,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                                         itemData.status
                                                             ? true
                                                             : false;
-                                                    print(
-                                                        'is checked, $isCheck');
+                                                    // print(
+                                                    //     'is checked, $isCheck');
                                                     return Padding(
                                                       padding:
                                                           const EdgeInsetsDirectional
@@ -1099,8 +1260,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                       ((modeView ==
                                                                           'served'))) &&
                                                                   (itemData
-                                                                          .docstatus !=
-                                                                      2))
+                                                                          .docstatus ==
+                                                                      0))
                                                                 Checkbox(
                                                                   value:
                                                                       isCheck,
@@ -1109,26 +1270,26 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                           value) {
                                                                     if (value !=
                                                                         null) {
-                                                                      print(
-                                                                          'check , $value');
+                                                                      // print(
+                                                                      //     'check , $value');
                                                                       setState(
                                                                           () {
                                                                         isCheck =
                                                                             value;
+                                                                        // itemData.status = value;
                                                                       });
                                                                       onCheckboxChange(
                                                                         itemData,
                                                                         index,
                                                                         value,
                                                                       );
-                                                                      print(
-                                                                          'check , $isCheck');
+                                                                      // print(
+                                                                      //     'check , $isCheck');
                                                                     }
                                                                     // isCheck = value!;
                                                                   },
                                                                 ),
-                                                              if ((modeView ==
-                                                                      'confirm') &&
+                                                              if (
                                                                   (itemData
                                                                           .docstatus ==
                                                                       2))
@@ -1186,19 +1347,21 @@ class _OrderScreenState extends State<OrderScreen> {
                                                               ),
                                                             ),
                                                           SizedBox(height: 8),
-                                                          if (itemData
+                                                          if ((itemData
                                                                   .docstatus !=
-                                                              2)
+                                                              2))
                                                             Row(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
                                                                       .spaceBetween,
+                                                                      crossAxisAlignment: CrossAxisAlignment.end,
                                                               children: [
+                                                                if ((itemData.docstatus == 0) && (modeView != 'served'))
                                                                 Padding(
                                                                   padding: EdgeInsetsDirectional
                                                                       .fromSTEB(
                                                                           0.0,
-                                                                          8.0,
+                                                                          0.0,
                                                                           0.0,
                                                                           0.0),
                                                                   child: Column(
@@ -1206,34 +1369,35 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                         MainAxisSize
                                                                             .max,
                                                                     children: [
-                                                                      CustomOutlinedButton(
-                                                                        height:
-                                                                            32.0,
-                                                                        width:
-                                                                            80.0,
-                                                                        text:
-                                                                            "Edit",
-                                                                        buttonTextStyle:
-                                                                            TextStyle(color: theme.colorScheme.primary),
-                                                                        buttonStyle:
-                                                                            CustomButtonStyles.outlinePrimary,
-                                                                        onPressed:
-                                                                            () {
+                                                                      InkWell(
+                                                                        onTap: () {
                                                                           onTapEditItem(
                                                                             context,
                                                                             itemData,
                                                                             index,
                                                                           );
                                                                         },
+                                                                        child: Padding(
+                                                                          padding:
+                                                                              const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
+                                                                          child: Text(
+                                                                            'Edit',
+                                                                            style: TextStyle(
+                                                                              color: theme.colorScheme.primary,
+                                                                              fontWeight: FontWeight.w600,
+                                                                            ),
+                                                                          ),
+                                                                        ),
                                                                       ),
                                                                     ],
                                                                   ),
                                                                 ),
+                                                                if ((itemData.docstatus != 2))
                                                                 Padding(
                                                                   padding: EdgeInsetsDirectional
                                                                       .fromSTEB(
                                                                           0.0,
-                                                                          8.0,
+                                                                          0.0,
                                                                           0.0,
                                                                           0.0),
                                                                   child: Column(
@@ -1241,26 +1405,39 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                         MainAxisSize
                                                                             .max,
                                                                     children: [
-                                                                      CustomOutlinedButton(
-                                                                        height:
-                                                                            32.0,
-                                                                        width:
-                                                                            80.0,
-                                                                        text:
-                                                                            "Delete",
-                                                                        buttonTextStyle:
-                                                                            TextStyle(color: theme.colorScheme.error),
-                                                                        buttonStyle:
-                                                                            CustomButtonStyles.outlineError,
-                                                                        onPressed:
-                                                                            () {
-                                                                          onTapDelete(
-                                                                            context,
-                                                                            itemData,
-                                                                            index,
-                                                                          );
+                                                                      InkWell(
+                                                                        onTap: () {
+                                                                          print('item id, ${itemData.id}');
+                                                                          print('item name, ${itemData.name}');
+                                                                          if (itemData.id.contains('PORD')) {
+                                                                            print('cancel');
+                                                                            onTapCancel(
+                                                                              context,
+                                                                              itemData,
+                                                                              index,
+                                                                            );
+                                                                          } else {
+                                                                            print('delete');
+                                                                            onTapDelete(
+                                                                              context,
+                                                                              itemData,
+                                                                              index,
+                                                                            );
+                                                                          }
                                                                         },
+                                                                        child: Padding(
+                                                                          padding:
+                                                                              const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
+                                                                          child: Text(
+                                                                            itemData.id.contains('PORD') ? 'Cancel' : 'Delete',
+                                                                            style: TextStyle(
+                                                                              color: theme.colorScheme.error,
+                                                                              fontWeight: FontWeight.w600,
+                                                                            ),
+                                                                          ),
+                                                                        ),
                                                                       ),
+                                                                      
                                                                     ],
                                                                   ),
                                                                 ),
@@ -1330,7 +1507,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                 EdgeInsetsDirectional
                                                                     .fromSTEB(
                                                                         0.0,
-                                                                        16.0,
+                                                                        6.0,
                                                                         8.0,
                                                                         0.0),
                                                             child: Divider(
@@ -1348,7 +1525,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 );
                                               },
                                             ))),
-                                  if (cartSelected != null)
+                                  if ((cartSelected != null) && (cartData.isNotEmpty))
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           0.0, 8.0, 0.0, 8.0),
@@ -1461,20 +1638,45 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
+  bool? onSearchFilterMenu(String value, String search) {
+    // print('--- value, $value');
+    // print('-- search, $search');
+    // print('--- contais, ${value.toLowerCase().contains(search.toLowerCase())}');
+    return value.toLowerCase().contains(search.toLowerCase());
+    // List<dynamic> itemNew = AppState().dataItem;
+    // itemNew.where((item) => ((item['item_name'] == search) || (item['item_group'] == filter))).toList();;
+    // // itemDisplay = AppState().dataItem;
+    // setState((){
+    //   itemDisplay = itemNew;
+    // });
+    // itemDisplay.contains()
+  }
+
+  List<dynamic> menu(List<dynamic> data, String search, String filter) {
+    // itemDisplay = AppState().dataItem;
+    return data.where((item) => (item['item_name'].toString().toLowerCase().contains(search.toLowerCase()) && item['item_group'].toString().toLowerCase().contains(filter.toLowerCase()))).toList();
+  }
+
+  List<dynamic> order(List<dynamic> data, String search) {
+    return data.where((item) => item['name'].toString().toLowerCase().contains(search.toLowerCase())).toList();
+  }
+
   onTapRefreshHistory() async {
     print('serve screen');
     setState(() {
       isLoadingContent = true;
     });
-    await onCallDataInvoicePosOrder();
+    await onCallDataPosDelivery();
+    await reformatServedCart();
   }
 
   onTapRefreshMenu() async {
     print('tap refresjh');
+    print('check cartdata, ${AppState().configPosProfile}');
     setState(() {
       isLoadingContent = true;
     });
-    await onCallItemGroup();
+    // await onCallItemGroup();
     await onCallItemPrice();
     await onCallItem();
     // onCallDataPosCart();
@@ -1507,10 +1709,16 @@ class _OrderScreenState extends State<OrderScreen> {
     if (modeView == 'order') {
       if (cartSelected == null) {
         await onCallCreatePosCart();
+        setState(() {
+          cartSelected = null;
+          AppState.resetOrderCart();
+          cartData = [];
+          // print('set state');
+        });
       } else {
         for (OrderCartItem itm in cartData) {
           dynamic itemReq = {};
-          if (itm.id.contains('CORD')) {
+          if (itm.id.contains('ORD')) {
             itemReq = {
               'id': itm.id,
               'name': itm.name,
@@ -1531,13 +1739,16 @@ class _OrderScreenState extends State<OrderScreen> {
             };
           }
           // onCallPosOrder(itemReq);
-          await onCallCreatePosOrder(itemReq);
+          if ((itm.docstatus != 1) && (itm.docstatus != 2)) {
+            await onCallCreatePosOrder(itemReq);
+
+          }
         }
         setState(() {
+          cartSelected = null;
           AppState.resetOrderCart();
           cartData = [];
-          // modeView = 'item';
-          cartSelected = null;
+          // print('set state');
         });
       }
       await onTapRefreshOrder();
@@ -1554,9 +1765,17 @@ class _OrderScreenState extends State<OrderScreen> {
             'notes': itm.notes,
             'status': itm.status,
           };
+          print('item req, $itemReq');
           // onCallPosOrder(itemReq);
-          if (itm.docstatus == 0) {
-            await onCallSubmitPosOrder(itemReq);
+          if (itm.docstatus != 2) {
+            if (itm.status == true) {
+              print('order submmit');
+              await onCallSubmitPosOrder(itemReq);
+            } else {
+              print('order udpate');
+              await onCallCreatePosOrder(itemReq);
+            }
+
           }
         }
         setState(() {
@@ -1588,40 +1807,12 @@ class _OrderScreenState extends State<OrderScreen> {
         setState(() {
           AppState.resetOrderCart();
           cartData = [];
-          modeView = 'confirm';
+          modeView = 'served';
           cartSelected = null;
         });
         await onTapRefreshHistory();
       }
     }
-
-    // onCallDataPosCart();
-    // onCallDataPosOrder();
-
-    // reformatOrderCart();
-
-    // try {
-    //   await cart.createOrder(
-    //     guestNameController: enterGuestNameController,
-    //     resetDropdown: () {},
-    //     onSuccess: () {
-    //       Navigator.pushReplacementNamed(
-    //         context,
-    //         AppRoutes.orderScreen,
-    //       );
-    //     },
-    //   );
-    //   if (context.mounted) {
-    //     alertSuccess(context, 'Order berhasil ditambahkan');
-    //   }
-    // } catch (e) {
-    //   if (context.mounted) {
-    //     alertError(context, e.toString());
-    //   }
-    //   // ScaffoldMessenger.of(context).showSnackBar(
-    //   //   SnackBar(content: Text('Error: $e')),
-    //   // );
-    // }
   }
 
   onTapActionServe(BuildContext context, dynamic item) async {
@@ -1673,18 +1864,110 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   onTapDelete(BuildContext context, dynamic item, int index) async {
-    dynamic itemReq = {
-      'id': item.id,
-      'name': item.name,
-      'item_name': item.itemName,
-      'item_group': item.itemGroup,
-      'uom': item.uom,
-      'qty': item.qty,
-      'notes': item.notes,
-      'status': item.status,
-    };
-    await onCallCancelPosOrder(itemReq);
-    await onTapRefreshOrder();
+    print('check item id, ${item.id}');
+    await showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Color(0x80000000),
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          child: Padding(
+            padding:
+                MediaQuery.viewInsetsOf(
+                    context),
+            child: DialogCustomWidget(
+              description:
+                  'Are you sure to delete item?',
+              isConfirm: true,
+              captionConfirm: 'Delete',
+              styleConfirm: TextStyle(
+                color: theme
+                    .colorScheme.error,
+              ),
+              onConfirm: () async {
+                cart.removeItem(item.id);
+              },
+            ),
+          ),
+        );
+      },
+    );
+    setState((){
+      // cartData = cart.getAllItemCart();
+    });
+    
+    // dynamic itemReq = {
+    //   'id': item.id,
+    //   'name': item.name,
+    //   'item_name': item.itemName,
+    //   'item_group': item.itemGroup,
+    //   'uom': item.uom,
+    //   'qty': item.qty,
+    //   'notes': item.notes,
+    //   'status': item.status,
+    // };
+    // await onCallCancelPosOrder(itemReq);
+    // await onTapRefreshOrder();
+
+    // setState(() { })
+  }
+
+  onTapCancel(BuildContext context, dynamic item, int index) async {
+    await showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Color(0x80000000),
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          child: Padding(
+            padding:
+                MediaQuery.viewInsetsOf(
+                    context),
+            child: DialogCustomWidget(
+              description:
+                  'Are you sure to cancel item?',
+              isConfirm: true,
+              captionConfirm: 'Cancel',
+              styleConfirm: TextStyle(
+                color: theme
+                    .colorScheme.error,
+              ),
+              onConfirm: () async {
+                dynamic itemReq = {
+                  'id': item.id,
+                  'name': item.name,
+                  'item_name': item.itemName,
+                  'item_group': item.itemGroup,
+                  'uom': item.uom,
+                  'qty': item.qty,
+                  'notes': item.notes,
+                  'status': item.status,
+                  'docstatus': item.docstatus,
+                };
+
+                if (item.docstatus == 0) {
+
+                  await onCallDeletePosOrder(itemReq);
+                } else {
+                  await onCallCancelPosOrder(itemReq);
+                }
+
+                setState(() {
+                  AppState.resetOrderCart();
+                  cartData = [];
+                  modeView = 'confirm';
+                  cartSelected = null;
+                });
+                await onTapRefreshOrder();
+              },
+            ),
+          ),
+        );
+      },
+    );
+    
 
     // setState(() { })
   }
@@ -1696,7 +1979,7 @@ class _OrderScreenState extends State<OrderScreen> {
         FrappeFetchDataItemGroup.ItemGroupRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: '[]',
+      filters: '[["company","=","${AppState().configCompany["name"]}"]]',
     );
 
     try {
@@ -1759,12 +2042,15 @@ class _OrderScreenState extends State<OrderScreen> {
 
   onCallItem() async {
     isLoading = true;
+    print('filter default, ${filterItemDefault}');
+    print('filter selected, ${filterItemGroupSelected}');
 
     final FrappeFetchDataItem.ItemRequest requestItem =
         FrappeFetchDataItem.ItemRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: '[["disabled","=",0],["is_sales_item","=",1]]',
+      filters: '[["disabled","=",0],["is_sales_item","=",1],["item_group","in",[${filterItemGroupSelected != '' ? '"$filterItemGroupSelected"' : filterItemDefault}]]]',
+      // filters: '[["disabled","=",0],["is_sales_item","=",1]]',
       limit: 1500,
     );
 
@@ -1776,7 +2062,7 @@ class _OrderScreenState extends State<OrderScreen> {
         Duration(seconds: 30),
       );
 
-      // print("titiew: $itemRequset");
+      // print("titiew: $itemRequest");
       setState(() {
         AppState().dataItem = ReformatItemWithPrice(
           itemRequest,
@@ -1918,7 +2204,7 @@ class _OrderScreenState extends State<OrderScreen> {
       outlet: AppState().configPosProfile['name'],
       postingDate: dateTimeFormat('date', null).toString(),
       priceList: AppState().configPosProfile['selling_price_list'],
-      table: '1',
+      table: tableNumber,
       id: cartSelected != null ? cartSelected['name'] : null,
     );
     // print('cart selected, $cartSelected');
@@ -2018,9 +2304,9 @@ class _OrderScreenState extends State<OrderScreen> {
     final FrappeFetchSubmitOrder.SubmitPosOrderRequest request =
         FrappeFetchSubmitOrder.SubmitPosOrderRequest(
       cookie: AppState().setCookie,
-      cartNo: cartSelected['name'],
+      // cartNo: cartSelected['name'],
       id: paramItem['id'],
-      status: paramItem['status'] == true ? 1 : 0,
+      // status: paramItem['status'] == true ? 1 : 0,
     );
 
     try {
@@ -2054,7 +2340,7 @@ class _OrderScreenState extends State<OrderScreen> {
       cookie: AppState().setCookie,
       cartNo: cartSelected['name'],
       id: paramItem['id'],
-      status: paramItem['status'] == true ? 1 : 0,
+      docstatus: paramItem['docstatus'],
     );
 
     try {
@@ -2062,6 +2348,32 @@ class _OrderScreenState extends State<OrderScreen> {
           await FrappeFetchCancelOrder.request(requestQuery: request);
 
       if (callCancelPosOrder.isNotEmpty) {
+        if (context.mounted) {
+          alertSuccess(context, 'Success order cancelled..');
+        }
+      }
+    } catch (error) {
+      print('check error, ${error}');
+      if (context.mounted) {
+        alertError(context, error.toString());
+      }
+    }
+  }
+
+  onCallDeletePosOrder(dynamic paramItem) async {
+    final FrappeFetchDeleteOrder.DeletePosOrderRequest request =
+        FrappeFetchDeleteOrder.DeletePosOrderRequest(
+      cookie: AppState().setCookie,
+      cartNo: cartSelected['name'],
+      id: paramItem['id'],
+      docstatus: paramItem['docstatus'],
+    );
+
+    try {
+      final callDeletePosOrder =
+          await FrappeFetchDeleteOrder.request(requestQuery: request);
+
+      if (callDeletePosOrder.isNotEmpty) {
         if (context.mounted) {
           alertSuccess(context, 'Success order cancelled..');
         }
@@ -2110,7 +2422,7 @@ class _OrderScreenState extends State<OrderScreen> {
     List<dynamic> cartNew = [];
 
     // print('temp cart, ${tempPosCart[0]}');
-    print('temp order, ${tempPosOrder}');
+    // print('temp order, ${tempPosOrder}');
 
     if (tempPosCart.isNotEmpty) {
       for (dynamic cartTemp in tempPosCart) {
@@ -2278,10 +2590,11 @@ class _OrderScreenState extends State<OrderScreen> {
   void addToCartFromOrder(BuildContext context, dynamic order) async {
     setState(() {
       cart.clearCart();
+      AppState.resetOrderCart();
     });
     const Duration(seconds: 1);
 
-    print('check items, ${order['items'][0]['qty']}');
+    // print('check items, ${order['items'][0]['qty']}');
     for (int a = 0; a < order['items'].length; a++) {
       OrderCartItem newItem = OrderCartItem(
         id: order['items'][a]['name'],
@@ -2312,6 +2625,7 @@ class _OrderScreenState extends State<OrderScreen> {
       typeTransaction = 'dine-in';
       cartData = cart.getAllItemCart();
       cartSelected = order;
+      tableNumber = order['table'];
       // isEdit = false;
     });
     // order.forEach((dt) {

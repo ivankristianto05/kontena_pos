@@ -12,7 +12,7 @@ class InvoiceCartItem {
   final String name;
   final String itemName;
   final String itemGroup;
-  final String uom;
+  final String? uom;
   final String description;
   int qty;
   final Map<String, String> preference;
@@ -33,7 +33,7 @@ class InvoiceCartItem {
     required this.qty,
     required this.preference,
     required this.price,
-    required this.uom,
+    this.uom,
     required this.description,
     this.notes,
     this.addon,
@@ -58,7 +58,10 @@ class InvoiceCart {
 
   void _recalculateTotalPrice() {
     for (var item in _items) {
-      item.totalPrice = item.qty * (item.price + item.totalAddon);
+      if (item.docstatus != 2) {
+        item.totalPrice = item.qty * (item.price + item.totalAddon);
+
+      }
     }
   }
 
@@ -181,7 +184,7 @@ class InvoiceCart {
     };
 
     for (var item in AppState.invoiceCartItems) {
-      recap['totalPrice'] += item.totalPrice;
+      recap['totalPrice'] += item.docstatus !=2 ? item.totalPrice : 0;
 
       if (!recap['items'].containsKey(item.name)) {
         recap['items'][item.name] = {

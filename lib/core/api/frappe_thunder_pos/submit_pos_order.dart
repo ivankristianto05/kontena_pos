@@ -3,21 +3,21 @@ import 'package:http/http.dart' as http;
 
 class SubmitPosOrderRequest {
   final String cookie;
-  final String cartNo;
-  final int status;
+  // final String cartNo;
+  // final int status;
   final String id;
 
   SubmitPosOrderRequest({
     required this.cookie,
-    required this.status,
-    required this.cartNo,
+    // required this.status,
+    // required this.cartNo,
     required this.id,
   });
 
   Map<String, String> formatHeader() {
     return {
       'Cookie': cookie,
-      'Content-Type': 'application/x-www-form-urlencoded',
+      // 'Content-Type': 'application/x-www-form-urlencoded',
     };
   }
 
@@ -27,9 +27,9 @@ class SubmitPosOrderRequest {
 
   Map<String, dynamic> toJson() {
     final data = {
-        "doctype": "POS Order",
-        "docstatus": 0,
-        "name": id,
+        // "doctype": "POS Order",
+        "docstatus": 1,
+        // "name": id,
     };
 
     data.removeWhere((key, value) => value == null);
@@ -44,35 +44,19 @@ class SubmitPosOrderRequest {
 
 Future<Map<String, dynamic>> request(
   {required SubmitPosOrderRequest requestQuery}) async {
+    String url = 'https://erp2.hotelkontena.com/api/resource/POS Order/${requestQuery.getParamID()}';
 
-     final getResponse = await http.get(
-      Uri.parse('https://erp2.hotelkontena.com/api/resource/POS Order/${requestQuery.getParamID()}'),
-      headers: requestQuery.formatHeader(),
-    );
-
-    final getData = json.decode(getResponse.body);
-
-    // Pastikan 'modified' dari dokumen terbaru
-    final latestModified = getData['data'];
-    String url = 'https://erp2.hotelkontena.com/api/method/frappe.desk.form.save.savedocs';
-
-  final response = await http.post(
+  final response = await http.put(
     Uri.parse(url),
     headers: requestQuery.formatHeader(),
-    body: {
-      "doc": json.encode(latestModified),
-      "action": "Submit",
-    },
+    body: json.encode(requestQuery.toJson()),
   );
-
-  // print('body, ${response.headers}'); 
-  print('body, ${json.encode(latestModified)}'); 
 
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
 
-    if (responseBody.containsKey('docs')) {
-      return responseBody['docs'][0];
+    if (responseBody.containsKey('data')) {
+      return responseBody['data'];
     } else {
       throw Exception(responseBody);
     }

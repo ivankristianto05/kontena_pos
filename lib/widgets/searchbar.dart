@@ -4,7 +4,7 @@ import 'package:kontena_pos/core/theme/theme_helper.dart';
 
 class Searchbar extends StatefulWidget {
   void Function(String)? onChanged;
-  Function()? onCompleted;
+  Function(String)? onCompleted;
 
   Searchbar({
     super.key,
@@ -18,13 +18,13 @@ class Searchbar extends StatefulWidget {
 
 class _SearchbarState extends State<Searchbar> {
   // final double screenWidth;
-  // TextEditingController enterSearch = TextEditingController();
-  late TextEditingController enterSearch;
+  TextEditingController enterSearch = TextEditingController();
+  // late TextEditingController enterSearch;
 
   @override
   void initState() {
     super.initState();
-    enterSearch = TextEditingController();
+    // enterSearch = TextEditingController();
     // enterSearch.text = 'test';
   }
 
@@ -79,13 +79,16 @@ class _SearchbarState extends State<Searchbar> {
         onChanged: (value) {
           EasyDebounce.debounce(
             '_model.enterSearch',
-            Duration(milliseconds: 100),
-            () => setState(() {
-              // enterSearch.text = value;
-            }),
+            Duration(milliseconds: 300),
+            () {
+              setState((){
+                enterSearch.text = value;
+              });
+              widget.onChanged!(enterSearch.text);
+            }
           );
         },
-        onEditingComplete: widget.onCompleted,
+        onEditingComplete: onCompletedChange,
       ),
       // child: CustomTextFormField(
       //   controller: enterSearch,
@@ -127,5 +130,9 @@ class _SearchbarState extends State<Searchbar> {
       //       : null,
       // ),
     );
+  }
+
+  onCompletedChange() {
+    // onCompleted(enterSearch.text);
   }
 }

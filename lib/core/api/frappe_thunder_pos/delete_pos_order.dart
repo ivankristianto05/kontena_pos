@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class CancelPosOrderRequest {
+class DeletePosOrderRequest {
   final String cookie;
   final String cartNo;
   final int docstatus;
   final String id;
 
-  CancelPosOrderRequest({
+  DeletePosOrderRequest({
     required this.cookie,
     required this.docstatus,
     required this.cartNo,
@@ -28,8 +28,8 @@ class CancelPosOrderRequest {
   Map<String, dynamic> toJson() {
     final data = {
       // "doctype": "POS Order",
-      // "name": id,
-      "docstatus": 2,
+      "name": id,
+      // "docstatus": 2,
     };
 
     data.removeWhere((key, value) => value == null);
@@ -43,7 +43,7 @@ class CancelPosOrderRequest {
 }
 
 Future<Map<String, dynamic>> request(
-    {required CancelPosOrderRequest requestQuery}) async {
+    {required DeletePosOrderRequest requestQuery}) async {
   // final getResponse = await http.get(
   //   Uri.parse(
   //       'https://erp2.hotelkontena.com/api/resource/POS Order/${requestQuery.getParamID()}'),
@@ -57,20 +57,21 @@ Future<Map<String, dynamic>> request(
   String url =
       'https://erp2.hotelkontena.com/api/resource/POS Order/${requestQuery.getParamID()}';
 
-  final response = await http.put(
+  final response = await http.delete(
     Uri.parse(url),
     headers: requestQuery.formatHeader(),
-    body: json.encode(requestQuery.toJson()),
+    // body: json.encode(requestQuery.toJson()),
   );
 
   // print('body, ${requestQuery.toJson()}');
   // print('body, ${json.encode(latestModified)}');
+  print('check status code, ${response.statusCode}');
 
-  if (response.statusCode == 200) {
+  if (response.statusCode == 202) {
     final responseBody = json.decode(response.body);
-
-    if (responseBody.containsKey('data')) {
-      return responseBody['data'];
+    // print('check responbody, ${responseBody}');
+    if (responseBody.containsKey('message')) {
+      return responseBody;
     } else {
       throw Exception(responseBody);
     }

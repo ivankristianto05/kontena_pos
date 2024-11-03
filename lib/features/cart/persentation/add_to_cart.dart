@@ -949,37 +949,37 @@ class _AddToCartState extends State<AddToCart> {
                                 ),
                               ),
                             ),
-                            Expanded(
-                              child: Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
-                                    8.0, 8.0, 8.0, 8.0),
-                                child: Container(
-                                  width: double.infinity,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(2.0),
-                                  ),
-                                  child: CustomElevatedButton(
-                                    text: "Add Item To Cart",
-                                    buttonTextStyle: TextStyle(
-                                      color: theme.colorScheme.primaryContainer,
-                                    ),
-                                    buttonStyle: CustomButtonStyles.primary,
-                                    onPressed: () {
-                                      addToCart(
-                                        context,
-                                        widget.dataMenu,
-                                        selectedVarian,
-                                        selectedAddon,
-                                        notesController.text,
-                                        int.parse(qtyController.text),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
+                            // Expanded(
+                            //   child: Padding(
+                            //     padding: EdgeInsetsDirectional.fromSTEB(
+                            //         8.0, 8.0, 8.0, 8.0),
+                            //     child: Container(
+                            //       width: double.infinity,
+                            //       height: 40,
+                            //       decoration: BoxDecoration(
+                            //         color: theme.colorScheme.primary,
+                            //         borderRadius: BorderRadius.circular(2.0),
+                            //       ),
+                            //       child: CustomElevatedButton(
+                            //         text: "Add Item To Cart",
+                            //         buttonTextStyle: TextStyle(
+                            //           color: theme.colorScheme.primaryContainer,
+                            //         ),
+                            //         buttonStyle: CustomButtonStyles.primary,
+                            //         onPressed: () {
+                            //           addToCart(
+                            //             context,
+                            //             widget.dataMenu,
+                            //             selectedVarian,
+                            //             selectedAddon,
+                            //             notesController.text,
+                            //             int.parse(qtyController.text),
+                            //           );
+                            //         },
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
@@ -1011,6 +1011,7 @@ class _AddToCartState extends State<AddToCart> {
       // const SizedBox(height: 6),
       CustomTextFormField(
         controller: searchVarianController,
+        autofocus: false,
         // focusNode: inputSearchVarian,
         contentPadding: EdgeInsets.symmetric(
           horizontal: 3.h,
@@ -1044,6 +1045,7 @@ class _AddToCartState extends State<AddToCart> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       CustomTextFormField(
         controller: notesController,
+        autofocus: false,
         // focusNode: inputSearchVarian,
         maxLines: 2,
         contentPadding: EdgeInsets.symmetric(
@@ -1261,6 +1263,7 @@ class _AddToCartState extends State<AddToCart> {
             width: 40,
             color: theme.colorScheme.surface,
             child: CustomTextFormField(
+              autofocus: false,
               controller: addonDisplay[indexParent]['items'][index]['editor'],
               maxLines: 1,
               contentPadding: EdgeInsets.symmetric(
@@ -1318,7 +1321,7 @@ class _AddToCartState extends State<AddToCart> {
     int qty = int.parse(qtyController.text);
     qty = type == 'add' ? qty + 1 : qty - 1;
     qty = qty.clamp(
-        0, 99); // Prevent negative quantities and set a reasonable upper limit
+        1, 99); // Prevent negative quantities and set a reasonable upper limit
     setState(() {
       qtyController.text = qty.toString();
     });
@@ -1343,6 +1346,7 @@ class _AddToCartState extends State<AddToCart> {
             // constraints: BoxConstraints(minWidth: 40),
             color: theme.colorScheme.surface,
             child: CustomTextFormField(
+              autofocus: false,
               controller: qtyController,
               maxLines: 1,
               contentPadding: EdgeInsets.symmetric(
@@ -1389,7 +1393,7 @@ class _AddToCartState extends State<AddToCart> {
     // print('check addon, $addon');
     // print('check qty, $qty');
 
-    String id = item['name'];
+    String id = item['item_name'];
 
     if (note != '') {
       var notes = note.toLowerCase();
@@ -1407,7 +1411,7 @@ class _AddToCartState extends State<AddToCart> {
         preference: {},
         price: item['standard_rate'].floor(),
         qty: qty,
-        uom: item['stock_uom'],
+        // uom: item['stock_uom'],
         description: item['item_name'],
         // addon: addon,
         itemGroup: item['item_group'],
@@ -1427,10 +1431,10 @@ class _AddToCartState extends State<AddToCart> {
         itemName: item['item_name'],
         // variant: null,
         // variantId: null,
-        uom: item['stock_uom'],
+        // uom: item['stock_uom'],
         description: item['item_name'],
         qty: qty,
-        price: item['standard_rate'].floor(),
+        price: widget.idxMenu != null ? item.price : item['standard_rate'].floor(),
         // variantPrice: item['standard_rate'].floor(),
         // addonsPrice:
         // item['standard_rate'].floor(), // Masukkan harga total addons
@@ -1476,25 +1480,34 @@ class _AddToCartState extends State<AddToCart> {
     // invoice
     if (widget.order == false) {
       print('ivnoce');
+      InvoiceCartItem itemNew = invoiceCart.getItemByIndex(widget.idxMenu!);
+
       InvoiceCartItem newItem = InvoiceCartItem(
-        id: id,
-        name: item['name'],
-        itemName: item['item_name'],
-        notes: note,
-        preference: {},
-        price: item['price'],
+        id: itemNew.id,
+        name: itemNew.name,
+        itemName: itemNew.itemName,
+        itemGroup: itemNew.itemGroup,
+        uom: itemNew.uom,
+        description: itemNew.description,
         qty: qty,
-        uom: item['stock_uom'],
-        description: item['item_name'],
-        // addon: addon,
-        itemGroup: item['item_group'],
-        docstatus: item['docstatus'],
+        price: itemNew.price,
+        notes: itemNew.notes,
+        preference: itemNew.preference,
+        status: false,
+        docstatus: itemNew.docstatus,
         addon: selectedAddon,
         totalAddon: totalAddon(),
       );
 
+      // setState(() {
+      //   invoiceCart.addItem(newItem, mode: InvoiceCartMode.update);
+      // });
       setState(() {
-        invoiceCart.addItem(newItem, mode: InvoiceCartMode.update);
+        if (qty == 0) {
+          invoiceCart.removeItem(itemNew.id);
+        } else {
+          invoiceCart.addItem(newItem, mode: InvoiceCartMode.update);
+        }
       });
     } else {
       print('order');
@@ -1538,7 +1551,11 @@ class _AddToCartState extends State<AddToCart> {
 
       // final cart = Provider.of<Cart>(context, listen: false);
       setState(() {
-        orderCart.addItem(newItem, mode: OrderCartMode.update);
+        if (qty == 0) {
+          orderCart.removeItem(itemNew.id);
+        } else {
+          orderCart.addItem(newItem, mode: OrderCartMode.update);
+        }
       });
     }
 

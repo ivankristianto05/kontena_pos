@@ -86,7 +86,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                             Column(
                               children: [
                                 Searchbar(
-                                  onCompleted: () {},
+                                  onCompleted: (value) {},
                                 ),
                               ],
                             ),
@@ -531,7 +531,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                                         CustomTextStyles
                                                             .bodySmallGray,
                                                     isEdit: false,
-                                                    onTap: () => {},
+                                                    // onTap: () => {},
                                                   );
                                                 },
                                               ),
