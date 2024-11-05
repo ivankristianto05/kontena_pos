@@ -70,177 +70,181 @@ class _LoginScreenState extends State<LoginScreen> {
         key: scaffoldKey,
         backgroundColor: theme.colorScheme.primaryContainer,
         body: SafeArea(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Padding(
-              padding:
-                  const EdgeInsetsDirectional.fromSTEB(0.0, 60.0, 0.0, 60.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: MediaQuery.sizeOf(context).width * 0.5,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer,
-                          border: Border.all(
-                            color: theme.colorScheme.background,
-                            width: 2,
+          child: Center(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Padding(
+                padding:
+                    const EdgeInsetsDirectional.fromSTEB(0.0, 60.0, 0.0, 60.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: MediaQuery.sizeOf(context).width * 0.5,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer,
+                            border: Border.all(
+                              color: theme.colorScheme.background,
+                              width: 2,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
                           ),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                            30.0,
-                            80.0,
-                            30.0,
-                            80.0,
-                          ),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  'assets/images/app_launcher_icon.png',
-                                  height: 165.v,
-                                  width: 165.v,
-                                ),
-                                Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Login',
-                                      style: theme.textTheme.titleMedium,
-                                    ),
-                                    Text(
-                                      'Masukkan username & password untuk melanjutkan',
-                                      style: theme.textTheme.labelSmall,
-                                    ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                        0.0,
-                                        16.0,
-                                        0.0,
-                                        16.0,
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                              30.0,
+                              80.0,
+                              30.0,
+                              80.0,
+                            ),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/app_launcher_icon.png',
+                                    height: 165.v,
+                                    width: 165.v,
+                                  ),
+                                  Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Login',
+                                        style: theme.textTheme.titleMedium,
                                       ),
-                                      child: Form(
-                                        key: formKey,
-                                        autovalidateMode:
-                                            AutovalidateMode.disabled,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                0.0,
-                                                0.0,
-                                                0.0,
-                                                16.0,
-                                              ),
-                                              child: _buildPhoneNumberSection(
-                                                context,
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                0.0,
-                                                0.0,
-                                                0.0,
-                                                16.0,
-                                              ),
-                                              child: _buildPasswordSection(
-                                                  context),
-                                            ),
-                                          ],
-                                        ),
+                                      Text(
+                                        'Masukkan username & password untuk melanjutkan',
+                                        style: theme.textTheme.labelSmall,
                                       ),
-                                    ),
-                                    if (isLoading)
-                                      Container(
-                                        width: double.infinity,
-                                        height: 48.0,
-                                        decoration: BoxDecoration(
-                                          color: theme.colorScheme.primary,
-                                          borderRadius:
-                                              BorderRadius.circular(8.0),
+                                      Padding(
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(
+                                          0.0,
+                                          16.0,
+                                          0.0,
+                                          16.0,
                                         ),
-                                        child: Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  8.0, 0.0, 8.0, 0.0),
-                                          child: Row(
+                                        child: Form(
+                                          key: formKey,
+                                          autovalidateMode:
+                                              AutovalidateMode.disabled,
+                                          child: Column(
                                             mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Center(
-                                                child: Container(
-                                                  width: 23,
-                                                  height: 23,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation<
-                                                            Color>(
-                                                      Colors.white,
-                                                    ),
-                                                  ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                  16.0,
+                                                ),
+                                                child: _buildPhoneNumberSection(
+                                                  context,
                                                 ),
                                               ),
                                               Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        10.0, 0.0, 8.0, 0.0),
-                                                child: Text(
-                                                  'Loading...',
-                                                  style: TextStyle(
-                                                      color: theme.colorScheme
-                                                          .primaryContainer),
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(
+                                                  0.0,
+                                                  0.0,
+                                                  0.0,
+                                                  16.0,
                                                 ),
+                                                child: _buildPasswordSection(
+                                                    context),
                                               ),
                                             ],
                                           ),
                                         ),
                                       ),
-                                    if (isLoading == false)
-                                      CustomElevatedButton(
-                                        text: "Masuk",
-                                        buttonTextStyle: TextStyle(
-                                            color: theme
-                                                .colorScheme.primaryContainer),
-                                        buttonStyle:
-                                            CustomButtonStyles.primaryButton,
-                                        onPressed: () {
-                                          onTapMasuk(context);
-                                        },
-                                      ),
-                                  ],
-                                ),
-                              ],
+                                      if (isLoading)
+                                        Container(
+                                          width: double.infinity,
+                                          height: 48.0,
+                                          decoration: BoxDecoration(
+                                            color: theme.colorScheme.primary,
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                          ),
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    8.0, 0.0, 8.0, 0.0),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Center(
+                                                  child: Container(
+                                                    width: 23,
+                                                    height: 23,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      valueColor:
+                                                          AlwaysStoppedAnimation<
+                                                              Color>(
+                                                        Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(
+                                                          10.0, 0.0, 8.0, 0.0),
+                                                  child: Text(
+                                                    'Loading...',
+                                                    style: TextStyle(
+                                                        color: theme.colorScheme
+                                                            .primaryContainer),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      if (isLoading == false)
+                                        CustomElevatedButton(
+                                          text: "Masuk",
+                                          buttonTextStyle: TextStyle(
+                                              color: theme.colorScheme
+                                                  .primaryContainer),
+                                          buttonStyle:
+                                              CustomButtonStyles.primaryButton,
+                                          onPressed: () {
+                                            onTapMasuk(context);
+                                          },
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

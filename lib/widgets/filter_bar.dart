@@ -57,8 +57,8 @@ class _FilterBarState extends State<FilterBar> {
   @override
   Widget build(BuildContext context) {
     // Calculate button width based on screen width
-    double screenWidth = MediaQuery.of(context).size.width;
-    double buttonWidth = (screenWidth * 0.65 - 145) /
+    // double screenWidth = MediaQuery.of(context).size.width;
+    double buttonWidth = (MediaQuery.of(context).size.width * 0.45 - 145) /
         4; // 65% of screen width divided among 4 buttons, minus padding
 
     return Padding(
@@ -103,7 +103,7 @@ class _FilterBarState extends State<FilterBar> {
   Widget _buildFilterButton(String type, double width) {
     bool isSelected = _selectedFilter == type;
     return SizedBox(
-      height: 50,
+      height: 48,
       width: width,
       child: CustomElevatedButton(
         text: type.toUpperCase(),

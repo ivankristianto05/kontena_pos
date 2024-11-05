@@ -172,20 +172,30 @@ String? dateTimeFormat(
   return result;
 }
 
-String timeFormat(String type, String time) {
+String timeFormat(String type, String? time) {
   DateTime now = DateTime.now();
-  DateTime parsed = time == 'now' ? now : DateFormat('H:m:s').parse(time);
+  // DateTime parsed = time == 'now' ? now : DateFormat('H:m:s').parse(time!);
   String result = '';
 
   switch (type) {
     case 'time_simple':
-      result = DateFormat('HH:mm').format(parsed);
+      if (time != null) {
+        DateTime parse = DateFormat('H:m:s').parse(time);
+        result = DateFormat('HH:mm').format(parse);
+      } else {
+        result = DateFormat('HH:mm').format(now);
+      }
       break;
 
     case 'time_full':
-    default:
-      result = DateFormat('hh:mm:ss').format(parsed);
+      if (time != null) {
+        DateTime parse = DateFormat('H:m:s').parse(time);
+        result = DateFormat('HH:mm:ss').format(parse);
+      } else {
+        result = DateFormat('HH:mm:ss').format(now);
+      }
       break;
+    default:
   }
   return result;
 }

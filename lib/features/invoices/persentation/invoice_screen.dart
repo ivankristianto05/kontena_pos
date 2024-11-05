@@ -84,7 +84,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   String search = '';
   String filter = '';
 
-
   int totalAddon = 0;
   int totalAddonCheckout = 0;
 
@@ -136,7 +135,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       AppState().tableNumber = '1';
       tableNumber = '1';
       itemGroupDisplay = AppState().configPosProfile['item_groups'];
-      filterItemDefault = itemGroupDisplay.map((itemGroup) => '"${itemGroup['item_group']}"').join(', ');
+      filterItemDefault = itemGroupDisplay
+          .map((itemGroup) => '"${itemGroup['item_group']}"')
+          .join(', ');
     });
     // cartData = cart.getAllItemCart();
 
@@ -206,18 +207,16 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                         child: Stack(
                           children: [
                             if (modeView == 'item')
-                            Column(
-                              children: [
-                                Searchbar(
-                                  onChanged: (value) {
+                              Column(
+                                children: [
+                                  Searchbar(onChanged: (value) {
                                     print('value, $value');
-                                    setState((){
+                                    setState(() {
                                       search = value;
                                     });
-                                  }
-                                ),
-                              ],
-                            ),
+                                  }),
+                                ],
+                              ),
                             if (modeView == 'item')
                               Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
@@ -227,7 +226,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                   fieldValue: 'item_group',
                                   onFilterSelected: (String type) {
                                     // print('check type, $type');
-                                    setState((){
+                                    setState(() {
                                       if (type == 'All') {
                                         filter = '';
                                       } else {
@@ -245,60 +244,65 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                   alignment: Alignment.topLeft,
                                   child: SingleChildScrollView(
                                     primary: true,
-                                    physics: const AlwaysScrollableScrollPhysics(),
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
                                     child: SizedBox(
                                       width: MediaQuery.sizeOf(context).width,
                                       child: Column(
                                         children: [
-                                          Builder(
-                                            builder: (context) {
-                                              final produk = AppState().dataItem;
-                                              final itemMenu = menu(produk, search, filter);
-                                              // print('check item menu, $itemMenu');
-                                              return itemMenu.isNotEmpty ? MasonryGridView.count(
-                                                crossAxisCount: 5,
-                                                mainAxisSpacing: 6,
-                                                crossAxisSpacing: 6,
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemCount: itemMenu.length,
-                                                itemBuilder: (context, index) {
-                                                  final currentItem =
-                                                      itemMenu[index];
+                                          Builder(builder: (context) {
+                                            final produk = AppState().dataItem;
+                                            final itemMenu =
+                                                menu(produk, search, filter);
+                                            // print('check item menu, $itemMenu');
+                                            return itemMenu.isNotEmpty
+                                                ? MasonryGridView.count(
+                                                    crossAxisCount: 5,
+                                                    mainAxisSpacing: 6,
+                                                    crossAxisSpacing: 6,
+                                                    shrinkWrap: true,
+                                                    physics:
+                                                        const NeverScrollableScrollPhysics(),
+                                                    itemCount: itemMenu.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final currentItem =
+                                                          itemMenu[index];
 
-                                                  return ProductGrid(
-                                                    name: currentItem[
-                                                            'item_name'] ??
-                                                        '',
-                                                    category: currentItem[
-                                                            'item_group'] ??
-                                                        '',
-                                                    price: numberFormat(
-                                                        'idr',
-                                                        currentItem[
-                                                            'standard_rate']),
-                                                    image: CustomImageView(
-                                                      imagePath:
-                                                          ImageConstant.imgAdl1,
-                                                      height: 90.v,
-                                                      width: 70.h,
-                                                      margin: EdgeInsets.only(
-                                                          bottom: 1.v),
-                                                    ),
-                                                    onTap: () {
-                                                      onTapOpenItem(
-                                                        context,
-                                                        currentItem,
+                                                      return ProductGrid(
+                                                        name: currentItem[
+                                                                'item_name'] ??
+                                                            '',
+                                                        category: currentItem[
+                                                                'item_group'] ??
+                                                            '',
+                                                        price: numberFormat(
+                                                            'idr',
+                                                            currentItem[
+                                                                'standard_rate']),
+                                                        image: CustomImageView(
+                                                          imagePath:
+                                                              ImageConstant
+                                                                  .imgAdl1,
+                                                          height: 90.v,
+                                                          width: 70.h,
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  bottom: 1.v),
+                                                        ),
+                                                        onTap: () {
+                                                          onTapOpenItem(
+                                                            context,
+                                                            currentItem,
+                                                          );
+                                                        },
                                                       );
                                                     },
-                                                  );
-                                                },
-                                              ) : EmptyData();
-                                            }
-                                          ),
+                                                  )
+                                                : EmptyData();
+                                          }),
                                           // if (itemDisplay.isNotEmpty)
-                                            
+
                                           // // Text('testing'),
                                           // if (itemDisplay.isEmpty) EmptyData(),
                                         ],
@@ -314,36 +318,34 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                     8.0, 8.0, 8.0, 0.0),
                                 child: Align(
                                   alignment: Alignment.topLeft,
-                                // child: SingleChildScrollView(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                                8.0, 4.0, 8.0, 0.0),
-                                            child: Text(
-                                              'Order To Pay ',
-                                              style: TextStyle(
-                                                color:
-                                                    theme.colorScheme.secondary,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                  // child: SingleChildScrollView(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(8.0, 4.0, 8.0, 0.0),
+                                          child: Text(
+                                            'Order To Pay ',
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          Divider(
-                                            height: 5.0,
-                                            thickness: 0.5,
-                                            color: theme
-                                                .colorScheme
-                                                .outline,
-                                          ),
-                                          if (orderDisplay.isNotEmpty)
-                                            Expanded(
+                                        ),
+                                        Divider(
+                                          height: 5.0,
+                                          thickness: 0.5,
+                                          color: theme.colorScheme.outline,
+                                        ),
+                                        if (orderDisplay.isNotEmpty)
+                                          Expanded(
                                             child: AlignedGridView.count(
                                               crossAxisCount: 3,
                                               mainAxisSpacing: 6,
@@ -357,7 +359,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                 //     'check order, ${orderDisplay[index]}');
                                                 // final currentOrderId =
                                                 //     AppState().currentOrderId;
-                                                final order = orderDisplay[index];
+                                                final order =
+                                                    orderDisplay[index];
                                                 dynamic orderItemList =
                                                     order['items'];
                                                 // final isSelected =
@@ -394,7 +397,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                         .spaceBetween,
                                                                 children: [
                                                                   Text(
-                                                                    order['name'],
+                                                                    order[
+                                                                        'name'],
                                                                     style: theme
                                                                         .textTheme
                                                                         .titleMedium,
@@ -463,8 +467,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                     ListView
                                                                         .separated(
                                                                       separatorBuilder:
-                                                                          (context,
-                                                                                  index) =>
+                                                                          (context, index) =>
                                                                               Divider(
                                                                         height:
                                                                             12,
@@ -486,15 +489,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                               idx) {
                                                                         dynamic
                                                                             orderItem =
-                                                                            orderItemList[
-                                                                                idx];
+                                                                            orderItemList[idx];
                                                                         print(
                                                                             'check item qty, ${orderItem['quantity']}');
                                                                         return Padding(
                                                                           padding: const EdgeInsets
                                                                               .only(
-                                                                              bottom:
-                                                                                  8.0),
+                                                                              bottom: 8.0),
                                                                           child:
                                                                               Row(
                                                                             crossAxisAlignment:
@@ -586,12 +587,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                   ),
                                                 );
                                               },
-                                            ),),
-                                          if (orderDisplay.isEmpty) EmptyData(),
-                                        ],
-                                      ),
+                                            ),
+                                          ),
+                                        if (orderDisplay.isEmpty) EmptyData(),
+                                      ],
                                     ),
-                                // ),
+                                  ),
+                                  // ),
                                 ),
                               ),
                           ],
@@ -733,8 +735,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                               .colorScheme.primaryContainer,
                                           border: Border(
                                             bottom: BorderSide(
-                                              color:
-                                                  theme.colorScheme.outline,
+                                              color: theme.colorScheme.outline,
                                               width: 0.5,
                                             ),
                                           ),
@@ -746,8 +747,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           child: Row(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .spaceBetween,
+                                                MainAxisAlignment.spaceBetween,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             children: [
@@ -766,8 +766,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                               Icon(
                                                 Icons
                                                     .keyboard_arrow_down_rounded,
-                                                color: theme
-                                                    .colorScheme.secondary,
+                                                color:
+                                                    theme.colorScheme.secondary,
                                                 size: 24.0,
                                               ),
                                             ],
@@ -995,7 +995,16 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   List<dynamic> menu(List<dynamic> data, String search, String filter) {
     // itemDisplay = AppState().dataItem;
-    return data.where((item) => (item['item_name'].toString().toLowerCase().contains(search.toLowerCase()) && item['item_group'].toString().toLowerCase().contains(filter.toLowerCase()))).toList();
+    return data
+        .where((item) => (item['item_name']
+                .toString()
+                .toLowerCase()
+                .contains(search.toLowerCase()) &&
+            item['item_group']
+                .toString()
+                .toLowerCase()
+                .contains(filter.toLowerCase())))
+        .toList();
   }
 
   onTapRefreshMenu() async {
@@ -1109,7 +1118,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         FrappeFetchDataItem.ItemRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: '[["disabled","=",0],["is_sales_item","=",1],["item_group","in",[$filterItemDefault]]]',
+      filters:
+          '[["disabled","=",0],["is_sales_item","=",1],["item_group","in",[$filterItemDefault]]]',
       // filters: '[["disabled","=",0],["is_sales_item","=",1]]',
       limit: 1500,
     );
@@ -1480,17 +1490,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       builder: (context) {
         return GestureDetector(
           child: Padding(
-            padding:
-                MediaQuery.viewInsetsOf(
-                    context),
+            padding: MediaQuery.viewInsetsOf(context),
             child: DialogCustomWidget(
-              description:
-                  'Are you sure to delete item?',
+              description: 'Are you sure to delete item?',
               isConfirm: true,
               captionConfirm: 'Delete',
               styleConfirm: TextStyle(
-                color: theme
-                    .colorScheme.error,
+                color: theme.colorScheme.error,
               ),
               onConfirm: () async {
                 cart.removeItem(item.id);
@@ -1500,8 +1506,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         );
       },
     );
-    setState((){
-      cartData = cart.getAllItemCart();
+    setState(() {
+      // cartData = cart.getAllItemCart();
     });
   }
 
@@ -1562,8 +1568,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           itemName: order['items'][a]['item_name'],
           itemGroup: order['items'][a]['item_group'],
           uom: order['items'][a]['uom'] ?? '',
-          description:
-              order['items'][a]['description'] ?? order['items'][a]['item_name'],
+          description: order['items'][a]['description'] ??
+              order['items'][a]['item_name'],
           qty: order['items'][a]['qty'],
           price: order['items'][a]['price'].floor(),
           notes: order['items'][a]['note'],
@@ -1578,7 +1584,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           cart.addItem(newItem, mode: InvoiceCartMode.add);
         });
       }
-
     }
     setState(() {
       enterGuestNameController.text = order['customer_name'];

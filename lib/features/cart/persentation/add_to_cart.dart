@@ -189,7 +189,7 @@ class _AddToCartState extends State<AddToCart> {
                     Divider(
                       height: 1.0,
                       thickness: 1.0,
-                      color: theme.colorScheme.surface,
+                      color: theme.colorScheme.outline,
                     ),
                     Expanded(
                       child: Row(
@@ -389,7 +389,7 @@ class _AddToCartState extends State<AddToCart> {
                             width: 1.0,
                             height: double.infinity,
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.surface,
+                              color: theme.colorScheme.outline,
                             ),
                           ),
                           Expanded(
@@ -612,7 +612,7 @@ class _AddToCartState extends State<AddToCart> {
                             width: 1.0,
                             height: double.infinity,
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.surface,
+                              color: theme.colorScheme.outline,
                             ),
                           ),
                           Expanded(
@@ -1434,7 +1434,8 @@ class _AddToCartState extends State<AddToCart> {
         // uom: item['stock_uom'],
         description: item['item_name'],
         qty: qty,
-        price: widget.idxMenu != null ? item.price : item['standard_rate'].floor(),
+        price:
+            widget.idxMenu != null ? item.price : item['standard_rate'].floor(),
         // variantPrice: item['standard_rate'].floor(),
         // addonsPrice:
         // item['standard_rate'].floor(), // Masukkan harga total addons

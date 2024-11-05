@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "pos_kontena" "\0"
+            VALUE "CompanyName", "id.thunderlab.jcpos" "\0"
+            VALUE "FileDescription", "JCPOS" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "pos_kontena" "\0"
+            VALUE "InternalName", "JCPOS" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "pos_kontena.exe" "\0"
-            VALUE "ProductName", "pos_kontena" "\0"
+            VALUE "OriginalFilename", "JCPOS.exe" "\0"
+            VALUE "ProductName", "JCPOS" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

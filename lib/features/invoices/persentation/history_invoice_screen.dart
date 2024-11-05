@@ -296,8 +296,10 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                         height: double.infinity,
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primaryContainer,
-                          border: Border.all(
-                            color: theme.colorScheme.outline,
+                          border: Border(
+                            left: BorderSide(
+                              color: theme.colorScheme.outline,
+                            ),
                           ),
                         ),
                         child: Padding(
@@ -307,13 +309,41 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Detail Invoice',
-                                style: TextStyle(
-                                  color: theme.colorScheme.secondary,
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Detail Invoice',
+                                    style: TextStyle(
+                                      color: theme.colorScheme.secondary,
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (invoiceSelected != null)
+                                    InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        // setState(() {
+                                        //   FFAppState().ActivePage = 'Menu';
+                                        // });
+                                        // context.pop();
+                                        // onTapClose(context);
+                                        setState(() {
+                                          invoiceSelected = null;
+                                        });
+                                      },
+                                      child: Icon(
+                                        Icons.close_rounded,
+                                        color: theme.colorScheme.secondary,
+                                        size: 24.0,
+                                      ),
+                                    ),
+                                ],
                               ),
                               Divider(
                                 height: 14.0,
@@ -620,7 +650,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                             buttonStyle: CustomButtonStyles
                                                 .outlinePrimary,
                                             onPressed: () {
-                                              // onPrintChecker();
+                                              onPrintChecker();
                                             },
                                           ),
                                         ],
@@ -670,7 +700,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
   }
 
   onTapRefresh() async {
-    print('yes');
+    // print('yes');
     setState(() {
       isLoading = true;
     });
@@ -681,7 +711,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
   }
 
   onTapAction(BuildContext context, dynamic item) async {
-    print('yes click');
+    // print('yes click');
     // setState
     setState(() {
       // invoiceSelected = item;
@@ -710,14 +740,14 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
       fields: '["*"]',
       filters: '[["pos_profile","=","${AppState().configPosProfile['name']}"]]',
       orderBy: 'creation desc',
-      limit: 2000,
+      limit: 500,
     );
 
     try {
       final callRequest =
           await FrappeFetchDataGetInvoice.request(requestQuery: request);
 
-      print('result, $callRequest');
+      // print('result, $callRequest');
       if (callRequest.isNotEmpty) {}
       setState(() {
         tempPosOrder = callRequest;
@@ -807,7 +837,34 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
     setState(() {
       filterPayment = AppState().configPosProfile['payments'];
     });
-    print('check, $filterPayment');
+    // print('check, $filterPayment');
+  }
+
+  onPrintChecker() async {
+    dynamic docPrint = await printChecker(
+      invoiceSelected,
+      AppState().configPrinter,
+    );
+
+    // print('print invoce, ${AppState().configPrinter}');
+
+    final sendToPrinter.ToPrint request =
+        sendToPrinter.ToPrint(doc: docPrint, ipAddress: '127.0.0.1');
+    try {
+      final callRespon = await sendToPrinter.request(requestQuery: request);
+      // print('call respon, ${callRespon}');
+      if (callRespon != null) {
+        // setState((){
+        //   paymentStatus = true;
+        //   invoice = callRespon;
+        // });
+      }
+    } catch (error) {
+      print('error pos invoice, ${error}');
+      if (context.mounted) {
+        alertError(context, error.toString());
+      }
+    }
   }
 
   onPrintInvoice(bool reprint) async {

@@ -122,13 +122,15 @@ class ConfigApp {
   }
 
   void setToState(dynamic config) {
-    dynamic tmpConfigOutlet = config['config_outlet'];
-    dynamic tmpConfigDevice = config['config_device'];
-    List<dynamic> tmpConfigPayment = config['config_payment'];
+    dynamic tmpConfigOutlet = config['config_outlet'] ?? null;
+    dynamic tmpConfigDevice = config['config_device'] ?? null;
+    List<dynamic> tmpConfigPayment = config['config_payment'] ?? [];
     dynamic tmpConfigPrinter = config['config_printer'];
-    dynamic tmpConfigVoid = config['config_void'];
+    dynamic tmpConfigVoid = config['config_void'] ?? null;
 
-    AppState().configPrinter = tmpConfigPrinter;
+    AppState().update(() {
+      AppState().configPrinter = tmpConfigPrinter;
+    });
 
     // FFAppState().update(() {
     //   FFAppState().configSettingOutlet = tmpConfigOutlet;

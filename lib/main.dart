@@ -97,7 +97,7 @@ class _MyAppState extends State<MyApp> {
         } else {
           return MaterialApp(
             theme: ThemeData(useMaterial3: false),
-            title: 'KONTENA',
+            title: 'JCPOS',
             debugShowCheckedModeBanner: false,
             initialRoute: snapshot.data ?? AppRoutes.loginScreen,
             navigatorKey: navigatorKey,

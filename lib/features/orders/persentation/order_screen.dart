@@ -131,10 +131,9 @@ class _OrderScreenState extends State<OrderScreen> {
       AppState().tableNumber = '1';
       tableNumber = '1';
       itemGroupDisplay = AppState().configPosProfile['item_groups'];
-      filterItemDefault = "${itemGroupDisplay.map((itemGroup) => '"${itemGroup['item_group']}"').join(', ')}";
+      filterItemDefault =
+          "${itemGroupDisplay.map((itemGroup) => '"${itemGroup['item_group']}"').join(', ')}";
     });
-
-    
   }
 
   @override
@@ -177,25 +176,24 @@ class _OrderScreenState extends State<OrderScreen> {
                         child: Stack(
                           children: [
                             if (modeView == 'order')
-                            Column(
-                              children: [
-                                Searchbar(
-                                  onChanged: (value) {
+                              Column(
+                                children: [
+                                  Searchbar(onChanged: (value) {
                                     print('value, $value');
-                                    setState((){
+                                    setState(() {
                                       search = value;
                                     });
                                   }
-                                  // onCompleted: (value) {
-                                  //   print('check search value $value');
-                                  //   // onSearchFilterMenu(value, '');
-                                  //   setState(() {
-                                  //     // search = value;
-                                  //   });
-                                  // },
-                                ),
-                              ],
-                            ),
+                                      // onCompleted: (value) {
+                                      //   print('check search value $value');
+                                      //   // onSearchFilterMenu(value, '');
+                                      //   setState(() {
+                                      //     // search = value;
+                                      //   });
+                                      // },
+                                      ),
+                                ],
+                              ),
                             if (modeView == 'order')
                               Padding(
                                 padding: EdgeInsetsDirectional.fromSTEB(
@@ -205,7 +203,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   fieldValue: 'item_group',
                                   onFilterSelected: (String type) {
                                     // print('check type, $type');
-                                    setState((){
+                                    setState(() {
                                       if (type == 'All') {
                                         filter = '';
                                       } else {
@@ -224,64 +222,78 @@ class _OrderScreenState extends State<OrderScreen> {
                                   alignment: Alignment.topLeft,
                                   child: SingleChildScrollView(
                                     // primary: true,
-                                    physics: const AlwaysScrollableScrollPhysics(),
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
                                     child: SizedBox(
                                       width: MediaQuery.sizeOf(context).width,
                                       child: Column(
                                         children: [
-                                          Builder(
-                                            builder: (context) {
-                                              final produk = AppState().dataItem;
-                                              final itemMenu = menu(produk, search, filter);
-                                              // print('check item menu, $itemMenu');
-                                              return (itemMenu.isNotEmpty) ? MasonryGridView.count(
-                                                // gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                                                // ),
-                                                  crossAxisCount: 5, // Jumlah kolom
-                                                mainAxisSpacing: 6,
-                                                crossAxisSpacing: 6,
-                                                shrinkWrap: true,
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                itemCount: itemMenu.length,
-                                                itemBuilder: (context, index) {
-                                                  final currentItem =
-                                                      itemMenu[index];
-                                                  bool isVisible = onSearchFilterMenu(currentItem['item_name'], search)! ? true : false;
-                                                  // print('check visible, ${onSearchFilterMenu(currentItem['item_name'], search)}');
-                                                  return Visibility(
-                                                    visible: isVisible,
-                                                    child: ProductGrid(
-                                                    name: currentItem[
-                                                            'item_name'] ??
-                                                        '',
-                                                    category: currentItem[
-                                                            'item_group'] ??
-                                                        '',
-                                                    price: numberFormat(
-                                                        'idr',
-                                                        currentItem[
-                                                            'standard_rate']),
-                                                    image: CustomImageView(
-                                                      imagePath:
-                                                          ImageConstant.imgAdl1,
-                                                      height: 90.v,
-                                                      width: 70.h,
-                                                      margin: EdgeInsets.only(
-                                                          bottom: 1.v),
-                                                    ),
-                                                    onTap: () {
-                                                      onTapOpenItem(
-                                                        context,
-                                                        currentItem,
+                                          Builder(builder: (context) {
+                                            final produk = AppState().dataItem;
+                                            final itemMenu =
+                                                menu(produk, search, filter);
+                                            // print('check item menu, $itemMenu');
+                                            return (itemMenu.isNotEmpty)
+                                                ? MasonryGridView.count(
+                                                    // gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                                                    // ),
+                                                    crossAxisCount:
+                                                        5, // Jumlah kolom
+                                                    mainAxisSpacing: 6,
+                                                    crossAxisSpacing: 6,
+                                                    shrinkWrap: true,
+                                                    physics:
+                                                        const NeverScrollableScrollPhysics(),
+                                                    itemCount: itemMenu.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final currentItem =
+                                                          itemMenu[index];
+                                                      bool isVisible =
+                                                          onSearchFilterMenu(
+                                                                  currentItem[
+                                                                      'item_name'],
+                                                                  search)!
+                                                              ? true
+                                                              : false;
+                                                      // print('check visible, ${onSearchFilterMenu(currentItem['item_name'], search)}');
+                                                      return Visibility(
+                                                        visible: isVisible,
+                                                        child: ProductGrid(
+                                                          name: currentItem[
+                                                                  'item_name'] ??
+                                                              '',
+                                                          category: currentItem[
+                                                                  'item_group'] ??
+                                                              '',
+                                                          price: numberFormat(
+                                                              'idr',
+                                                              currentItem[
+                                                                  'standard_rate']),
+                                                          image:
+                                                              CustomImageView(
+                                                            imagePath:
+                                                                ImageConstant
+                                                                    .imgAdl1,
+                                                            height: 90.v,
+                                                            width: 70.h,
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    bottom:
+                                                                        1.v),
+                                                          ),
+                                                          onTap: () {
+                                                            onTapOpenItem(
+                                                              context,
+                                                              currentItem,
+                                                            );
+                                                          },
+                                                        ),
                                                       );
                                                     },
-                                                  ),
-                                                  ) ;
-                                                },
-                                              ) : EmptyCart();
-                                            }
-                                          ),
+                                                  )
+                                                : EmptyCart();
+                                          }),
                                           // if (itemDisplay.isNotEmpty)
                                           //   MasonryGridView.builder(
                                           //     gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
@@ -344,37 +356,35 @@ class _OrderScreenState extends State<OrderScreen> {
                                 child: Align(
                                   alignment: Alignment.topLeft,
                                   // child: SingleChildScrollView(
-                                    // primary: false,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                                8.0, 4.0, 8.0, 0.0),
-                                            child: Text(
-                                              'Confirm',
-                                              style: TextStyle(
-                                                color:
-                                                    theme.colorScheme.secondary,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                  // primary: false,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(8.0, 4.0, 8.0, 0.0),
+                                          child: Text(
+                                            'Confirm',
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          Divider(
-                                            height: 5.0,
-                                            thickness: 0.5,
-                                            color: theme
-                                                .colorScheme
-                                                .outline,
-                                          ),
-                                          if (orderDisplay.isNotEmpty)
-                                            Expanded(
-                                            child:AlignedGridView.count(
+                                        ),
+                                        Divider(
+                                          height: 5.0,
+                                          thickness: 0.5,
+                                          color: theme.colorScheme.outline,
+                                        ),
+                                        if (orderDisplay.isNotEmpty)
+                                          Expanded(
+                                            child: AlignedGridView.count(
                                               crossAxisCount: 3,
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
@@ -629,11 +639,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                                   ),
                                                 );
                                               },
-                                            ),),
-                                          if (orderDisplay.isEmpty) EmptyData(),
-                                        ],
-                                      ),
+                                            ),
+                                          ),
+                                        if (orderDisplay.isEmpty) EmptyData(),
+                                      ],
                                     ),
+                                  ),
                                   // ),
                                 ),
                               ),
@@ -645,37 +656,35 @@ class _OrderScreenState extends State<OrderScreen> {
                                 child: Align(
                                   alignment: Alignment.topLeft,
                                   // child: SingleChildScrollView(
-                                    // primary: true,
-                                    // scrollDirection: Axis.vertical,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                                8.0, 4.0, 8.0, 0.0),
-                                            child: Text(
-                                              'Served',
-                                              style: TextStyle(
-                                                color:
-                                                    theme.colorScheme.secondary,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                  // primary: true,
+                                  // scrollDirection: Axis.vertical,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(8.0, 4.0, 8.0, 0.0),
+                                          child: Text(
+                                            'Served',
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          Divider(
-                                            height: 5.0,
-                                            thickness: 0.5,
-                                            color: theme
-                                                .colorScheme
-                                                .outline,
-                                          ),
-                                          if (servedDisplay.isNotEmpty)
-                                            Expanded(
+                                        ),
+                                        Divider(
+                                          height: 5.0,
+                                          thickness: 0.5,
+                                          color: theme.colorScheme.outline,
+                                        ),
+                                        if (servedDisplay.isNotEmpty)
+                                          Expanded(
                                             child: AlignedGridView.count(
                                               crossAxisCount: 3,
                                               mainAxisSpacing: 6,
@@ -685,7 +694,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                               // itemCount:tempPosServed.length,
                                               itemBuilder: (context, index) {
                                                 // final order = tempPosServed[index];
-                                                final order = servedDisplay[index];
+                                                final order =
+                                                    servedDisplay[index];
                                                 dynamic orderItemList =
                                                     order['items'];
                                                 return InkWell(
@@ -732,7 +742,6 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                           .textTheme
                                                                           .bodyMedium,
                                                                     ),
-                                                                  
                                                                 ],
                                                               ),
                                                               Divider(
@@ -906,11 +915,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                                   ),
                                                 );
                                               },
-                                            ),),
-                                          if (servedDisplay.isEmpty) EmptyData(),
-                                        ],
-                                      ),
+                                            ),
+                                          ),
+                                        if (servedDisplay.isEmpty) EmptyData(),
+                                      ],
                                     ),
+                                  ),
                                   // ),
                                 ),
                               ),
@@ -1044,62 +1054,60 @@ class _OrderScreenState extends State<OrderScreen> {
                                       ),
                                     ),
                                     InkWell(
-                                        splashColor: Colors.transparent,
-                                        focusColor: Colors.transparent,
-                                        hoverColor: Colors.transparent,
-                                        highlightColor: Colors.transparent,
-                                        onTap: () {
-                                          onTapTableNumber(context);
-                                        },
-                                        child: Container(
-                                          height: 48.0,
-                                          decoration: BoxDecoration(
-                                            color: theme
-                                                .colorScheme.primaryContainer,
-                                            border: Border(
-                                              bottom: BorderSide(
-                                                color:
-                                                    theme.colorScheme.outline,
-                                                width: 0.5,
-                                              ),
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    8.0, 0.0, 8.0, 0.0),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                if (tableNumber == '')
-                                                  Text(
-                                                    'Pilih Nomor Meja',
-                                                    style: theme
-                                                        .textTheme.labelMedium,
-                                                  ),
-                                                if (tableNumber != '')
-                                                  Text(
-                                                    tableNumber,
-                                                    style: theme
-                                                        .textTheme.titleSmall,
-                                                  ),
-                                                Icon(
-                                                  Icons
-                                                      .keyboard_arrow_down_rounded,
-                                                  color: theme
-                                                      .colorScheme.secondary,
-                                                  size: 24.0,
-                                                ),
-                                              ],
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () {
+                                        onTapTableNumber(context);
+                                      },
+                                      child: Container(
+                                        height: 48.0,
+                                        decoration: BoxDecoration(
+                                          color: theme
+                                              .colorScheme.primaryContainer,
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              color: theme.colorScheme.outline,
+                                              width: 0.5,
                                             ),
                                           ),
                                         ),
+                                        child: Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  8.0, 0.0, 8.0, 0.0),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              if (tableNumber == '')
+                                                Text(
+                                                  'Pilih Nomor Meja',
+                                                  style: theme
+                                                      .textTheme.labelMedium,
+                                                ),
+                                              if (tableNumber != '')
+                                                Text(
+                                                  tableNumber,
+                                                  style: theme
+                                                      .textTheme.titleSmall,
+                                                ),
+                                              Icon(
+                                                Icons
+                                                    .keyboard_arrow_down_rounded,
+                                                color:
+                                                    theme.colorScheme.secondary,
+                                                size: 24.0,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
+                                    ),
                                     InkWell(
                                       splashColor: Colors.transparent,
                                       focusColor: Colors.transparent,
@@ -1289,10 +1297,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                     // isCheck = value!;
                                                                   },
                                                                 ),
-                                                              if (
-                                                                  (itemData
-                                                                          .docstatus ==
-                                                                      2))
+                                                              if ((itemData
+                                                                      .docstatus ==
+                                                                  2))
                                                                 Text(
                                                                   'Cancelled',
                                                                   style:
@@ -1354,93 +1361,114 @@ class _OrderScreenState extends State<OrderScreen> {
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
                                                                       .spaceBetween,
-                                                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .end,
                                                               children: [
-                                                                if ((itemData.docstatus == 0) && (modeView != 'served'))
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0),
-                                                                  child: Column(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .max,
-                                                                    children: [
-                                                                      InkWell(
-                                                                        onTap: () {
-                                                                          onTapEditItem(
-                                                                            context,
-                                                                            itemData,
-                                                                            index,
-                                                                          );
-                                                                        },
-                                                                        child: Padding(
-                                                                          padding:
-                                                                              const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
-                                                                          child: Text(
-                                                                            'Edit',
-                                                                            style: TextStyle(
-                                                                              color: theme.colorScheme.primary,
-                                                                              fontWeight: FontWeight.w600,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                                if ((itemData.docstatus != 2))
-                                                                Padding(
-                                                                  padding: EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0,
-                                                                          0.0),
-                                                                  child: Column(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .max,
-                                                                    children: [
-                                                                      InkWell(
-                                                                        onTap: () {
-                                                                          print('item id, ${itemData.id}');
-                                                                          print('item name, ${itemData.name}');
-                                                                          if (itemData.id.contains('PORD')) {
-                                                                            print('cancel');
-                                                                            onTapCancel(
+                                                                if ((itemData
+                                                                            .docstatus ==
+                                                                        0) &&
+                                                                    (modeView !=
+                                                                        'served'))
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0.0,
+                                                                            0.0,
+                                                                            0.0,
+                                                                            0.0),
+                                                                    child:
+                                                                        Column(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .max,
+                                                                      children: [
+                                                                        InkWell(
+                                                                          onTap:
+                                                                              () {
+                                                                            onTapEditItem(
                                                                               context,
                                                                               itemData,
                                                                               index,
                                                                             );
-                                                                          } else {
-                                                                            print('delete');
-                                                                            onTapDelete(
-                                                                              context,
-                                                                              itemData,
-                                                                              index,
-                                                                            );
-                                                                          }
-                                                                        },
-                                                                        child: Padding(
-                                                                          padding:
-                                                                              const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
-                                                                          child: Text(
-                                                                            itemData.id.contains('PORD') ? 'Cancel' : 'Delete',
-                                                                            style: TextStyle(
-                                                                              color: theme.colorScheme.error,
-                                                                              fontWeight: FontWeight.w600,
+                                                                          },
+                                                                          child:
+                                                                              Padding(
+                                                                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                                                                8.0,
+                                                                                8.0,
+                                                                                8.0,
+                                                                                8.0),
+                                                                            child:
+                                                                                Text(
+                                                                              'Edit',
+                                                                              style: TextStyle(
+                                                                                color: theme.colorScheme.primary,
+                                                                                fontWeight: FontWeight.w600,
+                                                                              ),
                                                                             ),
                                                                           ),
                                                                         ),
-                                                                      ),
-                                                                      
-                                                                    ],
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                ),
+                                                                if ((itemData
+                                                                        .docstatus !=
+                                                                    2))
+                                                                  Padding(
+                                                                    padding: EdgeInsetsDirectional
+                                                                        .fromSTEB(
+                                                                            0.0,
+                                                                            0.0,
+                                                                            0.0,
+                                                                            0.0),
+                                                                    child:
+                                                                        Column(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .max,
+                                                                      children: [
+                                                                        InkWell(
+                                                                          onTap:
+                                                                              () {
+                                                                            print('item id, ${itemData.id}');
+                                                                            print('item name, ${itemData.name}');
+                                                                            if (itemData.id.contains('PORD')) {
+                                                                              print('cancel');
+                                                                              onTapCancel(
+                                                                                context,
+                                                                                itemData,
+                                                                                index,
+                                                                              );
+                                                                            } else {
+                                                                              print('delete');
+                                                                              onTapDelete(
+                                                                                context,
+                                                                                itemData,
+                                                                                index,
+                                                                              );
+                                                                            }
+                                                                          },
+                                                                          child:
+                                                                              Padding(
+                                                                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                                                                8.0,
+                                                                                8.0,
+                                                                                8.0,
+                                                                                8.0),
+                                                                            child:
+                                                                                Text(
+                                                                              itemData.id.contains('PORD') ? 'Cancel' : 'Delete',
+                                                                              style: TextStyle(
+                                                                                color: theme.colorScheme.error,
+                                                                                fontWeight: FontWeight.w600,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
                                                                 // CustomElevatedButton(
                                                                 //   text: "Delete",
                                                                 //   buttonTextStyle: TextStyle(
@@ -1525,7 +1553,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 );
                                               },
                                             ))),
-                                  if ((cartSelected != null) && (cartData.isNotEmpty))
+                                  if ((cartSelected != null) &&
+                                      (cartData.isNotEmpty))
                                     Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           0.0, 8.0, 0.0, 8.0),
@@ -1654,11 +1683,25 @@ class _OrderScreenState extends State<OrderScreen> {
 
   List<dynamic> menu(List<dynamic> data, String search, String filter) {
     // itemDisplay = AppState().dataItem;
-    return data.where((item) => (item['item_name'].toString().toLowerCase().contains(search.toLowerCase()) && item['item_group'].toString().toLowerCase().contains(filter.toLowerCase()))).toList();
+    return data
+        .where((item) => (item['item_name']
+                .toString()
+                .toLowerCase()
+                .contains(search.toLowerCase()) &&
+            item['item_group']
+                .toString()
+                .toLowerCase()
+                .contains(filter.toLowerCase())))
+        .toList();
   }
 
   List<dynamic> order(List<dynamic> data, String search) {
-    return data.where((item) => item['name'].toString().toLowerCase().contains(search.toLowerCase())).toList();
+    return data
+        .where((item) => item['name']
+            .toString()
+            .toLowerCase()
+            .contains(search.toLowerCase()))
+        .toList();
   }
 
   onTapRefreshHistory() async {
@@ -1718,9 +1761,8 @@ class _OrderScreenState extends State<OrderScreen> {
       } else {
         for (OrderCartItem itm in cartData) {
           dynamic itemReq = {};
-          if (itm.id.contains('ORD')) {
+          if (itm.id.contains(itm.itemName)) {
             itemReq = {
-              'id': itm.id,
               'name': itm.name,
               'item_name': itm.itemName,
               'item_group': itm.itemGroup,
@@ -1730,6 +1772,7 @@ class _OrderScreenState extends State<OrderScreen> {
             };
           } else {
             itemReq = {
+              'id': itm.id,
               'name': itm.name,
               'item_name': itm.itemName,
               'item_group': itm.itemGroup,
@@ -1741,7 +1784,6 @@ class _OrderScreenState extends State<OrderScreen> {
           // onCallPosOrder(itemReq);
           if ((itm.docstatus != 1) && (itm.docstatus != 2)) {
             await onCallCreatePosOrder(itemReq);
-
           }
         }
         setState(() {
@@ -1775,7 +1817,6 @@ class _OrderScreenState extends State<OrderScreen> {
               print('order udpate');
               await onCallCreatePosOrder(itemReq);
             }
-
           }
         }
         setState(() {
@@ -1873,17 +1914,13 @@ class _OrderScreenState extends State<OrderScreen> {
       builder: (context) {
         return GestureDetector(
           child: Padding(
-            padding:
-                MediaQuery.viewInsetsOf(
-                    context),
+            padding: MediaQuery.viewInsetsOf(context),
             child: DialogCustomWidget(
-              description:
-                  'Are you sure to delete item?',
+              description: 'Are you sure to delete item?',
               isConfirm: true,
               captionConfirm: 'Delete',
               styleConfirm: TextStyle(
-                color: theme
-                    .colorScheme.error,
+                color: theme.colorScheme.error,
               ),
               onConfirm: () async {
                 cart.removeItem(item.id);
@@ -1893,10 +1930,10 @@ class _OrderScreenState extends State<OrderScreen> {
         );
       },
     );
-    setState((){
+    setState(() {
       // cartData = cart.getAllItemCart();
     });
-    
+
     // dynamic itemReq = {
     //   'id': item.id,
     //   'name': item.name,
@@ -1922,17 +1959,13 @@ class _OrderScreenState extends State<OrderScreen> {
       builder: (context) {
         return GestureDetector(
           child: Padding(
-            padding:
-                MediaQuery.viewInsetsOf(
-                    context),
+            padding: MediaQuery.viewInsetsOf(context),
             child: DialogCustomWidget(
-              description:
-                  'Are you sure to cancel item?',
+              description: 'Are you sure to cancel item?',
               isConfirm: true,
               captionConfirm: 'Cancel',
               styleConfirm: TextStyle(
-                color: theme
-                    .colorScheme.error,
+                color: theme.colorScheme.error,
               ),
               onConfirm: () async {
                 dynamic itemReq = {
@@ -1948,7 +1981,6 @@ class _OrderScreenState extends State<OrderScreen> {
                 };
 
                 if (item.docstatus == 0) {
-
                   await onCallDeletePosOrder(itemReq);
                 } else {
                   await onCallCancelPosOrder(itemReq);
@@ -1967,7 +1999,6 @@ class _OrderScreenState extends State<OrderScreen> {
         );
       },
     );
-    
 
     // setState(() { })
   }
@@ -2049,7 +2080,8 @@ class _OrderScreenState extends State<OrderScreen> {
         FrappeFetchDataItem.ItemRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: '[["disabled","=",0],["is_sales_item","=",1],["item_group","in",[${filterItemGroupSelected != '' ? '"$filterItemGroupSelected"' : filterItemDefault}]]]',
+      filters:
+          '[["disabled","=",0],["is_sales_item","=",1],["item_group","in",[${filterItemGroupSelected != '' ? '"$filterItemGroupSelected"' : filterItemDefault}]]]',
       // filters: '[["disabled","=",0],["is_sales_item","=",1]]',
       limit: 1500,
     );
@@ -2181,8 +2213,7 @@ class _OrderScreenState extends State<OrderScreen> {
         setState(() {
           tempPosServed = callRequest;
           isLoading = false;
-            print('Data received: $tempPosServed');
-
+          print('Data received: $tempPosServed');
         });
         // print('check ata, $tempPosOrder');
       }

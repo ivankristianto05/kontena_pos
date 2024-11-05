@@ -1289,20 +1289,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
         // 'income_account': AppState().configCompany['default_income_account'],
         // 'cost_center': AppState().configCompany['cost_center'],
         // 'pos_cart': element.cartId,
-        'pos_order': element.id.contains('CORD') ? element.id : null,
+        'pos_order': element.id.contains(element.itemName) ? null : element.id,
       });
     }
 
     // print('check config payment, ${AppState().configCompany}');
 
-    // for (var methodPay in AppState().configCompany['payments']) {
-    //   print('check, $methodPay');
-    // }
-    tempPayment.add({
-      'mode_of_payment': 'Cash',
-      'amount': payment,
-      'account': '110-10-002 - Petty Cash G.Cashier (Rp) - KTN001'
-    });
+    for (var methodPay in AppState().configPosProfile['payments']) {
+      if (paymentMethod.toLowerCase() ==
+          methodPay['mode_of_payment'].toString().toLowerCase()) {
+        tempPayment.add({
+          'mode_of_payment': methodPay['mode_of_payment'],
+          'amount': payment,
+          'account': methodPay['account']
+        });
+      }
+      // print('check, $methodPay');
+    }
 
     final frappeFetchDataInvoice.CreatePosInvoiceRequest request =
         frappeFetchDataInvoice.CreatePosInvoiceRequest(
@@ -1311,7 +1314,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       customerName: 'Guest',
       company: AppState().configCompany['name'],
       postingDate: dateTimeFormat('date', null).toString(),
-      postingTime: timeFormat('time_full', 'now'),
+      postingTime: timeFormat('time_full', null),
       outlet: AppState().configPosProfile['name'],
       currency: AppState().configPosProfile['currency'],
       conversionRate: 1,
@@ -1342,6 +1345,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
         onPrintInvoice(false);
         onPrintChecker();
+
+        if (context.mounted) {
+          alert.alertSuccess(
+              context, 'SuccesSuccessfully created a transaction');
+        }
       }
     } catch (error) {
       print('error pos invoice, ${error}');

@@ -122,16 +122,18 @@ class AppState extends ChangeNotifier {
     // prefs.setString('ff_selectedPrinter', jsonEncode(_value));
   }
 
-  // BluetoothDevice? _selectedPrinter;
   bool _isConnected = false;
-
-  // BluetoothDevice? get selectedPrinter => _selectedPrinter;
   bool get isConnected => _isConnected;
 
-  //  void selectPrinter(BluetoothDevice printer) {
-  // _selectedPrinter = printer;
+  dynamic _sessionCashier;
+  dynamic get sessionCashier => _sessionCashier;
+  set sessionCashier(dynamic _value) {
+    _sessionCashier = _value;
+    prefs.setString('ff_sessionCashier', jsonEncode(_value));
+  }
+
+  @override
   notifyListeners();
-  // }
 
   void setConnectionStatus(bool status) {
     _isConnected = status;
