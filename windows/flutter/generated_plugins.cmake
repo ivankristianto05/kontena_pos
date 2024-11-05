@@ -3,6 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  just_audio_windows
+  print_bluetooth_thermal
   screen_retriever_windows
   window_manager
 )
