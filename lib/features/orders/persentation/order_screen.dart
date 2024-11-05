@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'package:just_audio/just_audio.dart';
 // import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 // import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -100,6 +101,19 @@ class _OrderScreenState extends State<OrderScreen> {
   dynamic cartSelected;
   dynamic orderCartSelected;
   dynamic servesSelected;
+
+  final player = AudioPlayer();
+
+Future<void>DeliveryNotification () async {
+  try {
+    await player.setAsset('assets/audio/delivery_notif.mp3'); // Ganti dengan jalur ke file audio Anda
+    await player.play();
+  } catch (e) {
+    print('Error playing audio: $e');
+  }
+}
+
+
 
   @override
   void setState(VoidCallback callback) {
@@ -682,9 +696,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
                                               itemCount: servedDisplay.length,
-                                              // itemCount:tempPosServed.length,
                                               itemBuilder: (context, index) {
-                                                // final order = tempPosServed[index];
                                                 final order = servedDisplay[index];
                                                 dynamic orderItemList =
                                                     order['items'];
@@ -991,7 +1003,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                         hoverColor: Colors.transparent,
                                         highlightColor: Colors.transparent,
                                         onTap: () {
-                                          onTapTableNumber(context);
+                                          onTapTypeTransaction(context);
                                         },
                                         child: Container(
                                           height: 48.0,
@@ -1058,6 +1070,11 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 .colorScheme.primaryContainer,
                                             border: Border(
                                               bottom: BorderSide(
+                                                color:
+                                                    theme.colorScheme.outline,
+                                                width: 0.5,
+                                              ),
+                                              left: BorderSide(
                                                 color:
                                                     theme.colorScheme.outline,
                                                 width: 0.5,
@@ -2286,6 +2303,7 @@ class _OrderScreenState extends State<OrderScreen> {
         // cartSelected = callCreatePosCart;
         if (context.mounted) {
           alertSuccess(context, 'Success, order saved..');
+          DeliveryNotification();
         }
       } else {
         if (context.mounted) {
@@ -2399,7 +2417,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
       if (callSubmitPosOrder.isNotEmpty) {
         if (context.mounted) {
-          alertSuccess(context, 'Success, order confirm..');
+          alertSuccess(context, 'Success, order confirm delivery..');
         }
         setState(() {
           // AppState.resetOrderCart();
@@ -2826,4 +2844,5 @@ class _OrderScreenState extends State<OrderScreen> {
 
     return bytes;
   }
+  
 }
