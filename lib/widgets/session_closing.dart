@@ -23,6 +23,12 @@ class _SessionClosingState extends State<SessionClosing> {
   double totalAmountInvoice = 0;
 
   @override
+  void setState(VoidCallback callback) {
+    super.setState(callback);
+    // reinitSession();
+  }
+
+  @override
   void initState() {
     super.initState();
     reinitSession();
@@ -188,7 +194,7 @@ class _SessionClosingState extends State<SessionClosing> {
                                                                   'paid_amount'];
                                                           return Column(
                                                             children: [
-                                                              Container(
+                                                              SizedBox(
                                                                 width: double
                                                                     .infinity,
                                                                 child: Padding(
@@ -299,7 +305,7 @@ class _SessionClosingState extends State<SessionClosing> {
                                               },
                                             ),
                                           ),
-                                          Container(
+                                          SizedBox(
                                             width: double.infinity,
                                             height: 30.0,
                                             // decoration: BoxDecoration(
@@ -368,7 +374,7 @@ class _SessionClosingState extends State<SessionClosing> {
                                   Padding(
                                     padding:
                                         const EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 24.0, 0.0, 4.0),
+                                            8.0, 24.0, 8.0, 4.0),
                                     child: Text(
                                       'Payments:',
                                       style: TextStyle(
@@ -376,6 +382,59 @@ class _SessionClosingState extends State<SessionClosing> {
                                         fontWeight: FontWeight.w700,
                                         fontSize: 14.0,
                                       ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Padding(
+                                    padding: const EdgeInsetsDirectional
+                                        .fromSTEB(8.0, 12.0, 8.0, 16.0),
+                                    child: Builder(
+                                      builder: (context) {
+                                        final paymentDisplay = paymentSession;
+                                        return Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            if (paymentDisplay.isNotEmpty)
+                                              ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: paymentDisplay.length,
+                                                itemBuilder: (context, index) {
+                                                  final currentPayment = paymentDisplay[index];
+                                                  return Column(
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            currentPayment['mode_of_payment'],
+                                                            style:
+                                                                TextStyle(
+                                                              color: theme.colorScheme.secondary,
+                                                              fontWeight: FontWeight.w600,
+                                                              fontSize: 14.0,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            numberFormat('idr_fixed', currentPayment['amount']),
+                                                            style:
+                                                                TextStyle(
+                                                              color: theme.colorScheme.secondary,
+                                                              fontWeight: FontWeight.w600,
+                                                              fontSize: 14.0,
+                                                            ),
+                                                          ),
+                                                        ]
+                                                      ),
+                                                      const SizedBox(height: 4.0),
+                                                    ]
+                                                  );
+                                                }
+                                              )
+                                          ]
+                                        );
+                                      },
                                     ),
                                   ),
                                 ],

@@ -11,7 +11,7 @@ import just_audio
 import path_provider_foundation
 import screen_retriever_macos
 import shared_preferences_foundation
-import sqflite_darwin
+import sqflite
 import window_manager
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
