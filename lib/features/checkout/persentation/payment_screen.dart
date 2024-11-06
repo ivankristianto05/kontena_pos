@@ -44,7 +44,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   double bill = 0.0;
 
   String paymentMethod = 'CASH';
-  
+
   bool paymentStatus = false;
   bool loading = false;
 
@@ -415,180 +415,209 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   //     ),
                                   //   ),
                                   // if (paymentMethod != 'CASH')
-                                    // Padding(
-                                    //   padding: EdgeInsetsDirectional.fromSTEB(
-                                    //       0.0, 150.0, 0.0, 0.0),
-                                    //   child: InkWell(
-                                    //     splashColor: Colors.transparent,
-                                    //     focusColor: Colors.transparent,
-                                    //     hoverColor: Colors.transparent,
-                                    //     highlightColor: Colors.transparent,
-                                    //     onTap: () async {
-                                    //       setState(() {
-                                    //         paymentMethod = 'CASH';
-                                    //       });
-                                    //     },
-                                    //     child: Row(
-                                    //       mainAxisSize: MainAxisSize.max,
-                                    //       mainAxisAlignment:
-                                    //           MainAxisAlignment.spaceBetween,
-                                    //       children: [
-                                    //         Padding(
-                                    //           padding: EdgeInsetsDirectional
-                                    //               .fromSTEB(
-                                    //                   0.0, 16.0, 0.0, 16.0),
-                                    //           child: Text(
-                                    //             'CASH',
-                                    //             style: TextStyle(
-                                    //                 color: theme
-                                    //                     .colorScheme.primary),
-                                    //           ),
-                                    //         ),
-                                    //         Icon(
-                                    //           Icons.keyboard_arrow_down_rounded,
-                                    //           color:
-                                    //               theme.colorScheme.secondary,
-                                    //           size: 24.0,
-                                    //         ),
-                                    //       ],
-                                    //     ),
-                                    //   ),
-                                    // ),
+                                  // Padding(
+                                  //   padding: EdgeInsetsDirectional.fromSTEB(
+                                  //       0.0, 150.0, 0.0, 0.0),
+                                  //   child: InkWell(
+                                  //     splashColor: Colors.transparent,
+                                  //     focusColor: Colors.transparent,
+                                  //     hoverColor: Colors.transparent,
+                                  //     highlightColor: Colors.transparent,
+                                  //     onTap: () async {
+                                  //       setState(() {
+                                  //         paymentMethod = 'CASH';
+                                  //       });
+                                  //     },
+                                  //     child: Row(
+                                  //       mainAxisSize: MainAxisSize.max,
+                                  //       mainAxisAlignment:
+                                  //           MainAxisAlignment.spaceBetween,
+                                  //       children: [
+                                  //         Padding(
+                                  //           padding: EdgeInsetsDirectional
+                                  //               .fromSTEB(
+                                  //                   0.0, 16.0, 0.0, 16.0),
+                                  //           child: Text(
+                                  //             'CASH',
+                                  //             style: TextStyle(
+                                  //                 color: theme
+                                  //                     .colorScheme.primary),
+                                  //           ),
+                                  //         ),
+                                  //         Icon(
+                                  //           Icons.keyboard_arrow_down_rounded,
+                                  //           color:
+                                  //               theme.colorScheme.secondary,
+                                  //           size: 24.0,
+                                  //         ),
+                                  //       ],
+                                  //     ),
+                                  //   ),
+                                  // ),
 
                                   Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 40.0, 0.0, 16.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          InkWell(
-                                            splashColor: Colors.transparent,
-                                            focusColor: Colors.transparent,
-                                            hoverColor: Colors.transparent,
-                                            highlightColor: Colors.transparent,
-                                            onTap: () async {
-                                              setState(() {
-                                                paymentMethod = '';
-                                              });
-                                            },
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Padding(
-                                                  padding: EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                          0.0, 16.0, 0.0, 16.0),
-                                                  child: Text(
-                                                    'Metode Payment',
-                                                    style: theme
-                                                        .textTheme.titleSmall,
-                                                  ),
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 40.0, 0.0, 16.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        InkWell(
+                                          splashColor: Colors.transparent,
+                                          focusColor: Colors.transparent,
+                                          hoverColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
+                                          onTap: () async {
+                                            setState(() {
+                                              paymentMethod = '';
+                                            });
+                                          },
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(
+                                                        0.0, 16.0, 0.0, 16.0),
+                                                child: Text(
+                                                  'Metode Payment',
+                                                  style: theme
+                                                      .textTheme.titleSmall,
                                                 ),
-                                                // Icon(
-                                                //   Icons
-                                                //       .keyboard_arrow_up_rounded,
-                                                //   color: theme
-                                                //       .colorScheme.secondary,
-                                                //   size: 24.0,
-                                                // ),
-                                              ],
-                                            ),
+                                              ),
+                                              // Icon(
+                                              //   Icons
+                                              //       .keyboard_arrow_up_rounded,
+                                              //   color: theme
+                                              //       .colorScheme.secondary,
+                                              //   size: 24.0,
+                                              // ),
+                                            ],
                                           ),
-                                          if (listPaymentMethod.isNotEmpty)
-                                            Builder(
-                                              builder: (context) {
-                                                return Column(
-                                                  mainAxisSize: MainAxisSize.max,
-                                                  children: List.generate(
-                                                    listPaymentMethod.length,
-                                                    (methodsIndex) {
-                                                      final methodsItem =
-                                                          listPaymentMethod[
-                                                              methodsIndex];
-                                                      return Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    10.0,
-                                                                    0.0,
-                                                                    10.0),
-                                                        child: InkWell(
-                                                          splashColor:
-                                                              Colors.transparent,
-                                                          focusColor:
-                                                              Colors.transparent,
-                                                          hoverColor:
-                                                              Colors.transparent,
-                                                          highlightColor:
-                                                              Colors.transparent,
-                                                          onTap: () async {},
-                                                          child: Container(
-                                                            width:
-                                                                double.infinity,
-                                                            decoration:
-                                                                BoxDecoration(
+                                        ),
+                                        if (listPaymentMethod.isNotEmpty)
+                                          Builder(
+                                            builder: (context) {
+                                              return Column(
+                                                mainAxisSize: MainAxisSize.max,
+                                                children: List.generate(
+                                                  listPaymentMethod.length,
+                                                  (methodsIndex) {
+                                                    final methodsItem =
+                                                        listPaymentMethod[
+                                                            methodsIndex];
+                                                    return Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  0.0,
+                                                                  10.0,
+                                                                  0.0,
+                                                                  10.0),
+                                                      child: InkWell(
+                                                        splashColor:
+                                                            Colors.transparent,
+                                                        focusColor:
+                                                            Colors.transparent,
+                                                        hoverColor:
+                                                            Colors.transparent,
+                                                        highlightColor:
+                                                            Colors.transparent,
+                                                        onTap: () async {
+                                                          setState(() {
+                                                            paymentMethod =
+                                                                methodsItem[
+                                                                    'mode_of_payment'];
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                          width:
+                                                              double.infinity,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: paymentMethod ==
+                                                                    methodsItem[
+                                                                        'mode_of_payment']
+                                                                ? theme
+                                                                    .colorScheme
+                                                                    .primary
+                                                                : theme
+                                                                    .colorScheme
+                                                                    .primaryContainer,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4.0),
+                                                            border: Border.all(
                                                               color: theme
                                                                   .colorScheme
-                                                                  .primaryContainer,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          4.0),
-                                                              border: Border.all(
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .primary,
-                                                                width: 2.0,
-                                                              ),
+                                                                  .primary,
+                                                              width: 2.0,
                                                             ),
-                                                            child: Padding(
-                                                              padding:
-                                                                  EdgeInsetsDirectional
-                                                                      .fromSTEB(
-                                                                          16.0,
-                                                                          16.0,
-                                                                          16.0,
-                                                                          16.0),
-                                                              child: Row(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .max,
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    methodsItem[
-                                                                        'mode_of_payment'].toString().toUpperCase(),
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: theme
-                                                                          .colorScheme
-                                                                          .primary,
-                                                                    ),
+                                                          ),
+                                                          child: Padding(
+                                                            padding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                                        16.0,
+                                                                        16.0,
+                                                                        16.0,
+                                                                        16.0),
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                  methodsItem[
+                                                                          'mode_of_payment']
+                                                                      .toString()
+                                                                      .toUpperCase(),
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: paymentMethod ==
+                                                                            methodsItem[
+                                                                                'mode_of_payment']
+                                                                        ? theme
+                                                                            .colorScheme
+                                                                            .primaryContainer
+                                                                        : theme
+                                                                            .colorScheme
+                                                                            .primary,
                                                                   ),
-                                                                ],
-                                                              ),
+                                                                ),
+                                                                if (paymentMethod ==
+                                                                    methodsItem[
+                                                                        'mode_of_payment'])
+                                                                  Icon(
+                                                                    Icons.check,
+                                                                    color: theme
+                                                                        .colorScheme
+                                                                        .primaryContainer,
+                                                                    size: 24.0,
+                                                                  ),
+                                                              ],
                                                             ),
                                                           ),
                                                         ),
-                                                      );
-                                                    },
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                        ],
-                                      ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                      ],
                                     ),
+                                  ),
 
                                   // payment card
                                   // if (paymentMethod == 'CARD')
-                                    
+
                                   // if (paymentMethod != 'CARD')
                                   //   InkWell(
                                   //     splashColor: Colors.transparent,
@@ -1150,7 +1179,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                       fontWeight:
                                                           FontWeight.bold,
                                                     ),
-                                                    padding: EdgeInsets.all(16),
+                                                    padding:
+                                                        const EdgeInsets.all(4),
                                                     note: itemCartItem.notes ??
                                                         '',
                                                     lineColor: appTheme.gray200,
@@ -1321,8 +1351,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final frappeFetchDataInvoice.CreatePosInvoiceRequest request =
         frappeFetchDataInvoice.CreatePosInvoiceRequest(
       cookie: AppState().setCookie,
-      customer: '0',
-      customerName: 'Guest',
+      // customer: '0',
+      // customerName: 'Guest',
+      customer: '133',
+      customerName: 'CHELSY MOOY',
       company: AppState().configCompany['name'],
       postingDate: dateTimeFormat('date', null).toString(),
       postingTime: timeFormat('time_full', null),

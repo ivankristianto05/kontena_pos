@@ -503,33 +503,6 @@ class _TopBarState extends State<TopBar> {
     }
   }
 
-  onCallCreateClosingEntry() async {
-    final FrappeFetchCreateClosingEntry.CreateClosingEntry request =
-        FrappeFetchCreateClosingEntry.CreateClosingEntry(
-      cookie: AppState().setCookie,
-      periodStart: AppState().sessionCashier['period_start_date'],
-      periodEnd:
-          '${dateTimeFormat('date', null).toString()} ${timeFormat('time_full', null).toString()}',
-      postingDate: dateTimeFormat('date', null).toString(),
-      posOpeningId: AppState().sessionCashier['name'],
-      company: AppState().configCompany['name'],
-      posProfile: AppState().configPosProfile['name'],
-      user: AppState().configUser['name'],
-    );
-
-    try {
-      final callApi =
-          await FrappeFetchCreateClosingEntry.request(requestQuery: request);
-      if (callApi.isNotEmpty) {
-        // print('response, ${callApi}');
-      }
-    } catch (error) {
-      if (context.mounted) {
-        alertError(context, error.toString());
-      }
-    }
-  }
-
   onCallEntryClosingInvoice() async {
     final FrappeFetchEntryClosing.EntryClosing request =
         FrappeFetchEntryClosing.EntryClosing(

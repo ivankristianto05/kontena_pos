@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+import 'package:kontena_pos/core/utils/alert.dart';
+import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
+
+import 'package:kontena_pos/core/api/frappe_thunder_pos/create_closing_entry.dart'
+    as FrappeFetchCreateClosingEntry;
 
 class SessionClosing extends StatefulWidget {
   SessionClosing({
@@ -21,6 +26,10 @@ class _SessionClosingState extends State<SessionClosing> {
   List<dynamic> paymentSession = [];
 
   double totalAmountInvoice = 0;
+
+  bool isLoading = false;
+
+  String closingPosId = '';
 
   @override
   void setState(VoidCallback callback) {
@@ -52,8 +61,8 @@ class _SessionClosingState extends State<SessionClosing> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: MediaQuery.sizeOf(context).width * 0.6,
-                height: MediaQuery.sizeOf(context).height * 0.8,
+                width: MediaQuery.sizeOf(context).width * 0.65,
+                height: MediaQuery.sizeOf(context).height * 0.6,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(8.0),
@@ -167,7 +176,7 @@ class _SessionClosingState extends State<SessionClosing> {
                                                 final invoiceDisplay =
                                                     invoiceSession;
                                                 // setState(() {
-                                                totalAmountInvoice = 0;
+                                                // totalAmountInvoice = 0;
 
                                                 return Column(
                                                   mainAxisSize:
@@ -206,7 +215,7 @@ class _SessionClosingState extends State<SessionClosing> {
                                                                     12.0,
                                                                     12.0,
                                                                   ),
-                                                                  child: Column(
+                                                                  child: Row(
                                                                     mainAxisSize:
                                                                         MainAxisSize
                                                                             .max,
@@ -214,51 +223,65 @@ class _SessionClosingState extends State<SessionClosing> {
                                                                         CrossAxisAlignment
                                                                             .start,
                                                                     children: [
-                                                                      Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.spaceBetween,
-                                                                        children: [
-                                                                          Text(
-                                                                            currentInvoice['name'],
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: theme.colorScheme.secondary,
-                                                                              fontWeight: FontWeight.w400,
-                                                                            ),
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          currentInvoice[
+                                                                              'name'],
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                theme.colorScheme.secondary,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
                                                                           ),
-                                                                          Text(
-                                                                            currentInvoice['customer_name'],
-                                                                            textAlign:
-                                                                                TextAlign.left,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: theme.colorScheme.secondary,
-                                                                              fontWeight: FontWeight.w400,
-                                                                            ),
+                                                                        ),
+                                                                      ),
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          currentInvoice[
+                                                                              'customer_name'],
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                theme.colorScheme.secondary,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
                                                                           ),
-                                                                          Text(
-                                                                            currentInvoice['mode_of_payment'],
-                                                                            textAlign:
-                                                                                TextAlign.left,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: theme.colorScheme.secondary,
-                                                                              fontWeight: FontWeight.w400,
-                                                                            ),
+                                                                        ),
+                                                                      ),
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          currentInvoice[
+                                                                              'mode_of_payment'],
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                theme.colorScheme.secondary,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
                                                                           ),
-                                                                          Text(
-                                                                            numberFormat('idr_fixed',
-                                                                                currentInvoice['paid_amount']),
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: theme.colorScheme.secondary,
-                                                                              fontWeight: FontWeight.w400,
-                                                                            ),
-                                                                            textAlign:
-                                                                                TextAlign.right,
+                                                                        ),
+                                                                      ),
+                                                                      Expanded(
+                                                                        child:
+                                                                            Text(
+                                                                          numberFormat(
+                                                                              'idr_fixed',
+                                                                              currentInvoice['paid_amount']),
+                                                                          textAlign:
+                                                                              TextAlign.right,
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                theme.colorScheme.secondary,
+                                                                            fontWeight:
+                                                                                FontWeight.w400,
                                                                           ),
-                                                                        ],
-                                                                      )
+                                                                        ),
+                                                                      ),
                                                                     ],
                                                                   ),
                                                                 ),
@@ -292,7 +315,7 @@ class _SessionClosingState extends State<SessionClosing> {
                                                                   8.0,
                                                                   4.0),
                                                           child: Text(
-                                                            'No Varian',
+                                                            'No Transaction',
                                                             style: TextStyle(
                                                                 color: theme
                                                                     .colorScheme
@@ -305,48 +328,43 @@ class _SessionClosingState extends State<SessionClosing> {
                                               },
                                             ),
                                           ),
-                                          SizedBox(
-                                            width: double.infinity,
-                                            height: 30.0,
-                                            // decoration: BoxDecoration(
-                                            //     color:
-                                            //         theme.colorScheme.surface),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(
-                                                      8.0, 4.0, 8.0, 4.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    'Total',
-                                                    style: TextStyle(
-                                                      color: theme.colorScheme
-                                                          .secondary,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 15.0,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    numberFormat('idr_fixed',
-                                                        totalAmountInvoice),
-                                                    style: TextStyle(
-                                                      color: theme.colorScheme
-                                                          .secondary,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 15.0,
-                                                    ),
-                                                  ),
-                                                ],
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 30.0,
+                                      // decoration: BoxDecoration(
+                                      //     color:
+                                      //         theme.colorScheme.surface),
+                                      child: Padding(
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(24.0, 8.0, 24.0, 4.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Total',
+                                              style: TextStyle(
+                                                color:
+                                                    theme.colorScheme.secondary,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 15.0,
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                            Text(
+                                              numberFormat('idr_fixed',
+                                                  totalAmountInvoice),
+                                              style: TextStyle(
+                                                color:
+                                                    theme.colorScheme.secondary,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 15.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -362,8 +380,9 @@ class _SessionClosingState extends State<SessionClosing> {
                             ),
                           ),
                           Expanded(
+                            flex: 1,
                             child: Container(
-                              width: 100.0,
+                              // width: 60.0,
                               height: double.infinity,
                               decoration: BoxDecoration(
                                   color: theme.colorScheme.background),
@@ -386,54 +405,72 @@ class _SessionClosingState extends State<SessionClosing> {
                                   ),
                                   const SizedBox(height: 4.0),
                                   Padding(
-                                    padding: const EdgeInsetsDirectional
-                                        .fromSTEB(8.0, 12.0, 8.0, 16.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            8.0, 16.0, 8.0, 8.0),
                                     child: Builder(
                                       builder: (context) {
                                         final paymentDisplay = paymentSession;
                                         return Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            if (paymentDisplay.isNotEmpty)
-                                              ListView.builder(
-                                                shrinkWrap: true,
-                                                itemCount: paymentDisplay.length,
-                                                itemBuilder: (context, index) {
-                                                  final currentPayment = paymentDisplay[index];
-                                                  return Column(
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          Text(
-                                                            currentPayment['mode_of_payment'],
-                                                            style:
-                                                                TextStyle(
-                                                              color: theme.colorScheme.secondary,
-                                                              fontWeight: FontWeight.w600,
-                                                              fontSize: 14.0,
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            numberFormat('idr_fixed', currentPayment['amount']),
-                                                            style:
-                                                                TextStyle(
-                                                              color: theme.colorScheme.secondary,
-                                                              fontWeight: FontWeight.w600,
-                                                              fontSize: 14.0,
-                                                            ),
-                                                          ),
-                                                        ]
-                                                      ),
-                                                      const SizedBox(height: 4.0),
-                                                    ]
-                                                  );
-                                                }
-                                              )
-                                          ]
-                                        );
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              if (paymentDisplay.isNotEmpty)
+                                                ListView.builder(
+                                                    shrinkWrap: true,
+                                                    itemCount:
+                                                        paymentDisplay.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final currentPayment =
+                                                          paymentDisplay[index];
+                                                      return Column(children: [
+                                                        Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                currentPayment[
+                                                                    'mode_of_payment'],
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: theme
+                                                                      .colorScheme
+                                                                      .secondary,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize:
+                                                                      14.0,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                numberFormat(
+                                                                    'idr_fixed',
+                                                                    currentPayment[
+                                                                        'amount']),
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: theme
+                                                                      .colorScheme
+                                                                      .secondary,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize:
+                                                                      14.0,
+                                                                ),
+                                                              ),
+                                                            ]),
+                                                        const SizedBox(
+                                                            height: 8.0),
+                                                      ]);
+                                                    })
+                                            ]);
                                       },
                                     ),
                                   ),
@@ -449,35 +486,81 @@ class _SessionClosingState extends State<SessionClosing> {
                       thickness: 1.0,
                       color: theme.colorScheme.surface,
                     ),
-                    Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(
-                          16.0, 16.0, 16.0, 16.0),
-                      child: Container(
-                        width: double.infinity,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
-                          borderRadius: BorderRadius.circular(2.0),
-                        ),
-                        child: CustomElevatedButton(
-                          text: "Close Cashier",
-                          buttonTextStyle: TextStyle(
-                            color: theme.colorScheme.primaryContainer,
+                    if (isLoading == false)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            16.0, 16.0, 16.0, 16.0),
+                        child: Container(
+                          width: double.infinity,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary,
+                            borderRadius: BorderRadius.circular(2.0),
                           ),
-                          buttonStyle: CustomButtonStyles.primary,
-                          onPressed: () {
-                            // addToCart(
-                            //   context,
-                            //   widget.dataMenu,
-                            //   selectedVarian,
-                            //   selectedAddon,
-                            //   notesController.text,
-                            //   int.parse(qtyController.text),
-                            // );
-                          },
+                          child: CustomElevatedButton(
+                            text: "Close Cashier",
+                            buttonTextStyle: TextStyle(
+                              color: theme.colorScheme.primaryContainer,
+                            ),
+                            buttonStyle: CustomButtonStyles.primary,
+                            onPressed: () {
+                              // addToCart(
+                              //   context,
+                              //   widget.dataMenu,
+                              //   selectedVarian,
+                              //   selectedAddon,
+                              //   notesController.text,
+                              //   int.parse(qtyController.text),
+                              // );
+                              onTapClosing();
+                            },
+                          ),
                         ),
                       ),
-                    ),
+                    if (isLoading == true)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            16.0, 16.0, 16.0, 16.0),
+                        child: Container(
+                          width: double.infinity,
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary,
+                            borderRadius: BorderRadius.circular(2.0),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                8.0, 0.0, 8.0, 0.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Center(
+                                  child: Container(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      10.0, 0.0, 8.0, 0.0),
+                                  child: Text(
+                                    'Loading...',
+                                    style: TextStyle(
+                                        color:
+                                            theme.colorScheme.primaryContainer),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -504,21 +587,32 @@ class _SessionClosingState extends State<SessionClosing> {
   reinitSession() {
     List<dynamic> defaultMethod = AppState().configPosProfile['payments'];
     List<dynamic> payments = [];
-    List<dynamic> invoice = widget.dataSession.map((item) {
-      return {
-        "name": item["name"],
-        "customer_name": item["customer_name"],
-        "paid_amount": item["paid_amount"],
-        "mode_of_payment": getMetodePayment(item['payments']),
-      };
-    }).toList();
+    List<dynamic> invoice = widget.dataSession
+        .map((item) {
+          return {
+            "name": item["name"],
+            "pos_invoice": item['name'],
+            "customer": item['customer'],
+            "customer_name": item["customer_name"],
+            "paid_amount": item["paid_amount"],
+            "grand_total": item["grand_total"],
+            "mode_of_payment": getMetodePayment(item['payments']),
+          };
+        })
+        .toList()
+        .reversed
+        .toList();
 
     for (var method in defaultMethod) {
       payments.add({
         'mode_of_payment': method['mode_of_payment'],
         'amount': 0,
+        'opening_amount': 0,
+        'closing_amount': 0,
       });
     }
+
+    totalAmountInvoice = 0;
 
     for (var pay in payments) {
       String mode = pay['mode_of_payment'];
@@ -531,19 +625,97 @@ class _SessionClosingState extends State<SessionClosing> {
           // for (var paym in payGroup) {
           if (payGroup['mode_of_payment'] == mode) {
             totalAmount += payGroup['amount'];
+            totalAmountInvoice += payGroup['amount'];
           }
           // }
         }
       }
 
       pay['amount'] = totalAmount;
+      pay['closing_amount'] = totalAmount;
     }
 
     setState(() {
       invoiceSession = invoice;
       paymentSession = payments;
     });
-    // print('check payments, ${payments}');
-    // print('check invoice, ${invoice}');
+  }
+
+  onTapClosing() async {
+    setState(() {
+      isLoading = true;
+    });
+    await onCallCreateClosingEntry();
+    if (closingPosId != '') {
+      await onCallSubmitClosingEntry();
+      Navigator.pop(context);
+    }
+  }
+
+  onCallCreateClosingEntry() async {
+    final FrappeFetchCreateClosingEntry.CreateClosingEntry request =
+        FrappeFetchCreateClosingEntry.CreateClosingEntry(
+      cookie: AppState().setCookie,
+      periodStart: AppState().sessionCashier['period_start_date'],
+      periodEnd:
+          '${dateTimeFormat('date', null).toString()} ${timeFormat('time_full', null).toString()}',
+      postingDate: dateTimeFormat('date', null).toString(),
+      posOpeningId: AppState().sessionCashier['name'],
+      company: AppState().configCompany['name'],
+      posProfile: AppState().configPosProfile['name'],
+      user: AppState().configUser['name'],
+      posTransaction: invoiceSession,
+      listPayment: paymentSession,
+    );
+
+    try {
+      final callApi =
+          await FrappeFetchCreateClosingEntry.request(requestQuery: request);
+      if (callApi.isNotEmpty) {
+        // print('response, ${callApi}');
+        setState(() {
+          closingPosId = callApi['name'];
+        });
+        // alertSuccess(context, 'Success, closing cashier');
+        // isLoading = true;
+      }
+    } catch (error) {
+      if (context.mounted) {
+        alertError(context, error.toString());
+      }
+    }
+  }
+
+  onCallSubmitClosingEntry() async {
+    final FrappeFetchCreateClosingEntry.CreateClosingEntry request =
+        FrappeFetchCreateClosingEntry.CreateClosingEntry(
+      cookie: AppState().setCookie,
+      periodStart: AppState().sessionCashier['period_start_date'],
+      periodEnd:
+          '${dateTimeFormat('date', null).toString()} ${timeFormat('time_full', null).toString()}',
+      postingDate: dateTimeFormat('date', null).toString(),
+      posOpeningId: AppState().sessionCashier['name'],
+      company: AppState().configCompany['name'],
+      posProfile: AppState().configPosProfile['name'],
+      user: AppState().configUser['name'],
+      id: closingPosId,
+    );
+
+    try {
+      final callApi =
+          await FrappeFetchCreateClosingEntry.submit(requestQuery: request);
+      if (callApi.isNotEmpty) {
+        // print('response, ${callApi}');
+        setState(() {
+          closingPosId = callApi['name'];
+        });
+        alertSuccess(context, 'Success, closing cashier');
+        isLoading = true;
+      }
+    } catch (error) {
+      if (context.mounted) {
+        alertError(context, error.toString());
+      }
+    }
   }
 }

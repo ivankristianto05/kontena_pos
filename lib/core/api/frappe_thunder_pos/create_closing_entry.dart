@@ -10,6 +10,9 @@ class CreateClosingEntry {
   final String company;
   final String posProfile;
   final String user;
+  final List<dynamic>? posTransaction;
+  final List<dynamic>? listPayment;
+  final String? id;
 
   CreateClosingEntry({
     required this.cookie,
@@ -20,6 +23,9 @@ class CreateClosingEntry {
     required this.company,
     required this.posProfile,
     required this.user,
+    this.posTransaction,
+    this.listPayment,
+    this.id,
   });
 
   Map<String, String> formatHeader() {
@@ -30,7 +36,7 @@ class CreateClosingEntry {
 
   Map<String, dynamic> toJson() {
     final data = {
-      // "docstatus": 1,
+      "docstatus": 0,
       "period_start_date": periodStart,
       "period_end_date": periodEnd,
       "posting_date": postingDate,
@@ -38,10 +44,25 @@ class CreateClosingEntry {
       "company": company,
       "pos_profile": posProfile,
       "user": user,
+      "pos_transactions": posTransaction,
+      "payment_reconciliation": listPayment,
     };
 
     data.removeWhere((key, value) => value == null);
     return data;
+  }
+
+  Map<String, dynamic> toJsonSubmit() {
+    final data = {
+      "docstatus": 1,
+    };
+
+    data.removeWhere((key, value) => value == null);
+    return data;
+  }
+
+  String? getParamID() {
+    return id;
   }
 }
 
@@ -54,13 +75,51 @@ Future<Map<String, dynamic>> request(
     headers: requestQuery.formatHeader(),
     body: json.encode(requestQuery.toJson()),
   );
+  print('check respon body === ${json.decode(response.body)}');
+  print('check query json === ${json.encode(requestQuery.toJson())}');
 
-  print('check ${json.decode(response.body)}');
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
 
     if (responseBody.containsKey('data')) {
       return responseBody['data'];
+    } else {
+      if (responseBody.containsKey('data')) {
+        return responseBody['data'];
+      } else {
+        throw Exception(responseBody);
+      }
+    }
+  } else {
+    final responseBody = json.decode(response.body);
+
+    throw Exception(responseBody);
+  }
+}
+
+Future<Map<String, dynamic>> submit(
+    {required CreateClosingEntry requestQuery}) async {
+  String url =
+      'https://erp2.hotelkontena.com/api/resource/POS Closing Entry/${requestQuery.getParamID()}';
+
+  final response = await http.put(
+    Uri.parse(url),
+    headers: requestQuery.formatHeader(),
+    body: json.encode(requestQuery.toJsonSubmit()),
+  );
+
+  print('check respon submit body === ${json.decode(response.body)}');
+  print('check query submit json === ${json.encode(requestQuery.toJson())}');
+
+  if (response.statusCode == 200) {
+    final responseBody = json.decode(response.body);
+
+    if (requestQuery.getParamID() != null) {
+      if (responseBody.containsKey('data')) {
+        return responseBody['data'];
+      } else {
+        return requestQuery.toJson();
+      }
     } else {
       if (responseBody.containsKey('data')) {
         return responseBody['data'];
