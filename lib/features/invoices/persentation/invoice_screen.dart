@@ -32,7 +32,9 @@ import 'package:kontena_pos/data/field.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
 import 'package:kontena_pos/features/invoices/persentation/bottom_navigation.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
+import 'package:kontena_pos/widgets/create_customer.dart';
 import 'package:kontena_pos/widgets/custom_dialog.dart';
+import 'package:kontena_pos/widgets/customer.dart';
 import 'package:kontena_pos/widgets/empty_cart.dart';
 import 'package:kontena_pos/widgets/empty_data.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
@@ -91,7 +93,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   bool isLoading = true;
   bool isEdit = true;
   bool isLoadingContent = false;
+
   dynamic cartSelected;
+  dynamic customerSelected;
 
 // // //   //  final String id;
 // // //   // final String name;
@@ -219,7 +223,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               ),
                             if (modeView == 'item')
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 60.0, 8.0, 8.0),
                                 child: FilterBar(
                                   filterData: itemGroupDisplay,
@@ -238,7 +242,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               ),
                             if (modeView == 'item' && isLoadingContent == false)
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 120.0, 8.0, 0.0),
                                 child: Align(
                                   alignment: Alignment.topLeft,
@@ -257,10 +261,17 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                             // print('check item menu, $itemMenu');
                                             return itemMenu.isNotEmpty
                                                 ? MasonryGridView.count(
-                                                    crossAxisCount: 5,
+                                                    crossAxisCount:
+                                                        MediaQuery.sizeOf(
+                                                                        context)
+                                                                    .width >
+                                                                930
+                                                            ? 4
+                                                            : 5,
                                                     mainAxisSpacing: 6,
                                                     crossAxisSpacing: 6,
                                                     shrinkWrap: true,
+                                                    primary: false,
                                                     physics:
                                                         const NeverScrollableScrollPhysics(),
                                                     itemCount: itemMenu.length,
@@ -299,7 +310,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                       );
                                                     },
                                                   )
-                                                : EmptyData();
+                                                : Padding(
+                                                    padding:
+                                                        const EdgeInsetsDirectional
+                                                            .fromSTEB(8.0,
+                                                            100.0, 8.0, 0.0),
+                                                    child: EmptyData(),
+                                                  );
                                           }),
                                           // if (itemDisplay.isNotEmpty)
 
@@ -317,48 +334,32 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 8.0, 8.0, 0.0),
                                 child: Align(
-                                  alignment: Alignment.topLeft,
+                                  alignment: Alignment.topCenter,
                                   // child: SingleChildScrollView(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(8.0, 4.0, 8.0, 0.0),
-                                          child: Text(
-                                            'Order To Pay ',
-                                            style: TextStyle(
-                                              color:
-                                                  theme.colorScheme.secondary,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Divider(
-                                          height: 5.0,
-                                          thickness: 0.5,
-                                          color: theme.colorScheme.outline,
-                                        ),
-                                        if (orderDisplay.isNotEmpty)
-                                          Expanded(
-                                            child: AlignedGridView.count(
-                                              crossAxisCount: 3,
+                                  child: SingleChildScrollView(
+                                    primary: true,
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          if (orderDisplay.isNotEmpty)
+                                            AlignedGridView.count(
+                                              crossAxisCount:
+                                                  MediaQuery.sizeOf(context)
+                                                              .width >
+                                                          930
+                                                      ? 2
+                                                      : 3,
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
-                                              // physics:
-                                              //     const NeverScrollableScrollPhysics(),
+                                              primary: false,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
                                               itemCount: orderDisplay.length,
                                               itemBuilder: (context, index) {
-                                                // print(
-                                                //     'check order, ${orderDisplay[index]}');
-                                                // final currentOrderId =
-                                                //     AppState().currentOrderId;
                                                 final order =
                                                     orderDisplay[index];
                                                 dynamic orderItemList =
@@ -491,7 +492,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                             orderItem =
                                                                             orderItemList[idx];
                                                                         print(
-                                                                            'check item qty, ${orderItem['quantity']}');
+                                                                            'check item qty, ${orderItem['qty']}');
                                                                         return Padding(
                                                                           padding: const EdgeInsets
                                                                               .only(
@@ -588,13 +589,18 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                 );
                                               },
                                             ),
-                                          ),
-                                        if (orderDisplay.isEmpty) EmptyData(),
-                                      ],
+                                          // ),
+                                          if (orderDisplay.isEmpty) EmptyData(),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                  // ),
                                 ),
+                              ),
+                            if (isLoadingContent)
+                              const Align(
+                                alignment: Alignment.center,
+                                child: LoadingContent(),
                               ),
                           ],
                         ),
@@ -614,32 +620,141 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 ),
                               ),
                             ),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Enter Customer Name',
-                                hintStyle: TextStyle(
-                                  color: theme.colorScheme.onPrimaryContainer,
-                                  fontSize: 14.0,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Expanded(
+                                  child: InkWell(
+                                    splashColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () async {
+                                      onTapCustomer(context);
+                                    },
+                                    child: Container(
+                                      height:
+                                          MediaQuery.sizeOf(context).height *
+                                              0.06,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    8.0, 0.0, 8.0, 0.0),
+                                            child: Icon(
+                                              (AppState().customerSelected ==
+                                                      null)
+                                                  ? Icons.person_search_outlined
+                                                  : Icons.person_outlined,
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                              size: 24.0,
+                                            ),
+                                          ),
+                                          if (customerSelected == null)
+                                            Text(
+                                              'Customer',
+                                              style: TextStyle(
+                                                color:
+                                                    theme.colorScheme.secondary,
+                                              ),
+                                            ),
+                                          if (customerSelected != null)
+                                            Flexible(
+                                              child: Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(
+                                                        2.0, 14.0, 2.0, 2.0),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      customerSelected[
+                                                          'customer_name'],
+                                                      style: TextStyle(
+                                                        fontSize: 14.0,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: theme.colorScheme
+                                                            .primary,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.all(12.0),
-                                suffixIcon: enterGuestNameController
-                                        .text.isNotEmpty
-                                    ? InkWell(
-                                        onTap: () async {
-                                          enterGuestNameController.clear();
-                                          setState(() {
-                                            enterGuestNameController.text = '';
-                                          });
-                                        },
+                                if ((customerSelected != null))
+                                  InkWell(
+                                    splashColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () async {
+                                      onTapRemoveCustomer(context);
+                                    },
+                                    child: SizedBox(
+                                      height:
+                                          MediaQuery.sizeOf(context).height *
+                                              0.06,
+                                      child: Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            16.0, 0.0, 16.0, 0.0),
                                         child: Icon(
-                                          Icons.clear,
-                                          color: theme.colorScheme.outline,
-                                          size: 24.0,
+                                          Icons.close_rounded,
+                                          color: theme.colorScheme.secondary,
+                                          size: 20.0,
                                         ),
-                                      )
-                                    : null,
-                              ),
+                                      ),
+                                    ),
+                                  ),
+                                InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    onTapCreateCustomer(context);
+                                  },
+                                  child: Container(
+                                    height: MediaQuery.sizeOf(context).height *
+                                        0.06,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        left: BorderSide(
+                                          color: theme.colorScheme.outline,
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          16.0, 0.0, 16.0, 0.0),
+                                      child: Icon(
+                                        Icons.person_add,
+                                        color: (AppState().customerSelected ==
+                                                false)
+                                            ? theme.colorScheme.primary
+                                            : theme.colorScheme.secondary,
+                                        size: 24.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           Divider(
@@ -843,7 +958,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                             color: cartData.isNotEmpty
                                                 ? theme.colorScheme.onError
                                                 : theme.colorScheme.outline,
-                                            size: 30.0,
+                                            size: 28.0,
                                           ),
                                         ),
                                       ),
@@ -953,7 +1068,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             ),
             Container(
               width: double.infinity,
-              height: MediaQuery.sizeOf(context).height * 0.07,
+              height: 51.0,
               decoration: BoxDecoration(
                 color: Colors.transparent,
               ),
@@ -1016,10 +1131,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     await onCallItemPrice();
     await onCallItem();
     await onCallItemAddon();
-    // onCallDataPosCart();
-    // onCallDataPosOrder();
-
-    // reformatOrderCart();
   }
 
   onTapRefreshOrder() async {
@@ -1481,7 +1592,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   onTapDelete(BuildContext context, dynamic item, int index) async {
-    print('check item id, ${item.id}');
     await showModalBottomSheet(
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -1545,12 +1655,68 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           selected: tableNumber,
         );
       },
-    ).then((value) => {
-          setState(() {
-            tableNumber = AppState().tableNumber;
-          }),
-          print('check table number , $tableNumber')
-        });
+    ).then(
+      (value) => {
+        setState(() {
+          tableNumber = AppState().tableNumber;
+        }),
+      },
+    );
+  }
+
+  onTapCustomer(BuildContext context) async {
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: const Color(0x8A000000),
+      barrierColor: const Color(0x00000000),
+      context: context,
+      builder: (context) {
+        return CustomerList(
+          selected: customerSelected,
+        );
+      },
+    ).then(
+      (value) => {
+        setState(() {
+          customerSelected = AppState().customerSelected;
+        }),
+      },
+    );
+  }
+
+  onTapRemoveCustomer(BuildContext context) {
+    AppState().update(() {
+      AppState().customerSelected = null;
+    });
+    setState(() {
+      AppState().customerSelected = null;
+      customerSelected = null;
+    });
+    // setState(() {});
+  }
+
+  onTapCreateCustomer(BuildContext context) {
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: const Color(0x8A000000),
+      barrierColor: const Color(0x00000000),
+      context: context,
+      builder: (context) {
+        return CreateCustomerWidget(
+            // selected: customerSelected,
+            );
+      },
+    ).then(
+      (value) => {
+        setState(() {
+          customerSelected = AppState().customerSelected;
+        }),
+      },
+    );
   }
 
   void addToCartFromOrder(BuildContext context, dynamic order) async {

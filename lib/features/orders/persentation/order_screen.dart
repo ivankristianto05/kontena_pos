@@ -131,8 +131,9 @@ class _OrderScreenState extends State<OrderScreen> {
       AppState().tableNumber = '1';
       tableNumber = '1';
       itemGroupDisplay = AppState().configPosProfile['item_groups'];
-      filterItemDefault =
-          "${itemGroupDisplay.map((itemGroup) => '"${itemGroup['item_group']}"').join(', ')}";
+      filterItemDefault = itemGroupDisplay
+          .map((itemGroup) => '"${itemGroup['item_group']}"')
+          .join(', ');
     });
   }
 
@@ -178,31 +179,23 @@ class _OrderScreenState extends State<OrderScreen> {
                             if (modeView == 'order')
                               Column(
                                 children: [
-                                  Searchbar(onChanged: (value) {
-                                    print('value, $value');
-                                    setState(() {
-                                      search = value;
-                                    });
-                                  }
-                                      // onCompleted: (value) {
-                                      //   print('check search value $value');
-                                      //   // onSearchFilterMenu(value, '');
-                                      //   setState(() {
-                                      //     // search = value;
-                                      //   });
-                                      // },
-                                      ),
+                                  Searchbar(
+                                    onChanged: (value) {
+                                      setState(() {
+                                        search = value;
+                                      });
+                                    },
+                                  ),
                                 ],
                               ),
                             if (modeView == 'order')
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 60.0, 8.0, 8.0),
                                 child: FilterBar(
                                   filterData: itemGroupDisplay,
                                   fieldValue: 'item_group',
                                   onFilterSelected: (String type) {
-                                    // print('check type, $type');
                                     setState(() {
                                       if (type == 'All') {
                                         filter = '';
@@ -216,7 +209,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             if (modeView == 'order' &&
                                 isLoadingContent == false)
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 120.0, 8.0, 0.0),
                                 child: Align(
                                   alignment: Alignment.topLeft,
@@ -228,38 +221,45 @@ class _OrderScreenState extends State<OrderScreen> {
                                       width: MediaQuery.sizeOf(context).width,
                                       child: Column(
                                         children: [
-                                          Builder(builder: (context) {
-                                            final produk = AppState().dataItem;
-                                            final itemMenu =
-                                                menu(produk, search, filter);
-                                            // print('check item menu, $itemMenu');
-                                            return (itemMenu.isNotEmpty)
-                                                ? MasonryGridView.count(
-                                                    // gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                                                    // ),
-                                                    crossAxisCount:
-                                                        5, // Jumlah kolom
-                                                    mainAxisSpacing: 6,
-                                                    crossAxisSpacing: 6,
-                                                    shrinkWrap: true,
-                                                    physics:
-                                                        const NeverScrollableScrollPhysics(),
-                                                    itemCount: itemMenu.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      final currentItem =
-                                                          itemMenu[index];
-                                                      bool isVisible =
-                                                          onSearchFilterMenu(
-                                                                  currentItem[
-                                                                      'item_name'],
-                                                                  search)!
-                                                              ? true
-                                                              : false;
-                                                      // print('check visible, ${onSearchFilterMenu(currentItem['item_name'], search)}');
-                                                      return Visibility(
-                                                        visible: isVisible,
-                                                        child: ProductGrid(
+                                          Builder(
+                                            builder: (context) {
+                                              final produk =
+                                                  AppState().dataItem;
+                                              final itemMenu = menu(
+                                                produk,
+                                                search,
+                                                filter,
+                                              );
+
+                                              return (itemMenu.isNotEmpty)
+                                                  ? MasonryGridView.count(
+                                                      crossAxisCount: MediaQuery
+                                                                      .sizeOf(
+                                                                          context)
+                                                                  .width >
+                                                              930
+                                                          ? 4
+                                                          : 5, // Jumlah kolom
+                                                      mainAxisSpacing: 6,
+                                                      crossAxisSpacing: 6,
+                                                      shrinkWrap: true,
+                                                      physics:
+                                                          const NeverScrollableScrollPhysics(),
+                                                      itemCount:
+                                                          itemMenu.length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        final currentItem =
+                                                            itemMenu[index];
+                                                        bool isVisible =
+                                                            onSearchFilterMenu(
+                                                                    currentItem[
+                                                                        'item_name'],
+                                                                    search)!
+                                                                ? true
+                                                                : false;
+
+                                                        return ProductGrid(
                                                           name: currentItem[
                                                                   'item_name'] ??
                                                               '',
@@ -288,60 +288,21 @@ class _OrderScreenState extends State<OrderScreen> {
                                                               currentItem,
                                                             );
                                                           },
-                                                        ),
-                                                      );
-                                                    },
-                                                  )
-                                                : EmptyCart();
-                                          }),
-                                          // if (itemDisplay.isNotEmpty)
-                                          //   MasonryGridView.builder(
-                                          //     gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                                          //       crossAxisCount: 5, // Jumlah kolom
-                                          //     ),
-                                          //     mainAxisSpacing: 6,
-                                          //     crossAxisSpacing: 6,
-                                          //     shrinkWrap: true,
-                                          //     physics:
-                                          //         const NeverScrollableScrollPhysics(),
-                                          //     itemCount: itemDisplay.length,
-                                          //     itemBuilder: (context, index) {
-                                          //       final currentItem =
-                                          //           itemDisplay[index];
-                                          //       bool isVisible = onSearchFilterMenu(currentItem['item_name'], search)! ? true : false;
-                                          //       // print('check visible, ${onSearchFilterMenu(currentItem['item_name'], search)}');
-                                          //       return Visibility(
-                                          //         visible: isVisible,
-                                          //         child: ProductGrid(
-                                          //         name: currentItem[
-                                          //                 'item_name'] ??
-                                          //             '',
-                                          //         category: currentItem[
-                                          //                 'item_group'] ??
-                                          //             '',
-                                          //         price: numberFormat(
-                                          //             'idr',
-                                          //             currentItem[
-                                          //                 'standard_rate']),
-                                          //         image: CustomImageView(
-                                          //           imagePath:
-                                          //               ImageConstant.imgAdl1,
-                                          //           height: 90.v,
-                                          //           width: 70.h,
-                                          //           margin: EdgeInsets.only(
-                                          //               bottom: 1.v),
-                                          //         ),
-                                          //         onTap: () {
-                                          //           onTapOpenItem(
-                                          //             context,
-                                          //             currentItem,
-                                          //           );
-                                          //         },
-                                          //       ),
-                                          //       ) ;
-                                          //     },
-                                          //   ),
-                                          // if (itemDisplay.isEmpty) EmptyData(),
+                                                        );
+                                                      },
+                                                    )
+                                                  : Padding(
+                                                      padding:
+                                                          EdgeInsetsDirectional
+                                                              .fromSTEB(
+                                                                  8.0,
+                                                                  100.0,
+                                                                  8.0,
+                                                                  0.0),
+                                                      child: EmptyData(),
+                                                    );
+                                            },
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -355,40 +316,28 @@ class _OrderScreenState extends State<OrderScreen> {
                                     8.0, 8.0, 8.0, 0.0),
                                 child: Align(
                                   alignment: Alignment.topLeft,
-                                  // child: SingleChildScrollView(
-                                  // primary: false,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(8.0, 4.0, 8.0, 0.0),
-                                          child: Text(
-                                            'Confirm',
-                                            style: TextStyle(
-                                              color:
-                                                  theme.colorScheme.secondary,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Divider(
-                                          height: 5.0,
-                                          thickness: 0.5,
-                                          color: theme.colorScheme.outline,
-                                        ),
-                                        if (orderDisplay.isNotEmpty)
-                                          Expanded(
-                                            child: AlignedGridView.count(
-                                              crossAxisCount: 3,
+                                  child: SingleChildScrollView(
+                                    primary: true,
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          if (orderDisplay.isNotEmpty)
+                                            AlignedGridView.count(
+                                              crossAxisCount:
+                                                  MediaQuery.sizeOf(context)
+                                                              .width >
+                                                          930
+                                                      ? 2
+                                                      : 3,
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
+                                              primary: false,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
                                               itemCount: orderDisplay.length,
                                               itemBuilder: (context, index) {
                                                 final order =
@@ -533,6 +482,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                   children: [
                                                                     ListView
                                                                         .separated(
+                                                                      primary:
+                                                                          false,
                                                                       separatorBuilder:
                                                                           (context, index) =>
                                                                               Divider(
@@ -640,12 +591,11 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 );
                                               },
                                             ),
-                                          ),
-                                        if (orderDisplay.isEmpty) EmptyData(),
-                                      ],
+                                          if (orderDisplay.isEmpty) EmptyData(),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                  // ),
                                 ),
                               ),
                             if (modeView == 'served' &&
@@ -655,41 +605,31 @@ class _OrderScreenState extends State<OrderScreen> {
                                     8.0, 8.0, 8.0, 0.0),
                                 child: Align(
                                   alignment: Alignment.topLeft,
-                                  // child: SingleChildScrollView(
-                                  // primary: true,
-                                  // scrollDirection: Axis.vertical,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsetsDirectional
-                                              .fromSTEB(8.0, 4.0, 8.0, 0.0),
-                                          child: Text(
-                                            'Served',
-                                            style: TextStyle(
-                                              color:
-                                                  theme.colorScheme.secondary,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Divider(
-                                          height: 5.0,
-                                          thickness: 0.5,
-                                          color: theme.colorScheme.outline,
-                                        ),
-                                        if (servedDisplay.isNotEmpty)
-                                          Expanded(
-                                            child: AlignedGridView.count(
-                                              crossAxisCount: 3,
+                                  child: SingleChildScrollView(
+                                    primary: true,
+                                    // scrollDirection: Axis.vertical,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (servedDisplay.isNotEmpty)
+                                            AlignedGridView.count(
+                                              crossAxisCount:
+                                                  MediaQuery.sizeOf(context)
+                                                              .width >
+                                                          930
+                                                      ? 2
+                                                      : 3,
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
+                                              primary: false,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
                                               itemCount: servedDisplay.length,
                                               // itemCount:tempPosServed.length,
                                               itemBuilder: (context, index) {
@@ -809,6 +749,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                   children: [
                                                                     ListView
                                                                         .separated(
+                                                                      primary:
+                                                                          false,
                                                                       separatorBuilder:
                                                                           (context, index) =>
                                                                               Divider(
@@ -916,12 +858,13 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 );
                                               },
                                             ),
-                                          ),
-                                        if (servedDisplay.isEmpty) EmptyData(),
-                                      ],
+                                          if (servedDisplay.isEmpty)
+                                            EmptyData(),
+                                        ],
+                                      ),
                                     ),
+                                    // ),
                                   ),
-                                  // ),
                                 ),
                               ),
                             if (isLoadingContent)
@@ -1611,8 +1554,8 @@ class _OrderScreenState extends State<OrderScreen> {
             // ),
             Container(
               width: double.infinity,
-              height: MediaQuery.sizeOf(context).height * 0.07,
-              decoration: BoxDecoration(
+              height: 51.0,
+              decoration: const BoxDecoration(
                 color: Colors.transparent,
               ),
               child: BottomNavigationOrder(
@@ -1705,7 +1648,6 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   onTapRefreshHistory() async {
-    print('serve screen');
     setState(() {
       isLoadingContent = true;
     });
@@ -1714,8 +1656,6 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   onTapRefreshMenu() async {
-    print('tap refresjh');
-    print('check cartdata, ${AppState().configPosProfile}');
     setState(() {
       isLoadingContent = true;
     });
@@ -1748,7 +1688,6 @@ class _OrderScreenState extends State<OrderScreen> {
     //   }
     //   return;
     // }
-    print('tap action');
     if (modeView == 'order') {
       if (cartSelected == null) {
         await onCallCreatePosCart();
@@ -2072,10 +2011,6 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   onCallItem() async {
-    isLoading = true;
-    print('filter default, ${filterItemDefault}');
-    print('filter selected, ${filterItemGroupSelected}');
-
     final FrappeFetchDataItem.ItemRequest requestItem =
         FrappeFetchDataItem.ItemRequest(
       cookie: AppState().setCookie,

@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
@@ -95,7 +96,7 @@ class _TopBarState extends State<TopBar> {
                 ),
               ),
               Container(
-                width: MediaQuery.sizeOf(context).width * 0.15,
+                width: MediaQuery.sizeOf(context).width * 0.1,
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
@@ -128,7 +129,7 @@ class _TopBarState extends State<TopBar> {
               ),
               // if (isWideScreen) ...[
               Container(
-                width: MediaQuery.sizeOf(context).width * 0.15,
+                width: MediaQuery.sizeOf(context).width * 0.1,
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
@@ -160,7 +161,7 @@ class _TopBarState extends State<TopBar> {
                 ),
               ),
               Container(
-                width: MediaQuery.sizeOf(context).width * 0.15,
+                width: MediaQuery.sizeOf(context).width * 0.1,
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
@@ -179,7 +180,7 @@ class _TopBarState extends State<TopBar> {
                     // Define the action for the History button
                     onTapHistoryInvoice(context);
                   },
-                  child: Text(
+                  child: AutoSizeText(
                     'History',
                     style: TextStyle(
                       color: widget.isSelected == 'history'
@@ -188,14 +189,53 @@ class _TopBarState extends State<TopBar> {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    minFontSize: 10,
                   ),
                 ),
               ),
+              // ],
+            ],
+          ),
+          Row(
+            children: [
+              // if (isWideScreen)
               Container(
-                width: MediaQuery.sizeOf(context).width * 0.15,
+                width: MediaQuery.sizeOf(context).width * 0.1,
                 decoration: BoxDecoration(
                   border: Border(
                     right: BorderSide(
+                      color: theme.colorScheme.outline,
+                      width: 1.0,
+                    ),
+                    left: BorderSide(
+                      color: theme.colorScheme.outline,
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                child: AutoSizeText(
+                  'Status Cashier : ${isClosing ? 'Open' : 'Closed'}',
+                  style: TextStyle(
+                    color: theme.colorScheme.secondary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  minFontSize: 10,
+                ),
+              ),
+              Container(
+                width: MediaQuery.sizeOf(context).width * 0.12,
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: theme.colorScheme.outline,
+                      width: 1.0,
+                    ),
+                    left: BorderSide(
                       color: theme.colorScheme.outline,
                       width: 1.0,
                     ),
@@ -217,26 +257,26 @@ class _TopBarState extends State<TopBar> {
                       onOpenCashier();
                     }
                   },
-                  child: Text(
-                    isClosing ? 'Close Cashier' : 'Open Cashier',
+                  child: AutoSizeText(
+                    isClosing
+                        ? 'Close Session Cashier'
+                        : 'Open Session Cashier',
                     style: TextStyle(
                       color: isClosing
                           ? theme.colorScheme.error
-                          : theme.colorScheme.secondary,
+                          : theme.colorScheme.onSecondary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    minFontSize: 10,
                   ),
                 ),
               ),
-              // ],
-            ],
-          ),
-          Row(
-            children: [
-              // if (isWideScreen)
               Container(
                 // width: double.infinity,
+                width: MediaQuery.sizeOf(context).width * 0.12,
                 height: 51,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
@@ -255,13 +295,16 @@ class _TopBarState extends State<TopBar> {
                   padding: const EdgeInsets.all(8.0),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: Text(
+                    child: AutoSizeText(
                       AppState().configPosProfile['name'],
-                      style: TextStyle(
-                        color: theme.colorScheme.secondary,
-                        fontSize: 16,
+                      style: const TextStyle(
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      minFontSize: 10,
                     ),
                   ),
                 ),
@@ -314,14 +357,18 @@ class _TopBarState extends State<TopBar> {
                       Icons.person,
                       color: theme.colorScheme.secondary,
                     ),
-                    const SizedBox(width: 8), // Space between text and icon
-                    Text(
+                    const SizedBox(width: 8),
+                    // Space between text and icon
+                    AutoSizeText(
                       AppState().configUser['name'],
                       style: TextStyle(
-                        color: theme.colorScheme.secondary,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.secondary,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      minFontSize: 10,
                     ),
                   ],
                 ),

@@ -107,6 +107,8 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                   alignment: Alignment.topCenter,
                                   child: SingleChildScrollView(
                                     primary: true,
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(
@@ -117,6 +119,9 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                               mainAxisSpacing: 6,
                                               crossAxisSpacing: 6,
                                               shrinkWrap: true,
+                                              primary: false,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
                                               itemCount: tempPosOrder.length,
                                               itemBuilder: (context, index) {
                                                 final order =
@@ -513,6 +518,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                             children: [
                                               ListView.builder(
                                                 shrinkWrap: true,
+                                                primary: false,
                                                 itemCount:
                                                     invoiceSelected['items']
                                                         .length,
@@ -520,10 +526,6 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                                   final itemData =
                                                       invoiceSelected['items']
                                                           [index];
-                                                  print(
-                                                      'item data, ${itemData['qty']}');
-                                                  print(
-                                                      'item data, ${itemData['rate']}');
                                                   return ListCart(
                                                     title:
                                                         "${itemData['item_name']} (${itemData['qty'].floor()})",
@@ -738,9 +740,10 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
         FrappeFetchDataGetInvoice.PosInvoiceRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: '[["pos_profile","=","${AppState().configPosProfile['name']}"]]',
+      filters:
+          '[["pos_profile","=","${AppState().configPosProfile['name']}"],["owner","=","${AppState().configUser['name']}"]]',
       orderBy: 'creation desc',
-      limit: 500,
+      limit: 200,
     );
 
     try {
@@ -754,6 +757,9 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
         isLoading = false;
       });
     } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
       print('error call data pos order, $error');
       if (context.mounted) {
         alertError(context, error.toString());

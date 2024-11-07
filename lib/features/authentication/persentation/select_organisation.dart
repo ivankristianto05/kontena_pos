@@ -15,6 +15,7 @@ import 'package:kontena_pos/widgets/custom_text_form_field.dart';
 import 'package:kontena_pos/core/app_export.dart';
 import 'package:kontena_pos/core/animation/fade.dart';
 import 'package:kontena_pos/core/utils/alert.dart' as alert;
+import 'package:kontena_pos/widgets/loading_content.dart';
 
 class SelectOrganisationScreen extends StatefulWidget {
   const SelectOrganisationScreen({Key? key}) : super(key: key);
@@ -31,17 +32,19 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
   final formKey = GlobalKey<FormState>();
 
   String? Function(BuildContext, String?)? userFieldControllerValidator;
+
   List<dynamic> companyDisplay = [];
   List<dynamic> posProfileDisplay = [];
+
   bool isCompany = true;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     // setState(() {
     isCompany = true;
-    callCompany();
-    callPOSProfile();
+    onRefresh();
     // companyDisplay = AppState().dataCompany;
     // posProfileDisplay = AppState().dataPOSProfile;
     // });
@@ -177,7 +180,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       children: [
-                                        if (isCompany)
+                                        if (isCompany && isLoading == false)
                                           Column(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment:
@@ -332,7 +335,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                               ),
                                             ],
                                           ),
-                                        if (!isCompany)
+                                        if (!isCompany && isLoading == false)
                                           Column(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment:
@@ -461,6 +464,12 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                               ),
                                             ],
                                           ),
+                                        if (isLoading)
+                                          const Align(
+                                            alignment: AlignmentDirectional(
+                                                0.00, 0.00),
+                                            child: LoadingContent(),
+                                          ),
                                       ],
                                     ),
                                   ),
@@ -489,6 +498,14 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
     return posProfile
         .where((posp) => posp['company'] == configCompany['name'])
         .toList();
+  }
+
+  onRefresh() async {
+    setState(() {
+      isLoading = true;
+    });
+    await callCompany();
+    await callPOSProfile();
   }
 
   void onTapCompany(BuildContext context, dynamic itemSelected) async {
@@ -546,13 +563,13 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
     }
   }
 
-  void callCompany() async {
+  callCompany() async {
     final frappeFetchDataCompany.CompanyRequest requestCompany =
         frappeFetchDataCompany.CompanyRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
       filters: '[]',
-      limit: 100,
+      limit: 50,
     );
 
     try {
@@ -579,13 +596,13 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
     }
   }
 
-  void callPOSProfile() async {
+  callPOSProfile() async {
     final frappeFetchDataPOSProfile.POSProfileRequest requestCompany =
         frappeFetchDataPOSProfile.POSProfileRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
       filters: '[]',
-      limit: 100,
+      limit: 50,
     );
 
     try {
@@ -597,6 +614,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
       setState(() {
         AppState().dataPOSProfile = callRequest;
         posProfileDisplay = callRequest;
+        isLoading = false;
       });
       // AppState().userDetail = profileResult;
     } catch (error) {

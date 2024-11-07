@@ -648,6 +648,9 @@ class _SessionClosingState extends State<SessionClosing> {
     await onCallCreateClosingEntry();
     if (closingPosId != '') {
       await onCallSubmitClosingEntry();
+      setState(() {
+        AppState().sessionCashier = null;
+      });
       Navigator.pop(context);
     }
   }

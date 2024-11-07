@@ -58,6 +58,38 @@ class AppState extends ChangeNotifier {
       }
     });
 
+    _safeInit(() {
+      if (prefs.containsKey('ff_sessionCashier')) {
+        try {
+          _sessionCashier =
+              json.decode(prefs.getString('ff_sessionCashier') ?? '');
+        } catch (e) {
+          print("Can't decode persisted json. Error: $e.");
+        }
+      }
+    });
+
+    _safeInit(() {
+      if (prefs.containsKey('ff_itemGroupSelected')) {
+        try {
+          _itemGroupSelected =
+              json.decode(prefs.getString('ff_itemGroupSelected') ?? '');
+        } catch (e) {
+          print("Can't decode persisted json. Error: $e.");
+        }
+      }
+    });
+
+    _safeInit(() {
+      if (prefs.containsKey('ff_dataCustomer')) {
+        try {
+          _dataCustomer = json.decode(prefs.getString('ff_dataCustomer') ?? '');
+        } catch (e) {
+          print("Can't decode persisted json. Error: $e.");
+        }
+      }
+    });
+
     notifyListeners();
   }
 
@@ -130,6 +162,26 @@ class AppState extends ChangeNotifier {
   set sessionCashier(dynamic _value) {
     _sessionCashier = _value;
     prefs.setString('ff_sessionCashier', jsonEncode(_value));
+  }
+
+  List<dynamic> _itemGroupSelected = [];
+  List<dynamic> get itemGroupSelected => _itemGroupSelected;
+  set itemGroupSelected(List<dynamic> _value) {
+    _itemGroupSelected = _value;
+    prefs.setString('ff_itemGroupSelected', jsonEncode(_value));
+  }
+
+  List<dynamic> _dataCustomer = [];
+  List<dynamic> get dataCustomer => _dataCustomer;
+  set dataCustomer(List<dynamic> _value) {
+    _dataCustomer = _value;
+    prefs.setString('ff_dataCustomer', jsonEncode(_value));
+  }
+
+  dynamic _customerSelected;
+  dynamic get customerSelected => _customerSelected;
+  set customerSelected(dynamic _value) {
+    _customerSelected = _value;
   }
 
   @override

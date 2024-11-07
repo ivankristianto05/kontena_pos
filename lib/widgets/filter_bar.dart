@@ -104,7 +104,7 @@ class _FilterBarState extends State<FilterBar> {
     bool isSelected = _selectedFilter == type;
     return SizedBox(
       height: 48,
-      width: width,
+      width: 140.0,
       child: CustomElevatedButton(
         text: type.toUpperCase(),
         buttonTextStyle: isSelected

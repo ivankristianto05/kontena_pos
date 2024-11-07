@@ -1304,6 +1304,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     setState(() {
       AppState.resetInvoiceCart();
       AppState().typeTransaction = 'dine-in';
+      AppState().customerSelected = null;
     });
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.invoiceScreen,
@@ -1353,8 +1354,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
       cookie: AppState().setCookie,
       // customer: '0',
       // customerName: 'Guest',
-      customer: '133',
-      customerName: 'CHELSY MOOY',
+      customer: AppState().customerSelected != null
+          ? AppState().customerSelected['name']
+          : '0',
+      customerName: AppState().customerSelected != null
+          ? AppState().customerSelected['customer_name']
+          : 'Guest',
       company: AppState().configCompany['name'],
       postingDate: dateTimeFormat('date', null).toString(),
       postingTime: timeFormat('time_full', null),

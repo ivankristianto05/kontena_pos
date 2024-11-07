@@ -11,7 +11,7 @@ class EmptyData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(15.0, 15.0, 15.0, 15.0),
+      padding: EdgeInsetsDirectional.fromSTEB(15.0, 60.0, 15.0, 60.0),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
