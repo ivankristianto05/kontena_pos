@@ -74,7 +74,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
             scrollDirection: Axis.vertical,
             child: Padding(
               padding:
-                  const EdgeInsetsDirectional.fromSTEB(0.0, 60.0, 0.0, 60.0),
+                  const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 20.0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -94,8 +94,9 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                               30.0, 30.0, 30.0, 80.0),
                           child: Column(
                             children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Padding(
@@ -107,8 +108,56 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                           CrossAxisAlignment.end,
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
+                                        if (isCompany == false)
+                                          SizedBox(
+                                            width: 200,
+                                            height: 51,
+                                            child: MaterialButton(
+                                              onPressed: () {
+                                                // Define the action for the MaterialButton
+                                                // onLogOut(context);
+                                                setState(() {
+                                                  isCompany = true;
+                                                });
+                                              },
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.arrow_back,
+                                                    color: theme
+                                                        .colorScheme.secondary,
+                                                  ),
+                                                  const SizedBox(
+                                                      width:
+                                                          8), // Space between text and icon
+                                                  Text(
+                                                    'Back to Organisation',
+                                                    style: TextStyle(
+                                                      color: theme.colorScheme
+                                                          .secondary,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 8.0, 0.0, 40.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
                                         SizedBox(
-                                          width: 250,
+                                          width: 240,
                                           height: 51,
                                           child: MaterialButton(
                                             onPressed: () {
@@ -162,14 +211,24 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   if (isCompany)
-                                    Text(
-                                      'Select Organisation',
-                                      style: theme.textTheme.titleLarge,
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              28.0, 20.0, 28.0, 0.0),
+                                      child: Text(
+                                        'Select Organisation',
+                                        style: theme.textTheme.titleLarge,
+                                      ),
                                     ),
                                   if (!isCompany)
-                                    Text(
-                                      'Select POS',
-                                      style: theme.textTheme.titleLarge,
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              28.0, 20.0, 28.0, 0.0),
+                                      child: Text(
+                                        'Select POS',
+                                        style: theme.textTheme.titleLarge,
+                                      ),
                                     ),
                                   SingleChildScrollView(
                                     primary: true,
@@ -192,7 +251,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                 padding:
                                                     const EdgeInsetsDirectional
                                                         .fromSTEB(
-                                                        8.0, 40.0, 8.0, 0.0),
+                                                        28.0, 20.0, 28.0, 0.0),
                                                 child: Align(
                                                   child: SizedBox(
                                                     width: MediaQuery.sizeOf(
@@ -200,16 +259,17 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                         .width,
                                                     child: Column(
                                                       children: [
-                                                        MasonryGridView.count(
+                                                        AlignedGridView.count(
                                                           crossAxisCount: 4,
-                                                          mainAxisSpacing: 6,
-                                                          crossAxisSpacing: 6,
+                                                          mainAxisSpacing: 8,
+                                                          crossAxisSpacing: 8,
                                                           shrinkWrap: true,
                                                           physics:
                                                               const NeverScrollableScrollPhysics(),
                                                           itemCount:
                                                               companyDisplay
                                                                   .length,
+                                                          semanticChildCount: 4,
                                                           itemBuilder:
                                                               (context, index) {
                                                             final currentItem =
@@ -271,11 +331,11 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                                           .asset(
                                                                         'assets/images/$filename.png',
                                                                         fit: BoxFit
-                                                                            .cover,
+                                                                            .contain,
                                                                         width:
-                                                                            130.0,
+                                                                            100.0,
                                                                         height:
-                                                                            130.0,
+                                                                            100.0,
                                                                         errorBuilder: (BuildContext context,
                                                                             Object
                                                                                 exception,
@@ -288,9 +348,9 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                                             fit:
                                                                                 BoxFit.cover,
                                                                             width:
-                                                                                130.0,
+                                                                                104.0,
                                                                             height:
-                                                                                130.0,
+                                                                                104.0,
                                                                           );
                                                                         },
                                                                       ),
@@ -306,8 +366,9 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                                         ),
                                                                       ),
                                                                       // AutoSizeText(
-                                                                      //   currentItem[
-                                                                      //       'name'],
+                                                                      //   currentItem['name']
+                                                                      //       .toString()
+                                                                      //       .toUpperCase(),
                                                                       //   style:
                                                                       //       TextStyle(
                                                                       //     color: theme
@@ -347,7 +408,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                 padding:
                                                     const EdgeInsetsDirectional
                                                         .fromSTEB(
-                                                        8.0, 40.0, 8.0, 0.0),
+                                                        28.0, 20.0, 28.0, 0.0),
                                                 child: Align(
                                                   child: SizedBox(
                                                     width: MediaQuery.sizeOf(
@@ -355,7 +416,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                         .width,
                                                     child: Column(
                                                       children: [
-                                                        MasonryGridView.count(
+                                                        AlignedGridView.count(
                                                           crossAxisCount: 4,
                                                           mainAxisSpacing: 6,
                                                           crossAxisSpacing: 6,
@@ -434,21 +495,32 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                                                       const SizedBox(
                                                                           height:
                                                                               12.0),
-                                                                      AutoSizeText(
-                                                                        currentItem[
-                                                                            'name'],
+                                                                      // AutoSizeText(
+                                                                      //   currentItem[
+                                                                      //       'name'],
+                                                                      //   style:
+                                                                      //       TextStyle(
+                                                                      //     color: theme
+                                                                      //         .colorScheme
+                                                                      //         .secondary,
+                                                                      //   ),
+                                                                      //   maxLines:
+                                                                      //       1,
+                                                                      //   overflow:
+                                                                      //       TextOverflow.ellipsis,
+                                                                      //   minFontSize:
+                                                                      //       10,
+                                                                      // ),
+                                                                      Text(
+                                                                        currentItem['name']
+                                                                            .toString()
+                                                                            .toUpperCase(),
                                                                         style:
                                                                             TextStyle(
                                                                           color: theme
                                                                               .colorScheme
                                                                               .secondary,
                                                                         ),
-                                                                        maxLines:
-                                                                            1,
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                        minFontSize:
-                                                                            10,
                                                                       ),
                                                                     ],
                                                                   ),

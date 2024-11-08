@@ -1,5 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
+
+import 'package:kontena_pos/core/api/frappe_thunder_pos/create_customer.dart'
+    as frappeFetchDataCreateCustomer;
+import 'package:kontena_pos/core/utils/alert.dart';
 
 class CreateCustomerWidget extends StatefulWidget {
   CreateCustomerWidget({Key? key}) : super(key: key);
@@ -10,6 +17,8 @@ class CreateCustomerWidget extends StatefulWidget {
 
 class _CreateCustomerState extends State<CreateCustomerWidget> {
   TextEditingController customerName = TextEditingController();
+
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -34,8 +43,8 @@ class _CreateCustomerState extends State<CreateCustomerWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: MediaQuery.sizeOf(context).width * 0.25,
-                height: MediaQuery.sizeOf(context).height * 0.4,
+                width: MediaQuery.sizeOf(context).width * 0.3,
+                height: MediaQuery.sizeOf(context).height * 0.5,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(8.0),
@@ -70,7 +79,6 @@ class _CreateCustomerState extends State<CreateCustomerWidget> {
                             highlightColor: Colors.transparent,
                             onTap: () async {
                               Navigator.of(context).pop(false);
-                              // context.pushNamed('HomePage');
                             },
                             child: Column(
                               mainAxisSize: MainAxisSize.max,
@@ -159,18 +167,11 @@ class _CreateCustomerState extends State<CreateCustomerWidget> {
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                8.0, 8.0, 8.0, 8.0),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
-                                // onTapDone(context);
-                              },
+                        if (isLoading == true)
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  8.0, 8.0, 8.0, 8.0),
                               child: Container(
                                 width: double.infinity,
                                 height: 48.0,
@@ -178,23 +179,81 @@ class _CreateCustomerState extends State<CreateCustomerWidget> {
                                   color: theme.colorScheme.primary,
                                   borderRadius: BorderRadius.circular(2.0),
                                 ),
-                                alignment:
-                                    const AlignmentDirectional(0.00, 0.00),
                                 child: Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      4.0, 4.0, 4.0, 4.0),
-                                  child: Text(
-                                    'Add Customer',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: theme.colorScheme.primaryContainer,
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      8.0, 0.0, 8.0, 0.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Center(
+                                        child: Container(
+                                          width: 23,
+                                          height: 23,
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            10.0, 0.0, 8.0, 0.0),
+                                        child: Text(
+                                          'Loading...',
+                                          style: TextStyle(
+                                              color: theme.colorScheme
+                                                  .primaryContainer),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (isLoading == false)
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  8.0, 8.0, 8.0, 8.0),
+                              child: InkWell(
+                                splashColor: Colors.transparent,
+                                focusColor: Colors.transparent,
+                                hoverColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                onTap: () async {
+                                  // onTapDone(context);
+                                  onTapSave(context);
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 48.0,
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary,
+                                    borderRadius: BorderRadius.circular(2.0),
+                                  ),
+                                  alignment:
+                                      const AlignmentDirectional(0.00, 0.00),
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            4.0, 4.0, 4.0, 4.0),
+                                    child: Text(
+                                      'Add Customer',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color:
+                                            theme.colorScheme.primaryContainer,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ],
@@ -205,5 +264,59 @@ class _CreateCustomerState extends State<CreateCustomerWidget> {
         ],
       ),
     );
+  }
+
+  onTapSave(BuildContext context) async {
+    print('save');
+    setState(() {
+      isLoading = true;
+      // AppState().customerSelected = ;
+    });
+
+    await onCallCreateCustomer();
+    Navigator.pop(context);
+  }
+
+  onCallCreateCustomer() async {
+    final frappeFetchDataCreateCustomer.CreateCustomer request =
+        frappeFetchDataCreateCustomer.CreateCustomer(
+      cookie: AppState().setCookie,
+      customerName: customerName.text,
+      customerGroup: 'Individual',
+      customerType: 'Individual',
+      territory: 'All Territories',
+    );
+
+    try {
+      // Add a timeout of 30 seconds to the profile request
+      final callRequest = await frappeFetchDataCreateCustomer.request(
+        requestQuery: request,
+      );
+
+      if (callRequest.isNotEmpty) {
+        print('call request, ${callRequest}');
+        setState(() {
+          AppState().customerSelected = callRequest;
+          // if (search.text.isEmpty) {
+          //   AppState().dataCustomer = callRequest;
+          // }
+          // customerDisplay = callRequest;
+          isLoading = false;
+        });
+        alertSuccess(context, 'Success add new customer');
+      }
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+      if (error is TimeoutException) {
+        // Handle timeout error
+        // _bottomScreenTimeout(context);
+      } else {
+        alertError(context, error.toString());
+        print(error);
+      }
+      return;
+    }
   }
 }

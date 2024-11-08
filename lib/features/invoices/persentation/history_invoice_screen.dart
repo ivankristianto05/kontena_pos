@@ -652,7 +652,16 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                             buttonStyle: CustomButtonStyles
                                                 .outlinePrimary,
                                             onPressed: () {
-                                              onPrintChecker();
+                                              if (AppState()
+                                                      .configPrinter[
+                                                          'tipeConnection']
+                                                      .toString()
+                                                      .toLowerCase() ==
+                                                  'bluetooth') {
+                                                onPrintCheckerBluetooth();
+                                              } else {
+                                                onPrintChecker();
+                                              }
                                             },
                                           ),
                                         ],
@@ -919,6 +928,18 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
         AppState().configUser,
       );
 
+      result = await PrintBluetoothThermal.writeBytes(ticket);
+    }
+  }
+
+  onPrintCheckerBluetooth() async {
+    bool connectionStatus = await PrintBluetoothThermal.connectionStatus;
+    if (connectionStatus) {
+      bool result = false;
+      List<int> ticket = await printCheckerBluetooth(
+        invoiceSelected,
+        AppState().configPrinter,
+      );
       result = await PrintBluetoothThermal.writeBytes(ticket);
       print('result print, $result');
     }

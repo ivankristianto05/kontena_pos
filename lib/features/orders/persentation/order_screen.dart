@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
-// import 'package:blue_thermal_printer/blue_thermal_printer.dart';
-// import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_invoice.dart'
     as FrappeFetchDataGetInvoice;
@@ -43,12 +41,13 @@ import 'package:kontena_pos/core/utils/alert.dart';
 import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/core/utils/print.dart';
-import 'package:kontena_pos/core/utils/print_bluetooth.dart';
 import 'package:kontena_pos/features/cart/persentation/add_to_cart.dart';
 import 'package:kontena_pos/features/orders/persentation/bottom_navigation.dart';
 import 'package:kontena_pos/features/products/persentation/product_grid.dart';
+import 'package:kontena_pos/widgets/create_customer.dart';
 import 'package:kontena_pos/widgets/custom_dialog.dart';
 import 'package:kontena_pos/widgets/custom_outlined_button.dart';
+import 'package:kontena_pos/widgets/customer.dart';
 import 'package:kontena_pos/widgets/empty_cart.dart';
 import 'package:kontena_pos/widgets/empty_data.dart';
 import 'package:kontena_pos/widgets/filter_bar.dart';
@@ -72,9 +71,8 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   OrderCart cart = OrderCart();
-  late Map cartRecapData;
-  late List<OrderCartItem> cartData;
   TextEditingController enterGuestNameController = TextEditingController();
+
   String? table;
   String? pickupType;
   String typeTransaction = 'dine-in';
@@ -89,6 +87,9 @@ class _OrderScreenState extends State<OrderScreen> {
   bool isLoadingContent = false;
   bool isLoadingDetail = false;
 
+  late Map cartRecapData;
+
+  late List<OrderCartItem> cartData;
   List<dynamic> itemGroupDisplay = [];
   List<dynamic> itemDisplay = [];
   List<dynamic> orderDisplay = [];
@@ -100,6 +101,7 @@ class _OrderScreenState extends State<OrderScreen> {
   dynamic cartSelected;
   dynamic orderCartSelected;
   dynamic servesSelected;
+  dynamic customerSelected;
 
   @override
   void setState(VoidCallback callback) {
@@ -232,7 +234,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                               );
 
                                               return (itemMenu.isNotEmpty)
-                                                  ? MasonryGridView.count(
+                                                  ? AlignedGridView.count(
                                                       crossAxisCount: MediaQuery
                                                                       .sizeOf(
                                                                           context)
@@ -293,12 +295,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                                     )
                                                   : Padding(
                                                       padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  8.0,
-                                                                  100.0,
-                                                                  8.0,
-                                                                  0.0),
+                                                          const EdgeInsetsDirectional
+                                                              .fromSTEB(8.0,
+                                                              100.0, 8.0, 0.0),
                                                       child: EmptyData(),
                                                     );
                                             },
@@ -370,12 +369,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                                             ),
                                                             child: Padding(
                                                               padding:
-                                                                  EdgeInsetsDirectional
+                                                                  const EdgeInsetsDirectional
                                                                       .fromSTEB(
-                                                                          0.0,
-                                                                          4.0,
-                                                                          0.0,
-                                                                          4.0),
+                                                                      0.0,
+                                                                      4.0,
+                                                                      0.0,
+                                                                      4.0),
                                                               child: Text(
                                                                 'Selected',
                                                                 textAlign:
@@ -440,7 +439,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
+                                                                    const EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                   0.0,
                                                                   4.0,
@@ -471,7 +470,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
+                                                                    const EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                   0.0,
                                                                   4.0,
@@ -707,7 +706,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
+                                                                    const EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                   0.0,
                                                                   4.0,
@@ -738,7 +737,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
+                                                                    const EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                   0.0,
                                                                   4.0,
@@ -795,7 +794,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                                                   children: [
                                                                                     AutoSizeText(
-                                                                                      "${orderItem['item_name']} - ${orderItem['variant'] ?? ''}",
+                                                                                      "${orderItem['remark']}",
                                                                                       style: theme.textTheme.titleMedium,
                                                                                       maxLines: 2, // Allows up to 2 lines
                                                                                       minFontSize: 10,
@@ -876,7 +875,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         ),
                       ),
                       Column(
-                        // mainAxisSize: MainAxisSize.max,
+                        mainAxisSize: MainAxisSize.max,
                         children: [
                           Container(
                             width: MediaQuery.sizeOf(context).width * 0.25,
@@ -890,32 +889,140 @@ class _OrderScreenState extends State<OrderScreen> {
                                 ),
                               ),
                             ),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Enter Customer Name',
-                                hintStyle: TextStyle(
-                                  color: theme.colorScheme.onPrimaryContainer,
-                                  fontSize: 14.0,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Expanded(
+                                  child: InkWell(
+                                    splashColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () async {
+                                      onTapCustomer(context);
+                                    },
+                                    child: SizedBox(
+                                      height: 48,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(8.0, 0.0, 8.0, 0.0),
+                                            child: Icon(
+                                              (AppState().customerSelected ==
+                                                      null)
+                                                  ? Icons.person_search_outlined
+                                                  : Icons.person_outlined,
+                                              color:
+                                                  theme.colorScheme.secondary,
+                                              size: 24.0,
+                                            ),
+                                          ),
+                                          if (customerSelected == null)
+                                            Text(
+                                              'Customer',
+                                              style: TextStyle(
+                                                color:
+                                                    theme.colorScheme.secondary,
+                                              ),
+                                            ),
+                                          if (customerSelected != null)
+                                            Flexible(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(
+                                                        2.0, 18.0, 2.0, 2.0),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      customerSelected[
+                                                          'customer_name'],
+                                                      style: TextStyle(
+                                                        fontSize: 14.0,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: theme.colorScheme
+                                                            .primary,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.all(12.0),
-                                suffixIcon: enterGuestNameController
-                                        .text.isNotEmpty
-                                    ? InkWell(
-                                        onTap: () async {
-                                          enterGuestNameController.clear();
-                                          setState(() {
-                                            enterGuestNameController.text = '';
-                                          });
-                                        },
+                                if ((customerSelected != null))
+                                  InkWell(
+                                    splashColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () async {
+                                      onTapRemoveCustomer(context);
+                                    },
+                                    child: SizedBox(
+                                      height:
+                                          MediaQuery.sizeOf(context).height *
+                                              0.06,
+                                      child: Padding(
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(16.0, 0.0, 16.0, 0.0),
                                         child: Icon(
-                                          Icons.clear,
-                                          color: theme.colorScheme.outline,
-                                          size: 24.0,
+                                          Icons.close_rounded,
+                                          color: theme.colorScheme.secondary,
+                                          size: 20.0,
                                         ),
-                                      )
-                                    : null,
-                              ),
+                                      ),
+                                    ),
+                                  ),
+                                InkWell(
+                                  splashColor: Colors.transparent,
+                                  focusColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  onTap: () async {
+                                    onTapCreateCustomer(context);
+                                  },
+                                  child: Container(
+                                    height: MediaQuery.sizeOf(context).height *
+                                        0.06,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        left: BorderSide(
+                                          color: theme.colorScheme.outline,
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              16.0, 0.0, 16.0, 0.0),
+                                      child: Icon(
+                                        Icons.person_add,
+                                        color: (AppState().customerSelected ==
+                                                false)
+                                            ? theme.colorScheme.primary
+                                            : theme.colorScheme.secondary,
+                                        size: 24.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           Divider(
@@ -960,9 +1067,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                             ),
                                           ),
                                           child: Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    8.0, 0.0, 8.0, 0.0),
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(8.0, 0.0, 8.0, 0.0),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -1017,9 +1123,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                           ),
                                         ),
                                         child: Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  8.0, 0.0, 8.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(8.0, 0.0, 8.0, 0.0),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment:
@@ -1061,7 +1166,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                           await showModalBottomSheet(
                                             isScrollControlled: true,
                                             backgroundColor: Colors.transparent,
-                                            barrierColor: Color(0x80000000),
+                                            barrierColor:
+                                                const Color(0x80000000),
                                             context: context,
                                             builder: (context) {
                                               return GestureDetector(
@@ -1113,9 +1219,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                           ),
                                         ),
                                         child: Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 16.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(16.0, 0.0, 16.0, 0.0),
                                           child: Icon(
                                             Icons.delete_forever_outlined,
                                             color: cartData.isNotEmpty
@@ -1150,8 +1255,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                         color: theme.colorScheme.outline,
                                       ),
                                       child: Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 4.0, 0.0, 4.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 4.0, 0.0, 4.0),
                                         child: Text(
                                           cartSelected['name'],
                                           textAlign: TextAlign.center,
@@ -1165,9 +1270,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                   if (cartData.isNotEmpty)
                                     Expanded(
                                         child: Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    0.0, 0.0, 0.0, 0.0),
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(0.0, 0.0, 0.0, 0.0),
                                             child: Builder(
                                               builder: (context) {
                                                 return ListView.builder(
@@ -1181,8 +1285,6 @@ class _OrderScreenState extends State<OrderScreen> {
                                                         itemData.status
                                                             ? true
                                                             : false;
-                                                    // print(
-                                                    //     'is checked, $isCheck');
                                                     return Padding(
                                                       padding:
                                                           const EdgeInsetsDirectional
@@ -1221,23 +1323,17 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                           value) {
                                                                     if (value !=
                                                                         null) {
-                                                                      // print(
-                                                                      //     'check , $value');
                                                                       setState(
                                                                           () {
                                                                         isCheck =
                                                                             value;
-                                                                        // itemData.status = value;
                                                                       });
                                                                       onCheckboxChange(
                                                                         itemData,
                                                                         index,
                                                                         value,
                                                                       );
-                                                                      // print(
-                                                                      //     'check , $isCheck');
                                                                     }
-                                                                    // isCheck = value!;
                                                                   },
                                                                 ),
                                                               if ((itemData
@@ -1296,7 +1392,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                 ),
                                                               ),
                                                             ),
-                                                          SizedBox(height: 8),
+                                                          const SizedBox(
+                                                              height: 8),
                                                           if ((itemData
                                                                   .docstatus !=
                                                               2))
@@ -1311,15 +1408,15 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                 if ((itemData
                                                                             .docstatus ==
                                                                         0) &&
-                                                                    (modeView !=
-                                                                        'served'))
+                                                                    (modeView ==
+                                                                        'order'))
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
+                                                                    padding: const EdgeInsetsDirectional
                                                                         .fromSTEB(
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0),
+                                                                        0.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                        0.0),
                                                                     child:
                                                                         Column(
                                                                       mainAxisSize:
@@ -1356,15 +1453,17 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                     ),
                                                                   ),
                                                                 if ((itemData
-                                                                        .docstatus !=
-                                                                    2))
+                                                                            .docstatus !=
+                                                                        2) &&
+                                                                    (modeView !=
+                                                                        'served'))
                                                                   Padding(
-                                                                    padding: EdgeInsetsDirectional
+                                                                    padding: const EdgeInsetsDirectional
                                                                         .fromSTEB(
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0,
-                                                                            0.0),
+                                                                        0.0,
+                                                                        0.0,
+                                                                        0.0,
+                                                                        0.0),
                                                                     child:
                                                                         Column(
                                                                       mainAxisSize:
@@ -1374,18 +1473,14 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                         InkWell(
                                                                           onTap:
                                                                               () {
-                                                                            print('item id, ${itemData.id}');
-                                                                            print('item name, ${itemData.name}');
-                                                                            if (itemData.id.contains('PORD')) {
-                                                                              print('cancel');
-                                                                              onTapCancel(
+                                                                            if (itemData.id.contains(itemData.itemName)) {
+                                                                              onTapDelete(
                                                                                 context,
                                                                                 itemData,
                                                                                 index,
                                                                               );
                                                                             } else {
-                                                                              print('delete');
-                                                                              onTapDelete(
+                                                                              onTapCancel(
                                                                                 context,
                                                                                 itemData,
                                                                                 index,
@@ -1401,7 +1496,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                                 8.0),
                                                                             child:
                                                                                 Text(
-                                                                              itemData.id.contains('PORD') ? 'Cancel' : 'Delete',
+                                                                              itemData.id.contains(itemData.itemName) ? 'Delete' : 'Cancel',
                                                                               style: TextStyle(
                                                                                 color: theme.colorScheme.error,
                                                                                 fontWeight: FontWeight.w600,
@@ -1412,75 +1507,16 @@ class _OrderScreenState extends State<OrderScreen> {
                                                                       ],
                                                                     ),
                                                                   ),
-                                                                // CustomElevatedButton(
-                                                                //   text: "Delete",
-                                                                //   buttonTextStyle: TextStyle(
-                                                                //       color: theme
-                                                                //           .colorScheme
-                                                                //           .primaryContainer),
-                                                                //   buttonStyle:
-                                                                //       CustomButtonStyles
-                                                                //           .outlineError,
-                                                                //   onPressed: () {
-                                                                //     onTapDelete(
-                                                                //       context,
-                                                                //       itemData,
-                                                                //       index,
-                                                                //     );
-                                                                //   },
-                                                                // ),
-                                                                // ElevatedButton(
-                                                                //   style: ElevatedButton
-                                                                //       .styleFrom(
-                                                                //     backgroundColor: theme
-                                                                //         .colorScheme
-                                                                //         .primaryContainer,
-                                                                //     padding: EdgeInsets
-                                                                //         .symmetric(
-                                                                //             horizontal:
-                                                                //                 16),
-                                                                //   ),
-                                                                //   onPressed: () {},
-                                                                //   child: Text(
-                                                                //     'Edit',
-                                                                //     style: TextStyle(
-                                                                //       color: theme
-                                                                //           .colorScheme
-                                                                //           .primary,
-                                                                //       fontSize: 14,
-                                                                //     ),
-                                                                //   ),
-                                                                // ),
-                                                                // ElevatedButton(
-                                                                //   style: ElevatedButton
-                                                                //       .styleFrom(
-                                                                //     backgroundColor: theme
-                                                                //         .colorScheme
-                                                                //         .error,
-                                                                //     padding: EdgeInsets
-                                                                //         .symmetric(
-                                                                //             horizontal:
-                                                                //                 16),
-                                                                //   ),
-                                                                //   onPressed: () {},
-                                                                //   child: Text(
-                                                                //     'Delete',
-                                                                //     style: TextStyle(
-                                                                //         color:
-                                                                //             Colors.white,
-                                                                //         fontSize: 14),
-                                                                //   ),
-                                                                // ),
                                                               ],
                                                             ),
                                                           Padding(
                                                             padding:
-                                                                EdgeInsetsDirectional
+                                                                const EdgeInsetsDirectional
                                                                     .fromSTEB(
-                                                                        0.0,
-                                                                        6.0,
-                                                                        8.0,
-                                                                        0.0),
+                                                                    0.0,
+                                                                    6.0,
+                                                                    8.0,
+                                                                    0.0),
                                                             child: Divider(
                                                               height: 5.0,
                                                               thickness: 0.5,
@@ -1499,8 +1535,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                   if ((cartSelected != null) &&
                                       (cartData.isNotEmpty))
                                     Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 8.0, 0.0, 8.0),
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 8.0, 0.0, 8.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
@@ -1513,11 +1550,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                             buttonStyle: CustomButtonStyles
                                                 .outlinePrimary,
                                             onPressed: () {
-                                              print(
-                                                  'check app state, ${AppState().configPrinter}');
-                                              if (AppState().configPrinter[
-                                                      'tipeConnection'] ==
-                                                  'Bluetooth') {
+                                              if (AppState()
+                                                      .configPrinter[
+                                                          'tipeConnection']
+                                                      .toString()
+                                                      .toLowerCase() ==
+                                                  'bluetooth') {
                                                 onPrintCheckerBluetooth();
                                               } else {
                                                 onPrintChecker();
@@ -1539,19 +1577,6 @@ class _OrderScreenState extends State<OrderScreen> {
                 ],
               ),
             ),
-
-            // Container(
-            //   height: 50,
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       Container(
-            //         width: screenWidth * 0.65,
-            //         child: Footer(screenWidth: screenWidth),
-            //       ),
-            //     ],
-            //   ),
-            // ),
             Container(
               width: double.infinity,
               height: 51.0,
@@ -1592,17 +1617,6 @@ class _OrderScreenState extends State<OrderScreen> {
                   }
                 },
               ),
-              // child: ActionButton(
-              //     // screenWidth: screenWidth,
-              //     // //cart: cart,
-              //     // guestNameController: _guestNameController,
-              //     // resetDropdown: () {
-              //     //   setState(() {
-              //     //     table = null;
-              //     //     pickupType = null;
-              //     //   });
-              //     // },
-              //     ),
             ),
           ],
         ),
@@ -1611,17 +1625,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   bool? onSearchFilterMenu(String value, String search) {
-    // print('--- value, $value');
-    // print('-- search, $search');
-    // print('--- contais, ${value.toLowerCase().contains(search.toLowerCase())}');
     return value.toLowerCase().contains(search.toLowerCase());
-    // List<dynamic> itemNew = AppState().dataItem;
-    // itemNew.where((item) => ((item['item_name'] == search) || (item['item_group'] == filter))).toList();;
-    // // itemDisplay = AppState().dataItem;
-    // setState((){
-    //   itemDisplay = itemNew;
-    // });
-    // itemDisplay.contains()
   }
 
   List<dynamic> menu(List<dynamic> data, String search, String filter) {
@@ -1844,11 +1848,10 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   onTapDelete(BuildContext context, dynamic item, int index) async {
-    print('check item id, ${item.id}');
     await showModalBottomSheet(
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Color(0x80000000),
+      barrierColor: const Color(0x80000000),
       context: context,
       builder: (context) {
         return GestureDetector(
@@ -1872,28 +1875,13 @@ class _OrderScreenState extends State<OrderScreen> {
     setState(() {
       // cartData = cart.getAllItemCart();
     });
-
-    // dynamic itemReq = {
-    //   'id': item.id,
-    //   'name': item.name,
-    //   'item_name': item.itemName,
-    //   'item_group': item.itemGroup,
-    //   'uom': item.uom,
-    //   'qty': item.qty,
-    //   'notes': item.notes,
-    //   'status': item.status,
-    // };
-    // await onCallCancelPosOrder(itemReq);
-    // await onTapRefreshOrder();
-
-    // setState(() { })
   }
 
   onTapCancel(BuildContext context, dynamic item, int index) async {
     await showModalBottomSheet(
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Color(0x80000000),
+      barrierColor: const Color(0x80000000),
       context: context,
       builder: (context) {
         return GestureDetector(
@@ -1956,7 +1944,7 @@ class _OrderScreenState extends State<OrderScreen> {
       final itemGroupRequest = await FrappeFetchDataItemGroup.requestItemGroup(
               requestQuery: requestItemGroup)
           .timeout(
-        Duration(seconds: 30),
+        const Duration(seconds: 30),
       );
 
       setState(() {
@@ -1990,7 +1978,7 @@ class _OrderScreenState extends State<OrderScreen> {
       final itemPriceRequest = await FrappeFetchDataItemPrice.requestItemPrice(
               requestQuery: requestItemPrice)
           .timeout(
-        Duration(seconds: 30),
+        const Duration(seconds: 30),
       );
 
       // print("item price request: $itemPriceRequest");
@@ -2026,7 +2014,7 @@ class _OrderScreenState extends State<OrderScreen> {
       final itemRequest =
           await FrappeFetchDataItem.requestItem(requestQuery: requestItem)
               .timeout(
-        Duration(seconds: 30),
+        const Duration(seconds: 30),
       );
 
       // print("titiew: $itemRequest");
@@ -2060,7 +2048,9 @@ class _OrderScreenState extends State<OrderScreen> {
         FrappeFetchDataGetCart.PosCartRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: id != null ? '[["name","=","$id"]]' : '[]',
+      filters: id != null
+          ? '[["name","=","$id"]]'
+          : '[["closed_at","is","not set"]]',
       limit: 1500,
     );
 
@@ -2164,8 +2154,12 @@ class _OrderScreenState extends State<OrderScreen> {
     final FrappeFetchCreateCart.CreatePosCartRequest request =
         FrappeFetchCreateCart.CreatePosCartRequest(
       cookie: AppState().setCookie,
-      customer: '0',
-      customerName: 'Guest',
+      customer: AppState().customerSelected != null
+          ? AppState().customerSelected['name']
+          : '0',
+      customerName: AppState().customerSelected != null
+          ? AppState().customerSelected['customer_name']
+          : 'Guest',
       company: AppState().configCompany['name'],
       outlet: AppState().configPosProfile['name'],
       postingDate: dateTimeFormat('date', null).toString(),
@@ -2206,28 +2200,18 @@ class _OrderScreenState extends State<OrderScreen> {
         alertError(context, error.toString());
       }
     }
-
-    // if (cartSelected != null) {
-    //   for (OrderCartItem itm in cartData) {
-    //     print('cart data, ${itm.qty}');
-    //     dynamic itemReq = {
-    //       'item': itm.name,
-    //       'item_name': itm.itemName,
-    //       'item_group': itm.itemGroup,
-    //       'qty': itm.qty,
-    //       'notes': itm.notes
-    //     };
-    //     onCallCreatePosOrder(itemReq);
-    //   }
-    // }
   }
 
   onCallCreatePosOrder(dynamic paramItem) async {
     final FrappeFetchCreateOrder.CreatePosOrderRequest request =
         FrappeFetchCreateOrder.CreatePosOrderRequest(
       cookie: AppState().setCookie,
-      customer: '0',
-      customerName: 'Guest',
+      customer: AppState().customerSelected != null
+          ? AppState().customerSelected['name']
+          : '0',
+      customerName: AppState().customerSelected != null
+          ? AppState().customerSelected['customer_name']
+          : 'Guest',
       company: AppState().configCompany['name'],
       postingDate: dateTimeFormat('date', null).toString(),
       outlet: AppState().configPosProfile['name'],
@@ -2472,12 +2456,67 @@ class _OrderScreenState extends State<OrderScreen> {
           selected: tableNumber,
         );
       },
-    ).then((value) => {
-          setState(() {
-            tableNumber = AppState().tableNumber;
-          }),
-          print('check table number , $tableNumber')
-        });
+    ).then(
+      (value) => {
+        setState(() {
+          tableNumber = AppState().tableNumber;
+        }),
+      },
+    );
+  }
+
+  onTapCustomer(BuildContext context) async {
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: const Color(0x8A000000),
+      barrierColor: const Color(0x00000000),
+      context: context,
+      builder: (context) {
+        return CustomerList(
+          selected: customerSelected,
+        );
+      },
+    ).then(
+      (value) => {
+        setState(() {
+          customerSelected = AppState().customerSelected;
+        }),
+      },
+    );
+  }
+
+  onTapRemoveCustomer(BuildContext context) {
+    AppState().update(() {
+      AppState().customerSelected = null;
+    });
+    setState(() {
+      AppState().customerSelected = null;
+      customerSelected = null;
+    });
+  }
+
+  onTapCreateCustomer(BuildContext context) {
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: const Color(0x8A000000),
+      barrierColor: const Color(0x00000000),
+      context: context,
+      builder: (context) {
+        return CreateCustomerWidget(
+            // selected: customerSelected,
+            );
+      },
+    ).then(
+      (value) => {
+        setState(() {
+          customerSelected = AppState().customerSelected;
+        }),
+      },
+    );
   }
 
   void onTapOpenItem(BuildContext context, dynamic item) async {
@@ -2557,10 +2596,11 @@ class _OrderScreenState extends State<OrderScreen> {
     setState(() {
       cart.clearCart();
       AppState.resetOrderCart();
+      AppState().customerSelected = null;
+      customerSelected = null;
     });
     const Duration(seconds: 1);
 
-    // print('check items, ${order['items'][0]['qty']}');
     for (int a = 0; a < order['items'].length; a++) {
       OrderCartItem newItem = OrderCartItem(
         id: order['items'][a]['name'],
@@ -2573,7 +2613,9 @@ class _OrderScreenState extends State<OrderScreen> {
         price: order['items'][a]['price'] != null
             ? order['items'][a]['price'].floor()
             : 0,
-        notes: order['items'][a]['note'],
+        notes: modeView == "served"
+            ? order['items'][a]['remark']
+            : order['items'][a]['note'],
         preference: order['items'][a]['preference'] ?? {},
         status: order['items'][a]['docstatus'] == 1 ? true : false,
         docstatus: order['items'][a]['docstatus'],
@@ -2586,17 +2628,12 @@ class _OrderScreenState extends State<OrderScreen> {
       });
     }
     setState(() {
-      // print('chekc ${order['customer_name']}');
       enterGuestNameController.text = order['customer_name'].toString();
       typeTransaction = 'dine-in';
       cartData = cart.getAllItemCart();
       cartSelected = order;
       tableNumber = order['table'];
-      // isEdit = false;
     });
-    // order.forEach((dt) {
-    //   print('check, $dt');
-    // });
   }
 
   onCheckboxChange(OrderCartItem itemOrder, int? index, bool? value) {
@@ -2674,84 +2711,6 @@ class _OrderScreenState extends State<OrderScreen> {
       result = await PrintBluetoothThermal.writeBytes(ticket);
       print('result print, $result');
     }
-    // BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
-    // // String name = cartSelected[];
-    // bluetooth.isConnected.then((isConnected) {
-    //   if (isConnected == true) {
-    //     List<dynamic> tempItem = [];
-    //     List<dynamic> docItem = [];
-    //     bluetooth.printLeftRight(
-    //       "No",
-    //       cartSelected['name'],
-    //       Size.medium.val,
-    //     );
-
-    //     String docTime = '';
-
-    //     if ((cartSelected['posting_date'] != null) ||
-    //         (cartSelected['posting_time'] != null)) {
-    //       var tmpDate = dateTimeFormat('dateui', cartSelected['posting_date']);
-    //       var tmpTime = timeFormat('time_simple', cartSelected['posting_time']);
-    //       docTime = '$tmpDate $tmpTime';
-    //     }
-    //     bluetooth.printLeftRight(
-    //       "Date",
-    //       docTime,
-    //       Size.medium.val,
-    //     );
-
-    //     if (cartSelected['customer'] != null) {
-    //       String tmpCustomer = cartSelected['customer_name'] != ''
-    //           ? cartSelected['customer_name']
-    //           : '';
-    //       bluetooth.printLeftRight(
-    //         "Customer",
-    //         tmpCustomer,
-    //         Size.medium.val,
-    //       );
-    //       // docHeader.add({"key": "line", "type": "line"});
-    //     }
-    //     bluetooth.printNewLine();
-
-    //     if (cartSelected['items'] != null) {
-    //       tempItem = cartSelected['items'];
-    //     } else {
-    //       tempItem = ((cartSelected['items'] != null) &&
-    //               (cartSelected['items'].length > 2))
-    //           ? cartSelected['items']
-    //           : [];
-    //     }
-
-    //     if (tempItem.isNotEmpty) {
-    //       for (var dt in tempItem) {
-    //         // if (dt['parent_addon_idx'] == null) {
-    //         String qty = numberFormat('number_fixed', dt['qty']);
-    //         String tmpTitle = '${qty}x  ${dt['item_name']}';
-    //         bluetooth.printLeftRight(
-    //           tmpTitle,
-    //           "[ ]",
-    //           Size.medium.val,
-    //         );
-    //       }
-    //     }
-    // bluetooth.printNewLine();
-    // bluetooth.paperCut();
-    // }
-    // });
-    // if (AppState().isConnected && AppState().selectedPrinter != null) {
-    //   BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
-    //   Map<String, dynamic> config = Map();
-    //   List<LineText> list = [];
-
-    //   list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 1, align: LineText.ALIGN_CENTER,linefeed: 1));
-    //   list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', weight: 0, align: LineText.ALIGN_CENTER,linefeed: 1));
-    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', weight: 0, align: LineText.ALIGN_LEFT,linefeed: 1));
-    //   list.add(LineText(linefeed: 1));
-    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Test Print', align: LineText.ALIGN_LEFT, absolutePos: 0,relativePos: 0, linefeed: 0));
-    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: 'Berhasil', align: LineText.ALIGN_LEFT, absolutePos: 350, relativePos: 0, linefeed: 0));
-    //   // list.add(LineText(type: LineText.TYPE_TEXT, content: '数量', align: LineText.ALIGN_LEFT, absolutePos: 500, relativePos: 0, linefeed: 1));
-    //   await bluetoothPrint.printReceipt(config, list);
-    // }
   }
 
   Future<List<int>> testTicket() async {
@@ -2766,27 +2725,28 @@ class _OrderScreenState extends State<OrderScreen> {
     // final Uint8List bytesImg = data.buffer.asUint8List();
     // img.Image? image = img.decodeImage(bytesImg);
 
-    bytes += generator.text('Bold text', styles: PosStyles(bold: true));
-    bytes += generator.text('Reverse text', styles: PosStyles(reverse: true));
-    bytes += generator.text('Underlined text',
-        styles: PosStyles(underline: true), linesAfter: 1);
+    bytes += generator.text('Bold text', styles: const PosStyles(bold: true));
     bytes +=
-        generator.text('Align left', styles: PosStyles(align: PosAlign.left));
+        generator.text('Reverse text', styles: const PosStyles(reverse: true));
+    bytes += generator.text('Underlined text',
+        styles: const PosStyles(underline: true), linesAfter: 1);
+    bytes += generator.text('Align left',
+        styles: const PosStyles(align: PosAlign.left));
     bytes += generator.text('Align center',
-        styles: PosStyles(align: PosAlign.center));
+        styles: const PosStyles(align: PosAlign.center));
     bytes += generator.text('Align right',
-        styles: PosStyles(align: PosAlign.right), linesAfter: 1);
+        styles: const PosStyles(align: PosAlign.right), linesAfter: 1);
 
     bytes += generator.row([
       PosColumn(
         text: 'col5',
         width: 6,
-        styles: PosStyles(align: PosAlign.left, underline: true),
+        styles: const PosStyles(align: PosAlign.left, underline: true),
       ),
       PosColumn(
         text: 'col7',
         width: 6,
-        styles: PosStyles(align: PosAlign.right, underline: true),
+        styles: const PosStyles(align: PosAlign.right, underline: true),
       ),
     ]);
 

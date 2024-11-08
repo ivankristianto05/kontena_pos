@@ -62,8 +62,6 @@ Future<List<dynamic>> request({required Customer requestQuery}) async {
     headers: requestQuery.formatHeader(),
   );
 
-  print('uri, $url');
-
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
     if (responseBody.containsKey('data')) {

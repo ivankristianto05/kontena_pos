@@ -43,7 +43,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: MediaQuery.sizeOf(context).width * 0.25,
+              width: MediaQuery.sizeOf(context).width * 0.3,
               decoration: BoxDecoration(
                 color: theme.colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(4.0),
@@ -59,7 +59,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
                         padding: EdgeInsetsDirectional.fromSTEB(
                             16.0, 16.0, 16.0, 16.0),
                         child: Text(
-                          'Pilih Tipe Pesanan',
+                          'Choose the type of order',
                           style: theme.textTheme.titleMedium,
                         ),
                       ),
@@ -166,7 +166,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                                         .textTheme.labelMedium,
                                               ),
                                               Text(
-                                                'Pesanan Dine In',
+                                                'Order Dine In',
                                                 style: (typeTransaction ==
                                                         "dine-in")
                                                     ? TextStyle(
@@ -199,7 +199,6 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                             typeTransaction = '';
                                           }
                                         });
-                                        print('check, $typeTransaction');
                                       },
                                       child: Container(
                                         width: double.infinity,
@@ -234,7 +233,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                                         .textTheme.labelMedium,
                                               ),
                                               Text(
-                                                'Pesanan Take Away',
+                                                'Order Take Away',
                                                 style: (typeTransaction == "ta")
                                                     ? TextStyle(
                                                         color: theme.colorScheme
@@ -303,7 +302,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                                         .textTheme.labelMedium,
                                               ),
                                               Text(
-                                                'Pesanan GoFood',
+                                                'Order GoFood',
                                                 style: (typeTransaction ==
                                                         "gojek")
                                                     ? TextStyle(
@@ -337,7 +336,6 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                             typeTransaction = '';
                                           }
                                         });
-                                        print('check, $typeTransaction');
                                       },
                                       child: Container(
                                         width: double.infinity,
@@ -373,7 +371,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                                         .textTheme.labelMedium,
                                               ),
                                               Text(
-                                                'Pesanan GrabFood',
+                                                'Order GrabFood',
                                                 style: (typeTransaction ==
                                                         "grab")
                                                     ? TextStyle(
@@ -441,7 +439,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                                         .textTheme.labelMedium,
                                               ),
                                               Text(
-                                                'Pesanan ShopeeFood',
+                                                'Order ShopeeFood',
                                                 style: (typeTransaction ==
                                                         "shopee")
                                                     ? TextStyle(
@@ -486,16 +484,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
                               setState(() {
                                 AppState().typeTransaction = typeTransaction;
                               });
-                              // AppState().update(() {
-                              //   AppState().typeTransaction = typeTransaction;
-                              // });
-                              // Navigator.pop(context);
                               Navigator.of(context).pop();
-                              // Navigator.of(context).pushNamedAndRemoveUntil(
-                              //   AppRoutes.invoiceScreen,
-                              //   (route) => false,
-                              // );
-                              // context.pushNamed('');
                               setState(() {});
                             },
                             child: Container(
@@ -510,7 +499,7 @@ class _TypeTransactionState extends State<TypeTransaction> {
                                 padding: EdgeInsetsDirectional.fromSTEB(
                                     4.0, 4.0, 4.0, 4.0),
                                 child: Text(
-                                  'Terapkan',
+                                  'Confirm',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: theme.colorScheme.primaryContainer,

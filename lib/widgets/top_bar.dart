@@ -468,7 +468,7 @@ class _TopBarState extends State<TopBar> {
   onCloseCashier() async {
     // print('state closing');
     // print('state closing, ${AppState().sessionCashier}');
-    await onCallEntryClosingInvoice();
+    // await onCallEntryClosingInvoice();
     // await onCallCreateClosingEntry();
 
     // if (sessionInvoiceCashier) {
@@ -568,7 +568,6 @@ class _TopBarState extends State<TopBar> {
       final callApi =
           await FrappeFetchEntryClosing.request(requestQuery: request);
       if (callApi.isNotEmpty) {
-        // print('response, ${callApi}');
         setState(() {
           sessionInvoiceCashier = callApi;
         });

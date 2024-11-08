@@ -2,21 +2,19 @@ import 'dart:async';
 
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 
 import 'package:kontena_pos/core/api/frappe_thunder_pos/customer.dart'
     as frappeFetchDataCustomer;
 import 'package:kontena_pos/widgets/empty_data.dart';
-import 'package:kontena_pos/widgets/loading_content.dart';
 
 class CustomerList extends StatefulWidget {
   dynamic selected;
   CustomerList({
-    Key? key,
+    super.key,
     this.selected,
-  }) : super(key: key);
+  });
 
   @override
   _CustomerListState createState() => _CustomerListState();
@@ -29,16 +27,6 @@ class _CustomerListState extends State<CustomerList> {
   dynamic customerSelect;
   bool isLoading = false;
   String searchCustomer = '';
-
-  // @override
-  // void setState(VoidCallback callback) {
-  //   super.setState(callback);
-  //   // print('yes');
-
-  //   // if (AppState().dataCustomer.isEmpty) {
-  //   //   onRefresh();
-  //   // }
-  // }
 
   @override
   void initState() {
@@ -66,8 +54,8 @@ class _CustomerListState extends State<CustomerList> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: MediaQuery.sizeOf(context).width * 0.26,
-                height: MediaQuery.sizeOf(context).height * 0.6,
+                width: MediaQuery.sizeOf(context).width * 0.3,
+                height: MediaQuery.sizeOf(context).height * 0.65,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(8.0),
@@ -138,7 +126,7 @@ class _CustomerListState extends State<CustomerList> {
                           TextField(
                             controller: search,
                             decoration: InputDecoration(
-                              hintText: 'Search Menu',
+                              hintText: 'Search',
                               hintStyle: TextStyle(
                                 color: theme.colorScheme.onPrimaryContainer,
                                 fontSize: 14.0,
@@ -146,7 +134,7 @@ class _CustomerListState extends State<CustomerList> {
                               // filled: true,
                               // fillColor: Colors.white,
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(12.0),
+                              contentPadding: const EdgeInsets.all(12.0),
                               // isDense: true,
                               suffixIcon: search.text.isNotEmpty
                                   ? InkWell(
@@ -167,7 +155,8 @@ class _CustomerListState extends State<CustomerList> {
                             ),
                             onChanged: (value) {
                               EasyDebounce.debounce(
-                                  'search', Duration(milliseconds: 300), () {
+                                  'search', const Duration(milliseconds: 300),
+                                  () {
                                 setState(() {
                                   search.text = value;
                                 });

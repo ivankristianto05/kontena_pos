@@ -4,18 +4,18 @@ import 'package:kontena_pos/core/functions/invoice.dart';
 import 'package:kontena_pos/core/functions/order_new.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/number_ui.dart';
-import 'package:kontena_pos/data/menu.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/widgets/custom_text_form_field.dart';
+import 'package:print_bluetooth_thermal/post_code.dart';
 // import 'package:kontena_pos/core/functions/cart.dart';
 
 class AddToCart extends StatefulWidget {
   AddToCart({
-    Key? key,
+    super.key,
     this.dataMenu,
     this.idxMenu,
     this.order = false,
-  }) : super(key: key);
+  });
 
   final dynamic dataMenu;
   final int? idxMenu;
@@ -26,18 +26,23 @@ class AddToCart extends StatefulWidget {
 }
 
 class _AddToCartState extends State<AddToCart> {
-  bool isLoading = true;
+  late List<TextEditingController> qtyAddonController;
+
   List<dynamic> varianDisplay = [];
   List<dynamic> prefDisplay = [];
   List<dynamic> addonDisplay = [];
   dynamic selectedVarian;
   List<dynamic> selectedPref = [];
-  String notes = '';
   List<dynamic> selectedAddon = [];
-  int qty = 0;
-  late List<TextEditingController> qtyAddonController;
+
   InvoiceCart invoiceCart = InvoiceCart();
   OrderCart orderCart = OrderCart();
+
+  String notes = '';
+  int qty = 0;
+
+  bool isLoading = true;
+  bool featureAddon = false;
 
   @override
   void setState(VoidCallback callback) {
@@ -85,7 +90,6 @@ class _AddToCartState extends State<AddToCart> {
   }
 
   initAddon() {
-    // print('check data, ${widget.dataMenu}');
     List<dynamic> itemAddon = AppState().dataItemAddon.where((addon) {
       return addon['item_group'] == widget.dataMenu['item_group'];
     }).toList();
@@ -101,8 +105,6 @@ class _AddToCartState extends State<AddToCart> {
         };
       }).toList();
     }
-    // print('check addon, ${itemAddon}');
-    // print('check addon, ${addonDisplay}');
   }
 
   // List<dynamic> getVarian() {
@@ -155,7 +157,11 @@ class _AddToCartState extends State<AddToCart> {
                                 16.0, 16.0, 16.0, 16.0),
                             child: Text(
                               widget.dataMenu['item_name'],
-                              style: theme.textTheme.labelMedium,
+                              style: TextStyle(
+                                color: theme.colorScheme.secondary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.0,
+                              ),
                             ),
                           ),
                           InkWell(
@@ -176,8 +182,8 @@ class _AddToCartState extends State<AddToCart> {
                                       16.0, 16.0, 16.0, 16.0),
                                   child: Icon(
                                     Icons.close_rounded,
-                                    color: theme.colorScheme.onBackground,
-                                    size: 20.0,
+                                    color: theme.colorScheme.secondary,
+                                    size: 18.0,
                                   ),
                                 ),
                               ],
@@ -352,23 +358,21 @@ class _AddToCartState extends State<AddToCart> {
                                                         height: 30.0,
                                                         decoration:
                                                             BoxDecoration(
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .surface),
+                                                          color: theme
+                                                              .colorScheme
+                                                              .surface,
+                                                        ),
                                                         child: Padding(
                                                           padding:
                                                               const EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                  8.0,
-                                                                  4.0,
-                                                                  8.0,
-                                                                  4.0),
+                                                                  .all(8.0),
                                                           child: Text(
                                                             'No Varian',
                                                             style: TextStyle(
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .onPrimaryContainer),
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .onPrimaryContainer,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
@@ -575,23 +579,21 @@ class _AddToCartState extends State<AddToCart> {
                                                         height: 30.0,
                                                         decoration:
                                                             BoxDecoration(
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .surface),
+                                                          color: theme
+                                                              .colorScheme
+                                                              .surface,
+                                                        ),
                                                         child: Padding(
                                                           padding:
                                                               const EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                  8.0,
-                                                                  4.0,
-                                                                  8.0,
-                                                                  4.0),
+                                                                  .all(8.0),
                                                           child: Text(
                                                             'No Preference',
                                                             style: TextStyle(
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .onPrimaryContainer),
+                                                              color: theme
+                                                                  .colorScheme
+                                                                  .onPrimaryContainer,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
@@ -641,7 +643,8 @@ class _AddToCartState extends State<AddToCart> {
                                               style:
                                                   theme.textTheme.labelMedium),
                                           const SizedBox(height: 4.0),
-                                          Padding(
+                                          if (featureAddon)
+                                            Padding(
                                               padding:
                                                   const EdgeInsetsDirectional
                                                       .fromSTEB(
@@ -649,7 +652,31 @@ class _AddToCartState extends State<AddToCart> {
                                               child: _buildAddonSection(
                                                 context,
                                                 addonDisplay,
-                                              )),
+                                              ),
+                                            ),
+                                          if (!featureAddon)
+                                            Container(
+                                              width: double.infinity,
+                                              height: 30.0,
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    theme.colorScheme.outline,
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(
+                                                        8.0, 8.0, 8.0, 8.0),
+                                                child: Text(
+                                                  'Upcoming Feature',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: theme.colorScheme
+                                                        .onPrimaryContainer,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                         ],
                                       ),
                                     ),
@@ -1040,14 +1067,16 @@ class _AddToCartState extends State<AddToCart> {
 
   // widget list varian
   // widget notes
+  FocusNode inputNotes = FocusNode();
   TextEditingController notesController = TextEditingController();
   Widget _buildNotesSection(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       CustomTextFormField(
         controller: notesController,
         autofocus: false,
-        // focusNode: inputSearchVarian,
+        focusNode: inputNotes,
         maxLines: 2,
+        textInputAction: TextInputAction.done,
         contentPadding: EdgeInsets.symmetric(
           horizontal: 3.h,
           vertical: 9.v,
@@ -1064,9 +1093,10 @@ class _AddToCartState extends State<AddToCart> {
           setState(() {
             notes = notesController.text;
           });
+          inputNotes.unfocus();
         },
         onTapOutside: (value) {
-          // inputSearchVarian.unfocus();
+          inputNotes.unfocus();
           setState(() {
             notes = notesController.text;
           });
@@ -1139,16 +1169,11 @@ class _AddToCartState extends State<AddToCart> {
         selectedAddon[findIndex]['qty'] = qty;
       });
 
-      print('fin dienx, ${findIndex}');
-      print('qty, $qty');
-
       if (qty == 0) {
         setState(() {
           selectedAddon.removeAt(findIndex);
         });
       }
-
-      print('check selection, ${selectedAddon}');
     }
   }
 
@@ -1198,36 +1223,41 @@ class _AddToCartState extends State<AddToCart> {
                               itemCount: currentAddonItem.length,
                               itemBuilder: (context, index2) {
                                 final addonItem = currentAddonItem[index2];
-                                return Row(
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Expanded(
-                                      flex: 2,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              addonItem['item_name'],
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .labelMedium,
-                                            ),
-                                            Text(
-                                              numberFormat(
-                                                  'idr', addonItem['rate']),
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .labelMedium,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                    Text(
+                                      addonItem['item_name'],
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium,
                                     ),
-                                    _buildQuantityControl(
-                                        context, index, index2),
+                                    Text(
+                                      numberFormat('idr', addonItem['rate']),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        // Expanded(
+                                        //   flex: 2,
+                                        //   child: Padding(
+                                        //     padding: const EdgeInsets.all(12.0),
+                                        //     child: Column(
+                                        //       mainAxisSize: MainAxisSize.max,
+                                        //       crossAxisAlignment:
+                                        //           CrossAxisAlignment.start,
+                                        //       children: [],
+                                        //     ),
+                                        //   ),
+                                        // ),
+                                        _buildQuantityControl(
+                                            context, index, index2),
+                                      ],
+                                    ),
                                   ],
                                 );
                               },
@@ -1248,7 +1278,6 @@ class _AddToCartState extends State<AddToCart> {
 
   Widget _buildQuantityControl(
       BuildContext context, int indexParent, int index) {
-    // print('addon display, ${addonDisplay[indexParent]}');
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: Row(
@@ -1260,24 +1289,20 @@ class _AddToCartState extends State<AddToCart> {
             () => qtyChangeAddon('minus', indexParent, index),
           ),
           Container(
+            height: 34,
             width: 40,
-            color: theme.colorScheme.surface,
-            child: CustomTextFormField(
-              autofocus: false,
+            color: theme.colorScheme.primaryContainer,
+            child: TextField(
               controller: addonDisplay[indexParent]['items'][index]['editor'],
-              maxLines: 1,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 3.h,
-                vertical: 13.v,
-              ),
-              borderDecoration: OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(
-                  color: theme.colorScheme.surface,
-                  width: 1,
+              decoration: InputDecoration(
+                hintText: 'Qty',
+                hintStyle: TextStyle(
+                  color: theme.colorScheme.onPrimaryContainer,
+                  fontSize: 12.0,
                 ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.all(14.5),
               ),
-              hintText: "Qty",
             ),
           ),
           _buildQuantityButton(
@@ -1316,7 +1341,6 @@ class _AddToCartState extends State<AddToCart> {
 
   // widget qty
   TextEditingController qtyController = TextEditingController();
-  // qtyController.text = '1';
   void qtyChange(String type) {
     int qty = int.parse(qtyController.text);
     qty = type == 'add' ? qty + 1 : qty - 1;
@@ -1339,36 +1363,23 @@ class _AddToCartState extends State<AddToCart> {
             () => qtyChange('minus'),
             36.0,
           ),
-          // Expanded(
           Container(
-            // height: 50.0,
-            width: MediaQuery.sizeOf(context).width * 0.08,
-            // constraints: BoxConstraints(minWidth: 40),
-            color: theme.colorScheme.surface,
-            child: CustomTextFormField(
-              autofocus: false,
+            height: 36.0,
+            width: 60.0,
+            color: theme.colorScheme.primaryContainer,
+            child: TextField(
               controller: qtyController,
-              maxLines: 1,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 3.h,
-                vertical: 13.v,
-              ),
-              borderDecoration: OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(
-                  color: theme.colorScheme.surface,
-                  width: 1,
+              decoration: InputDecoration(
+                hintText: 'Qty',
+                hintStyle: TextStyle(
+                  color: theme.colorScheme.onPrimaryContainer,
+                  fontSize: 14.0,
                 ),
-              ),
-              hintText: "Qty",
-              textAlign: TextAlign.center,
-              textStyle: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.all(14.0),
               ),
             ),
           ),
-
           _buildQuantityButton(
             context,
             Icons.add,
@@ -1388,11 +1399,6 @@ class _AddToCartState extends State<AddToCart> {
     String note,
     int qty,
   ) {
-    // print('check item, $item');
-    // print('check varian, $varian');
-    // print('check addon, $addon');
-    // print('check qty, $qty');
-
     String id = item['item_name'];
 
     if (note != '') {
@@ -1402,7 +1408,6 @@ class _AddToCartState extends State<AddToCart> {
 
     // invoice
     if (widget.order == false) {
-      print('ivnoce');
       InvoiceCartItem newItem = InvoiceCartItem(
         id: id,
         name: item['name'],
@@ -1424,7 +1429,6 @@ class _AddToCartState extends State<AddToCart> {
         invoiceCart.addItem(newItem, mode: InvoiceCartMode.add);
       });
     } else {
-      print('order');
       OrderCartItem newItem = OrderCartItem(
         id: id,
         name: item['name'],
@@ -1449,13 +1453,9 @@ class _AddToCartState extends State<AddToCart> {
         totalAddon: (totalAddon()),
         // type: item['item_group'],
       );
-
-      // final cart = Provider.of<Cart>(context, listen: false);
       orderCart.addItem(newItem, mode: OrderCartMode.add);
     }
-
     Navigator.pop(context);
-    // Navigator.of(context).pushNamed(AppRoutes.invoiceScreen);
   }
 
   void updateCart(
@@ -1466,11 +1466,6 @@ class _AddToCartState extends State<AddToCart> {
     String note,
     int qty,
   ) {
-    print('check item, ${item}');
-    // print('check varian, $varian');
-    // print('check addon, $addon');
-    // print('check qty, $qty');
-
     String id = item['name'];
 
     if (note != '') {
@@ -1480,7 +1475,6 @@ class _AddToCartState extends State<AddToCart> {
 
     // invoice
     if (widget.order == false) {
-      print('ivnoce');
       InvoiceCartItem itemNew = invoiceCart.getItemByIndex(widget.idxMenu!);
 
       InvoiceCartItem newItem = InvoiceCartItem(
@@ -1492,7 +1486,7 @@ class _AddToCartState extends State<AddToCart> {
         description: itemNew.description,
         qty: qty,
         price: itemNew.price,
-        notes: itemNew.notes,
+        notes: note,
         preference: itemNew.preference,
         status: false,
         docstatus: itemNew.docstatus,
@@ -1511,9 +1505,7 @@ class _AddToCartState extends State<AddToCart> {
         }
       });
     } else {
-      print('order');
       OrderCartItem itemNew = orderCart.getItemByIndex(widget.idxMenu!);
-      print('id, ${itemNew.id}');
       OrderCartItem newItem = OrderCartItem(
         id: itemNew.id,
         name: itemNew.name,
@@ -1523,34 +1515,14 @@ class _AddToCartState extends State<AddToCart> {
         description: itemNew.description,
         qty: qty,
         price: itemNew.price,
-        notes: itemNew.notes,
+        notes: note,
         preference: itemNew.preference,
         status: false,
         docstatus: itemNew.docstatus,
         addon: selectedAddon,
         totalAddon: totalAddon(),
-
-        // id: id,
-        // name: item['name'],
-        // itemName: item['item_name'],
-        // // variant: null,
-        // // variantId: null,
-        // uom: item['uom'],
-        // description: item['item_name'],
-        // qty: qty,
-        // price: item['price'],
-        // // variantPrice: item['standard_rate'].floor(),
-        // // addonsPrice:
-        // // item['standard_rate'].floor(), // Masukkan harga total addons
-        // // addons: null,
-        // notes: note,
-        // preference: {},
-        // itemGroup: item['item_group'],
-        // status: false,
-        // type: item['item_group'],
       );
 
-      // final cart = Provider.of<Cart>(context, listen: false);
       setState(() {
         if (qty == 0) {
           orderCart.removeItem(itemNew.id);
@@ -1561,7 +1533,6 @@ class _AddToCartState extends State<AddToCart> {
     }
 
     Navigator.pop(context);
-    // Navigator.of(context).pushNamed(AppRoutes.invoiceScreen);
   }
 
   setReinitData() {

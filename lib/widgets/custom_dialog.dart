@@ -92,8 +92,9 @@ class _DialogCustomWidgetWidgetState extends State<DialogCustomWidget> {
                     thickness: 0.5,
                     color: theme.colorScheme.outline,
                   ),
-                  Expanded(
-                    flex: 1,
+                  SizedBox(
+                    width: double.infinity,
+                    height: 40.0,
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
@@ -125,13 +126,6 @@ class _DialogCustomWidgetWidgetState extends State<DialogCustomWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                // FFAppState().update(() {
-                                //   FFAppState().deleteVoucherUsed();
-                                //   FFAppState().VoucherUsed = [];
-
-                                //   FFAppState().VoucherPack = [];
-                                //   FFAppState().VoucherItem = [];
-                                // });
                                 if (widget.onConfirm != null) {
                                   widget.onConfirm!();
                                   Navigator.pop(context);

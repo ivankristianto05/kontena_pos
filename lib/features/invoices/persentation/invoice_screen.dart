@@ -97,16 +97,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   dynamic cartSelected;
   dynamic customerSelected;
 
-// // //   //  final String id;
-// // //   // final String name;
-// // //   // String? variant;
-// // //   // int qty;
-// // //   // final int price;
-// // //   // late int totalPrice;
-// // //   // Map<String, Map<String, dynamic>>? addons;
-// // //   // final String notes;
-// // //   // final Map<String, String> preference;
-// // //   // String? type;
   @override
   void setState(VoidCallback callback) {
     super.setState(callback);
@@ -123,14 +113,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     if (orderDisplay.isEmpty) {
       onTapRefreshOrder();
     }
-    // onCallItemGroup();
-    // onCallItemPrice();
-    // onCallItem();
-
-    // onCallDataPosCart();
-    // onCallDataPosOrder();
-    // reformatOrderCart();
-    // print('check config pos profile, ${AppState().configPosProfile}');
 
     setState(() {
       cartData = cart.getAllItemCart();
@@ -143,19 +125,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           .map((itemGroup) => '"${itemGroup['item_group']}"')
           .join(', ');
     });
-    // cartData = cart.getAllItemCart();
-
-    // Future.delayed(Duration(milliseconds: 300), () {
-    //   setState(() {
-    //     // item = AppState().item;
-    //     item = ListMenu;
-    //     isLoading = false;
-
-    //     // print(itemDisplay);
-    //     itemDisplay = getItem();
-    //     // orderList = AppState().confirmedOrders;
-    //   });
-    // });
   }
 
   @override
@@ -214,7 +183,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                               Column(
                                 children: [
                                   Searchbar(onChanged: (value) {
-                                    print('value, $value');
                                     setState(() {
                                       search = value;
                                     });
@@ -229,7 +197,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                   filterData: itemGroupDisplay,
                                   fieldValue: 'item_group',
                                   onFilterSelected: (String type) {
-                                    // print('check type, $type');
                                     setState(() {
                                       if (type == 'All') {
                                         filter = '';
@@ -425,7 +392,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
+                                                                    const EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                   0.0,
                                                                   4.0,
@@ -456,7 +423,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
+                                                                    const EdgeInsetsDirectional
                                                                         .fromSTEB(
                                                                   0.0,
                                                                   4.0,
@@ -553,25 +520,33 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                                                   ],
                                                                                 ),
                                                                               ),
-                                                                              Text(
-                                                                                  (orderItem['docstatus'] == 1)
-                                                                                      ? 'Confirm'
-                                                                                      : (orderItem['docstatus'] == 2)
-                                                                                          ? 'Cancelled'
-                                                                                          : 'Draft',
+                                                                              if ((orderItem['docstatus'] == 1) && (orderItem['ots_bill'] != 0))
+                                                                                Text(
+                                                                                  'Unpaid',
                                                                                   style: TextStyle(
-                                                                                    color: () {
-                                                                                      if (orderItem['docstatus'] == 1) {
-                                                                                        return theme.colorScheme.primary;
-                                                                                      } else if (orderItem['docstatus'] == 2) {
-                                                                                        return theme.colorScheme.error;
-                                                                                      } else {
-                                                                                        return theme.colorScheme.onPrimaryContainer;
-                                                                                      }
-                                                                                    }(),
+                                                                                    color: appTheme.orange600,
                                                                                     fontWeight: FontWeight.w700,
                                                                                     fontSize: 12,
-                                                                                  )),
+                                                                                  ),
+                                                                                ),
+                                                                              if ((orderItem['docstatus'] == 1) && (orderItem['ots_bill'] == 0))
+                                                                                Text(
+                                                                                  'Paid',
+                                                                                  style: TextStyle(
+                                                                                    color: theme.colorScheme.onSecondary,
+                                                                                    fontWeight: FontWeight.w700,
+                                                                                    fontSize: 12,
+                                                                                  ),
+                                                                                ),
+                                                                              if (orderItem['docstatus'] == 2)
+                                                                                Text(
+                                                                                  'Cancelled',
+                                                                                  style: TextStyle(
+                                                                                    color: theme.colorScheme.error,
+                                                                                    fontWeight: FontWeight.w700,
+                                                                                    fontSize: 12,
+                                                                                  ),
+                                                                                ),
                                                                             ],
                                                                           ),
                                                                         );
@@ -609,7 +584,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                         mainAxisSize: MainAxisSize.max,
                         children: [
                           Container(
-                            width: dataContentWidth,
+                            width: MediaQuery.sizeOf(context).width * 0.25,
                             height: 48.0,
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primaryContainer,
@@ -632,10 +607,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                     onTap: () async {
                                       onTapCustomer(context);
                                     },
-                                    child: Container(
-                                      height:
-                                          MediaQuery.sizeOf(context).height *
-                                              0.06,
+                                    child: SizedBox(
+                                      height: 48,
                                       child: Row(
                                         mainAxisSize: MainAxisSize.max,
                                         mainAxisAlignment:
@@ -644,9 +617,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                             CrossAxisAlignment.center,
                                         children: [
                                           Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    8.0, 0.0, 8.0, 0.0),
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(8.0, 0.0, 8.0, 0.0),
                                             child: Icon(
                                               (AppState().customerSelected ==
                                                       null)
@@ -668,9 +640,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           if (customerSelected != null)
                                             Flexible(
                                               child: Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        2.0, 14.0, 2.0, 2.0),
+                                                padding:
+                                                    const EdgeInsetsDirectional
+                                                        .fromSTEB(
+                                                        2.0, 18.0, 2.0, 2.0),
                                                 child: Column(
                                                   mainAxisSize:
                                                       MainAxisSize.max,
@@ -711,8 +684,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           MediaQuery.sizeOf(context).height *
                                               0.06,
                                       child: Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            16.0, 0.0, 16.0, 0.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(16.0, 0.0, 16.0, 0.0),
                                         child: Icon(
                                           Icons.close_rounded,
                                           color: theme.colorScheme.secondary,
@@ -741,8 +714,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                       ),
                                     ),
                                     child: Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          16.0, 0.0, 16.0, 0.0),
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              16.0, 0.0, 16.0, 0.0),
                                       child: Icon(
                                         Icons.person_add,
                                         color: (AppState().customerSelected ==
@@ -799,9 +773,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                             ),
                                           ),
                                           child: Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    8.0, 0.0, 8.0, 0.0),
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(8.0, 0.0, 8.0, 0.0),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.max,
                                               mainAxisAlignment:
@@ -856,9 +829,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           ),
                                         ),
                                         child: Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  8.0, 0.0, 8.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(8.0, 0.0, 8.0, 0.0),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment:
@@ -900,7 +872,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           await showModalBottomSheet(
                                             isScrollControlled: true,
                                             backgroundColor: Colors.transparent,
-                                            barrierColor: Color(0x80000000),
+                                            barrierColor:
+                                                const Color(0x80000000),
                                             context: context,
                                             builder: (context) {
                                               return GestureDetector(
@@ -950,9 +923,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           ),
                                         ),
                                         child: Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  16.0, 0.0, 16.0, 0.0),
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(16.0, 0.0, 16.0, 0.0),
                                           child: Icon(
                                             Icons.delete_forever_outlined,
                                             color: cartData.isNotEmpty
@@ -983,8 +955,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                     Expanded(
                                       // Menggunakan Expanded untuk memungkinkan ListView memiliki ruang penuh dalam Column
                                       child: Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 0.0, 0.0, 0.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 0.0, 0.0, 0.0),
                                         child: Builder(
                                           builder: (context) {
                                             // final itemCart = cartData;
@@ -1035,7 +1007,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                                         .colorScheme.primary,
                                                     fontWeight: FontWeight.bold,
                                                   ),
-                                                  padding: EdgeInsets.all(16),
+                                                  padding:
+                                                      const EdgeInsets.all(16),
                                                   note: itemData.notes ?? '',
                                                   lineColor: appTheme.gray200,
                                                   secondaryStyle:
@@ -1069,7 +1042,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             Container(
               width: double.infinity,
               height: 51.0,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.transparent,
               ),
               child: BottomNavigationInvoice(
@@ -1090,17 +1063,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                   }
                 },
               ),
-              // child: ActionButton(
-              //     // screenWidth: screenWidth,
-              //     // //cart: cart,
-              //     // guestNameController: _guestNameController,
-              //     // resetDropdown: () {
-              //     //   setState(() {
-              //     //     table = null;
-              //     //     pickupType = null;
-              //     //   });
-              //     // },
-              //     ),
             ),
           ],
         ),
@@ -1196,7 +1158,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       final itemPriceRequest = await FrappeFetchDataItemPrice.requestItemPrice(
               requestQuery: requestItemPrice)
           .timeout(
-        Duration(seconds: 30),
+        const Duration(seconds: 30),
       );
 
       // print("item price request: $itemPriceRequest");
@@ -1240,7 +1202,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       final itemRequest =
           await FrappeFetchDataItem.requestItem(requestQuery: requestItem)
               .timeout(
-        Duration(seconds: 30),
+        const Duration(seconds: 30),
       );
 
       // print("titiew: $itemRequset");
@@ -1458,7 +1420,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         FrappeFetchDataGetCart.PosCartRequest(
       cookie: AppState().setCookie,
       fields: '["*"]',
-      filters: '[]',
+      filters: '[["closed_at","is","not set"]]',
       limit: 1500,
     );
 
@@ -1595,7 +1557,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     await showModalBottomSheet(
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Color(0x80000000),
+      barrierColor: const Color(0x80000000),
       context: context,
       builder: (context) {
         return GestureDetector(
@@ -1723,11 +1685,14 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     setState(() {
       cart.clearCart();
       AppState.resetInvoiceCart();
+      AppState().customerSelected = null;
+      customerSelected = null;
     });
     const Duration(seconds: 1);
 
     for (int a = 0; a < order['items'].length; a++) {
-      if (order['items'][a]['docstatus'] == 1) {
+      if ((order['items'][a]['docstatus'] == 1) &&
+          (order['items'][a]['ots_bill'] != 0)) {
         InvoiceCartItem newItem = InvoiceCartItem(
           id: order['items'][a]['name'],
           name: order['items'][a]['item'],
@@ -1736,7 +1701,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           uom: order['items'][a]['uom'] ?? '',
           description: order['items'][a]['description'] ??
               order['items'][a]['item_name'],
-          qty: order['items'][a]['qty'],
+          qty: order['items'][a]['ots_bill'],
           price: order['items'][a]['price'].floor(),
           notes: order['items'][a]['note'],
           preference: order['items'][a]['preference'] ?? {},

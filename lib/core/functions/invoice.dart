@@ -60,7 +60,6 @@ class InvoiceCart {
     for (var item in _items) {
       if (item.docstatus != 2) {
         item.totalPrice = item.qty * (item.price + item.totalAddon);
-
       }
     }
   }
@@ -93,9 +92,11 @@ class InvoiceCart {
       // Item already exists, update the quantity
       if (mode == InvoiceCartMode.add) {
         existingItem.qty += newItem.qty;
+        existingItem.notes = newItem.notes;
       } else {
         // Default behavior: Add a new item
         existingItem.qty = newItem.qty;
+        existingItem.notes = newItem.notes;
       }
     } else {
       // Item doesn't exist, add a new item
@@ -184,7 +185,7 @@ class InvoiceCart {
     };
 
     for (var item in AppState.invoiceCartItems) {
-      recap['totalPrice'] += item.docstatus !=2 ? item.totalPrice : 0;
+      recap['totalPrice'] += item.docstatus != 2 ? item.totalPrice : 0;
 
       if (!recap['items'].containsKey(item.name)) {
         recap['items'][item.name] = {

@@ -30,7 +30,7 @@ class CreateCustomer {
     final data = {
       "docstatus": 1,
       "customer_name": customerName,
-      "customer_type": customerName,
+      "customer_type": customerType,
       "customer_group": customerGroup,
       "territory": territory,
     };
@@ -56,6 +56,9 @@ Future<Map<String, dynamic>> request(
     headers: requestQuery.formatHeader(),
     body: json.encode(requestQuery.toJson()),
   );
+
+  print('ctest, ${response.body}');
+  print('ctest, ${requestQuery.toJson()}');
 
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);

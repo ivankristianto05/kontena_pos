@@ -47,7 +47,7 @@ class _NumPadWidgetState extends State<NumPad> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.width * 0.35,
+      height: MediaQuery.of(context).size.width * 0.31,
       decoration: BoxDecoration(
         color: theme.colorScheme.primaryContainer,
       ),
@@ -67,7 +67,7 @@ class _NumPadWidgetState extends State<NumPad> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 60.0, 0.0, 60.0),
+                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 20.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
@@ -75,7 +75,7 @@ class _NumPadWidgetState extends State<NumPad> {
                         numberFormat('idr', nominal),
                         style: TextStyle(
                           color: theme.colorScheme.secondary,
-                          fontSize: 42.0,
+                          fontSize: 38.0,
                         ),
                       ),
                     ],

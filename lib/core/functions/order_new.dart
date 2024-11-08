@@ -61,7 +61,6 @@ class OrderCart {
       print('check item docstatus, ${item.docstatus}');
       if (item.docstatus != 2) {
         item.totalPrice = item.qty * item.price;
-
       }
     }
   }
@@ -99,11 +98,13 @@ class OrderCart {
       if (mode == OrderCartMode.add) {
         // print('3');
         existingItem.qty += newItem.qty;
+        existingItem.notes = newItem.notes;
       } else {
         // print('4');
         // Default behavior: Add a new item
         existingItem.qty = newItem.qty;
         existingItem.status = newItem.status;
+        existingItem.notes = newItem.notes;
       }
     } else {
       // print('5');
@@ -195,7 +196,7 @@ class OrderCart {
     };
 
     for (var item in AppState.orderCartItems) {
-      recap['totalPrice'] += item.docstatus !=2 ? item.totalPrice : 0;
+      recap['totalPrice'] += item.docstatus != 2 ? item.totalPrice : 0;
 
       if (!recap['items'].containsKey(item.name)) {
         recap['items'][item.name] = {

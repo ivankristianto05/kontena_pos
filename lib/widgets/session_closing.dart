@@ -198,9 +198,6 @@ class _SessionClosingState extends State<SessionClosing> {
                                                           final currentInvoice =
                                                               invoiceDisplay[
                                                                   index];
-                                                          totalAmountInvoice +=
-                                                              currentInvoice[
-                                                                  'paid_amount'];
                                                           return Column(
                                                             children: [
                                                               SizedBox(
@@ -386,32 +383,34 @@ class _SessionClosingState extends State<SessionClosing> {
                               height: double.infinity,
                               decoration: BoxDecoration(
                                   color: theme.colorScheme.background),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            8.0, 24.0, 8.0, 4.0),
-                                    child: Text(
-                                      'Payments:',
-                                      style: TextStyle(
-                                        color: theme.colorScheme.secondary,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14.0,
+                              child: SingleChildScrollView(
+                                primary: true,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              8.0, 24.0, 8.0, 4.0),
+                                      child: Text(
+                                        'Payments:',
+                                        style: TextStyle(
+                                          color: theme.colorScheme.secondary,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14.0,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 4.0),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            8.0, 16.0, 8.0, 8.0),
-                                    child: Builder(
-                                      builder: (context) {
-                                        final paymentDisplay = paymentSession;
-                                        return Column(
+                                    const SizedBox(height: 4.0),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              8.0, 16.0, 8.0, 8.0),
+                                      child: Builder(
+                                        builder: (context) {
+                                          final paymentDisplay = paymentSession;
+                                          return Column(
                                             mainAxisSize: MainAxisSize.max,
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
@@ -420,61 +419,64 @@ class _SessionClosingState extends State<SessionClosing> {
                                             children: [
                                               if (paymentDisplay.isNotEmpty)
                                                 ListView.builder(
-                                                    shrinkWrap: true,
-                                                    itemCount:
-                                                        paymentDisplay.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      final currentPayment =
-                                                          paymentDisplay[index];
-                                                      return Column(children: [
+                                                  primary: false,
+                                                  shrinkWrap: true,
+                                                  itemCount:
+                                                      paymentDisplay.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final currentPayment =
+                                                        paymentDisplay[index];
+                                                    return Column(
+                                                      children: [
                                                         Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                currentPayment[
-                                                                    'mode_of_payment'],
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: theme
-                                                                      .colorScheme
-                                                                      .secondary,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  fontSize:
-                                                                      14.0,
-                                                                ),
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                              currentPayment[
+                                                                  'mode_of_payment'],
+                                                              style: TextStyle(
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .secondary,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontSize: 14.0,
                                                               ),
-                                                              Text(
-                                                                numberFormat(
-                                                                    'idr_fixed',
-                                                                    currentPayment[
-                                                                        'amount']),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: theme
-                                                                      .colorScheme
-                                                                      .secondary,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  fontSize:
-                                                                      14.0,
-                                                                ),
+                                                            ),
+                                                            Text(
+                                                              numberFormat(
+                                                                  'idr_fixed',
+                                                                  currentPayment[
+                                                                      'amount']),
+                                                              style: TextStyle(
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .secondary,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontSize: 14.0,
                                                               ),
-                                                            ]),
+                                                            ),
+                                                          ],
+                                                        ),
                                                         const SizedBox(
                                                             height: 8.0),
-                                                      ]);
-                                                    })
-                                            ]);
-                                      },
+                                                      ],
+                                                    );
+                                                  },
+                                                )
+                                            ],
+                                          );
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
