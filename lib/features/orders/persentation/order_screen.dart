@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_invoice.dart'
@@ -102,6 +103,7 @@ class _OrderScreenState extends State<OrderScreen> {
   dynamic orderCartSelected;
   dynamic servesSelected;
   dynamic customerSelected;
+  final soLoud = SoLoud.instance;
 
   @override
   void setState(VoidCallback callback) {
@@ -112,6 +114,9 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeAudio();
+    });
     // enterGuestNameController.addListener(_updateState);
 
     if (AppState().dataItem.isEmpty) {
@@ -137,6 +142,10 @@ class _OrderScreenState extends State<OrderScreen> {
           .map((itemGroup) => '"${itemGroup['item_group']}"')
           .join(', ');
     });
+  }
+
+  void _initializeAudio() async {
+    await soLoud.init();
   }
 
   @override
@@ -1597,6 +1606,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     cartSelected = null;
                     cart.clearCart();
                     cartData = cart.getAllItemCart();
+                    loadAndPlayAudio(); //test audio ketika pindah ke confirm
                   });
                   onTapRefreshOrder();
                   // Navigator.pushNamed(context, AppRoutes.confirmScreen);
@@ -2110,6 +2120,7 @@ class _OrderScreenState extends State<OrderScreen> {
       if (callRequest.isNotEmpty) {
         setState(() {
           tempPosServed = callRequest;
+          loadAndPlayAudio();
         });
       }
     } catch (error) {
@@ -2751,5 +2762,11 @@ class _OrderScreenState extends State<OrderScreen> {
     ]);
 
     return bytes;
+  }
+
+  Future<void> loadAndPlayAudio() async {
+    final audioSource =
+        await soLoud.loadAsset('assets/audio/delivery_notif.mp3');
+    final soundHandle = await soLoud.play(audioSource);
   }
 }
