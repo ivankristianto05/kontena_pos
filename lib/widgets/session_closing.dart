@@ -8,6 +8,8 @@ import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 
 import 'package:kontena_pos/core/api/frappe_thunder_pos/create_closing_entry.dart'
     as FrappeFetchCreateClosingEntry;
+import 'package:kontena_pos/core/api/frappe_thunder_pos/entry_closing.dart'
+    as FrappeFetchEntryClosing;
 
 class SessionClosing extends StatefulWidget {
   SessionClosing({
@@ -24,8 +26,9 @@ class SessionClosing extends StatefulWidget {
 class _SessionClosingState extends State<SessionClosing> {
   List<dynamic> invoiceSession = [];
   List<dynamic> paymentSession = [];
+  List<dynamic> dataSession = [];
 
-  double totalAmountInvoice = 0;
+  double total = 0;
 
   bool isLoading = false;
 
@@ -40,7 +43,9 @@ class _SessionClosingState extends State<SessionClosing> {
   @override
   void initState() {
     super.initState();
-    reinitSession();
+    // onCallEntryClosingInvoice();
+    onInit();
+    // reinitSession();
   }
 
   @override
@@ -351,8 +356,7 @@ class _SessionClosingState extends State<SessionClosing> {
                                               ),
                                             ),
                                             Text(
-                                              numberFormat('idr_fixed',
-                                                  totalAmountInvoice),
+                                              numberFormat('idr_fixed', total),
                                               style: TextStyle(
                                                 color:
                                                     theme.colorScheme.secondary,
@@ -586,10 +590,11 @@ class _SessionClosingState extends State<SessionClosing> {
     return result;
   }
 
-  reinitSession() {
+  reinitSession() async {
     List<dynamic> defaultMethod = AppState().configPosProfile['payments'];
     List<dynamic> payments = [];
-    List<dynamic> invoice = widget.dataSession
+    double totalInvoice = 0;
+    List<dynamic> invoice = dataSession
         .map((item) {
           return {
             "name": item["name"],
@@ -611,35 +616,50 @@ class _SessionClosingState extends State<SessionClosing> {
         'amount': 0,
         'opening_amount': 0,
         'closing_amount': 0,
+        'expected_amount': 0,
       });
     }
 
-    totalAmountInvoice = 0;
+    // totalAmountInvoice = 0;
 
     for (var pay in payments) {
       String mode = pay['mode_of_payment'];
       double totalAmount = 0;
 
-      for (var invoice in widget.dataSession) {
+      for (var invoice in dataSession) {
         for (var payGroup in invoice['payments']) {
           // print('paygroup ${payGroup.runtimeType}');
           // print('paygroup ${payGroup}');
           // for (var paym in payGroup) {
           if (payGroup['mode_of_payment'] == mode) {
             totalAmount += payGroup['amount'];
-            totalAmountInvoice += payGroup['amount'];
           }
           // }
         }
       }
 
+      totalInvoice += totalAmount;
+
       pay['amount'] = totalAmount;
       pay['closing_amount'] = totalAmount;
+      pay['expected_amount'] = totalAmount;
     }
 
     setState(() {
       invoiceSession = invoice;
       paymentSession = payments;
+      total = totalInvoice;
+    });
+  }
+
+  onInit() async {
+    setState(() {
+      isLoading = true;
+    });
+    await onCallEntryClosingInvoice();
+    await reinitSession();
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -671,6 +691,7 @@ class _SessionClosingState extends State<SessionClosing> {
       user: AppState().configUser['name'],
       posTransaction: invoiceSession,
       listPayment: paymentSession,
+      total: total,
     );
 
     try {
@@ -716,6 +737,35 @@ class _SessionClosingState extends State<SessionClosing> {
         });
         alertSuccess(context, 'Success, closing cashier');
         isLoading = true;
+      }
+    } catch (error) {
+      if (context.mounted) {
+        alertError(context, error.toString());
+      }
+    }
+  }
+
+  onCallEntryClosingInvoice() async {
+    final FrappeFetchEntryClosing.EntryClosing request =
+        FrappeFetchEntryClosing.EntryClosing(
+      cookie: AppState().setCookie,
+      periodStart: AppState().sessionCashier['period_start_date'],
+      periodEnd:
+          '${dateTimeFormat('date', null).toString()} ${timeFormat('time_full', null).toString()}',
+      postingDate: dateTimeFormat('date', null).toString(),
+      posOpeningId: AppState().sessionCashier['name'],
+      company: AppState().configCompany['name'],
+      posProfile: AppState().configPosProfile['name'],
+      user: AppState().configUser['name'],
+    );
+
+    try {
+      final callApi =
+          await FrappeFetchEntryClosing.request(requestQuery: request);
+      if (callApi.isNotEmpty) {
+        setState(() {
+          dataSession = callApi;
+        });
       }
     } catch (error) {
       if (context.mounted) {

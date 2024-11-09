@@ -14,6 +14,7 @@ import 'package:kontena_pos/core/api/frappe_thunder_pos/entry_closing.dart'
 import 'package:kontena_pos/core/utils/alert.dart';
 import 'package:kontena_pos/core/utils/datetime_ui.dart';
 import 'package:kontena_pos/widgets/session_closing.dart';
+import 'package:kontena_pos/widgets/session_opening.dart';
 
 class TopBar extends StatefulWidget {
   TopBar({
@@ -461,8 +462,29 @@ class _TopBarState extends State<TopBar> {
       paymentOpening = tmp;
     });
 
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      enableDrag: false,
+      backgroundColor: const Color(0x8A000000),
+      barrierColor: const Color(0x00000000),
+      context: context,
+      builder: (context) {
+        return SessionOpening(
+            // dataSession: sessionInvoiceCashier,
+            );
+      },
+    ).then(
+      (value) => {
+        // setState(() {
+        //   tableNumber = AppState().tableNumber;
+        // }),
+        // print('check table number , $tableNumber')
+      },
+    );
+
     // print('check, ${AppState().configPosProfile['payments']}');
-    await onCallCreateOpeningEntry();
+    // await onCallCreateOpeningEntry();
   }
 
   onCloseCashier() async {

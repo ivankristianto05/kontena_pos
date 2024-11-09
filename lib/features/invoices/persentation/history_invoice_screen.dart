@@ -16,8 +16,10 @@ import 'package:kontena_pos/widgets/list_cart.dart';
 import 'package:kontena_pos/widgets/loading_content.dart';
 import 'package:kontena_pos/widgets/searchbar.dart';
 import 'package:kontena_pos/widgets/top_bar.dart';
+import 'package:kontena_pos/core/api/frappe_thunder_pos/report_pos_invoice.dart'
+    as FrappeFetchDataInvoice;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_invoice.dart'
-    as FrappeFetchDataGetInvoice;
+    as FrappeFetchGetDetailInvoice;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/cancel_pos_invoice.dart'
     as FrappeFetchCancelInvoice;
 import 'package:kontena_pos/core/api/send_printer.dart' as sendToPrinter;
@@ -38,6 +40,9 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
 
   dynamic invoiceSelected;
 
+  String search = '';
+  String filter = '';
+
   bool isLoading = false;
   bool isLoadingDetail = false;
 
@@ -55,11 +60,6 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double searchbarWidth = screenWidth * 0.65;
-    double smallButtonWidth = screenWidth * 0.05;
-    double buttonWidth = screenWidth * 0.15;
-
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: theme.colorScheme.background,
@@ -86,22 +86,40 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                             Column(
                               children: [
                                 Searchbar(
-                                  onCompleted: (value) {},
+                                  onChanged: (value) {
+                                    print('search, $search');
+                                    print('value, $value');
+                                    setState(() {
+                                      search = value;
+                                    });
+                                  },
+                                  // selected: search,
                                 ),
                               ],
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
+                              padding: const EdgeInsetsDirectional.fromSTEB(
                                   8.0, 60.0, 8.0, 8.0),
                               child: FilterBar(
                                 filterData: filterPayment,
                                 fieldValue: 'mode_of_payment',
-                                onFilterSelected: (String type) {},
+                                onFilterSelected: (String type) {
+                                  print('check type, $type');
+                                  if (type == 'All') {
+                                    setState(() {
+                                      filter = '';
+                                    });
+                                  } else {
+                                    setState(() {
+                                      filter = type;
+                                    });
+                                  }
+                                },
                               ),
                             ),
                             if (isLoading == false)
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
                                     8.0, 120.0, 8.0, 0.0),
                                 child: Align(
                                   alignment: Alignment.topCenter,
@@ -113,175 +131,350 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(
                                         children: [
-                                          if (tempPosOrder.isNotEmpty)
-                                            AlignedGridView.count(
-                                              crossAxisCount: 1,
-                                              mainAxisSpacing: 6,
-                                              crossAxisSpacing: 6,
-                                              shrinkWrap: true,
-                                              primary: false,
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              itemCount: tempPosOrder.length,
-                                              itemBuilder: (context, index) {
-                                                final order =
-                                                    tempPosOrder[index];
-                                                return InkWell(
-                                                  onTap: () {
-                                                    onTapAction(context, order);
-                                                  },
-                                                  child: Card(
-                                                    elevation: 2,
-                                                    child: Column(
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                            16.0,
-                                                            16.0,
-                                                            16.0,
-                                                            10.0,
-                                                          ),
+                                          Builder(builder: (context) {
+                                            final history = tempPosOrder;
+                                            final itemMenu = invoiceList(
+                                                history, search, filter);
+
+                                            return itemMenu.isNotEmpty
+                                                ? AlignedGridView.count(
+                                                    crossAxisCount: 1,
+                                                    mainAxisSpacing: 6,
+                                                    crossAxisSpacing: 6,
+                                                    shrinkWrap: true,
+                                                    primary: false,
+                                                    physics:
+                                                        const NeverScrollableScrollPhysics(),
+                                                    itemCount: itemMenu.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final order =
+                                                          itemMenu[index];
+                                                      return InkWell(
+                                                        onTap: () {
+                                                          onTapAction(
+                                                              context, order);
+                                                        },
+                                                        child: Card(
+                                                          elevation: 2,
                                                           child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
                                                             children: [
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .spaceBetween,
-                                                                children: [
-                                                                  Text(
-                                                                    order[
-                                                                        'name'],
-                                                                    style: theme
-                                                                        .textTheme
-                                                                        .titleMedium,
-                                                                  ),
-                                                                  if (order[
-                                                                          'table'] !=
-                                                                      null)
-                                                                    Text(
-                                                                      'Table ${order['table']}',
-                                                                      style: theme
-                                                                          .textTheme
-                                                                          .bodyMedium,
-                                                                    ),
-                                                                  Text(
-                                                                      (order['docstatus'] ==
-                                                                              1)
-                                                                          ? order[
-                                                                              'status']
-                                                                          : (order['docstatus'] ==
-                                                                                  2)
-                                                                              ? 'Cancelled'
-                                                                              : 'Draft',
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.w600,
-                                                                        color:
-                                                                            () {
-                                                                          if (order['docstatus'] ==
-                                                                              1) {
-                                                                            return theme.colorScheme.onSecondary;
-                                                                          } else if (order['docstatus'] ==
-                                                                              2) {
-                                                                            return theme.colorScheme.error;
-                                                                          } else {
-                                                                            return theme.colorScheme.onPrimaryContainer;
-                                                                          }
-                                                                        }(),
-                                                                      )),
-                                                                ],
-                                                              ),
-                                                              Divider(
-                                                                height: 5.0,
-                                                                thickness: 0.5,
-                                                                color: theme
-                                                                    .colorScheme
-                                                                    .outline,
-                                                              ),
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .spaceBetween,
-                                                                children: [
-                                                                  Text(
-                                                                    order['customer_name']
-                                                                        .toString(),
-                                                                    style: theme
-                                                                        .textTheme
-                                                                        .bodyMedium,
-                                                                  ),
-                                                                  Text(
-                                                                    '${numberFormat('idr_fixed', order['grand_total'])}',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: theme
-                                                                          .colorScheme
-                                                                          .secondary,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
                                                               Padding(
                                                                 padding:
-                                                                    EdgeInsetsDirectional
+                                                                    const EdgeInsetsDirectional
                                                                         .fromSTEB(
-                                                                  0.0,
-                                                                  4.0,
-                                                                  0.0,
-                                                                  4.0,
+                                                                  16.0,
+                                                                  16.0,
+                                                                  16.0,
+                                                                  10.0,
                                                                 ),
-                                                                child: Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
                                                                   children: [
                                                                     Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
                                                                       children: [
                                                                         Text(
-                                                                          dateTimeFormat(
-                                                                            'dateui',
-                                                                            order['posting_date'],
-                                                                          ).toString(),
+                                                                          order[
+                                                                              'pos_invoice'],
                                                                           style: theme
                                                                               .textTheme
-                                                                              .labelSmall,
+                                                                              .titleMedium,
                                                                         ),
+                                                                        if (order['table'] !=
+                                                                            null)
+                                                                          Text(
+                                                                            'Table ${order['table']}',
+                                                                            style:
+                                                                                theme.textTheme.bodyMedium,
+                                                                          ),
                                                                         Text(
-                                                                          ' | ${timeFormat(
-                                                                            'time_simple',
-                                                                            order['posting_time'],
-                                                                          ).toString()}',
-                                                                          style: theme
-                                                                              .textTheme
-                                                                              .labelSmall,
+                                                                          order['status']
+                                                                              .toString()
+                                                                              .toUpperCase(),
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
+                                                                            color:
+                                                                                () {
+                                                                              if (order['status'].toString().toLowerCase() == 'paid') {
+                                                                                return theme.colorScheme.onSecondary;
+                                                                              } else if (order['status'].toString().toLowerCase() == 'consolidated') {
+                                                                                return appTheme.orange600;
+                                                                              } else {
+                                                                                return theme.colorScheme.onPrimaryContainer;
+                                                                              }
+                                                                            }(),
+                                                                          ),
                                                                         ),
                                                                       ],
                                                                     ),
-                                                                    // Text(
-                                                                    //   'Paid: ${numberFormat('idr_fixed', order['paid_amount'])}',
-                                                                    //   style: theme
-                                                                    //       .textTheme
-                                                                    //       .bodyMedium,
-                                                                    // ),
+                                                                    Divider(
+                                                                      height:
+                                                                          5.0,
+                                                                      thickness:
+                                                                          0.5,
+                                                                      color: theme
+                                                                          .colorScheme
+                                                                          .outline,
+                                                                    ),
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        Text(
+                                                                          order['customer_name']
+                                                                              .toString(),
+                                                                          style: theme
+                                                                              .textTheme
+                                                                              .bodyMedium,
+                                                                        ),
+                                                                        Text(
+                                                                          '${numberFormat('idr_fixed', order['grand_total'])}',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                theme.colorScheme.secondary,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    Padding(
+                                                                      padding:
+                                                                          const EdgeInsetsDirectional
+                                                                              .fromSTEB(
+                                                                        0.0,
+                                                                        4.0,
+                                                                        0.0,
+                                                                        4.0,
+                                                                      ),
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          Row(
+                                                                            children: [
+                                                                              Text(
+                                                                                dateTimeFormat(
+                                                                                  'dateui',
+                                                                                  order['posting_date'],
+                                                                                ).toString(),
+                                                                                style: theme.textTheme.labelSmall,
+                                                                              ),
+                                                                              Text(
+                                                                                ' | ${timeFormat(
+                                                                                  'time_simple',
+                                                                                  order['posting_time'],
+                                                                                ).toString()}',
+                                                                                style: theme.textTheme.labelSmall,
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                          Text(
+                                                                            order['mode_of_payment'].toString().toUpperCase(),
+                                                                            style:
+                                                                                theme.textTheme.bodyMedium,
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
                                                                   ],
                                                                 ),
                                                               ),
                                                             ],
                                                           ),
                                                         ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          if (tempPosOrder.isEmpty) EmptyData(),
+                                                      );
+                                                    },
+                                                  )
+                                                : Padding(
+                                                    padding:
+                                                        const EdgeInsetsDirectional
+                                                            .fromSTEB(8.0,
+                                                            100.0, 8.0, 0.0),
+                                                    child: EmptyData(),
+                                                  );
+                                          }),
+                                          // if (tempPosOrder.isNotEmpty)
+                                          //   AlignedGridView.count(
+                                          //     crossAxisCount: 1,
+                                          //     mainAxisSpacing: 6,
+                                          //     crossAxisSpacing: 6,
+                                          //     shrinkWrap: true,
+                                          //     primary: false,
+                                          //     physics:
+                                          //         const NeverScrollableScrollPhysics(),
+                                          //     itemCount: tempPosOrder.length,
+                                          //     itemBuilder: (context, index) {
+                                          //       final order =
+                                          //           tempPosOrder[index];
+                                          //       return InkWell(
+                                          //         onTap: () {
+                                          //           onTapAction(context, order);
+                                          //         },
+                                          //         child: Card(
+                                          //           elevation: 2,
+                                          //           child: Column(
+                                          //             children: [
+                                          //               Padding(
+                                          //                 padding:
+                                          //                     const EdgeInsetsDirectional
+                                          //                         .fromSTEB(
+                                          //                   16.0,
+                                          //                   16.0,
+                                          //                   16.0,
+                                          //                   10.0,
+                                          //                 ),
+                                          //                 child: Column(
+                                          //                   crossAxisAlignment:
+                                          //                       CrossAxisAlignment
+                                          //                           .start,
+                                          //                   children: [
+                                          //                     Row(
+                                          //                       mainAxisAlignment:
+                                          //                           MainAxisAlignment
+                                          //                               .spaceBetween,
+                                          //                       children: [
+                                          //                         Text(
+                                          //                           order[
+                                          //                               'pos_invoice'],
+                                          //                           style: theme
+                                          //                               .textTheme
+                                          //                               .titleMedium,
+                                          //                         ),
+                                          //                         if (order[
+                                          //                                 'table'] !=
+                                          //                             null)
+                                          //                           Text(
+                                          //                             'Table ${order['table']}',
+                                          //                             style: theme
+                                          //                                 .textTheme
+                                          //                                 .bodyMedium,
+                                          //                           ),
+                                          //                         Text(
+                                          //                           order['status']
+                                          //                               .toString()
+                                          //                               .toUpperCase(),
+                                          //                           style:
+                                          //                               TextStyle(
+                                          //                             fontWeight:
+                                          //                                 FontWeight
+                                          //                                     .w600,
+                                          //                             color:
+                                          //                                 () {
+                                          //                               if (order['status'].toString().toLowerCase() ==
+                                          //                                   'paid') {
+                                          //                                 return theme
+                                          //                                     .colorScheme
+                                          //                                     .onSecondary;
+                                          //                               } else if (order['status'].toString().toLowerCase() ==
+                                          //                                   'consolidated') {
+                                          //                                 return appTheme
+                                          //                                     .orange600;
+                                          //                               } else {
+                                          //                                 return theme
+                                          //                                     .colorScheme
+                                          //                                     .onPrimaryContainer;
+                                          //                               }
+                                          //                             }(),
+                                          //                           ),
+                                          //                         ),
+                                          //                       ],
+                                          //                     ),
+                                          //                     Divider(
+                                          //                       height: 5.0,
+                                          //                       thickness: 0.5,
+                                          //                       color: theme
+                                          //                           .colorScheme
+                                          //                           .outline,
+                                          //                     ),
+                                          //                     Row(
+                                          //                       mainAxisAlignment:
+                                          //                           MainAxisAlignment
+                                          //                               .spaceBetween,
+                                          //                       children: [
+                                          //                         Text(
+                                          //                           order['customer_name']
+                                          //                               .toString(),
+                                          //                           style: theme
+                                          //                               .textTheme
+                                          //                               .bodyMedium,
+                                          //                         ),
+                                          //                         Text(
+                                          //                           '${numberFormat('idr_fixed', order['grand_total'])}',
+                                          //                           style:
+                                          //                               TextStyle(
+                                          //                             color: theme
+                                          //                                 .colorScheme
+                                          //                                 .secondary,
+                                          //                           ),
+                                          //                         ),
+                                          //                       ],
+                                          //                     ),
+                                          //                     Padding(
+                                          //                       padding:
+                                          //                           const EdgeInsetsDirectional
+                                          //                               .fromSTEB(
+                                          //                         0.0,
+                                          //                         4.0,
+                                          //                         0.0,
+                                          //                         4.0,
+                                          //                       ),
+                                          //                       child: Row(
+                                          //                         mainAxisAlignment:
+                                          //                             MainAxisAlignment
+                                          //                                 .spaceBetween,
+                                          //                         children: [
+                                          //                           Row(
+                                          //                             children: [
+                                          //                               Text(
+                                          //                                 dateTimeFormat(
+                                          //                                   'dateui',
+                                          //                                   order['posting_date'],
+                                          //                                 ).toString(),
+                                          //                                 style: theme
+                                          //                                     .textTheme
+                                          //                                     .labelSmall,
+                                          //                               ),
+                                          //                               Text(
+                                          //                                 ' | ${timeFormat(
+                                          //                                   'time_simple',
+                                          //                                   order['posting_time'],
+                                          //                                 ).toString()}',
+                                          //                                 style: theme
+                                          //                                     .textTheme
+                                          //                                     .labelSmall,
+                                          //                               ),
+                                          //                             ],
+                                          //                           ),
+                                          //                           Text(
+                                          //                             order['mode_of_payment']
+                                          //                                 .toString()
+                                          //                                 .toUpperCase(),
+                                          //                             style: theme
+                                          //                                 .textTheme
+                                          //                                 .bodyMedium,
+                                          //                           ),
+                                          //                         ],
+                                          //                       ),
+                                          //                     ),
+                                          //                   ],
+                                          //                 ),
+                                          //               ),
+                                          //             ],
+                                          //           ),
+                                          //         ),
+                                          //       );
+                                          //     },
+                                          //   ),
+                                          // if (tempPosOrder.isEmpty) EmptyData(),
                                         ],
                                       ),
                                     ),
@@ -308,7 +501,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               15.0, 15.0, 15.0, 15.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
@@ -355,11 +548,13 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                 thickness: 1.0,
                                 color: theme.colorScheme.outline,
                               ),
-                              if (invoiceSelected != null)
+                              if ((invoiceSelected != null) &&
+                                  (isLoadingDetail == false))
                                 Expanded(
                                   child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 16.0, 0.0, 0.0),
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            0.0, 16.0, 0.0, 0.0),
                                     child: SingleChildScrollView(
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
@@ -465,7 +660,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
+                                              const Text(
                                                 'Total',
                                               ),
                                               Text(
@@ -477,7 +672,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
+                                              const Text(
                                                 'Pay',
                                               ),
                                               Text(numberFormat(
@@ -491,7 +686,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
+                                              const Text(
                                                 'Change',
                                               ),
                                               Text((invoiceSelected[
@@ -556,7 +751,8 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                                       fontWeight:
                                                           FontWeight.bold,
                                                     ),
-                                                    padding: EdgeInsets.all(8),
+                                                    padding:
+                                                        const EdgeInsets.all(8),
                                                     note: '',
                                                     lineColor: appTheme.gray200,
                                                     secondaryStyle:
@@ -574,15 +770,16 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                     ),
                                   ),
                                 ),
-                              if (invoiceSelected == null)
+                              if ((invoiceSelected == null) &&
+                                  (isLoadingDetail == false))
                                 Expanded(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 64.0, 0.0, 0.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 64.0, 0.0, 0.0),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.max,
                                           mainAxisAlignment:
@@ -601,7 +798,8 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                     ],
                                   ),
                                 ),
-                              if (invoiceSelected != null)
+                              if ((invoiceSelected != null) &&
+                                  (isLoadingDetail == false))
                                 Column(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
@@ -611,8 +809,9 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                       color: theme.colorScheme.outline,
                                     ),
                                     Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 8.0, 0.0, 0.0),
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 8.0, 0.0, 0.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
@@ -638,8 +837,9 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                       ),
                                     ),
                                     Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          0.0, 8.0, 0.0, 0.0),
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 8.0, 0.0, 0.0),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
@@ -669,8 +869,8 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                     ),
                                     if (invoiceSelected['docstatus'] == 1)
                                       Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 8.0, 0.0, 0.0),
+                                        padding: const EdgeInsetsDirectional
+                                            .fromSTEB(0.0, 8.0, 0.0, 0.0),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
@@ -694,7 +894,14 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                         ),
                                       ),
                                   ],
-                                )
+                                ),
+                              if (isLoadingDetail)
+                                const Expanded(
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: LoadingContent(),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -710,12 +917,31 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
     );
   }
 
+  List<dynamic> invoiceList(List<dynamic> data, String search, String filter) {
+    return data
+        .where((item) =>
+            (item['pos_invoice']
+                    .toString()
+                    .toLowerCase()
+                    .contains(search.toLowerCase()) ||
+                item['customer_name']
+                    .toString()
+                    .toLowerCase()
+                    .contains(search.toLowerCase())) &&
+            item['mode_of_payment']
+                .toString()
+                .toLowerCase()
+                .contains(filter.toLowerCase()))
+        .toList();
+    // print('data, $data');
+  }
+
   onTapRefresh() async {
     // print('yes');
     setState(() {
       isLoading = true;
     });
-    await onCallDataPosOrder();
+    await onCallDataPosInvoice();
     setState(() {
       // isLoading = false;
     });
@@ -734,42 +960,49 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
 
   onTapVoid(BuildContext context, dynamic item) async {
     setState(() {
-      isLoading = true;
+      // isLoading = true;
+      isLoadingDetail = true;
     });
     await onCallCancelPosOrder(item);
     setState(() {
-      isLoading = false;
+      // isLoading = false;
       invoiceSelected = null;
     });
     onTapRefresh();
   }
 
-  onCallDataPosOrder() async {
-    final FrappeFetchDataGetInvoice.PosInvoiceRequest request =
-        FrappeFetchDataGetInvoice.PosInvoiceRequest(
+  onCallDataPosInvoice() async {
+    final FrappeFetchDataInvoice.ReportPosInvoice request =
+        FrappeFetchDataInvoice.ReportPosInvoice(
       cookie: AppState().setCookie,
-      fields: '["*"]',
+      reportName: 'Report POS Invoice',
       filters:
-          '[["pos_profile","=","${AppState().configPosProfile['name']}"],["owner","=","${AppState().configUser['name']}"]]',
+          '{"company":"${AppState().configCompany['name']}","pos_profile":"${AppState().configPosProfile['name']}","owner":"${AppState().configUser['name']}","from_date":"2024-11-01","to_date":"2024-11-09","user":"${AppState().configUser['email']}"}',
       orderBy: 'creation desc',
       limit: 200,
     );
 
     try {
       final callRequest =
-          await FrappeFetchDataGetInvoice.request(requestQuery: request);
+          await FrappeFetchDataInvoice.request(requestQuery: request);
 
       // print('result, $callRequest');
       if (callRequest.isNotEmpty) {}
       setState(() {
         tempPosOrder = callRequest;
+        tempPosOrder = tempPosOrder.reversed.toList();
+
         isLoading = false;
+
+        if (tempPosOrder.isNotEmpty) {
+          onSetAmount();
+        }
       });
     } catch (error) {
       setState(() {
         isLoading = false;
       });
-      print('error call data pos order, $error');
+      print('error call data pos invoice, $error');
       if (context.mounted) {
         alertError(context, error.toString());
       }
@@ -777,18 +1010,19 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
   }
 
   onCallDataPosInvoiceDetail(dynamic invoice) async {
-    final FrappeFetchDataGetInvoice.PosInvoiceRequest reqPosInvoiceDetail =
-        FrappeFetchDataGetInvoice.PosInvoiceRequest(
-            cookie: AppState().setCookie, id: invoice['name']);
+    final FrappeFetchGetDetailInvoice.PosInvoiceRequest reqPosInvoiceDetail =
+        FrappeFetchGetDetailInvoice.PosInvoiceRequest(
+            cookie: AppState().setCookie, id: invoice['pos_invoice']);
 
     try {
-      final request = await FrappeFetchDataGetInvoice.requestDetail(
+      final request = await FrappeFetchGetDetailInvoice.requestDetail(
           requestQuery: reqPosInvoiceDetail);
 
       if (request.isNotEmpty) {
         setState(() {
           invoiceSelected = request;
           isLoading = false;
+          isLoadingDetail = false;
         });
       }
 
@@ -801,7 +1035,8 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
       //   );
       // }
     } catch (error) {
-      // isLoading = false;
+      isLoadingDetail = false;
+      isLoading = false;
       if (error is TimeoutException) {
         // Handle timeout error
         // _bottomScreenTimeout(context);
@@ -836,10 +1071,12 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
           // // modeView = 'item';
           // cartSelected = null;
           // isLoadingContent = true;
+          isLoadingDetail = false;
         });
         // onTapRefreshOrder();
       }
     } catch (error) {
+      isLoadingDetail = false;
       print('check error, ${error}');
       if (context.mounted) {
         alertError(context, error.toString());
@@ -853,6 +1090,27 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
       filterPayment = AppState().configPosProfile['payments'];
     });
     // print('check, $filterPayment');
+  }
+
+  onSetAmount() {
+    List<dynamic> tmpFi = [];
+    double tot = 0;
+    for (var pay in filterPayment) {
+      double tmp = 0;
+      for (var pInv in tempPosOrder) {
+        if (pInv['mode_of_payment'] == pay['mode_of_payment']) {
+          tmp += pInv['paid_amount'];
+          tot += pInv['paid_amount'];
+        }
+      }
+      pay['amount'] = tmp;
+      tmpFi.add(pay);
+      // tmpFi.
+    }
+    setState(() {
+      filterPayment = tmpFi;
+    });
+    print('check, ${tmpFi}');
   }
 
   onPrintChecker() async {

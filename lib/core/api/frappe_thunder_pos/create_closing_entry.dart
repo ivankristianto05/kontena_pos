@@ -13,6 +13,7 @@ class CreateClosingEntry {
   final List<dynamic>? posTransaction;
   final List<dynamic>? listPayment;
   final String? id;
+  final double? total;
 
   CreateClosingEntry({
     required this.cookie,
@@ -26,6 +27,7 @@ class CreateClosingEntry {
     this.posTransaction,
     this.listPayment,
     this.id,
+    this.total,
   });
 
   Map<String, String> formatHeader() {
@@ -46,6 +48,7 @@ class CreateClosingEntry {
       "user": user,
       "pos_transactions": posTransaction,
       "payment_reconciliation": listPayment,
+      "grand_total": total,
     };
 
     data.removeWhere((key, value) => value == null);

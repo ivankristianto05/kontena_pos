@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/app_export.dart';
+import 'package:kontena_pos/core/utils/number_ui.dart';
 import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 
 class FilterBar extends StatefulWidget {
@@ -68,7 +69,7 @@ class _FilterBarState extends State<FilterBar> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            _buildFilterButton('All', buttonWidth),
+            _buildFilterButton('All', '', buttonWidth),
             const SizedBox(width: 8),
             Builder(
               builder: (context) {
@@ -77,10 +78,13 @@ class _FilterBarState extends State<FilterBar> {
                     filterDisplay.length,
                     (index) {
                       final filterItem = filterDisplay[index];
+                      String captionItem = filterItem.containsKey('amount')
+                          ? numberFormat('idr', filterItem['amount'])
+                          : '';
                       return Row(
                         children: [
                           _buildFilterButton(
-                              filterItem[fieldName], buttonWidth),
+                              filterItem[fieldName], captionItem, buttonWidth),
                           const SizedBox(width: 8),
                         ],
                       );
@@ -100,11 +104,11 @@ class _FilterBarState extends State<FilterBar> {
     );
   }
 
-  Widget _buildFilterButton(String type, double width) {
+  Widget _buildFilterButton(String type, String? caption, double width) {
     bool isSelected = _selectedFilter == type;
     return SizedBox(
       height: 48,
-      width: 140.0,
+      width: 180.0,
       child: CustomElevatedButton(
         text: type.toUpperCase(),
         buttonTextStyle: isSelected

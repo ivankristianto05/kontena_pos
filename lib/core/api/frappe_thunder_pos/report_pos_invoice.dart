@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:ui';
 import 'package:http/http.dart' as http;
 
-class PosInvoiceRequest {
+class ReportPosInvoice {
   final String cookie;
-  final String? fields;
+  final String? reportName;
   final String? limitStart;
   final String? orderBy;
   final int? limit;
@@ -12,9 +11,9 @@ class PosInvoiceRequest {
   final String? id;
   // late http.Client client;
 
-  PosInvoiceRequest({
+  ReportPosInvoice({
     required this.cookie,
-    this.fields,
+    this.reportName,
     this.limit,
     this.limitStart,
     this.filters,
@@ -27,25 +26,25 @@ class PosInvoiceRequest {
   Map<String, dynamic> formatRequest() {
     Map<String, dynamic> requestMap = {};
 
-    if (fields != null && fields!.isNotEmpty) {
-      requestMap['fields'] = fields;
+    if (reportName != null && reportName!.isNotEmpty) {
+      requestMap['report_name'] = reportName;
     }
 
-    if (limitStart != null && limitStart!.isNotEmpty) {
-      requestMap['limit_start'] = limitStart;
-    }
+    // if (limitStart != null && limitStart!.isNotEmpty) {
+    //   requestMap['limit_start'] = limitStart;
+    // }
 
-    if (limit != null) {
-      requestMap['limit'] = limit;
-    }
+    // if (limit != null) {
+    //   requestMap['limit'] = limit;
+    // }
 
     if (filters != null && filters!.isNotEmpty) {
       requestMap['filters'] = filters;
     }
 
-    if (orderBy != null && orderBy!.isNotEmpty) {
-      requestMap['order_by'] = orderBy;
-    }
+    // if (orderBy != null && orderBy!.isNotEmpty) {
+    //   requestMap['order_by'] = orderBy;
+    // }
 
     return requestMap;
   }
@@ -68,19 +67,22 @@ String queryParams(Map<String, dynamic> map) =>
     map.entries.map((e) => '${e.key}=${e.value}').join('&');
 
 // print('check url, $cookie');
-Future<List<dynamic>> request({required PosInvoiceRequest requestQuery}) async {
+Future<List<dynamic>> request({required ReportPosInvoice requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/resource/POS Invoice?${queryParams(requestQuery.formatRequest())}';
+      'https://erp2.hotelkontena.com/api/method/frappe.desk.query_report.run?${queryParams(requestQuery.formatRequest())}';
 
   final response = await http.get(
     Uri.parse(url),
     headers: requestQuery.formatHeader(),
   );
 
+  // print('data, ${json.decode(response.body)}');
+  print('data, ${json.decode(response.body)}');
+  print('url, ${url}');
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
-    if (responseBody.containsKey('data')) {
-      return responseBody['data'];
+    if (responseBody.containsKey('message')) {
+      return responseBody['message']['result'];
     } else {
       throw Exception(responseBody);
     }
@@ -90,14 +92,15 @@ Future<List<dynamic>> request({required PosInvoiceRequest requestQuery}) async {
 }
 
 Future<Map<String, dynamic>> requestDetail(
-    {required PosInvoiceRequest requestQuery}) async {
+    {required ReportPosInvoice requestQuery}) async {
   String url =
       'https://erp2.hotelkontena.com/api/method/frappe.desk.form.load.getdoc?${queryParams(requestQuery.paramDetail())}';
-  print('url, $url');
   final response = await http.get(
     Uri.parse(url),
     headers: requestQuery.formatHeader(),
   );
+
+  print('check param, ${requestQuery.formatHeader()}');
 
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);

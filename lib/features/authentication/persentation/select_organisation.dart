@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/app_state.dart';
@@ -8,17 +7,13 @@ import 'package:kontena_pos/core/api/frappe_thunder_pos/company.dart'
     as frappeFetchDataCompany;
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_profile.dart'
     as frappeFetchDataPOSProfile;
-import 'package:kontena_pos/data/organisation.dart';
-import 'package:kontena_pos/widgets/custom_elevated_button.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
-import 'package:kontena_pos/widgets/custom_text_form_field.dart';
 import 'package:kontena_pos/core/app_export.dart';
-import 'package:kontena_pos/core/animation/fade.dart';
 import 'package:kontena_pos/core/utils/alert.dart' as alert;
 import 'package:kontena_pos/widgets/loading_content.dart';
 
 class SelectOrganisationScreen extends StatefulWidget {
-  const SelectOrganisationScreen({Key? key}) : super(key: key);
+  const SelectOrganisationScreen({super.key});
 
   @override
   _SelectOrganisationScreenState createState() =>
@@ -110,7 +105,7 @@ class _SelectOrganisationScreenState extends State<SelectOrganisationScreen> {
                                       children: [
                                         if (isCompany == false)
                                           SizedBox(
-                                            width: 200,
+                                            width: 240,
                                             height: 51,
                                             child: MaterialButton(
                                               onPressed: () {

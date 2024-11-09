@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 
 class Searchbar extends StatefulWidget {
-  void Function(String)? onChanged;
-  Function(String)? onCompleted;
+  final void Function(String)? onChanged;
+  final Function(String)? onCompleted;
+  // String? selected;
 
   Searchbar({
     super.key,
     this.onChanged,
     this.onCompleted,
+    // this.selected,
   });
 
   @override
@@ -17,15 +19,20 @@ class Searchbar extends StatefulWidget {
 }
 
 class _SearchbarState extends State<Searchbar> {
-  // final double screenWidth;
   TextEditingController enterSearch = TextEditingController();
-  // late TextEditingController enterSearch;
+  bool _showClearIcon = false;
 
   @override
   void initState() {
     super.initState();
-    // enterSearch = TextEditingController();
-    // enterSearch.text = 'test';
+    enterSearch.addListener(() {
+      setState(() {
+        _showClearIcon = enterSearch.text.isNotEmpty;
+      });
+    });
+    // if (widget.selected != '') {
+    //   enterSearch.text = widget.selected!;
+    // }
   }
 
   @override
@@ -55,17 +62,16 @@ class _SearchbarState extends State<Searchbar> {
             color: theme.colorScheme.onPrimaryContainer,
             fontSize: 14.0,
           ),
-          // filled: true,
-          // fillColor: Colors.white,
           border: InputBorder.none,
-          contentPadding: EdgeInsets.all(12.0),
-          // isDense: true,
-          suffixIcon: enterSearch.text.isNotEmpty
+          contentPadding: const EdgeInsets.all(12.0),
+          suffixIcon: _showClearIcon
               ? InkWell(
-                  onTap: () async {
-                    enterSearch.clear();
+                  onTap: () {
+                    enterSearch.clear(); // Clear the text in the controller
+                    widget.onChanged
+                        ?.call(''); // Notify onChanged with empty string
                     setState(() {
-                      enterSearch.text = '';
+                      _showClearIcon = false; // Hide the clear icon
                     });
                   },
                   child: Icon(
@@ -78,61 +84,20 @@ class _SearchbarState extends State<Searchbar> {
         ),
         onChanged: (value) {
           EasyDebounce.debounce(
-            '_model.enterSearch',
-            Duration(milliseconds: 300),
-            () {
-              setState((){
-                enterSearch.text = value;
-              });
-              widget.onChanged!(enterSearch.text);
-            }
+            'enterSearch',
+            const Duration(milliseconds: 300),
+            () => widget.onChanged?.call(value),
           );
+          // setState(() {
+          //   _showClearIcon = true; // Hide the clear icon
+          // });
         },
-        onEditingComplete: onCompletedChange,
+        // onEditingComplete: onCompletedChange,
       ),
-      // child: CustomTextFormField(
-      //   controller: enterSearch,
-      //   maxLines: 1,
-      //   borderDecoration: OutlineInputBorder(
-      //     borderRadius: BorderRadius.circular(0.h),
-      //     borderSide: BorderSide(
-      //       color: theme.colorScheme.surface,
-      //       width: 0,
-      //     ),
-      //   ),
-      //   hintText: "Enter a search",
-      //   textStyle: const TextStyle(
-      //     fontSize: 14.0,
-      //   ),
-      //   hintStyle: const TextStyle(
-      //     fontSize: 14.0,
-      //   ),
-      //   onEditingComplete: () {
-      //     // print('check value, $value');
-      //     setState(() {
-      //       // enterSearch.text = value;
-      //     });
-      //   },
-      //   suffix: enterSearch.text != ''
-      //       ? InkWell(
-      //           onTap: () async {
-      //             enterSearch.clear();
-      //             // setState(() {
-      //             //   FFAppState().searchProduk = '';
-      //             // });
-      //           },
-      //           child: Icon(
-      //             Icons.clear,
-      //             color: theme.colorScheme.outline,
-      //             size: 24.0,
-      //           ),
-      //         )
-      //       : null,
-      // ),
     );
   }
 
   onCompletedChange() {
-    // onCompleted(enterSearch.text);
+    widget.onCompleted?.call(enterSearch.text);
   }
 }

@@ -1085,7 +1085,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   onTapRefreshMenu() async {
-    print('tap refresjh');
     setState(() {
       isLoadingContent = true;
     });
