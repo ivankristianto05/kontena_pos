@@ -858,9 +858,9 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
                                                       .toString()
                                                       .toLowerCase() ==
                                                   'bluetooth') {
-                                                onPrintCheckerBluetooth();
+                                                onPrintCheckerBluetooth(true);
                                               } else {
-                                                onPrintChecker();
+                                                onPrintChecker(true);
                                               }
                                             },
                                           ),
@@ -1113,10 +1113,12 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
     print('check, ${tmpFi}');
   }
 
-  onPrintChecker() async {
+  onPrintChecker(bool reprint) async {
     dynamic docPrint = await printChecker(
       invoiceSelected,
       AppState().configPrinter,
+      AppState().configApplication,
+      reprint ? 'reprint' : null,
     );
 
     // print('print invoce, ${AppState().configPrinter}');
@@ -1190,13 +1192,15 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
     }
   }
 
-  onPrintCheckerBluetooth() async {
+  onPrintCheckerBluetooth(bool reprint) async {
     bool connectionStatus = await PrintBluetoothThermal.connectionStatus;
     if (connectionStatus) {
       bool result = false;
       List<int> ticket = await printCheckerBluetooth(
         invoiceSelected,
         AppState().configPrinter,
+        AppState().configApplication,
+        reprint ? 'reprint' : null,
       );
       result = await PrintBluetoothThermal.writeBytes(ticket);
       print('result print, $result');

@@ -1,7 +1,9 @@
 import 'dart:io';
 
 // import 'package:blue_thermal_printer/blue_thermal_printer.dart';
+import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'package:kontena_pos/core/utils/alert.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -52,6 +54,9 @@ class _SettingDevicesState extends State<SettingDevices> {
   String optionprinttype = "80 mm";
   List<String> optionsSize = ["58 mm", "80 mm"];
 
+  late SingleValueDropDownController  selectedPrinterUSB = SingleValueDropDownController();
+  List<DropDownValueModel> listPrinterModel = [];
+
   @override
   void setState(VoidCallback callback) {
     super.setState(callback);
@@ -74,12 +79,14 @@ class _SettingDevicesState extends State<SettingDevices> {
     // onGetPrinter(context);
     // initPlatformState();
     platformState();
+    onGetPrinter(context);
 
     if (AppState().configPrinter != null) {
       setState(() {
         selectedTipePrinter = AppState().configPrinter['tipeConnection'];
         selectedPrinter = AppState().configPrinter['selectedPrinter'];
         // selectedMacAddPrinter =
+        selectedPrinterUSB.setDropDown(DropDownValueModel(name: selectedPrinter, value: selectedPrinter));
 
         if (selectedTipePrinter == 'Bluetooth') {}
       });
@@ -494,45 +501,20 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                           2.0,
                                                                     ),
                                                                   ),
-                                                                  child:
-                                                                      DropdownButtonHideUnderline(
-                                                                    child:
-                                                                        Padding(
-                                                                      padding: const EdgeInsets
-                                                                          .all(
-                                                                          8.0),
-                                                                      child: DropdownButton<
-                                                                          String>(
-                                                                        isExpanded:
-                                                                            true,
-                                                                        value:
-                                                                            selectedPrinter,
-                                                                        items: listPrinter.map<
-                                                                            DropdownMenuItem<
-                                                                                String>>((dynamic
-                                                                            dt) {
-                                                                          return DropdownMenuItem<
-                                                                              String>(
-                                                                            value:
-                                                                                dt['name'],
-                                                                            child:
-                                                                                Text(
-                                                                              dt['name'],
-                                                                              style: TextStyle(fontWeight: FontWeight.normal),
-                                                                            ),
-                                                                          );
-                                                                        }).toList(),
-                                                                        onChanged:
-                                                                            (String?
-                                                                                newValue) {
-                                                                          setState(
-                                                                              () {
-                                                                            selectedPrinter =
-                                                                                newValue!;
-                                                                          });
-                                                                        },
-                                                                      ),
-                                                                    ),
+                                                                  child: DropDownTextField(
+                                                                    controller: selectedPrinterUSB,
+                                                                    dropDownItemCount: listPrinter.length,
+                                                                    enableSearch: false,
+                                                                    clearOption: false,
+                                                                    // initialValue: selectedPrinter ?? '',
+                                                                    dropDownList: listPrinterModel,
+                                                                    onChanged: (value) {
+                                                                      print('value, ${value.name}');
+
+                                                                      setState((){
+                                                                        selectedPrinter = value.name;
+                                                                      });
+                                                                    },
                                                                   ),
                                                                 ),
                                                                 Padding(
@@ -561,7 +543,7 @@ class _SettingDevicesState extends State<SettingDevices> {
                                                                         () async {
                                                                       print(
                                                                           'button');
-                                                                      onGetPrinter(
+                                                                      await onGetPrinter(
                                                                           context);
                                                                     },
                                                                   ),
@@ -890,11 +872,21 @@ class _SettingDevicesState extends State<SettingDevices> {
 
     final resultPrinter =
         await callGetPrinter.requestGetPrinter(requestQuery: dataPrinter);
-
+    print('result, ${resultPrinter['printer']}');
     if (resultPrinter.containsKey('printer')) {
       setState(() {
         AppState().listPrinter = resultPrinter['printer'];
         listPrinter = resultPrinter['printer'];
+        for (var printer in listPrinter) {
+          listPrinterModel.add(DropDownValueModel(name: printer['name'], value: printer['name'],));
+        }
+        // listPrinterModel = resultPrinter['printer'].map((option) {
+        //   print('check option, $option');
+        //   // print('check option, ${option.name}');
+        //   print('check option, ${option['name']}');
+        //   return DropDownValueModel(name: option['name'], value: option['name']);
+        // }).toList();
+      
       });
     }
   }
@@ -1008,9 +1000,11 @@ class _SettingDevicesState extends State<SettingDevices> {
     });
     dynamic configPrinter = ConfigApp().generateConfig(
       AppState().configPrinter,
+      AppState().configApplication,
     );
     ConfigApp().writeConfig(configPrinter);
     print('check data, ${AppState().configPrinter}');
+    alertSuccess(context, 'Configuration device saved..');
   }
 
   getPermission() async {

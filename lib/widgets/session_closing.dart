@@ -671,7 +671,7 @@ class _SessionClosingState extends State<SessionClosing> {
     if (closingPosId != '') {
       await onCallSubmitClosingEntry();
       setState(() {
-        AppState().sessionCashier = null;
+        // AppState().sessionCashier = null;
       });
       Navigator.pop(context);
     }
@@ -735,7 +735,11 @@ class _SessionClosingState extends State<SessionClosing> {
         setState(() {
           closingPosId = callApi['name'];
         });
+        AppState().update((){
+          AppState().sessionCashier = null;
+        });
         alertSuccess(context, 'Success, closing cashier');
+
         isLoading = true;
       }
     } catch (error) {

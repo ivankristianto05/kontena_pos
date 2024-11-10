@@ -45,6 +45,7 @@ class _TopBarState extends State<TopBar> {
   void setState(VoidCallback callback) {
     super.setState(callback);
     // onCallOpeCashier();
+    // onCheckSession();
   }
 
   @override
@@ -446,6 +447,19 @@ class _TopBarState extends State<TopBar> {
     );
   }
 
+  onCheckSession() {
+    print('check session, ${AppState().sessionCashier}');
+    if (AppState().sessionCashier != null) {
+      setState((){
+        isClosing ==  false;
+      });
+    } else {
+      setState((){
+        isClosing == true;
+      });
+    }
+  }
+
   onOpenCashier() async {
     print('state opening');
     List<dynamic> payment = AppState().configPosProfile['payments'];
@@ -462,7 +476,7 @@ class _TopBarState extends State<TopBar> {
       paymentOpening = tmp;
     });
 
-    showModalBottomSheet(
+    await showModalBottomSheet(
       useSafeArea: true,
       isScrollControlled: true,
       enableDrag: false,
@@ -483,6 +497,13 @@ class _TopBarState extends State<TopBar> {
       },
     );
 
+    if (context.mounted) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.invoiceScreen,
+        (route) => false,
+      );
+    }
+
     // print('check, ${AppState().configPosProfile['payments']}');
     // await onCallCreateOpeningEntry();
   }
@@ -494,7 +515,7 @@ class _TopBarState extends State<TopBar> {
     // await onCallCreateClosingEntry();
 
     // if (sessionInvoiceCashier) {
-    showModalBottomSheet(
+    await showModalBottomSheet(
       useSafeArea: true,
       isScrollControlled: true,
       enableDrag: false,
@@ -514,6 +535,12 @@ class _TopBarState extends State<TopBar> {
         // print('check table number , $tableNumber')
       },
     );
+    if (context.mounted) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.invoiceScreen,
+        (route) => false,
+      );
+    }
     // }
   }
 

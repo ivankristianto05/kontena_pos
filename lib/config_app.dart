@@ -64,11 +64,13 @@ class ConfigApp {
 
   dynamic generateConfig(
     dynamic printer,
+    dynamic application,
   ) {
     dynamic tmpConfig = {};
     try {
       tmpConfig = {
         'config_printer': printer,
+        'config_application': application,
       };
     } catch (e) {
       print('gagal generate config, $e');

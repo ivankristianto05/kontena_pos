@@ -1535,7 +1535,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                           buttonStyle:
                                               CustomButtonStyles.outlinePrimary,
                                           onPressed: () {
-                                            onPrintChecker();
+                                            onPrintChecker(true);
                                           },
                                         ),
                                       ],
@@ -1685,10 +1685,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 .toLowerCase() ==
             'bluetooth') {
           onPrintInvoiceBluetooth(false);
-          onPrintCheckerBluetooth();
+          onPrintCheckerBluetooth(false);
         } else {
           onPrintInvoice(false);
-          onPrintChecker();
+          onPrintChecker(false);
         }
 
         if (context.mounted) {
@@ -1734,10 +1734,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  onPrintChecker() async {
+  onPrintChecker(bool reprint) async {
     dynamic docPrint = await printChecker(
       invoice,
       AppState().configPrinter,
+      AppState().configApplication,
+      reprint ? 'reprint' : null,
     );
 
     // print('print invoce, $docPrint');
@@ -1778,13 +1780,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  onPrintCheckerBluetooth() async {
+  onPrintCheckerBluetooth(bool reprint) async {
     bool connectionStatus = await PrintBluetoothThermal.connectionStatus;
     if (connectionStatus) {
       bool result = false;
       List<int> ticket = await printCheckerBluetooth(
         invoice,
         AppState().configPrinter,
+        AppState().configApplication,
+        reprint ? 'reprint' : null,
       );
       result = await PrintBluetoothThermal.writeBytes(ticket);
       print('result print, $result');

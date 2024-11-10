@@ -371,6 +371,8 @@ double getChangePayment(List<dynamic> pay, double total) {
 dynamic printChecker(
   dynamic dataOrder,
   dynamic configPrinter,
+  dynamic configApplication,
+  String? type,
 ) {
   dynamic docToPrint = {};
   List<dynamic> docTemp = [];
@@ -388,6 +390,16 @@ dynamic printChecker(
     //   "style": "large",
     //   "text": ["CHECKER", dataOrder['service']]
     // });
+
+    if (type == 'reprint') {
+      docHeader.add({
+          "key": "label",
+          "style": "normal",
+          "text": "** Reprinted **",
+          "type": "center"
+        });
+      docHeader.add({"key": 'line', "type": 'blank'});
+    }
 
     docHeader.add({"key": "line", "type": "line"});
 
@@ -436,8 +448,11 @@ dynamic printChecker(
 
   // Set document items lines
   // Beverage
+  print('aoo, ${configApplication}');
   if (tempItem.isNotEmpty) {
     for (var dt in tempItem) {
+      if (configApplication['itemGroupSelectedPrint'].contains(dt['item_group'])) {
+
       // if (dt['parent_addon_idx'] == null) {
       String qty = numberFormat('number_fixed', dt['qty']);
       String tmpTitle = '${qty}x  ${dt['item_name']}';
@@ -506,7 +521,7 @@ dynamic printChecker(
         }
       }
 
-      if (dt['note'] != '') {
+      if (dt['notes'] != '' && dt['notes'] != null) {
         docItem.add({
           "key": "label",
           "text": "Note: ${dt['note']}",
@@ -514,7 +529,8 @@ dynamic printChecker(
           "type": "left"
         });
       }
-      // }
+    }
+        // }
     }
   }
 
@@ -591,6 +607,8 @@ dynamic printChecker(
 Future<List<int>> printCheckerBluetooth(
   dynamic dataOrder,
   dynamic configPrinter,
+  dynamic configApplication,
+  String? type,
 ) async {
   print('check data order, $dataOrder');
   final profile = await CapabilityProfile.load();
@@ -599,6 +617,17 @@ Future<List<int>> printCheckerBluetooth(
   List<dynamic> tempItem = [];
 
   docPrint += generator.reset();
+
+  if (type == 'reprint') {
+    docPrint += generator.text(
+      '** Reprinted **',
+      styles: PosStyles(
+        align: PosAlign.center,
+        // height: PosTextSize.size2,
+      ),
+    );
+    docPrint += generator.emptyLines(1);
+  }
 
   docPrint += generator.hr();
   docPrint += generator.row([
@@ -680,35 +709,39 @@ Future<List<int>> printCheckerBluetooth(
         : [];
   }
 
+  print('check application, ${configApplication}');
+
   if (tempItem.isNotEmpty) {
     for (var dt in tempItem) {
-      String qty = numberFormat('number_fixed', dt['qty']);
-      String tmpTitle = '${qty}x  ${dt['item_name']}';
+      if (configApplication['itemGroupSelectedPrint'].contains(dt['item_group'])) {
+        String qty = numberFormat('number_fixed', dt['qty']);
+        String tmpTitle = '${qty}x  ${dt['item_name']}';
 
-      docPrint += generator.row([
-        PosColumn(
-          text: tmpTitle,
-          width: 6,
-          styles: PosStyles(
-            align: PosAlign.left,
-            height: PosTextSize.size1,
+        docPrint += generator.row([
+          PosColumn(
+            text: tmpTitle,
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.left,
+              height: PosTextSize.size1,
+            ),
           ),
-        ),
-        PosColumn(
-          text: '[   ]',
-          width: 6,
-          styles: PosStyles(
-            align: PosAlign.right,
-            height: PosTextSize.size1,
+          PosColumn(
+            text: '[   ]',
+            width: 6,
+            styles: PosStyles(
+              align: PosAlign.right,
+              height: PosTextSize.size1,
+            ),
           ),
-        ),
-      ]);
+        ]);
 
-      if ((dt['note'] != null) && (dt['note'] != '')) {
-        docPrint += generator.text(
-          'Note: ${dt["note"]}',
-          styles: PosStyles(align: PosAlign.left),
-        );
+        if ((dt['note'] != null) && (dt['note'] != '')) {
+          docPrint += generator.text(
+            'Note: ${dt["note"]}',
+            styles: PosStyles(align: PosAlign.left),
+          );
+        }
       }
     }
   }

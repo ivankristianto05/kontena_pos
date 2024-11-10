@@ -30,7 +30,7 @@ class AppState extends ChangeNotifier {
     _safeInit(() {
       if (prefs.containsKey('ff_configUser')) {
         try {
-          _configUser = json.decode(prefs.getString('_configUser') ?? '');
+          _configUser = json.decode(prefs.getString('ff_configUser') ?? '');
         } catch (e) {
           print("Can't decode persisted json. Error: $e.");
         }
@@ -40,7 +40,18 @@ class AppState extends ChangeNotifier {
     _safeInit(() {
       if (prefs.containsKey('ff_configPrinter')) {
         try {
-          _configPrinter = json.decode(prefs.getString('_configPrinter') ?? '');
+          _configPrinter = json.decode(prefs.getString('ff_configPrinter') ?? '');
+        } catch (e) {
+          print("Can't decode persisted json. Error: $e.");
+        }
+      }
+    });
+
+    _safeInit(() {
+      if (prefs.containsKey('ff_configApplication')) {
+        try {
+          _configApplication =
+              json.decode(prefs.getString('ff_configApplication') ?? '');
         } catch (e) {
           print("Can't decode persisted json. Error: $e.");
         }
@@ -135,6 +146,13 @@ class AppState extends ChangeNotifier {
   set configUser(dynamic _value) {
     _configUser = _value;
     prefs.setString('ff_configUser', jsonEncode(_value));
+  }
+
+  dynamic _configApplication;
+  dynamic get configApplication => _configApplication;
+  set configApplication(dynamic _value) {
+    _configApplication = _value;
+    prefs.setString('ff_configApplication', jsonEncode(_value));
   }
 
   dynamic _configPrinter;

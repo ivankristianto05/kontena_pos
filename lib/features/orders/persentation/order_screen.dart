@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter_soloud/flutter_soloud.dart';
+// import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_invoice.dart'
@@ -103,7 +103,7 @@ class _OrderScreenState extends State<OrderScreen> {
   dynamic orderCartSelected;
   dynamic servesSelected;
   dynamic customerSelected;
-  final soLoud = SoLoud.instance;
+  // final soLoud = SoLoud();
 
   @override
   void setState(VoidCallback callback) {
@@ -145,7 +145,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   void _initializeAudio() async {
-    await soLoud.init();
+    // await soLoud().startIsolate();
   }
 
   @override
@@ -1565,9 +1565,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                                       .toString()
                                                       .toLowerCase() ==
                                                   'bluetooth') {
-                                                onPrintCheckerBluetooth();
+                                                onPrintCheckerBluetooth(true);
                                               } else {
-                                                onPrintChecker();
+                                                onPrintChecker(true);
                                               }
                                             },
                                           ),
@@ -2684,10 +2684,12 @@ class _OrderScreenState extends State<OrderScreen> {
     // _checkAllCheckedStatus();
   }
 
-  onPrintChecker() async {
+  onPrintChecker(bool reprint) async {
     dynamic docPrint = await printChecker(
       cartSelected,
       AppState().configPrinter,
+      AppState().configApplication,
+      reprint ? 'reprint' : null,
     );
 
     // print('print invoce, $docPrint');
@@ -2711,13 +2713,15 @@ class _OrderScreenState extends State<OrderScreen> {
     }
   }
 
-  onPrintCheckerBluetooth() async {
+  onPrintCheckerBluetooth(bool reprint) async {
     bool connectionStatus = await PrintBluetoothThermal.connectionStatus;
     if (connectionStatus) {
       bool result = false;
       List<int> ticket = await printCheckerBluetooth(
         cartSelected,
         AppState().configPrinter,
+        AppState().configApplication,
+        reprint ? 'reprint' : null,
       );
       result = await PrintBluetoothThermal.writeBytes(ticket);
       print('result print, $result');
@@ -2765,8 +2769,8 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Future<void> loadAndPlayAudio() async {
-    final audioSource =
-        await soLoud.loadAsset('assets/audio/delivery_notif.mp3');
-    final soundHandle = await soLoud.play(audioSource);
+    // final audioSource =
+        // await SoloudTools.loadFromFile('assets/audio/delivery_notif.mp3');
+    // final soundHandle = await SoLoud().play(audioSource);
   }
 }
