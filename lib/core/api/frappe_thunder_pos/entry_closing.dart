@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class EntryClosing {
   final String cookie;
@@ -55,7 +56,7 @@ String queryParams(Map<String, dynamic> map) =>
 
 Future<List<dynamic>> request({required EntryClosing requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/method/erpnext.accounts.doctype.pos_closing_entry.pos_closing_entry.get_pos_invoices';
+      '${AppState().domain}/api/method/erpnext.accounts.doctype.pos_closing_entry.pos_closing_entry.get_pos_invoices';
 
   final response = await http.post(
     Uri.parse(url),

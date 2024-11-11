@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class CreateOpeningEntry {
   final String cookie;
@@ -44,7 +45,7 @@ class CreateOpeningEntry {
 
 Future<Map<String, dynamic>> request(
     {required CreateOpeningEntry requestQuery}) async {
-  String url = 'https://erp2.hotelkontena.com/api/resource/POS Opening Entry';
+  String url = '${AppState().domain}/api/resource/POS Opening Entry';
 
   final response = await http.post(
     Uri.parse(url),

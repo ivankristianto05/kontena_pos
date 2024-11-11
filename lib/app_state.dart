@@ -40,7 +40,8 @@ class AppState extends ChangeNotifier {
     _safeInit(() {
       if (prefs.containsKey('ff_configPrinter')) {
         try {
-          _configPrinter = json.decode(prefs.getString('ff_configPrinter') ?? '');
+          _configPrinter =
+              json.decode(prefs.getString('ff_configPrinter') ?? '');
         } catch (e) {
           print("Can't decode persisted json. Error: $e.");
         }
@@ -219,6 +220,8 @@ class AppState extends ChangeNotifier {
   String typeTransaction = '';
   String tableNumber = '';
   String setCookie = '';
+  // String domain = 'https://erp.hotelkontena.com';
+  String domain = 'https://erp2.hotelkontena.com';
 
   static List<InvoiceCartItem> invoiceCartItems =
       []; // New static list to store cart items

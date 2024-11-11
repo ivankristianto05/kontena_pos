@@ -295,7 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
           obscureText: _obscurePassword,
           contentPadding: EdgeInsets.symmetric(
             horizontal: 3.h,
-            vertical: 9.v,
+            vertical: 6.v,
           ),
           hintText: "Masukin password mu",
           suffix: IconButton(

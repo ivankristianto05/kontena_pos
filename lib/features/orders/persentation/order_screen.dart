@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_size_text/auto_size_text.dart';
-// import 'package:flutter_soloud/flutter_soloud.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:kontena_pos/core/api/frappe_thunder_pos/pos_invoice.dart'
@@ -103,7 +103,13 @@ class _OrderScreenState extends State<OrderScreen> {
   dynamic orderCartSelected;
   dynamic servesSelected;
   dynamic customerSelected;
-  // final soLoud = SoLoud();
+
+  final soLoud = SoLoud.instance;
+
+  DateTime? lastOrderTimestamp;
+  Timer? timer;
+
+  // SoundProps? currentSound;
 
   @override
   void setState(VoidCallback callback) {
@@ -142,10 +148,18 @@ class _OrderScreenState extends State<OrderScreen> {
           .map((itemGroup) => '"${itemGroup['item_group']}"')
           .join(', ');
     });
+
+    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      // setState(() {
+      //   isLoadingContent = true;
+      // });
+      onCallDataPosDelivery();
+      // await reformatServedCart();
+    });
   }
 
   void _initializeAudio() async {
-    // await soLoud().startIsolate();
+    await soLoud.init();
   }
 
   @override
@@ -1060,7 +1074,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                         hoverColor: Colors.transparent,
                                         highlightColor: Colors.transparent,
                                         onTap: () {
-                                          onTapTableNumber(context);
+                                          onTapTypeTransaction(context);
                                         },
                                         child: Container(
                                           height: 48.0,
@@ -1606,7 +1620,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     cartSelected = null;
                     cart.clearCart();
                     cartData = cart.getAllItemCart();
-                    loadAndPlayAudio(); //test audio ketika pindah ke confirm
+                    // loadAndPlayAudio(); //test audio ketika pindah ke confirm
                   });
                   onTapRefreshOrder();
                   // Navigator.pushNamed(context, AppRoutes.confirmScreen);
@@ -2118,16 +2132,18 @@ class _OrderScreenState extends State<OrderScreen> {
           await FrappeFetchDataGetDelivery.request(requestQuery: request);
       // print('check pos order, $callRequest');
       if (callRequest.isNotEmpty) {
+        onCheckNewOrder();
         setState(() {
           tempPosServed = callRequest;
-          loadAndPlayAudio();
+          // loadAndPlayAudio();
         });
+        // print('yes');
       }
     } catch (error) {
       print('error call data pos order, $error');
-      if (context.mounted) {
-        alertError(context, error.toString());
-      }
+      // if (context.mounted) {
+      alertError(context, error.toString());
+      // }
     }
   }
 
@@ -2369,7 +2385,7 @@ class _OrderScreenState extends State<OrderScreen> {
           // cartSelected = null;
           // isLoadingContent = true;
         });
-        // onTapRefreshOrder();
+        // onTapRefreshHistory();
       }
     } catch (error) {
       print('check error, ${error}');
@@ -2768,9 +2784,30 @@ class _OrderScreenState extends State<OrderScreen> {
     return bytes;
   }
 
-  Future<void> loadAndPlayAudio() async {
-    // final audioSource =
-        // await SoloudTools.loadFromFile('assets/audio/delivery_notif.mp3');
-    // final soundHandle = await SoLoud().play(audioSource);
+  void loadAndPlayAudio() async {
+    final audioSource =
+        await soLoud.loadAsset('assets/audio/delivery_notif.mp3');
+    final soundHandle = await soLoud.play(audioSource);
+  }
+
+  onCheckNewOrder() async {
+    if (tempPosServed.isNotEmpty) {
+      tempPosServed.sort((a, b) => b['creation'].compareTo(a['creation']));
+      final latestOrder = tempPosServed.isNotEmpty ? tempPosServed.first : null;
+
+      if (latestOrder != null) {
+        bool isNewOrder = lastOrderTimestamp == null ||
+            DateTime.parse(latestOrder['creation'])
+                .isAfter(lastOrderTimestamp!);
+
+        // Cek jika order terbaru dan belum disubmit
+        if (isNewOrder && latestOrder['docstatus'] == 0) {
+          lastOrderTimestamp = DateTime.parse(
+              latestOrder['creation']); // Update timestamp terbaru
+          loadAndPlayAudio(); // Bunyi notifikasi jika memenuhi syarat
+          onTapRefreshHistory();
+        }
+      }
+    }
   }
 }

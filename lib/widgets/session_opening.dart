@@ -1,5 +1,6 @@
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kontena_pos/app_state.dart';
 import 'package:kontena_pos/core/theme/theme_helper.dart';
 import 'package:kontena_pos/core/utils/alert.dart';
@@ -20,7 +21,7 @@ class SessionOpening extends StatefulWidget {
 }
 
 class _SessionOpeningState extends State<SessionOpening> {
-  TextEditingController amount = TextEditingController();
+  TextEditingController amountController = TextEditingController();
 
   List<dynamic> invoiceSession = [];
   List<dynamic> paymentSession = [];
@@ -136,7 +137,7 @@ class _SessionOpeningState extends State<SessionOpening> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           TextField(
-                            controller: amount,
+                            controller: amountController,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               hintText: 'Amount',
@@ -154,14 +155,20 @@ class _SessionOpeningState extends State<SessionOpening> {
                               EasyDebounce.debounce(
                                   'search', const Duration(milliseconds: 300),
                                   () {
-                                setState(() {
-                                  amount.text = value;
-                                });
+                                // setState(() {
+                                amountController.text = value;
+                                // });
                                 // widget.onChanged!(enterSearch.text);
                               });
                               // onSearch();
                             },
-                            // onEditingComplete: onCompletedChange,
+                            onEditingComplete: () {
+                              // String tmp = numberFormat(
+                              //     'number_fixed', amountController.text);
+                              // amountController.text = numberFormat(
+                              // print('check tmp, $tmp');
+                              //     'idr_fixed', amountController.text);
+                            },
                           ),
                         ],
                       ),
@@ -333,7 +340,7 @@ class _SessionOpeningState extends State<SessionOpening> {
       if (pay['mode_of_payment'].toString().toLowerCase() == 'cash') {
         tmp.add({
           'mode_of_payment': pay['mode_of_payment'],
-          'opening_amount': amount.text ?? 0,
+          'opening_amount': amountController.text ?? 0,
         });
       }
     }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class SubmitPosOrderRequest {
   final String cookie;
@@ -27,9 +28,9 @@ class SubmitPosOrderRequest {
 
   Map<String, dynamic> toJson() {
     final data = {
-        // "doctype": "POS Order",
-        "docstatus": 1,
-        // "name": id,
+      // "doctype": "POS Order",
+      "docstatus": 1,
+      // "name": id,
     };
 
     data.removeWhere((key, value) => value == null);
@@ -43,8 +44,9 @@ class SubmitPosOrderRequest {
 }
 
 Future<Map<String, dynamic>> request(
-  {required SubmitPosOrderRequest requestQuery}) async {
-    String url = 'https://erp2.hotelkontena.com/api/resource/POS Order/${requestQuery.getParamID()}';
+    {required SubmitPosOrderRequest requestQuery}) async {
+  String url =
+      '${AppState().domain}/api/resource/POS Order/${requestQuery.getParamID()}';
 
   final response = await http.put(
     Uri.parse(url),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class PosDeliveryRequest {
   final String cookie;
@@ -55,7 +56,7 @@ String queryParams(Map<String, dynamic> map) =>
 Future<List<dynamic>> request(
     {required PosDeliveryRequest requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/resource/POS Delivery?${queryParams(requestQuery.formatRequest())}';
+      '${AppState().domain}/api/resource/POS Delivery?${queryParams(requestQuery.formatRequest())}';
 
   final response = await http.get(
     Uri.parse(url),

@@ -977,7 +977,7 @@ class _HistoryInvoiceScreenState extends State<HistoryInvoiceScreen> {
       cookie: AppState().setCookie,
       reportName: 'Report POS Invoice',
       filters:
-          '{"company":"${AppState().configCompany['name']}","pos_profile":"${AppState().configPosProfile['name']}","owner":"${AppState().configUser['name']}","from_date":"2024-11-01","to_date":"2024-11-09","user":"${AppState().configUser['email']}"}',
+          '{"company":"${AppState().configCompany['name']}","pos_profile":"${AppState().configPosProfile['name']}","owner":"${AppState().configUser['name']}","from_date":"2024-11-01","to_date":"${dateTimeFormat('date', null)}","user":"${AppState().configUser['email']}"}',
       orderBy: 'creation desc',
       limit: 200,
     );

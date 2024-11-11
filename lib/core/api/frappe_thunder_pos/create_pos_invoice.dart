@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class CreatePosInvoiceRequest {
   final String cookie;
@@ -24,6 +25,8 @@ class CreatePosInvoiceRequest {
   List<dynamic> payments = [];
   final double basePaidAmount;
   final double paidAmount;
+  final int additionalDiscountPercentage;
+  final int discountAmount;
 
   CreatePosInvoiceRequest({
     required this.cookie,
@@ -48,6 +51,8 @@ class CreatePosInvoiceRequest {
     required this.payments,
     required this.basePaidAmount,
     required this.paidAmount,
+    required this.additionalDiscountPercentage,
+    required this.discountAmount,
   });
 
   Map<String, String> formatHeader() {
@@ -73,12 +78,16 @@ class CreatePosInvoiceRequest {
       "customer": customer,
       "pos_cart": cartNo,
       "items": items,
-      "base_net_total": baseNetTotal,
-      "base_grand_total": baseGrandTotal,
+      // "base_net_total": baseNetTotal,
+      // "base_grand_total": baseGrandTotal,
+      "total": baseNetTotal,
       "grand_total": grandTotal,
+      'additional_discount_percentage': additionalDiscountPercentage,
+      'discount_amount': discountAmount,
       "payments": payments,
       "base_paid_amount": basePaidAmount,
       "paid_amount": paidAmount,
+      "apply_discount_on": "Grand Total",
     };
 
     data.removeWhere((key, value) => value == null);
@@ -88,8 +97,8 @@ class CreatePosInvoiceRequest {
 
 Future<Map<String, dynamic>> request(
     {required CreatePosInvoiceRequest requestQuery}) async {
-  String url = 'https://erp2.hotelkontena.com/api/resource/POS Invoice';
-  // print('check data, ${json.encode(requestQuery.toJson())}');
+  String url = '${AppState().domain}/api/resource/POS Invoice';
+  print('check data, ${json.encode(requestQuery.toJson())}');
   final response = await http.post(
     Uri.parse(url),
     headers: requestQuery.formatHeader(),
@@ -98,7 +107,7 @@ Future<Map<String, dynamic>> request(
 
   if (response.statusCode == 200) {
     final responseBody = json.decode(response.body);
-    print('check, $responseBody');
+    // print('check, $responseBody');
     if (responseBody.containsKey('data')) {
       return responseBody['data'];
     } else {
@@ -106,7 +115,14 @@ Future<Map<String, dynamic>> request(
     }
   } else {
     final responseBody = json.decode(response.body);
-
-    throw Exception(responseBody);
+    final message;
+    if (responseBody.containsKey('exception')) {
+      message = responseBody['exception'];
+    } else if (responseBody.containsKey('message')) {
+      message = responseBody['message'];
+    } else {
+      message = responseBody;
+    }
+    throw Exception(message);
   }
 }

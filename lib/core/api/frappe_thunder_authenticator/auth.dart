@@ -31,7 +31,7 @@ class loginRequest {
 
 Future<Map<String, dynamic>> login(loginRequest requestBody) async {
   final response = await http.post(
-    Uri.parse('https://erp2.hotelkontena.com/api/method/login'),
+    Uri.parse('${AppState().domain}/api/method/login'),
     headers: requestBody.formatHeaders(),
     body: requestBody.formatLoginRequest(),
   );

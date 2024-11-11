@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class CreateCustomer {
   final String cookie;
@@ -46,9 +47,9 @@ Future<Map<String, dynamic>> request(
 
   if (requestQuery.getParamID() != null) {
     url =
-        'https://erp2.hotelkontena.com/api/resource/Customer/${requestQuery.getParamID()}';
+        '${AppState().domain}/api/resource/Customer/${requestQuery.getParamID()}';
   } else {
-    url = 'https://erp2.hotelkontena.com/api/resource/Customer';
+    url = '${AppState().domain}/api/resource/Customer';
   }
 
   final response = await http.post(

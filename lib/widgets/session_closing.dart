@@ -642,7 +642,7 @@ class _SessionClosingState extends State<SessionClosing> {
 
       pay['amount'] = totalAmount;
       pay['closing_amount'] = totalAmount;
-      pay['expected_amount'] = totalAmount;
+      // pay['expected_amount'] = totalAmount;
     }
 
     setState(() {
@@ -735,7 +735,7 @@ class _SessionClosingState extends State<SessionClosing> {
         setState(() {
           closingPosId = callApi['name'];
         });
-        AppState().update((){
+        AppState().update(() {
           AppState().sessionCashier = null;
         });
         alertSuccess(context, 'Success, closing cashier');

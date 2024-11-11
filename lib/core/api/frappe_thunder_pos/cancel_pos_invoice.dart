@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class CancelPosInvoiceRequest {
   final String cookie;
@@ -43,7 +44,7 @@ Future<Map<String, dynamic>> request(
     {required CancelPosInvoiceRequest requestQuery}) async {
   final getResponse = await http.get(
     Uri.parse(
-        'https://erp2.hotelkontena.com/api/resource/POS Invoice/${requestQuery.getParamID()}'),
+        '${AppState().domain}/api/resource/POS Invoice/${requestQuery.getParamID()}'),
     headers: requestQuery.formatHeader(),
   );
 
@@ -51,8 +52,7 @@ Future<Map<String, dynamic>> request(
 
   // Pastikan 'modified' dari dokumen terbaru
   final latestModified = getData['data'];
-  String url =
-      'https://erp2.hotelkontena.com/api/method/frappe.desk.form.save.cancel';
+  String url = '${AppState().domain}/api/method/frappe.desk.form.save.cancel';
 
   final response = await http.post(
     Uri.parse(url),

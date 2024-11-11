@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class PosInvoiceRequest {
   final String cookie;
@@ -70,7 +71,7 @@ String queryParams(Map<String, dynamic> map) =>
 // print('check url, $cookie');
 Future<List<dynamic>> request({required PosInvoiceRequest requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/resource/POS Invoice?${queryParams(requestQuery.formatRequest())}';
+      '${AppState().domain}/api/resource/POS Invoice?${queryParams(requestQuery.formatRequest())}';
 
   final response = await http.get(
     Uri.parse(url),
@@ -92,7 +93,7 @@ Future<List<dynamic>> request({required PosInvoiceRequest requestQuery}) async {
 Future<Map<String, dynamic>> requestDetail(
     {required PosInvoiceRequest requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/method/frappe.desk.form.load.getdoc?${queryParams(requestQuery.paramDetail())}';
+      '${AppState().domain}/api/method/frappe.desk.form.load.getdoc?${queryParams(requestQuery.paramDetail())}';
   print('url, $url');
   final response = await http.get(
     Uri.parse(url),

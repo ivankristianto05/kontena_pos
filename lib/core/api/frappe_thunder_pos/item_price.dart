@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class ItemPriceRequest {
   final String cookie;
@@ -52,7 +53,7 @@ String queryParams(Map<String, dynamic> map) =>
 Future<List<dynamic>> requestItemPrice(
     {required ItemPriceRequest requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/resource/Item Price?${queryParams(requestQuery.formatRequestItemPrice())}';
+      '${AppState().domain}/api/resource/Item Price?${queryParams(requestQuery.formatRequestItemPrice())}';
 
   final response = await http.get(Uri.parse(url),
       headers: requestQuery.formatHeaderItemPrice());

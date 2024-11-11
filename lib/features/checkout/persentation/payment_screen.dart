@@ -40,10 +40,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
     'Grab',
     'Shopee',
   };
+  List<dynamic> discountDisplay = [
+    {'value': 'additional_discount_percentage', 'display': 'Percentase (%)'},
+    {'value': 'discount_amount', 'display': 'Nominal (IDR)'},
+  ];
   double payment = 0.0;
   double bill = 0.0;
+  int discount = 0;
+  int grandTotal = 0;
 
   String paymentMethod = 'CASH';
+  String selectedDiscount = 'additional_discount_percentage';
 
   bool paymentStatus = false;
   bool loading = false;
@@ -55,6 +62,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
   InvoiceCart cart = InvoiceCart();
   late List<InvoiceCartItem> cartData;
   dynamic invoice;
+
+  TextEditingController discountController = TextEditingController();
 
   @override
   void initState() {
@@ -154,6 +163,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           children: [
                             Column(
                               mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
@@ -180,6 +190,133 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                             ),
                                           ),
                                           Text(
+                                            'Tagihan',
+                                            style: theme.textTheme.labelLarge,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Divider(
+                                  height: 5.0,
+                                  thickness: 0.5,
+                                  color: theme.colorScheme.outline,
+                                ),
+                                Text(
+                                  'Discount',
+                                  style: TextStyle(
+                                    color: theme.colorScheme.secondary,
+                                  ),
+                                  textAlign: TextAlign.start,
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 6.0, 0.0, 0.0),
+                                  child: Container(
+                                    width: 200.0,
+                                    height: 45.0,
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primaryContainer,
+                                      border: Border.all(
+                                        color: theme.colorScheme.outline,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    child: DropdownButtonHideUnderline(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: DropdownButton<String>(
+                                          isExpanded: true,
+                                          hint: Text("Select an Option"),
+                                          value: selectedDiscount,
+                                          items: discountDisplay
+                                              .map((dynamic value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value['value'],
+                                              child: Text(
+                                                value['display'],
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                              ),
+                                            );
+                                          }).toList(),
+                                          onChanged: (String? newValue) {
+                                            setState(() {
+                                              // selectedTipePrinter =
+                                              //     newValue!;
+                                              selectedDiscount = newValue!;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 6.0, 0.0, 8.0),
+                                  child: Container(
+                                    width: 200.0,
+                                    height: 48.0,
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primaryContainer,
+                                      border: Border.all(
+                                        color: theme.colorScheme.outline,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    child: TextField(
+                                        keyboardType: TextInputType.number,
+                                        controller: discountController,
+                                        decoration: InputDecoration(
+                                          hintText: 'Enter nominal discount',
+                                          hintStyle: TextStyle(
+                                            color: theme
+                                                .colorScheme.onPrimaryContainer,
+                                            fontSize: 16.0,
+                                          ),
+                                          border: InputBorder.none,
+                                          contentPadding:
+                                              const EdgeInsets.all(6.0),
+                                        ),
+                                        onChanged: (value) {},
+                                        onEditingComplete: () {
+                                          setState(() {
+                                            discount = int.parse(
+                                                discountController.text);
+                                          });
+                                          print('check discount, $discount');
+                                          onChangeDiscount();
+                                        }),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      0.0, 0.0, 0.0, 8.0),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            numberFormat(
+                                              'idr',
+                                              grandTotal,
+                                            ),
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.onPrimary,
+                                              fontSize: 24.0,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
                                             'Total Tagihan',
                                             style: theme.textTheme.labelLarge,
                                           ),
@@ -195,7 +332,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ),
                                 Padding(
                                   padding: EdgeInsetsDirectional.fromSTEB(
-                                      0.0, 8.0, 0.0, 8.0),
+                                      0.0, 20.0, 0.0, 8.0),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment:
@@ -246,23 +383,22 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                 highlightColor:
                                                     Colors.transparent,
                                                 onTap: () async {
-                                                  if (methodsItem['account'] !=
-                                                      '') {
-                                                    setState(() {
-                                                      paymentMethod =
-                                                          methodsItem[
-                                                              'mode_of_payment'];
-                                                    });
-                                                    if (methodsItem[
-                                                                'mode_of_payment']
-                                                            .toString()
-                                                            .toLowerCase() !=
-                                                        'cash') {
-                                                      payment = bill;
-                                                    } else {
-                                                      payment = 0;
-                                                    }
+                                                  // if (methodsItem['account'] !=
+                                                  //     '') {
+                                                  setState(() {
+                                                    paymentMethod = methodsItem[
+                                                        'mode_of_payment'];
+                                                  });
+                                                  if (methodsItem[
+                                                              'mode_of_payment']
+                                                          .toString()
+                                                          .toLowerCase() !=
+                                                      'cash') {
+                                                    payment = bill;
+                                                  } else {
+                                                    payment = 0;
                                                   }
+                                                  // }
                                                 },
                                                 child: Container(
                                                   width: double.infinity,
@@ -278,13 +414,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                         BorderRadius.circular(
                                                             4.0),
                                                     border: Border.all(
-                                                      color: methodsItem[
-                                                                  'account'] ==
-                                                              ''
-                                                          ? theme.colorScheme
-                                                              .onPrimaryContainer
-                                                          : theme.colorScheme
-                                                              .primary,
+                                                      color: theme
+                                                          .colorScheme.primary,
                                                       width: 2.0,
                                                     ),
                                                   ),
@@ -315,15 +446,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                                                 ? theme
                                                                     .colorScheme
                                                                     .primaryContainer
-                                                                : (methodsItem[
-                                                                            'account'] ==
-                                                                        '')
-                                                                    ? theme
-                                                                        .colorScheme
-                                                                        .onPrimaryContainer
-                                                                    : theme
-                                                                        .colorScheme
-                                                                        .primary,
+                                                                : theme
+                                                                    .colorScheme
+                                                                    .primary,
                                                           ),
                                                         ),
                                                         if (paymentMethod ==
@@ -356,768 +481,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       ),
                     ),
                   ),
-                  // payment cash
-                  // if (paymentMethod == 'CASH')
-                  //   Padding(
-                  //     padding: EdgeInsetsDirectional.fromSTEB(
-                  //         0.0, 50.0, 0.0, 16.0),
-                  //     child: Column(
-                  //       mainAxisSize: MainAxisSize.max,
-                  //       children: [
-                  //         InkWell(
-                  //           splashColor: Colors.transparent,
-                  //           focusColor: Colors.transparent,
-                  //           hoverColor: Colors.transparent,
-                  //           highlightColor: Colors.transparent,
-                  //           onTap: () async {
-                  //             setState(() {
-                  //               paymentMethod = '';
-                  //             });
-                  //           },
-                  //           child: Row(
-                  //             mainAxisSize: MainAxisSize.max,
-                  //             mainAxisAlignment:
-                  //                 MainAxisAlignment
-                  //                     .spaceBetween,
-                  //             children: [
-                  //               Padding(
-                  //                 padding: EdgeInsetsDirectional
-                  //                     .fromSTEB(
-                  //                         0.0, 16.0, 0.0, 16.0),
-                  //                 child: Text(
-                  //                   'CASH',
-                  //                   style: theme
-                  //                       .textTheme.titleSmall,
-                  //                 ),
-                  //               ),
-                  //               Icon(
-                  //                 Icons
-                  //                     .keyboard_arrow_up_rounded,
-                  //                 color: theme
-                  //                     .colorScheme.secondary,
-                  //                 size: 24.0,
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //         Divider(
-                  //           height: 5.0,
-                  //           thickness: 0.5,
-                  //           color: theme.colorScheme.outline,
-                  //         ),
-                  //         Padding(
-                  //           padding:
-                  //               EdgeInsetsDirectional.fromSTEB(
-                  //                   0.0, 16.0, 0.0, 16.0),
-                  //           child: InkWell(
-                  //             splashColor: Colors.transparent,
-                  //             focusColor: Colors.transparent,
-                  //             hoverColor: Colors.transparent,
-                  //             highlightColor:
-                  //                 Colors.transparent,
-                  //             onTap: () async {
-                  //               setState(() {
-                  //                 //   _model.payment = _model.bill;
-                  //                 //   _model.subMethod = 'CASH';
-                  //                 //   _model.ref = null;
-                  //                 // paymentMethod = 'Cash';
-                  //                 payment = bill;
-                  //               });
-                  //             },
-                  //             child: Container(
-                  //               width: double.infinity,
-                  //               decoration: BoxDecoration(
-                  //                 color: (payment == bill)
-                  //                     ? theme
-                  //                         .colorScheme.primary
-                  //                     : theme.colorScheme
-                  //                         .primaryContainer,
-                  //                 borderRadius:
-                  //                     BorderRadius.circular(
-                  //                         4.0),
-                  //                 border: Border.all(
-                  //                   color: theme
-                  //                       .colorScheme.primary,
-                  //                   width: 2.0,
-                  //                 ),
-                  //               ),
-                  //               child: Padding(
-                  //                 padding: EdgeInsetsDirectional
-                  //                     .fromSTEB(16.0, 16.0,
-                  //                         16.0, 16.0),
-                  //                 child: Row(
-                  //                   mainAxisSize:
-                  //                       MainAxisSize.max,
-                  //                   mainAxisAlignment:
-                  //                       MainAxisAlignment
-                  //                           .center,
-                  //                   children: [
-                  //                     Text(
-                  //                       'Uang Pas',
-                  //                       style: TextStyle(
-                  //                         color: payment == bill
-                  //                             ? theme
-                  //                                 .colorScheme
-                  //                                 .primaryContainer
-                  //                             : theme
-                  //                                 .colorScheme
-                  //                                 .primary,
-                  //                       ),
-                  //                     ),
-                  //                   ],
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ),
-                  //         Row(
-                  //           mainAxisSize: MainAxisSize.max,
-                  //           children: [
-                  //             Expanded(
-                  //               child: Builder(
-                  //                 builder: (context) {
-                  //                   final paymentRecommendation =
-                  //                       paymentPrediction(bill)
-                  //                           .toList();
-
-                  //                   return GridView.builder(
-                  //                     padding: EdgeInsets.zero,
-                  //                     gridDelegate:
-                  //                         SliverGridDelegateWithFixedCrossAxisCount(
-                  //                       crossAxisCount: 2,
-                  //                       crossAxisSpacing: 5.0,
-                  //                       mainAxisSpacing: 5.0,
-                  //                       childAspectRatio: 3.0,
-                  //                     ),
-                  //                     shrinkWrap: true,
-                  //                     scrollDirection:
-                  //                         Axis.vertical,
-                  //                     itemCount:
-                  //                         paymentRecommendation
-                  //                             .length,
-                  //                     itemBuilder: (context,
-                  //                         paymentRecommendationIndex) {
-                  //                       final paymentRecommendationItem =
-                  //                           paymentRecommendation[
-                  //                               paymentRecommendationIndex];
-                  //                       return Container(
-                  //                         width:
-                  //                             double.infinity,
-                  //                         decoration:
-                  //                             BoxDecoration(
-                  //                           color: (payment == paymentRecommendationItem)
-                  //                               ? theme
-                  //                                   .colorScheme
-                  //                                   .primary
-                  //                               : theme
-                  //                                   .colorScheme
-                  //                                   .primaryContainer,
-                  //                           borderRadius:
-                  //                               BorderRadius
-                  //                                   .circular(
-                  //                                       4.0),
-                  //                           border: Border.all(
-                  //                             color: theme
-                  //                                 .colorScheme
-                  //                                 .primary,
-                  //                             width: 2.0,
-                  //                           ),
-                  //                         ),
-                  //                         child: InkWell(
-                  //                           splashColor: Colors
-                  //                               .transparent,
-                  //                           focusColor: Colors
-                  //                               .transparent,
-                  //                           hoverColor: Colors
-                  //                               .transparent,
-                  //                           highlightColor:
-                  //                               Colors
-                  //                                   .transparent,
-                  //                           onTap: () async {
-                  //                             setState(() {
-                  //                               payment =
-                  //                                   paymentRecommendationItem;
-                  //                             });
-                  //                           },
-                  //                           child: Row(
-                  //                             mainAxisSize:
-                  //                                 MainAxisSize
-                  //                                     .min,
-                  //                             mainAxisAlignment:
-                  //                                 MainAxisAlignment
-                  //                                     .center,
-                  //                             children: [
-                  //                               Text(
-                  //                                 numberFormat(
-                  //                                   'idr',
-                  //                                   paymentRecommendationItem,
-                  //                                 ),
-                  //                                 style: TextStyle(
-                  //                                     color: (payment ==
-                  //                                             paymentRecommendationItem)
-                  //                                         ? theme
-                  //                                             .colorScheme
-                  //                                             .primaryContainer
-                  //                                         : theme
-                  //                                             .colorScheme
-                  //                                             .primary),
-                  //                               ),
-                  //                             ],
-                  //                           ),
-                  //                         ),
-                  //                       );
-                  //                     },
-                  //                   );
-                  //                 },
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // if (paymentMethod != 'CASH')
-                  // Padding(
-                  //   padding: EdgeInsetsDirectional.fromSTEB(
-                  //       0.0, 150.0, 0.0, 0.0),
-                  //   child: InkWell(
-                  //     splashColor: Colors.transparent,
-                  //     focusColor: Colors.transparent,
-                  //     hoverColor: Colors.transparent,
-                  //     highlightColor: Colors.transparent,
-                  //     onTap: () async {
-                  //       setState(() {
-                  //         paymentMethod = 'CASH';
-                  //       });
-                  //     },
-                  //     child: Row(
-                  //       mainAxisSize: MainAxisSize.max,
-                  //       mainAxisAlignment:
-                  //           MainAxisAlignment.spaceBetween,
-                  //       children: [
-                  //         Padding(
-                  //           padding: EdgeInsetsDirectional
-                  //               .fromSTEB(
-                  //                   0.0, 16.0, 0.0, 16.0),
-                  //           child: Text(
-                  //             'CASH',
-                  //             style: TextStyle(
-                  //                 color: theme
-                  //                     .colorScheme.primary),
-                  //           ),
-                  //         ),
-                  //         Icon(
-                  //           Icons.keyboard_arrow_down_rounded,
-                  //           color:
-                  //               theme.colorScheme.secondary,
-                  //           size: 24.0,
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-
-                  // Expanded(
-                  //   child: Container(
-                  //     width:
-                  //         MediaQuery.sizeOf(context).width * 0.25,
-                  //     decoration: BoxDecoration(
-                  //       color: theme.colorScheme.primaryContainer,
-                  //     ),
-                  //   ),
-                  // ),
-
-                  // Padding(
-                  //   padding: EdgeInsetsDirectional.fromSTEB(
-                  //       0.0, 20.0, 0.0, 16.0),
-                  //   child: Column(
-                  //     mainAxisSize: MainAxisSize.max,
-                  //     children: [
-                  // InkWell(
-                  //   splashColor: Colors.transparent,
-                  //   focusColor: Colors.transparent,
-                  //   hoverColor: Colors.transparent,
-                  //   highlightColor: Colors.transparent,
-                  //   onTap: () async {
-                  //     setState(() {
-                  //       paymentMethod = '';
-                  //     });
-                  //   },
-                  //   child: Row(
-                  //     mainAxisSize: MainAxisSize.max,
-                  //     mainAxisAlignment:
-                  //         MainAxisAlignment.spaceBetween,
-                  //     children: [
-                  //       Padding(
-                  //         padding: EdgeInsetsDirectional
-                  //             .fromSTEB(
-                  //                 0.0, 16.0, 0.0, 16.0),
-                  //         child: Text(
-                  //           'Metode Payment',
-                  //           style:
-                  //               theme.textTheme.titleSmall,
-                  //         ),
-                  //       ),
-                  //       // Icon(
-                  //       //   Icons
-                  //       //       .keyboard_arrow_up_rounded,
-                  //       //   color: theme
-                  //       //       .colorScheme.secondary,
-                  //       //   size: 24.0,
-                  //       // ),
-                  //     ],
-                  //   ),
-                  // ),
-                  // if (listPaymentMethod.isNotEmpty)
-                  //   Expanded(
-                  //     child: Container(
-                  //       width: MediaQuery.sizeOf(context)
-                  //               .width *
-                  //           0.25,
-                  //       decoration: BoxDecoration(
-                  //         color: theme
-                  //             .colorScheme.primaryContainer,
-                  //       ),
-                  //       child: Column(
-                  //         mainAxisSize: MainAxisSize.max,
-                  //         mainAxisAlignment:
-                  //             MainAxisAlignment.start,
-                  //         crossAxisAlignment:
-                  //             CrossAxisAlignment.center,
-                  //         children: [
-                  //           Expanded(
-                  //             child: Padding(
-                  //               padding:
-                  //                   EdgeInsetsDirectional
-                  //                       .fromSTEB(0.0, 0.0,
-                  //                           0.0, 0.0),
-                  //               child: Builder(
-                  //                 builder: (context) {
-                  //                   return ListView.builder(
-                  //                     shrinkWrap: true,
-                  //                     itemCount:
-                  //                         cartData.length,
-                  //                     itemBuilder:
-                  //                         (context, index) {
-                  //                       final methodsItem =
-                  //                           listPaymentMethod[
-                  //                               index];
-                  //                       return Padding(
-                  //                         padding:
-                  //                             EdgeInsetsDirectional
-                  //                                 .fromSTEB(
-                  //                                     0.0,
-                  //                                     10.0,
-                  //                                     0.0,
-                  //                                     10.0),
-                  //                         child: InkWell(
-                  //                           splashColor: Colors
-                  //                               .transparent,
-                  //                           focusColor: Colors
-                  //                               .transparent,
-                  //                           hoverColor: Colors
-                  //                               .transparent,
-                  //                           highlightColor:
-                  //                               Colors
-                  //                                   .transparent,
-                  //                           onTap:
-                  //                               () async {},
-                  //                           child:
-                  //                               Container(
-                  //                             width: double
-                  //                                 .infinity,
-                  //                             decoration:
-                  //                                 BoxDecoration(
-                  //                               color: paymentMethod ==
-                  //                                       methodsItem[
-                  //                                           'mode_of_payment']
-                  //                                   ? theme
-                  //                                       .colorScheme
-                  //                                       .primary
-                  //                                   : theme
-                  //                                       .colorScheme
-                  //                                       .primaryContainer,
-                  //                               borderRadius:
-                  //                                   BorderRadius.circular(
-                  //                                       4.0),
-                  //                               border:
-                  //                                   Border
-                  //                                       .all(
-                  //                                 color: theme
-                  //                                     .colorScheme
-                  //                                     .primary,
-                  //                                 width:
-                  //                                     2.0,
-                  //                               ),
-                  //                             ),
-                  //                             child:
-                  //                                 Padding(
-                  //                               padding: EdgeInsetsDirectional
-                  //                                   .fromSTEB(
-                  //                                       16.0,
-                  //                                       16.0,
-                  //                                       16.0,
-                  //                                       16.0),
-                  //                               child: Row(
-                  //                                 mainAxisSize:
-                  //                                     MainAxisSize
-                  //                                         .max,
-                  //                                 mainAxisAlignment:
-                  //                                     MainAxisAlignment
-                  //                                         .spaceBetween,
-                  //                                 children: [
-                  //                                   Text(
-                  //                                     methodsItem['mode_of_payment']
-                  //                                         .toString()
-                  //                                         .toUpperCase(),
-                  //                                     style:
-                  //                                         TextStyle(
-                  //                                       color: paymentMethod == methodsItem['mode_of_payment']
-                  //                                           ? theme.colorScheme.primaryContainer
-                  //                                           : theme.colorScheme.primary,
-                  //                                     ),
-                  //                                   ),
-                  //                                 ],
-                  //                               ),
-                  //                             ),
-                  //                           ),
-                  //                         ),
-                  //                       );
-                  //                     },
-                  //                   );
-                  //                 },
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
-                  // Builder(
-                  //   builder: (context) {
-                  //     return SingleChildScrollView(
-                  //       primary: true,
-                  //       child: Column(
-                  //         mainAxisSize: MainAxisSize.max,
-                  //         children: List.generate(
-                  //           listPaymentMethod.length,
-                  //           (methodsIndex) {
-                  //             final methodsItem =
-                  //                 listPaymentMethod[
-                  //                     methodsIndex];
-                  //             return Padding(
-                  //               padding:
-                  //                   EdgeInsetsDirectional
-                  //                       .fromSTEB(0.0, 10.0,
-                  //                           0.0, 10.0),
-                  //               child: InkWell(
-                  //                 splashColor:
-                  //                     Colors.transparent,
-                  //                 focusColor:
-                  //                     Colors.transparent,
-                  //                 hoverColor:
-                  //                     Colors.transparent,
-                  //                 highlightColor:
-                  //                     Colors.transparent,
-                  //                 onTap: () async {
-                  //                   setState(() {
-                  //                     paymentMethod =
-                  //                         methodsItem[
-                  //                             'mode_of_payment'];
-                  //                   });
-                  //                 },
-                  //                 child: Container(
-                  //                   width: double.infinity,
-                  //                   decoration:
-                  //                       BoxDecoration(
-                  //                     color: paymentMethod ==
-                  //                             methodsItem[
-                  //                                 'mode_of_payment']
-                  //                         ? theme
-                  //                             .colorScheme
-                  //                             .primary
-                  //                         : theme
-                  //                             .colorScheme
-                  //                             .primaryContainer,
-                  //                     borderRadius:
-                  //                         BorderRadius
-                  //                             .circular(
-                  //                                 4.0),
-                  //                     border: Border.all(
-                  //                       color: theme
-                  //                           .colorScheme
-                  //                           .primary,
-                  //                       width: 2.0,
-                  //                     ),
-                  //                   ),
-                  //                   child: Padding(
-                  //                     padding:
-                  //                         EdgeInsetsDirectional
-                  //                             .fromSTEB(
-                  //                                 16.0,
-                  //                                 16.0,
-                  //                                 16.0,
-                  //                                 16.0),
-                  //                     child: Row(
-                  //                       mainAxisSize:
-                  //                           MainAxisSize
-                  //                               .max,
-                  //                       mainAxisAlignment:
-                  //                           MainAxisAlignment
-                  //                               .spaceBetween,
-                  //                       children: [
-                  //                         Text(
-                  //                           methodsItem[
-                  //                                   'mode_of_payment']
-                  //                               .toString()
-                  //                               .toUpperCase(),
-                  //                           style:
-                  //                               TextStyle(
-                  //                             color: paymentMethod ==
-                  //                                     methodsItem[
-                  //                                         'mode_of_payment']
-                  //                                 ? theme
-                  //                                     .colorScheme
-                  //                                     .primaryContainer
-                  //                                 : theme
-                  //                                     .colorScheme
-                  //                                     .primary,
-                  //                           ),
-                  //                         ),
-                  //                         if (paymentMethod ==
-                  //                             methodsItem[
-                  //                                 'mode_of_payment'])
-                  //                           Icon(
-                  //                             Icons.check,
-                  //                             color: theme
-                  //                                 .colorScheme
-                  //                                 .primaryContainer,
-                  //                             size: 24.0,
-                  //                           ),
-                  //                       ],
-                  //                     ),
-                  //                   ),
-                  //                 ),
-                  //               ),
-                  //             );
-                  //           },
-                  //         ),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
-                  //     ],
-                  //   ),
-                  // ),
-
-                  // payment card
-                  // if (paymentMethod == 'CARD')
-
-                  // if (paymentMethod != 'CARD')
-                  //   InkWell(
-                  //     splashColor: Colors.transparent,
-                  //     focusColor: Colors.transparent,
-                  //     hoverColor: Colors.transparent,
-                  //     highlightColor: Colors.transparent,
-                  //     onTap: () async {
-                  //       setState(() {
-                  //         paymentMethod = 'CARD';
-                  //       });
-                  //     },
-                  //     child: Row(
-                  //       mainAxisSize: MainAxisSize.max,
-                  //       mainAxisAlignment:
-                  //           MainAxisAlignment.spaceBetween,
-                  //       children: [
-                  //         Padding(
-                  //           padding:
-                  //               EdgeInsetsDirectional.fromSTEB(
-                  //                   0.0, 16.0, 0.0, 16.0),
-                  //           child: Text(
-                  //             'CARD',
-                  //             style: TextStyle(
-                  //                 color: theme
-                  //                     .colorScheme.primary),
-                  //           ),
-                  //         ),
-                  //         Icon(
-                  //           Icons.keyboard_arrow_down_rounded,
-                  //           color: theme.colorScheme.secondary,
-                  //           size: 24.0,
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-
-                  // payment digital
-                  // if (paymentMethod == 'DIGITAL')
-                  //   Padding(
-                  //     padding: EdgeInsetsDirectional.fromSTEB(
-                  //         0.0, 0.0, 0.0, 16.0),
-                  //     child: Column(
-                  //       mainAxisSize: MainAxisSize.max,
-                  //       children: [
-                  //         InkWell(
-                  //           splashColor: Colors.transparent,
-                  //           focusColor: Colors.transparent,
-                  //           hoverColor: Colors.transparent,
-                  //           highlightColor: Colors.transparent,
-                  //           onTap: () async {
-                  //             setState(() {
-                  //               paymentMethod = '';
-                  //             });
-                  //           },
-                  //           child: Row(
-                  //             mainAxisSize: MainAxisSize.max,
-                  //             mainAxisAlignment:
-                  //                 MainAxisAlignment
-                  //                     .spaceBetween,
-                  //             children: [
-                  //               Padding(
-                  //                 padding: EdgeInsetsDirectional
-                  //                     .fromSTEB(
-                  //                         0.0, 16.0, 0.0, 16.0),
-                  //                 child: Text(
-                  //                   'DIGITAL',
-                  //                   style: theme
-                  //                       .textTheme.titleSmall,
-                  //                 ),
-                  //               ),
-                  //               Icon(
-                  //                 Icons
-                  //                     .keyboard_arrow_up_rounded,
-                  //                 color: theme
-                  //                     .colorScheme.secondary,
-                  //                 size: 24.0,
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //         Builder(
-                  //           builder: (context) {
-                  //             return Column(
-                  //               mainAxisSize: MainAxisSize.max,
-                  //               children: List.generate(
-                  //                 digitalListMethod.length,
-                  //                 (methodsIndex) {
-                  //                   final methodsItem =
-                  //                       digitalListMethod[
-                  //                           methodsIndex];
-                  //                   return Padding(
-                  //                     padding:
-                  //                         EdgeInsetsDirectional
-                  //                             .fromSTEB(
-                  //                                 0.0,
-                  //                                 10.0,
-                  //                                 0.0,
-                  //                                 10.0),
-                  //                     child: InkWell(
-                  //                       splashColor:
-                  //                           Colors.transparent,
-                  //                       focusColor:
-                  //                           Colors.transparent,
-                  //                       hoverColor:
-                  //                           Colors.transparent,
-                  //                       highlightColor:
-                  //                           Colors.transparent,
-                  //                       onTap: () async {},
-                  //                       child: Container(
-                  //                         width:
-                  //                             double.infinity,
-                  //                         decoration:
-                  //                             BoxDecoration(
-                  //                           color: theme
-                  //                               .colorScheme
-                  //                               .primary,
-                  //                           borderRadius:
-                  //                               BorderRadius
-                  //                                   .circular(
-                  //                                       4.0),
-                  //                           border: Border.all(
-                  //                             color: theme
-                  //                                 .colorScheme
-                  //                                 .primary,
-                  //                             width: 2.0,
-                  //                           ),
-                  //                         ),
-                  //                         child: Padding(
-                  //                           padding:
-                  //                               EdgeInsetsDirectional
-                  //                                   .fromSTEB(
-                  //                                       16.0,
-                  //                                       16.0,
-                  //                                       16.0,
-                  //                                       16.0),
-                  //                           child: Row(
-                  //                             mainAxisSize:
-                  //                                 MainAxisSize
-                  //                                     .max,
-                  //                             mainAxisAlignment:
-                  //                                 MainAxisAlignment
-                  //                                     .center,
-                  //                             children: [
-                  //                               Text(
-                  //                                 methodsItem[
-                  //                                     'mode_of_payment'],
-                  //                                 style:
-                  //                                     TextStyle(
-                  //                                   color: theme
-                  //                                       .colorScheme
-                  //                                       .primaryContainer,
-                  //                                 ),
-                  //                               ),
-                  //                             ],
-                  //                           ),
-                  //                         ),
-                  //                       ),
-                  //                     ),
-                  //                   );
-                  //                 },
-                  //               ),
-                  //             );
-                  //           },
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // if (paymentMethod != 'DIGITAL')
-                  //   InkWell(
-                  //     splashColor: Colors.transparent,
-                  //     focusColor: Colors.transparent,
-                  //     hoverColor: Colors.transparent,
-                  //     highlightColor: Colors.transparent,
-                  //     onTap: () async {
-                  //       setState(() {
-                  //         paymentMethod = 'DIGITAL';
-                  //       });
-                  //     },
-                  //     child: Row(
-                  //       mainAxisSize: MainAxisSize.max,
-                  //       mainAxisAlignment:
-                  //           MainAxisAlignment.spaceBetween,
-                  //       children: [
-                  //         Padding(
-                  //           padding:
-                  //               EdgeInsetsDirectional.fromSTEB(
-                  //                   0.0, 16.0, 0.0, 16.0),
-                  //           child: Text(
-                  //             'DIGITAL',
-                  //             style: TextStyle(
-                  //                 color: theme
-                  //                     .colorScheme.primary),
-                  //           ),
-                  //         ),
-                  //         Icon(
-                  //           Icons.keyboard_arrow_down_rounded,
-                  //           color: theme.colorScheme.secondary,
-                  //           size: 24.0,
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-
                   Expanded(
-                    flex: 2,
+                    flex: 1,
                     child: Container(
                       height: double.infinity,
                       decoration: BoxDecoration(
@@ -1156,7 +521,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   CustomOutlinedButton(
                                     height: 48.0,
                                     text: "Pay",
-                                    isDisabled: payment < bill ? true : false,
+                                    isDisabled: discount != 0
+                                        ? payment < grandTotal
+                                        : payment < bill,
                                     buttonTextStyle: TextStyle(
                                         color:
                                             theme.colorScheme.primaryContainer),
@@ -1631,7 +998,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         tempPayment.add({
           'mode_of_payment': methodPay['mode_of_payment'],
           'amount': payment,
-          'account': methodPay['account']
+          // 'account': methodPay['account']
         });
       }
       // print('check, $methodPay');
@@ -1661,15 +1028,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
       costCenter: AppState().configCompany['cost_center'],
       items: tempItem,
       baseNetTotal: bill,
-      baseGrandTotal: bill,
-      grandTotal: bill,
+      baseGrandTotal: discount > 0 ? grandTotal * 1.0 : bill,
+      grandTotal: discount > 0 ? grandTotal * 1.0 : bill,
       payments: tempPayment,
       basePaidAmount: payment,
       paidAmount: payment,
+      discountAmount:
+          selectedDiscount == 'additional_discount_percentage' ? 0 : discount,
+      additionalDiscountPercentage:
+          selectedDiscount == 'discount_amount' ? 0 : discount,
     );
 
     try {
-      print('check request, ${request}');
+      // print('check request, ${request}');
       final callRespon =
           await frappeFetchDataInvoice.request(requestQuery: request);
       print('call respon, ${callRespon}');
@@ -1792,6 +1163,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
       );
       result = await PrintBluetoothThermal.writeBytes(ticket);
       print('result print, $result');
+    }
+  }
+
+  onChangeDiscount() {
+    print('yes');
+    if (selectedDiscount == 'additional_discount_percentage') {
+      grandTotal = (bill * (1 - (discount / 100))).floor();
+      print('check persentase, ${bill * (1 - (discount / 100))}');
+    } else {
+      grandTotal = (bill - discount).floor();
+      print('check nominal, ${bill - discount}');
     }
   }
 }

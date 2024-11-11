@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class CreatePosCartRequest {
   final String cookie;
@@ -55,9 +56,9 @@ Future<Map<String, dynamic>> request(
 
   if (requestQuery.getParamID() != null) {
     url =
-        'https://erp2.hotelkontena.com/api/resource/POS Cart/${requestQuery.getParamID()}';
+        '${AppState().domain}/api/resource/POS Cart/${requestQuery.getParamID()}';
   } else {
-    url = 'https://erp2.hotelkontena.com/api/resource/POS Cart';
+    url = '${AppState().domain}/api/resource/POS Cart';
   }
 
   print('json, ${json.encode(requestQuery.toJson())}');

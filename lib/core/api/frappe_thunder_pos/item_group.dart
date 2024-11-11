@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:http/http.dart' as http;
+import 'package:kontena_pos/app_state.dart';
 
 class ItemGroupRequest {
   final String cookie;
@@ -56,7 +57,7 @@ String queryParams(Map<String, dynamic> map) =>
 Future<List<dynamic>> requestItemGroup(
     {required ItemGroupRequest requestQuery}) async {
   String url =
-      'https://erp2.hotelkontena.com/api/resource/Item Group?${queryParams(requestQuery.formatRequestItemGroup())}';
+      '${AppState().domain}/api/resource/Item Group?${queryParams(requestQuery.formatRequestItemGroup())}';
 
   final response = await http.get(
     Uri.parse(url),
