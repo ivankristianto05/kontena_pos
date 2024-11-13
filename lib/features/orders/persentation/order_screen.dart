@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
@@ -653,9 +653,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                               physics:
                                                   const NeverScrollableScrollPhysics(),
                                               itemCount: servedDisplay.length,
-                                              // itemCount:tempPosServed.length,
                                               itemBuilder: (context, index) {
-                                                // final order = tempPosServed[index];
                                                 final order =
                                                     servedDisplay[index];
                                                 dynamic orderItemList =
@@ -1620,7 +1618,6 @@ class _OrderScreenState extends State<OrderScreen> {
                     cartSelected = null;
                     cart.clearCart();
                     cartData = cart.getAllItemCart();
-                    // loadAndPlayAudio(); //test audio ketika pindah ke confirm
                   });
                   onTapRefreshOrder();
                   // Navigator.pushNamed(context, AppRoutes.confirmScreen);
@@ -1631,6 +1628,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     cartSelected = null;
                     cart.clearCart();
                     cartData = cart.getAllItemCart();
+                    stopAudio();
                   });
                   onTapRefreshHistory();
                   // Navigator.pushNamed(context, AppRoutes.servescreen);
@@ -2132,11 +2130,10 @@ class _OrderScreenState extends State<OrderScreen> {
           await FrappeFetchDataGetDelivery.request(requestQuery: request);
       // print('check pos order, $callRequest');
       if (callRequest.isNotEmpty) {
-        onCheckNewOrder();
         setState(() {
           tempPosServed = callRequest;
-          // loadAndPlayAudio();
         });
+        onCheckNewOrder();
         // print('yes');
       }
     } catch (error) {
@@ -2426,7 +2423,7 @@ class _OrderScreenState extends State<OrderScreen> {
     List<dynamic> cartNew = [];
 
     // print('temp cart, ${tempPosCart[0]}');
-    print('temp served, ${tempPosServed}');
+    //print('temp served, ${tempPosServed}');
 
     if (tempPosCart.isNotEmpty) {
       for (dynamic cartTemp in tempPosCart) {
@@ -2784,10 +2781,38 @@ class _OrderScreenState extends State<OrderScreen> {
     return bytes;
   }
 
-  void loadAndPlayAudio() async {
-    final audioSource =
-        await soLoud.loadAsset('assets/audio/delivery_notif.mp3');
-    final soundHandle = await soLoud.play(audioSource);
+void loadAndPlayAudio() async {
+  final audioSource = await soLoud.loadAsset('assets/audio/delivery_notif.mp3');
+  await soLoud.play(audioSource); // Putar ulang audio
+
+  print('Audio mulai diputar');
+
+  // Durasi total (1 menit = 60000 milidetik)
+  const totalDuration = Duration(seconds: 45);
+
+  // Durasi audio asli (misal 3 detik, sesuaikan dengan durasi asli file audio)
+  const originalAudioDuration = Duration(seconds: 13);
+
+  // Timer untuk menghentikan pemutaran setelah 1 menit
+  Timer(totalDuration, () {
+    soLoud.stop; // Hentikan semua pemutaran
+  });
+
+  // Timer untuk memutar ulang audio setiap durasi audio asli
+  Timer.periodic(originalAudioDuration, (timer) async {
+    await soLoud.stop; // Hentikan audio sebelumnya sebelum memutar ulang
+    await soLoud.play(audioSource); // Putar ulang audio
+
+    // Hentikan timer setelah mencapai durasi total 1 menit
+    if (timer.tick * originalAudioDuration.inMilliseconds >= totalDuration.inMilliseconds) {
+      timer.cancel();
+      print('Audio berhenti setelah 1 menit');
+
+    }
+  });
+}
+  void stopAudio() async {
+    soLoud.stop; // Hentikan semua pemutaran
   }
 
   onCheckNewOrder() async {
